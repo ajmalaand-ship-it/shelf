@@ -1,0 +1,28 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://poetry.ajmalaand.com%{REQUEST_URI} [L,R=301]
+
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteCond %{HTTP:X-XSRF-TOKEN} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-TOKEN}]
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule php8_module>
+    php_value error_log "/home/ajmalaand/apps/poetry/storage/logs/php-error.log"
+    php_flag log_errors On
+</IfModule>
+<IfModule lsapi_module>
+    php_value error_log "/home/ajmalaand/apps/poetry/storage/logs/php-error.log"
+    php_flag log_errors On
+</IfModule>
+
+<IfModule mime_module>
+    AddHandler application/x-httpd-ea-php83 .php .php8 .phtml
+</IfModule>

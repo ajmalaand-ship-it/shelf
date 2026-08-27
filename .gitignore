@@ -16,6 +16,7 @@ secrets/
 
 # PHP, Composer, and Laravel
 /vendor/
+/database/*.sqlite
 /.phpunit.cache/
 /.phpunit.result.cache
 /bootstrap/cache/*.php
@@ -25,6 +26,9 @@ secrets/
 /storage/framework/views/**
 /storage/logs/**
 *.log
+error_log
+/storage/app/source/**
+!/storage/app/source/.gitignore
 
 # Runtime and protected/uploaded media
 /storage/app/covers/**
@@ -35,6 +39,10 @@ secrets/
 /public/uploads/**
 /public/covers/**
 /public/audio/**
+/public/storage
+/public/css/filament/
+/public/fonts/filament/
+/public/js/filament/
 /protected-media/**
 
 # JavaScript dependencies and build output

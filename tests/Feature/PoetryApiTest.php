@@ -1,0 +1,93 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\AppSetting;
+use App\Models\Collection;
+use App\Models\Poem;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
+
+class PoetryApiTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_pashto_unicode_and_stanzas_round_trip_for_free_poem(): void
+    {
+        $collection = Collection::create([
+            'title' => 'ازمېښتي ټولګه', 'slug' => 'test-collection', 'sort_order' => 1, 'is_active' => true,
+        ]);
+        $body = "د زړه خبره\nد مينې سندره\n\nدويم بند";
+        $poem = Poem::create([
+            'collection_id' => $collection->id, 'title' => 'ازمېښتي شعر', 'body' => $body,
+            'excerpt' => 'د زړه خبره', 'sort_order' => 1, 'is_free_sample' => true, 'is_active' => true,
+        ]);
+
+        $this->getJson("/api/poems/{$poem->id}")
+            ->assertOk()
+            ->assertJsonPath('data.title', 'ازمېښتي شعر')
+            ->assertJsonPath('data.body', $body)
+            ->assertJsonPath('data.locked', false);
+    }
+
+    public function test_locked_poem_never_exposes_full_body_or_audio_url(): void
+    {
+        Storage::fake('audio');
+        $collection = Collection::create(['title' => 'ټولګه', 'slug' => 'locked', 'is_active' => true]);
+        $poem = Poem::create([
+            'collection_id' => $collection->id, 'title' => 'پټ شعر', 'body' => 'بشپړ پټ متن',
+            'excerpt' => 'لنډه برخه', 'audio_path' => 'source.mp3', 'is_free_sample' => false, 'is_active' => true,
+        ]);
+
+        $this->getJson("/api/poems/{$poem->id}")
+            ->assertOk()->assertJsonPath('data.locked', true)->assertJsonPath('data.body', null);
+        $this->getJson("/api/poems/{$poem->id}/audio")
+            ->assertOk()->assertExactJson(['locked' => true, 'excerpt' => 'لنډه برخه']);
+    }
+
+    public function test_only_active_collections_and_poems_are_public(): void
+    {
+        $active = Collection::create(['title' => 'ښکاره', 'slug' => 'active', 'is_active' => true]);
+        $hidden = Collection::create(['title' => 'پټ', 'slug' => 'hidden', 'is_active' => false]);
+        Poem::create(['collection_id' => $active->id, 'title' => 'ښکاره', 'body' => 'متن', 'excerpt' => 'متن', 'is_active' => true]);
+        Poem::create(['collection_id' => $active->id, 'title' => 'پټ', 'body' => 'متن', 'excerpt' => 'متن', 'is_active' => false]);
+
+        $this->getJson('/api/collections')->assertOk()->assertJsonCount(1, 'data');
+        $this->getJson('/api/collections/active/poems')->assertOk()->assertJsonCount(1, 'data');
+        $this->getJson('/api/collections/'.$hidden->slug)->assertNotFound();
+    }
+
+    public function test_app_config_exposes_only_public_version_keys(): void
+    {
+        AppSetting::where('key', 'content_version')->update(['value' => '7']);
+        AppSetting::where('key', 'min_app_version')->update(['value' => '1.2.3']);
+        AppSetting::create(['key' => 'private_value', 'value' => 'never expose']);
+
+        $this->getJson('/api/app-config')->assertExactJson([
+            'content_version' => 7, 'min_app_version' => '1.2.3',
+        ]);
+    }
+
+    public function test_cover_and_free_audio_metadata_are_public_safe(): void
+    {
+        Storage::fake('audio');
+        Storage::fake('covers');
+        Storage::disk('audio')->put('test-only.m4a', 'TEST ONLY AUDIO');
+        $collection = Collection::create([
+            'title' => 'TEST ONLY', 'slug' => 'media-test', 'cover_image' => 'cover.webp', 'is_active' => true,
+        ]);
+        $poem = Poem::create([
+            'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'ازمېښتي متن',
+            'excerpt' => 'ازمېښت', 'audio_path' => 'test-only.m4a', 'audio_duration_seconds' => 15,
+            'is_free_sample' => true, 'is_active' => true,
+        ]);
+
+        $this->getJson('/api/collections/media-test')
+            ->assertOk()->assertJsonPath('data.cover_url', Storage::disk('covers')->url('cover.webp'));
+        $response = $this->getJson("/api/poems/{$poem->id}/audio")
+            ->assertOk()->assertJsonPath('locked', false)->assertJsonPath('duration_seconds', 15);
+        $stream = $this->get($response->json('url'))->assertOk();
+        $this->assertSame('TEST ONLY AUDIO', $stream->streamedContent());
+    }
+}
