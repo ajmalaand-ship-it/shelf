@@ -60,12 +60,17 @@ class PoetryApiTest extends TestCase
 
     public function test_app_config_exposes_only_public_version_keys(): void
     {
+        AppSetting::where('key', 'public_app_name')->update(['value' => 'پېڅوَل']);
+        AppSetting::where('key', 'public_slogan')->update(['value' => 'اجمل اند بشپړه شاعري']);
         AppSetting::where('key', 'content_version')->update(['value' => '7']);
         AppSetting::where('key', 'min_app_version')->update(['value' => '1.2.3']);
         AppSetting::create(['key' => 'private_value', 'value' => 'never expose']);
 
         $this->getJson('/api/app-config')->assertExactJson([
-            'content_version' => 7, 'min_app_version' => '1.2.3',
+            'app_name' => 'پېڅوَل',
+            'slogan' => 'اجمل اند بشپړه شاعري',
+            'content_version' => 7,
+            'min_app_version' => '1.2.3',
         ]);
     }
 

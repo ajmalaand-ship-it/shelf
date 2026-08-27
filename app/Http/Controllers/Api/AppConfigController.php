@@ -11,10 +11,12 @@ class AppConfigController extends Controller
     public function __invoke(): JsonResponse
     {
         $settings = AppSetting::query()
-            ->whereIn('key', ['content_version', 'min_app_version'])
+            ->whereIn('key', ['public_app_name', 'public_slogan', 'content_version', 'min_app_version'])
             ->pluck('value', 'key');
 
         return response()->json([
+            'app_name' => $settings['public_app_name'] ?? '',
+            'slogan' => $settings['public_slogan'] ?? '',
             'content_version' => (int) ($settings['content_version'] ?? 1),
             'min_app_version' => $settings['min_app_version'] ?? '1.0.0',
         ]);

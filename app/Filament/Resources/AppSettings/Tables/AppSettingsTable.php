@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\AppSettings\Tables;
 
+use App\Filament\Resources\AppSettings\AppSettingResource;
+use App\Models\AppSetting;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -23,6 +25,7 @@ class AppSettingsTable
             ->recordActions([
                 EditAction::make(),
             ])
+            ->recordUrl(fn (AppSetting $record): string => AppSettingResource::getUrl('edit', ['record' => $record]))
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

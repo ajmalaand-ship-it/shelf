@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\AppSettings\AppSettingResource;
 use App\Filament\Resources\AppSettings\Pages\EditAppSetting;
+use App\Filament\Resources\AppSettings\Pages\ListAppSettings;
 use App\Filament\Resources\Collections\Pages\CreateCollection;
 use App\Filament\Resources\Collections\Pages\EditCollection;
 use App\Filament\Resources\Poems\Pages\CreatePoem;
@@ -25,6 +27,19 @@ class AdminGateTest extends TestCase
     public function test_anonymous_user_cannot_access_admin(): void
     {
         $this->get('/admin')->assertRedirect('/admin/login');
+    }
+
+    public function test_owner_can_see_and_open_app_setting_edit_action(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $setting = AppSetting::where('key', 'content_version')->firstOrFail();
+
+        Livewire::test(ListAppSettings::class)
+            ->assertCanSeeTableRecords([$setting])
+            ->assertTableActionVisible('edit', $setting);
+
+        $this->get(AppSettingResource::getUrl('edit', ['record' => $setting]))->assertOk();
     }
 
     public function test_owner_can_create_collection_with_validated_cover(): void
