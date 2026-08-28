@@ -25,3 +25,7 @@ RevenueCat maps entitlements to official Google Play Billing and Apple In-App Pu
 ## 6. Original recorded voice
 
 Ajmal Aand's recorded voice is primary. AI voice is excluded from Version 1, and AI must not substitute for or rewrite Ajmal's original poetry or recordings. Original poem text and voice recordings require off-server backups.
+
+## 7. Approved reader typography and themes
+
+The approved P0/P2 reader baseline is Noto Nastaliq Urdu for primary poem text and Scheherazade New as the Naskh/alternate font. Reading themes are Light, Sepia, and Dark. Poem reading uses explicit RTL, owner-adjustable font size, and approximately 2.2 line height. A Nastaliq/Naskh toggle may be included only when economical within the approved Flutter reader work. This records the decision only; it does not begin P2.

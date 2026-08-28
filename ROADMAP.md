@@ -8,6 +8,8 @@ Choose the app identity and first collection; prepare 30–50 proofread Unicode 
 
 **Gate:** Launch content is ready for administration entry, the Play account is registered and verifying, and the tester group is lined up.
 
+**Current approved preparation baseline:** The public identity is `پېڅوَل` with slogan `اجمل اند بشپړه شاعري`. The reader typography decision is Noto Nastaliq Urdu for primary body text and Scheherazade New as the Naskh alternate, with Light, Sepia, and Dark themes, explicit RTL, font-size control, and approximately 2.2 poem line height. The safely structured private catalogue currently contains 148 works and 15 configured free samples. At least 10 original Ajmal voice recordings, an owner-verified off-server archive copy, Google Play developer-account evidence, and a closed-test tester group remain owner/external gate actions.
+
 ## P1 — Laravel and Filament backend
 
 Build the isolated Laravel API and Filament administration with collections, poems, and application settings; Pashto-safe `utf8mb4` storage and `LONGTEXT` poem bodies; cover/audio uploads; ordering, status, sample, and product mapping fields; and HTTPS API responses that distinguish excerpts/locked content from full content.
