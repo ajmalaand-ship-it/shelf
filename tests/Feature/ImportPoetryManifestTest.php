@@ -6,6 +6,7 @@ use App\Models\Collection;
 use App\Models\Poem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use RuntimeException;
 use Tests\TestCase;
 
 class ImportPoetryManifestTest extends TestCase
@@ -47,5 +48,70 @@ class ImportPoetryManifestTest extends TestCase
 
         File::delete($manifestPath);
         File::delete($source);
+    }
+
+    public function test_manifest_can_create_a_draft_collection_with_truthful_translation_attribution(): void
+    {
+        $source = storage_path('app/source/testing/collection-three.doc');
+        File::ensureDirectoryExists(dirname($source));
+        File::put($source, 'private word source');
+        $manifestPath = storage_path('app/test-collection-three-manifest.json');
+        File::put($manifestPath, json_encode([
+            'source' => [
+                'private_path' => 'source/testing/collection-three.doc',
+                'sha256' => hash_file('sha256', $source),
+            ],
+            'collection' => [
+                'title' => 'هېندارې او چینې', 'slug' => 'hindare-test', 'author' => 'اجمل اند',
+                'catalogue_order' => 3, 'dedication' => 'سپېڅلي رياضت ته',
+                'introduction' => 'درنو لوستونکيو!', 'foreword_author' => 'غفور لېوال',
+                'foreword' => 'اې عشقه نامراده', 'publication_info' => '١٣٨٥ لمريز کال',
+            ],
+            'poems' => [[
+                'sequence' => 1, 'title' => 'ژمى', 'untitled' => false,
+                'body' => "لومړۍ کرښه\nدويمه کرښه", 'source_location' => 'Word paragraphs 1–2',
+                'source_date_place_text' => null, 'source_note' => 'دپروین پژواک ديو شعرژباړه',
+                'work_type' => 'TRANSLATION', 'original_author' => 'پروین پژواک', 'translator' => 'اجمل اند',
+            ]],
+        ], JSON_UNESCAPED_UNICODE));
+
+        $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath, '--apply' => true])->assertSuccessful();
+        $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath, '--apply' => true])->assertSuccessful();
+
+        $this->assertDatabaseHas('collections', [
+            'title' => 'هېندارې او چینې', 'sort_order' => 3, 'is_active' => false,
+            'foreword_author' => 'غفور لېوال',
+        ]);
+        $this->assertDatabaseHas('poems', [
+            'title' => 'ژمى', 'work_type' => 'TRANSLATION', 'original_author' => 'پروین پژواک',
+            'translator' => 'اجمل اند', 'is_active' => false, 'is_free_sample' => false,
+        ]);
+        $this->assertDatabaseCount('poems', 1);
+
+        File::delete($manifestPath);
+        File::delete($source);
+        File::deleteDirectory(dirname($source));
+    }
+
+    public function test_manifest_rejects_a_private_source_path_outside_system_c_source_storage(): void
+    {
+        $manifestPath = storage_path('app/test-invalid-source-manifest.json');
+        File::put($manifestPath, json_encode([
+            'source' => ['private_path' => '../logs/laravel.log', 'sha256' => str_repeat('0', 64)],
+            'collection' => ['title' => 'TEST ONLY'],
+            'poems' => [[
+                'sequence' => 1, 'title' => null, 'untitled' => true, 'body' => 'متن',
+                'source_location' => 'Word paragraph 1',
+            ]],
+        ], JSON_UNESCAPED_UNICODE));
+
+        try {
+            $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath])->run();
+            $this->fail('Unsafe private source path was accepted.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Manifest source path is outside private System C source storage.', $exception->getMessage());
+        } finally {
+            File::delete($manifestPath);
+        }
     }
 }

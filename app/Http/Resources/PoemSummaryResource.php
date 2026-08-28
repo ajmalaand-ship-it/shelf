@@ -12,6 +12,9 @@ class PoemSummaryResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'work_type' => $this->work_type,
+            'original_author' => $this->original_author,
+            'translator' => $this->translator,
             'excerpt' => $this->excerpt,
             'locked' => ! $this->is_free_sample,
             'has_audio' => (bool) $this->audio_path,

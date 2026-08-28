@@ -105,6 +105,8 @@ class PoetryApiTest extends TestCase
             'author' => 'اجمل اند',
             'dedication' => 'يوازې ښکلا تهـ',
             'introduction' => "خوږو لوستونکيو!\nدويمه کرښه",
+            'foreword_author' => 'غفور لېوال',
+            'foreword' => 'اې عشقه نامراده....',
             'publication_info' => 'لومړی چاپ: ۱۳۷۹ لمريز — وږى',
             'cover_image' => 'presentation/cover.webp',
             'is_active' => true,
@@ -119,8 +121,31 @@ class PoetryApiTest extends TestCase
             ->assertJsonPath('data.author', 'اجمل اند')
             ->assertJsonPath('data.dedication', 'يوازې ښکلا تهـ')
             ->assertJsonPath('data.introduction', "خوږو لوستونکيو!\nدويمه کرښه")
+            ->assertJsonPath('data.foreword_author', 'غفور لېوال')
+            ->assertJsonPath('data.foreword', 'اې عشقه نامراده....')
             ->assertJsonPath('data.publication_info', 'لومړی چاپ: ۱۳۷۹ لمريز — وږى')
             ->assertJsonPath('data.poem_count', 2)
+            ->assertJsonMissingPath('data.source_path');
+    }
+
+    public function test_translation_attribution_is_public_but_private_source_location_is_not(): void
+    {
+        $collection = Collection::create([
+            'title' => 'هېندارې او چینې', 'slug' => 'translation-attribution', 'is_active' => true,
+        ]);
+        $poem = Poem::create([
+            'collection_id' => $collection->id, 'title' => 'ژمى', 'body' => 'ژباړل شوی متن',
+            'excerpt' => 'ژباړل شوی متن', 'work_type' => 'TRANSLATION',
+            'original_author' => 'پروین پژواک', 'translator' => 'اجمل اند',
+            'source_note' => 'دپروین پژواک ديو شعرژباړه', 'is_free_sample' => true, 'is_active' => true,
+        ]);
+
+        $this->getJson("/api/poems/{$poem->id}")
+            ->assertOk()
+            ->assertJsonPath('data.work_type', 'TRANSLATION')
+            ->assertJsonPath('data.original_author', 'پروین پژواک')
+            ->assertJsonPath('data.translator', 'اجمل اند')
+            ->assertJsonMissingPath('data.source_location')
             ->assertJsonMissingPath('data.source_path');
     }
 }

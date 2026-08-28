@@ -20,6 +20,15 @@ class PoemForm
                     ->helperText('Leave blank when the source poem has no authored title.'),
                 Textarea::make('body')->required()->rows(18)->extraInputAttributes(['dir' => 'rtl']),
                 Textarea::make('excerpt')->required()->rows(5)->extraInputAttributes(['dir' => 'rtl']),
+                Select::make('work_type')->options([
+                    'ORIGINAL' => 'Original work',
+                    'TRANSLATION' => 'Translation',
+                ])->required()->default('ORIGINAL'),
+                TextInput::make('original_author')->maxLength(255),
+                TextInput::make('translator')->maxLength(255),
+                TextInput::make('source_date_place')->maxLength(255)
+                    ->helperText('Preserve the authored date/place exactly; do not convert calendars.'),
+                Textarea::make('source_note')->rows(3)->extraInputAttributes(['dir' => 'rtl']),
                 FileUpload::make('audio_path')->disk('audio')->visibility('private')
                     ->acceptedFileTypes(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/x-wav'])
                     ->maxSize(51200),

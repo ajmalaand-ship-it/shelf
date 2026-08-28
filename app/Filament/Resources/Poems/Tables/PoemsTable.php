@@ -30,6 +30,8 @@ class PoemsTable
                             ->orWhere('body', 'like', "%{$search}%");
                     })),
                 TextColumn::make('collection.title')->label('Collection')->searchable()->sortable(),
+                TextColumn::make('work_type')->label('Work type')->badge()
+                    ->color(fn (string $state): string => $state === 'TRANSLATION' ? 'info' : 'gray'),
                 IconColumn::make('is_active')->label('Published')->boolean(),
                 ToggleColumn::make('is_free_sample')->label('Free sample')
                     ->tooltip(fn (bool $state): string => $state ? 'Free sample' : 'Locked'),
@@ -40,6 +42,10 @@ class PoemsTable
             ->reorderable('sort_order')
             ->filters([
                 SelectFilter::make('collection')->relationship('collection', 'title')->searchable()->preload(),
+                SelectFilter::make('work_type')->label('Work type')->options([
+                    'ORIGINAL' => 'Original work',
+                    'TRANSLATION' => 'Translation',
+                ]),
                 TernaryFilter::make('is_active')->label('Publication')
                     ->trueLabel('Published')->falseLabel('Draft')->placeholder('All publication states'),
                 TernaryFilter::make('is_free_sample')->label('Access')

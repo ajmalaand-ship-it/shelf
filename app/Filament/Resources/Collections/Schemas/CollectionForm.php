@@ -21,6 +21,8 @@ class CollectionForm
                 Textarea::make('description')->rows(4),
                 Textarea::make('dedication')->rows(3)->extraInputAttributes(['dir' => 'rtl']),
                 Textarea::make('introduction')->rows(12)->extraInputAttributes(['dir' => 'rtl']),
+                TextInput::make('foreword_author')->maxLength(255),
+                Textarea::make('foreword')->rows(12)->extraInputAttributes(['dir' => 'rtl']),
                 Textarea::make('publication_info')->rows(7)->extraInputAttributes(['dir' => 'rtl']),
                 FileUpload::make('cover_image')->disk('covers')->image()
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120),

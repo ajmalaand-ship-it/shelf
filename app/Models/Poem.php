@@ -12,7 +12,11 @@ class Poem extends Model
     /** @use HasFactory<PoemFactory> */
     use HasFactory;
 
-    protected $fillable = ['collection_id', 'title', 'body', 'excerpt', 'audio_path', 'audio_duration_seconds', 'sort_order', 'is_free_sample', 'is_active'];
+    protected $fillable = [
+        'collection_id', 'title', 'body', 'excerpt', 'work_type', 'original_author', 'translator',
+        'source_date_place', 'source_note', 'audio_path', 'audio_duration_seconds', 'sort_order',
+        'is_free_sample', 'is_active',
+    ];
 
     protected function casts(): array
     {

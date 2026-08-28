@@ -106,6 +106,8 @@ class AdminGateTest extends TestCase
                 'author' => 'اجمل اند',
                 'dedication' => 'يوازې ښکلا تهـ',
                 'introduction' => "لومړۍ کرښه\n\nدويم بند",
+                'foreword_author' => 'غفور لېوال',
+                'foreword' => "اې عشقه نامراده....\nدويمه کرښه",
                 'publication_info' => 'لومړی چاپ: ۱۳۷۹ لمريز — وږى',
             ])
             ->call('save')
@@ -113,6 +115,7 @@ class AdminGateTest extends TestCase
 
         $collection->refresh();
         $this->assertSame("لومړۍ کرښه\n\nدويم بند", $collection->introduction);
+        $this->assertSame('غفور لېوال', $collection->foreword_author);
         $this->assertFalse($collection->is_active);
     }
 
@@ -136,6 +139,7 @@ class AdminGateTest extends TestCase
             ->fillForm([
                 'collection_id' => $collection->id, 'title' => 'TEST ONLY شعر', 'body' => $body,
                 'excerpt' => 'TEST ONLY',
+                'work_type' => 'TRANSLATION', 'original_author' => 'پروین پژواک', 'translator' => 'اجمل اند',
                 'audio_path' => [UploadedFile::fake()->create('voice.m4a', 20, 'audio/mp4')],
                 'audio_duration_seconds' => 12, 'sort_order' => 4,
                 'is_free_sample' => false, 'is_active' => false,
@@ -146,6 +150,8 @@ class AdminGateTest extends TestCase
         $poem = Poem::where('title', 'TEST ONLY شعر')->firstOrFail();
         $this->assertSame($body, $poem->body);
         $this->assertNotNull($poem->audio_path);
+        $this->assertSame('TRANSLATION', $poem->work_type);
+        $this->assertSame('پروین پژواک', $poem->original_author);
         Storage::disk('audio')->assertExists($poem->audio_path);
 
         Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
@@ -185,6 +191,7 @@ class AdminGateTest extends TestCase
         Livewire::test(ListPoems::class)
             ->assertTableColumnExists('admin_display_title')
             ->assertTableColumnExists('collection.title')
+            ->assertTableColumnExists('work_type')
             ->assertTableColumnExists('is_active')
             ->assertTableColumnExists('is_free_sample')
             ->assertTableColumnExists('audio_path')
@@ -216,6 +223,11 @@ class AdminGateTest extends TestCase
         $this->assertDatabaseHas('poems', [
             'id' => $untitled->id, 'is_free_sample' => true, 'is_active' => false,
         ]);
+
+        Livewire::test(ListPoems::class)
+            ->filterTable('work_type', 'ORIGINAL')
+            ->assertCanSeeTableRecords([$published])
+            ->assertCanSeeTableRecords([$untitled]);
 
         Livewire::test(ListPoems::class)
             ->filterTable('is_active', true)

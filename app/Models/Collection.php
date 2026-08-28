@@ -14,7 +14,7 @@ class Collection extends Model
 
     protected $fillable = [
         'title', 'slug', 'subtitle', 'description', 'author', 'dedication', 'introduction',
-        'publication_info', 'cover_image', 'sort_order', 'is_active', 'product_id',
+        'foreword_author', 'foreword', 'publication_info', 'cover_image', 'sort_order', 'is_active', 'product_id',
     ];
 
     protected function casts(): array
