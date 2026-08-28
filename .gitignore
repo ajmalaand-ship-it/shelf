@@ -29,6 +29,7 @@ secrets/
 error_log
 /storage/app/source/**
 !/storage/app/source/.gitignore
+/storage/app/source-imports/**
 
 # Runtime and protected/uploaded media
 /storage/app/covers/**

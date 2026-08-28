@@ -46,11 +46,11 @@ STRUCTURE = [
     (92, 92, None, 0), (93, 93, None, 0),
 ]
 
-REVIEW_ITEMS = {
-    12: "Legacy glyphs in the source date line are not uniquely recoverable.",
-    15: "Legacy glyphs in the source date line are not uniquely recoverable.",
-    65: "The source date line is incomplete/ambiguous in the legacy text layer.",
-    70: "The source date line contains an unresolved final numeral/glyph.",
+SOURCE_NOTE_OVERRIDES = {
+    12: "۱/کب/۱۳۷۷\nخوكياڼي",
+    15: "۲۹/لړم/۱۳۷۸\nكوزبيار خوګياڼي",
+    65: "۴/۷/۱۳۷۶\nجلال كوټ",
+    70: "۴/حمل/۱۳۷۹\nپېښور",
 }
 
 VERIFIED_REPLACEMENTS = {
@@ -174,7 +174,7 @@ def poem_records(pages: dict[int, list[str]]) -> list[dict]:
             source_notes = lines[-3:-1]
             body_lines = lines[:-3] + lines[-1:]
 
-        uncertainty = REVIEW_ITEMS.get(sequence)
+        source_note = SOURCE_NOTE_OVERRIDES.get(sequence, "\n".join(source_notes) or None)
         poems.append({
             "sequence": sequence,
             "title": title,
@@ -182,9 +182,9 @@ def poem_records(pages: dict[int, list[str]]) -> list[dict]:
             "body": "\n".join(body_lines).strip(),
             "source_page_start": start,
             "source_page_end": end,
-            "source_date_place_text": "\n".join(source_notes) or None,
-            "review_status": "needs_owner_review" if uncertainty else "verified_from_rendered_source",
-            "extraction_uncertainty": uncertainty,
+            "source_date_place_text": source_note,
+            "review_status": "verified_from_rendered_source",
+            "extraction_uncertainty": None,
         })
     return poems
 
