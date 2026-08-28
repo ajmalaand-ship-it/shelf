@@ -15,6 +15,9 @@ All notable repository governance changes are recorded here.
 - Automated Filament, upload, API, publication, and Pashto Unicode round-trip tests.
 - P0/P1 reconciliation record with owner, external, runtime, deployment, and governance gaps.
 - System C-only production provisioning/deployment scripts and checksummed database/media/source backup verification commands.
+- Android-first Flutter reader in `mobile/` with Home, Collections, collection detail, and Unicode poem-reader surfaces.
+- Explicit Pashto RTL, bundled Nastaliq/Naskh fonts with license notices, Light/Sepia/Dark palettes, persistent font controls, and resilient `content_version` caching.
+- Flutter model, API-cache, offline, locked-state, translation-attribution, typography-preference, and reader widget tests.
 
 ### Security
 

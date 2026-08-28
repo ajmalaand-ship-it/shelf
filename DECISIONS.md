@@ -28,4 +28,8 @@ Ajmal Aand's recorded voice is primary. AI voice is excluded from Version 1, and
 
 ## 7. Approved reader typography and themes
 
-The approved P0/P2 reader baseline is Noto Nastaliq Urdu for primary poem text and Scheherazade New as the Naskh/alternate font. Reading themes are Light, Sepia, and Dark. Poem reading uses explicit RTL, owner-adjustable font size, and approximately 2.2 line height. A Nastaliq/Naskh toggle may be included only when economical within the approved Flutter reader work. This records the decision only; it does not begin P2.
+The approved P0/P2 reader baseline is Noto Nastaliq Urdu for primary poem text and Scheherazade New as the Naskh/alternate font. Reading themes are Light, Sepia, and Dark. Poem reading uses explicit RTL, owner-adjustable font size, and approximately 2.2 line height. The economical Nastaliq/Naskh toggle is included in the owner-authorized P2 implementation.
+
+## 8. P2 mobile reader architecture
+
+P2 is explicitly owner-authorized and lives in `mobile/` within the isolated System C repository under Android application ID `com.hindara.pitswal`. It uses a proportionate models/API/repository/cache/screens/settings structure. Public API JSON is cached locally as complete validated snapshots keyed by `content_version`; a failed refresh never replaces a valid cache. Reader preferences remain local with no user account. Populated automated fixtures remain under `mobile/test/` and are never release content. P3 audio, P4 sharing, and P5 purchases remain unstarted.

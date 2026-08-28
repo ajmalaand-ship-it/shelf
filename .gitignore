@@ -55,6 +55,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Flutter and Dart artifacts
+/.android-tmp/
 /.dart_tool/
 /.flutter-plugins
 /.flutter-plugins-dependencies
