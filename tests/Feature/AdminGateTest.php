@@ -7,8 +7,10 @@ use App\Filament\Resources\AppSettings\Pages\EditAppSetting;
 use App\Filament\Resources\AppSettings\Pages\ListAppSettings;
 use App\Filament\Resources\Collections\Pages\CreateCollection;
 use App\Filament\Resources\Collections\Pages\EditCollection;
+use App\Filament\Resources\Collections\Pages\ListCollections;
 use App\Filament\Resources\Poems\Pages\CreatePoem;
 use App\Filament\Resources\Poems\Pages\EditPoem;
+use App\Filament\Resources\Poems\Pages\ListPoems;
 use App\Models\AppSetting;
 use App\Models\Collection;
 use App\Models\Poem;
@@ -160,5 +162,129 @@ class AdminGateTest extends TestCase
             ->call('save')
             ->assertHasNoFormErrors();
         $this->assertDatabaseHas('app_settings', ['key' => 'content_version', 'value' => '2']);
+    }
+
+    public function test_poem_list_supports_owner_search_filters_and_inline_free_control(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $firstCollection = Collection::create(['title' => 'لومړۍ ټولګه', 'slug' => 'first', 'is_active' => false]);
+        $secondCollection = Collection::create(['title' => 'دويمه ټولګه', 'slug' => 'second', 'is_active' => true]);
+        $untitled = Poem::create([
+            'collection_id' => $firstCollection->id,
+            'body' => "د لټون لومړۍ کرښه\nدويمه کرښه",
+            'excerpt' => 'لنډ متن', 'sort_order' => 1,
+            'is_active' => false, 'is_free_sample' => false,
+        ]);
+        $published = Poem::create([
+            'collection_id' => $secondCollection->id, 'title' => 'ليکلی سرليک',
+            'body' => 'متن', 'excerpt' => 'لنډ متن', 'audio_path' => 'test-only.m4a',
+            'sort_order' => 2, 'is_active' => true, 'is_free_sample' => true,
+        ]);
+
+        Livewire::test(ListPoems::class)
+            ->assertTableColumnExists('admin_display_title')
+            ->assertTableColumnExists('collection.title')
+            ->assertTableColumnExists('is_active')
+            ->assertTableColumnExists('is_free_sample')
+            ->assertTableColumnExists('audio_path')
+            ->searchTable('د لټون لومړۍ کرښه')
+            ->assertCanSeeTableRecords([$untitled])
+            ->assertCanNotSeeTableRecords([$published]);
+
+        Livewire::test(ListPoems::class)
+            ->searchTable('ليکلی سرليک')
+            ->assertCanSeeTableRecords([$published])
+            ->assertCanNotSeeTableRecords([$untitled]);
+
+        Livewire::test(ListPoems::class)
+            ->assertTableActionVisible('publish', $untitled)
+            ->callTableAction('publish', $untitled);
+        $this->assertTrue($untitled->fresh()->is_active);
+
+        Livewire::test(ListPoems::class)
+            ->assertTableActionVisible('unpublish', $untitled->fresh())
+            ->callTableAction('unpublish', $untitled->fresh());
+        $this->assertFalse($untitled->fresh()->is_active);
+
+        Livewire::test(ListPoems::class)
+            ->filterTable('collection', $firstCollection)
+            ->assertCanSeeTableRecords([$untitled])
+            ->assertCanNotSeeTableRecords([$published])
+            ->call('updateTableColumnState', 'is_free_sample', (string) $untitled->id, true);
+
+        $this->assertDatabaseHas('poems', [
+            'id' => $untitled->id, 'is_free_sample' => true, 'is_active' => false,
+        ]);
+
+        Livewire::test(ListPoems::class)
+            ->filterTable('is_active', true)
+            ->filterTable('is_free_sample', true)
+            ->filterTable('audio_path', true)
+            ->assertCanSeeTableRecords([$published])
+            ->assertCanNotSeeTableRecords([$untitled]);
+    }
+
+    public function test_poem_bulk_editorial_actions_do_not_mix_free_and_publication_states(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'bulk-actions', 'is_active' => false]);
+        $poems = collect([1, 2])->map(fn (int $order) => Poem::create([
+            'collection_id' => $collection->id, 'body' => "شعر {$order}", 'excerpt' => 'لنډ',
+            'sort_order' => $order, 'is_active' => false, 'is_free_sample' => false,
+        ]));
+
+        Livewire::test(ListPoems::class)
+            ->assertTableBulkActionExists('setFree')
+            ->assertTableBulkActionExists('setLocked')
+            ->assertTableBulkActionExists('publish')
+            ->assertTableBulkActionExists('unpublish')
+            ->callTableBulkAction('setFree', $poems);
+
+        $this->assertSame(2, Poem::where('is_free_sample', true)->where('is_active', false)->count());
+
+        Livewire::test(ListPoems::class)->callTableBulkAction('publish', $poems);
+        $this->assertSame(2, Poem::where('is_free_sample', true)->where('is_active', true)->count());
+        $this->assertFalse($collection->fresh()->is_active);
+
+        Livewire::test(ListPoems::class)->callTableBulkAction('unpublish', $poems);
+        Livewire::test(ListPoems::class)->callTableBulkAction('setLocked', $poems);
+        $this->assertSame(2, Poem::where('is_free_sample', false)->where('is_active', false)->count());
+    }
+
+    public function test_collection_list_shows_counts_and_uses_deliberate_publication_actions(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create([
+            'title' => 'TEST ONLY', 'slug' => 'collection-controls', 'cover_image' => 'test.webp', 'is_active' => false,
+        ]);
+        Poem::create([
+            'collection_id' => $collection->id, 'body' => 'لومړی', 'excerpt' => 'لنډ',
+            'is_free_sample' => true, 'is_active' => true, 'audio_path' => 'test.m4a',
+        ]);
+        Poem::create([
+            'collection_id' => $collection->id, 'body' => 'دويم', 'excerpt' => 'لنډ',
+            'is_free_sample' => false, 'is_active' => false,
+        ]);
+
+        Livewire::test(ListCollections::class)
+            ->assertTableColumnStateSet('poems_count', 2, $collection)
+            ->assertTableColumnStateSet('free_poems_count', 1, $collection)
+            ->assertTableColumnStateSet('published_poems_count', 1, $collection)
+            ->assertTableColumnStateSet('audio_poems_count', 1, $collection)
+            ->assertTableActionVisible('publish', $collection)
+            ->callTableAction('publish', $collection);
+
+        $this->assertTrue($collection->fresh()->is_active);
+        $this->assertSame(1, $collection->poems()->where('is_active', true)->count());
+
+        Livewire::test(ListCollections::class)
+            ->assertTableActionVisible('unpublish', $collection->fresh())
+            ->callTableAction('unpublish', $collection->fresh());
+
+        $this->assertFalse($collection->fresh()->is_active);
+        $this->assertSame(1, $collection->poems()->where('is_active', true)->count());
     }
 }

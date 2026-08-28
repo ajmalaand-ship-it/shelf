@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class CollectionResource extends Resource
 {
@@ -28,6 +29,16 @@ class CollectionResource extends Resource
     public static function table(Table $table): Table
     {
         return CollectionsTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount([
+            'poems',
+            'poems as free_poems_count' => fn (Builder $query) => $query->where('is_free_sample', true),
+            'poems as published_poems_count' => fn (Builder $query) => $query->where('is_active', true),
+            'poems as audio_poems_count' => fn (Builder $query) => $query->whereNotNull('audio_path'),
+        ]);
     }
 
     public static function getRelations(): array
