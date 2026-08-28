@@ -23,4 +23,9 @@ class Poem extends Model
     {
         return $this->belongsTo(Collection::class);
     }
+
+    public function getAdminDisplayTitleAttribute(): string
+    {
+        return $this->title ?: str($this->body)->before("\n")->limit(80)->toString();
+    }
 }

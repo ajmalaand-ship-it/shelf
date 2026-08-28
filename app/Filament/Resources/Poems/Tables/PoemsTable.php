@@ -16,7 +16,11 @@ class PoemsTable
         return $table
             ->columns([
                 TextColumn::make('sort_order')->sortable(),
-                TextColumn::make('title')->searchable()->sortable(),
+                TextColumn::make('admin_display_title')->label('Title / first line')
+                    ->searchable(query: fn ($query, string $search) => $query->where(function ($query) use ($search): void {
+                        $query->where('title', 'like', "%{$search}%")
+                            ->orWhere('body', 'like', "%{$search}%");
+                    })),
                 TextColumn::make('collection.title')->sortable(),
                 IconColumn::make('is_free_sample')->boolean(),
                 IconColumn::make('is_active')->boolean(),

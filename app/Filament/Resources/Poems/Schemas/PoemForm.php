@@ -16,7 +16,8 @@ class PoemForm
         return $schema
             ->components([
                 Select::make('collection_id')->relationship('collection', 'title')->required(),
-                TextInput::make('title')->required()->maxLength(255),
+                TextInput::make('title')->maxLength(255)
+                    ->helperText('Leave blank when the source poem has no authored title.'),
                 Textarea::make('body')->required()->rows(18)->extraInputAttributes(['dir' => 'rtl']),
                 Textarea::make('excerpt')->required()->rows(5)->extraInputAttributes(['dir' => 'rtl']),
                 FileUpload::make('audio_path')->disk('audio')->visibility('private')
