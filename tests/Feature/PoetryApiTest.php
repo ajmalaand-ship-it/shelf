@@ -95,4 +95,32 @@ class PoetryApiTest extends TestCase
         $stream = $this->get($response->json('url'))->assertOk();
         $this->assertSame('TEST ONLY AUDIO', $stream->streamedContent());
     }
+
+    public function test_published_collection_returns_reader_safe_front_matter_and_active_poem_count(): void
+    {
+        Storage::fake('covers');
+        $collection = Collection::create([
+            'title' => 'څپو کې انځورونه',
+            'slug' => 'presentation-test',
+            'author' => 'اجمل اند',
+            'dedication' => 'يوازې ښکلا تهـ',
+            'introduction' => "خوږو لوستونکيو!\nدويمه کرښه",
+            'publication_info' => 'لومړی چاپ: ۱۳۷۹ لمريز — وږى',
+            'cover_image' => 'presentation/cover.webp',
+            'is_active' => true,
+        ]);
+        Poem::create(['collection_id' => $collection->id, 'body' => 'لومړی', 'excerpt' => 'لومړی', 'is_active' => true]);
+        Poem::create(['collection_id' => $collection->id, 'body' => 'دويم', 'excerpt' => 'دويم', 'is_active' => true]);
+        Poem::create(['collection_id' => $collection->id, 'body' => 'پټ', 'excerpt' => 'پټ', 'is_active' => false]);
+
+        $this->getJson('/api/collections/presentation-test')
+            ->assertOk()
+            ->assertJsonPath('data.title', 'څپو کې انځورونه')
+            ->assertJsonPath('data.author', 'اجمل اند')
+            ->assertJsonPath('data.dedication', 'يوازې ښکلا تهـ')
+            ->assertJsonPath('data.introduction', "خوږو لوستونکيو!\nدويمه کرښه")
+            ->assertJsonPath('data.publication_info', 'لومړی چاپ: ۱۳۷۹ لمريز — وږى')
+            ->assertJsonPath('data.poem_count', 2)
+            ->assertJsonMissingPath('data.source_path');
+    }
 }

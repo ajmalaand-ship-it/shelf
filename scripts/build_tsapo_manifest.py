@@ -53,6 +53,24 @@ SOURCE_NOTE_OVERRIDES = {
     70: "۴/حمل/۱۳۷۹\nپېښور",
 }
 
+FREE_SAMPLE_CANDIDATES = {
+    1: "Untitled traditional verse from the opening of the collection.",
+    3: "Untitled title-theme poem centered on images in waves.",
+    4: "Titled traditional verse and rural imagery.",
+    8: "Titled free-verse treatment of a ټپه.",
+    12: "Titled free verse focused on poetic language and beauty.",
+    15: "Titled narrative free verse with a distinct dramatic voice.",
+    32: "Multi-page titled prose/free verse.",
+    42: "Untitled traditional verse from the middle of the collection.",
+    48: "Multi-page titled narrative poem.",
+    50: "Multi-page titled reflective free verse.",
+    53: "Untitled traditional verse with a source footnote.",
+    60: "Short titled poem offering a compact contrast in form.",
+    68: "Titled dialogue-form free verse.",
+    71: "Authored ټوټې section preserving multiple short pieces.",
+    75: "Late multi-page titled poem representing the collection's longer work.",
+}
+
 VERIFIED_REPLACEMENTS = {
     "لل": "((",
     "عع": "))",
@@ -195,6 +213,17 @@ def build_manifest(source: Path) -> dict:
     pages = recover_pages(source)
     poems = poem_records(pages)
     introduction = "\n".join(pages[3])
+    candidates = []
+    for sequence, reason in FREE_SAMPLE_CANDIDATES.items():
+        poem = poems[sequence - 1]
+        candidates.append({
+            "sequence": sequence,
+            "title": poem["title"],
+            "first_line": poem["body"].splitlines()[0],
+            "reason": reason,
+            "owner_decision": "pending",
+        })
+    archive_cover = Path(__file__).resolve().parents[1] / "storage/app/source/collections/tsapo-ke-anzorona/cover-page-1-300dpi.png"
     return {
         "manifest_version": 1,
         "source": {"filename": source.name, "sha256": SOURCE_SHA256, "pdf_pages": 94},
@@ -211,6 +240,22 @@ def build_manifest(source: Path) -> dict:
             "source_pages": {"bibliographic": 2, "dedication": 2, "introduction": 3},
         },
         "structure_decision": "The authored ټوټې section is one titled record spanning PDF pages 79–81; its internal ****** separators remain in the body.",
+        "presentation": {
+            "cover": {
+                "source_pdf_page": 1,
+                "archival_image": archive_cover.name,
+                "archival_sha256": sha256(archive_cover) if archive_cover.is_file() else None,
+                "collection_derivative": "tsapo-ke-anzorona/original-cover-page-1.webp",
+                "global_app_branding": False,
+            },
+            "free_sample_candidates": candidates,
+            "audio_ingest": {
+                "status": "awaiting Ajmal's original recordings",
+                "filename_pattern": "tsapo-ke-anzorona-{sequence:03d}.m4a",
+                "matching_key": "manifest poem sequence",
+                "validation": "Match sequence 001–081, reject duplicates or unknown sequences, and never infer poem identity from title alone.",
+            },
+        },
         "poems": poems,
     }
 

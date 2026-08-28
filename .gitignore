@@ -33,6 +33,7 @@ error_log
 
 # Runtime and protected/uploaded media
 /storage/app/covers/**
+/storage/app/public/**
 /storage/app/audio/**
 /storage/app/uploads/**
 /storage/app/private/**

@@ -77,6 +77,43 @@ class AdminGateTest extends TestCase
             ->assertHasFormErrors(['audio_path']);
     }
 
+    public function test_collection_form_rejects_non_image_cover(): void
+    {
+        Storage::fake('covers');
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        Livewire::test(CreateCollection::class)
+            ->fillForm([
+                'title' => 'TEST ONLY', 'slug' => 'invalid-cover',
+                'cover_image' => [UploadedFile::fake()->create('cover.php', 2, 'application/x-php')],
+                'sort_order' => 1, 'is_active' => false,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['cover_image']);
+    }
+
+    public function test_owner_can_edit_collection_front_matter_in_pashto(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'front-matter', 'is_active' => false]);
+
+        Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
+            ->fillForm([
+                'author' => 'اجمل اند',
+                'dedication' => 'يوازې ښکلا تهـ',
+                'introduction' => "لومړۍ کرښه\n\nدويم بند",
+                'publication_info' => 'لومړی چاپ: ۱۳۷۹ لمريز — وږى',
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $collection->refresh();
+        $this->assertSame("لومړۍ کرښه\n\nدويم بند", $collection->introduction);
+        $this->assertFalse($collection->is_active);
+    }
+
     public function test_owner_can_edit_order_state_pashto_audio_and_settings(): void
     {
         Storage::fake('audio');

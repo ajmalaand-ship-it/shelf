@@ -12,12 +12,17 @@ class CollectionController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        return CollectionResource::collection(Collection::query()->where('is_active', true)->orderBy('sort_order')->get());
+        return CollectionResource::collection(Collection::query()
+            ->where('is_active', true)
+            ->withCount(['poems' => fn ($query) => $query->where('is_active', true)])
+            ->orderBy('sort_order')
+            ->get());
     }
 
     public function show(Collection $collection): CollectionResource
     {
         abort_unless($collection->is_active, 404);
+        $collection->loadCount(['poems' => fn ($query) => $query->where('is_active', true)]);
 
         return new CollectionResource($collection);
     }

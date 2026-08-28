@@ -13,9 +13,14 @@ class CollectionResource extends JsonResource
         return [
             'title' => $this->title,
             'slug' => $this->slug,
+            'author' => $this->author,
             'subtitle' => $this->subtitle,
             'description' => $this->description,
+            'dedication' => $this->dedication,
+            'introduction' => $this->introduction,
+            'publication_info' => $this->publication_info,
             'cover_url' => $this->cover_image ? Storage::disk('covers')->url($this->cover_image) : null,
+            'poem_count' => $this->whenCounted('poems'),
             'sort_order' => $this->sort_order,
         ];
     }

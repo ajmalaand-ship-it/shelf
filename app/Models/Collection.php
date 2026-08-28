@@ -12,7 +12,10 @@ class Collection extends Model
     /** @use HasFactory<CollectionFactory> */
     use HasFactory;
 
-    protected $fillable = ['title', 'slug', 'subtitle', 'description', 'cover_image', 'sort_order', 'is_active', 'product_id'];
+    protected $fillable = [
+        'title', 'slug', 'subtitle', 'description', 'author', 'dedication', 'introduction',
+        'publication_info', 'cover_image', 'sort_order', 'is_active', 'product_id',
+    ];
 
     protected function casts(): array
     {

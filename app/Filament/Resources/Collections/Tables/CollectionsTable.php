@@ -17,6 +17,7 @@ class CollectionsTable
             ->columns([
                 TextColumn::make('sort_order')->sortable(),
                 TextColumn::make('title')->searchable()->sortable(),
+                TextColumn::make('author')->searchable(),
                 TextColumn::make('slug')->searchable(),
                 IconColumn::make('is_active')->boolean(),
             ])
