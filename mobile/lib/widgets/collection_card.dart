@@ -46,7 +46,7 @@ class CollectionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+              const Icon(Icons.arrow_forward_ios_rounded, size: 18),
             ],
           ),
         ),

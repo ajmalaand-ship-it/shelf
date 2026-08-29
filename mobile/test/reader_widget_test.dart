@@ -36,6 +36,10 @@ void main() {
     expect(find.text('اجمل اند بشپړه شاعري'), findsOneWidget);
     expect(find.text('ټولګې'), findsOneWidget);
     expect(find.text('ټولې ټولګې'), findsNothing);
+    final homeForwardIcon = tester.widget<Icon>(
+      find.byIcon(Icons.arrow_forward_rounded),
+    );
+    expect(homeForwardIcon.icon!.matchTextDirection, isTrue);
     final hasRtlRoot = tester
         .widgetList<Directionality>(find.byType(Directionality))
         .any((widget) => widget.textDirection == TextDirection.rtl);
@@ -53,11 +57,18 @@ void main() {
         50,
         (index) => index == 2 ? '\nنوی بند' : 'ازاده کرښه ${index + 1}',
       ).join('\n');
+      const poemTitle = 'اوږد ازموينيز شعر';
+      final readerSettings = await settings();
+      await readerSettings.setFontSize(38);
       final repository = PoetryRepository(
         api: ApiClient(
           client: MockClient(
             (_) async => http.Response.bytes(
-              utf8.encode(jsonEncode({'data': poemDetailJson(body: longBody)})),
+              utf8.encode(
+                jsonEncode({
+                  'data': poemDetailJson(title: poemTitle, body: longBody),
+                }),
+              ),
               200,
               headers: {'content-type': 'application/json; charset=utf-8'},
             ),
@@ -70,10 +81,9 @@ void main() {
         MaterialApp(
           home: PoemReaderScreen(
             poemId: 301,
-            initialTitle: 'ازاده شاعري',
             contentVersion: 7,
             repository: repository,
-            settings: await settings(),
+            settings: readerSettings,
           ),
         ),
       );
@@ -85,7 +95,34 @@ void main() {
       expect(text.data, longBody);
       expect(text.data, contains('\n\nنوی بند'));
       expect(text.textDirection, TextDirection.rtl);
+      expect(text.style!.fontSize, 38);
       expect(find.byKey(const Key('poem-scroll-view')), findsOneWidget);
+      expect(find.text(poemTitle), findsOneWidget);
+
+      final appBar = tester.widget<AppBar>(
+        find.byKey(const Key('reader-app-bar')),
+      );
+      expect(appBar.title, isNull);
+      expect(appBar.backgroundColor!.a, 1);
+      expect(appBar.scrolledUnderElevation, 0);
+
+      final toolbarBottom = tester.getBottomLeft(
+        find.byKey(const Key('reader-app-bar')),
+      );
+      final readerTop = tester.getTopLeft(
+        find.byKey(const Key('reader-body-clip')),
+      );
+      expect(readerTop.dy, greaterThanOrEqualTo(toolbarBottom.dy));
+
+      await tester.drag(
+        find.byKey(const Key('poem-scroll-view')),
+        const Offset(0, -900),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester.getTopLeft(find.byKey(const Key('reader-body-clip'))).dy,
+        greaterThanOrEqualTo(toolbarBottom.dy),
+      );
       expect(tester.takeException(), isNull);
     },
   );
@@ -121,7 +158,6 @@ void main() {
       MaterialApp(
         home: PoemReaderScreen(
           poemId: 301,
-          initialTitle: 'شعر',
           contentVersion: 7,
           repository: fixtureRepository(),
           settings: readerSettings,
@@ -166,7 +202,6 @@ void main() {
       MaterialApp(
         home: PoemReaderScreen(
           poemId: 301,
-          initialTitle: 'تړلی شعر',
           contentVersion: 7,
           repository: repository,
           settings: await settings(),

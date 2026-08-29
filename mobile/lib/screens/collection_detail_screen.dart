@@ -95,7 +95,6 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                           MaterialPageRoute<void>(
                             builder: (_) => PoemReaderScreen(
                               poemId: poem.id,
-                              initialTitle: poem.displayTitle,
                               contentVersion: widget.contentVersion,
                               repository: widget.repository,
                               settings: widget.readerSettings,

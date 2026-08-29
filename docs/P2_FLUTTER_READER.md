@@ -11,6 +11,8 @@ P2 began through explicit owner authorization on August 28, 2026. The app is loc
 - Untitled works use the first non-empty excerpt/body line for reader navigation only; no authored title is created.
 - Noto Nastaliq Urdu and Scheherazade New are bundled locally with their SIL Open Font License notices.
 - The reader uses explicit RTL, selectable Unicode text, preserved newlines/stanzas, approximately 2.2 line height, constrained readable width, and scrolling for long poems.
+- The full poem title appears only in the reader content hierarchy. The pinned toolbar is title-free, opaque in every reader palette, and separated from the hard-clipped, bottom-safe scroll viewport so Nastaliq text cannot paint behind it.
+- Forward collection-entry cues use direction-aware icons, while Flutter's automatic back controls retain platform behavior and mirror correctly in RTL.
 - Light, Sepia, and Dark palettes plus Nastaliq/Naskh and font-size controls persist locally without accounts.
 
 ## API and cache

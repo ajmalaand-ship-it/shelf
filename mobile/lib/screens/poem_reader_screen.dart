@@ -7,7 +7,6 @@ import '../settings/reader_settings.dart';
 class PoemReaderScreen extends StatefulWidget {
   const PoemReaderScreen({
     required this.poemId,
-    required this.initialTitle,
     required this.contentVersion,
     required this.repository,
     required this.settings,
@@ -15,7 +14,6 @@ class PoemReaderScreen extends StatefulWidget {
   });
 
   final int poemId;
-  final String initialTitle;
   final int contentVersion;
   final PoetryDataSource repository;
   final ReaderSettings settings;
@@ -44,9 +42,12 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
       return Scaffold(
         backgroundColor: colors.background,
         appBar: AppBar(
+          key: const Key('reader-app-bar'),
           backgroundColor: colors.background,
           foregroundColor: colors.foreground,
-          title: Text(widget.initialTitle, maxLines: 1),
+          surfaceTintColor: colors.background,
+          shadowColor: Colors.transparent,
+          scrolledUnderElevation: 0,
           actions: [
             IconButton(
               tooltip: 'د لوست بڼه',
@@ -55,26 +56,29 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
             ),
           ],
         ),
-        body: FutureBuilder<PoemDetail>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return Center(
-                child: CircularProgressIndicator(color: colors.foreground),
+        body: ClipRect(
+          key: const Key('reader-body-clip'),
+          child: FutureBuilder<PoemDetail>(
+            future: _future,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return Center(
+                  child: CircularProgressIndicator(color: colors.foreground),
+                );
+              }
+              if (snapshot.hasError || !snapshot.hasData) {
+                return _ReaderError(
+                  color: colors.foreground,
+                  onRetry: () => setState(() => _future = _load()),
+                );
+              }
+              return _PoemBody(
+                poem: snapshot.requireData,
+                settings: widget.settings,
+                colors: colors,
               );
-            }
-            if (snapshot.hasError || !snapshot.hasData) {
-              return _ReaderError(
-                color: colors.foreground,
-                onRetry: () => setState(() => _future = _load()),
-              );
-            }
-            return _PoemBody(
-              poem: snapshot.requireData,
-              settings: widget.settings,
-              colors: colors,
-            );
-          },
+            },
+          ),
         ),
       );
     },
@@ -167,73 +171,77 @@ class _PoemBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Directionality(
     textDirection: TextDirection.rtl,
-    child: SelectionArea(
-      child: SingleChildScrollView(
-        key: const Key('poem-scroll-view'),
-        padding: const EdgeInsets.fromLTRB(24, 18, 24, 72),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (!poem.isUntitled)
-                  Text(
-                    poem.title!,
-                    textAlign: TextAlign.center,
+    child: SafeArea(
+      top: false,
+      child: SelectionArea(
+        child: SingleChildScrollView(
+          key: const Key('poem-scroll-view'),
+          clipBehavior: Clip.hardEdge,
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 72),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (!poem.isUntitled)
+                    Text(
+                      poem.title!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: colors.foreground,
+                        fontFamily: settings.fontFamily,
+                        fontSize: settings.fontSize + 5,
+                        height: 1.8,
+                      ),
+                    ),
+                  if (poem.isTranslation) ...[
+                    const SizedBox(height: 18),
+                    Text(
+                      'اصلي شاعر: ${poem.originalAuthor ?? '—'}\n'
+                      'پښتو ژباړه: ${poem.translator ?? '—'}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: colors.muted, height: 1.6),
+                    ),
+                  ],
+                  if (poem.sourceDatePlace case final datePlace?) ...[
+                    const SizedBox(height: 14),
+                    Text(
+                      datePlace,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: colors.muted),
+                    ),
+                  ],
+                  const SizedBox(height: 28),
+                  if (poem.locked) _LockedNotice(color: colors.foreground),
+                  SelectableText(
+                    poem.readableText,
+                    key: const Key('poem-body'),
+                    textDirection: TextDirection.rtl,
+                    textAlign: TextAlign.start,
                     style: TextStyle(
                       color: colors.foreground,
                       fontFamily: settings.fontFamily,
-                      fontSize: settings.fontSize + 5,
-                      height: 1.8,
+                      fontSize: settings.fontSize,
+                      height: 2.2,
                     ),
                   ),
-                if (poem.isTranslation) ...[
-                  const SizedBox(height: 18),
-                  Text(
-                    'اصلي شاعر: ${poem.originalAuthor ?? '—'}\n'
-                    'پښتو ژباړه: ${poem.translator ?? '—'}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: colors.muted, height: 1.6),
-                  ),
+                  if (poem.audioAvailable) ...[
+                    const SizedBox(height: 26),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.graphic_eq_rounded, color: colors.muted),
+                        const SizedBox(width: 8),
+                        Text(
+                          'غږيزه بڼه شته',
+                          style: TextStyle(color: colors.muted),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
-                if (poem.sourceDatePlace case final datePlace?) ...[
-                  const SizedBox(height: 14),
-                  Text(
-                    datePlace,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: colors.muted),
-                  ),
-                ],
-                const SizedBox(height: 28),
-                if (poem.locked) _LockedNotice(color: colors.foreground),
-                SelectableText(
-                  poem.readableText,
-                  key: const Key('poem-body'),
-                  textDirection: TextDirection.rtl,
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    color: colors.foreground,
-                    fontFamily: settings.fontFamily,
-                    fontSize: settings.fontSize,
-                    height: 2.2,
-                  ),
-                ),
-                if (poem.audioAvailable) ...[
-                  const SizedBox(height: 26),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.graphic_eq_rounded, color: colors.muted),
-                      const SizedBox(width: 8),
-                      Text(
-                        'غږيزه بڼه شته',
-                        style: TextStyle(color: colors.muted),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
+              ),
             ),
           ),
         ),

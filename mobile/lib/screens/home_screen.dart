@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             .headlineMedium,
                                       ),
                                     ),
-                                    const Icon(Icons.arrow_back_rounded),
+                                    const Icon(Icons.arrow_forward_rounded),
                                   ],
                                 ),
                               ),
