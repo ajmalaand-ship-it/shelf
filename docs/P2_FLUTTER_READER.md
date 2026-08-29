@@ -2,6 +2,8 @@
 
 P2 began through explicit owner authorization on August 28, 2026. The app is located in `mobile/` and uses Android application ID `com.hindara.pitswal`.
 
+**Gate status: Complete — owner real-device acceptance recorded August 29, 2026.**
+
 ## Reader foundation
 
 - Home, Collections, collection detail/front matter, ordered poem list, and poem reader are implemented against `https://poetry.ajmalaand.com/api/`.
@@ -25,7 +27,11 @@ P3 audio playback, P4 sharing, P5 purchases, search, accounts, and store submiss
 
 The real-device acceptance build provides two clearly labelled local test collections covering cover/no-cover, titled/untitled, short/long, multi-stanza/free-verse, translation, free, and locked reader states. Product build mode takes precedence over every requested fixture mode, so release builds continue to use only the production API/cache repository. The fixtures are not published and make no backend or production-data changes.
 
-Automated checks prepare the build, but the constitutional P2 exit gate remains open until Ajmal installs the debug APK on a real Android phone and verifies RTL, Nastaliq diacritics/clipping, stanza structure, small-screen margins, long scrolling, all three palettes, font/size switching, locked and translation treatment, navigation, cover scaling, and offline/cache behavior where applicable.
+Ajmal tested the final P2 QA APK on real Android hardware and accepted the core reader operational gate with the assessment: “The basics of the operations are working.” Owner evidence confirmed launch, corrected Home hierarchy, RTL navigation, the complete collection-to-reader route, long scrolling, unobscured poem text, single-title hierarchy, unclipped Nastaliq rendering, reader controls, font-size adjustment, Nastaliq/Naskh selection, Light/Sepia/Dark availability, and locked/translation representations.
+
+The accepted technical baseline is the `com.hindara.pitswal` Flutter reader with RTL Pashto, bundled Noto Nastaliq Urdu and Scheherazade New, Light/Sepia/Dark palettes, font-size control, Nastaliq/Naskh toggle, and the versioned public API/cache architecture. Synthetic QA wording remains test-only; fixtures remain debug-only. Real production content remains governed by API publication state and was not published for acceptance.
+
+P2 acceptance closes the core operational reader gate, not final launch presentation. Detailed visual polish and final Play Store screenshots/assets remain P6 launch-stage work. P3 has not started and requires its own authorized task.
 
 ## Technical validation
 

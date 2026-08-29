@@ -4,6 +4,11 @@ All notable repository governance changes are recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Closed the P2 Flutter Reader gate on August 29, 2026, after owner testing on real Android hardware confirmed the core RTL reader flow, long scrolling, toolbar boundary, title hierarchy, bundled font choices, reader settings, and locked/translation representations.
+- Preserved debug-only QA fixture isolation and API publication control over real production content; deferred detailed visual polish and final Play Store screenshots/assets to the P6 launch stage.
+
 ### Added
 
 - Initial System C repository governance and safety baseline.

@@ -22,7 +22,7 @@ After P1 passes, build the Android-first Flutter home, collection, poem list, an
 
 **Gate:** Poems are readable, unclipped, attractive, and correctly RTL on a real Android device.
 
-**Current implementation status:** P2 began with explicit owner authorization on August 28, 2026. The Android-first Flutter project is in `mobile/` and uses the public Laravel API with a `content_version`-keyed JSON cache, locally bundled Noto Nastaliq Urdu and Scheherazade New fonts, explicit RTL, Light/Sepia/Dark reader palettes, and persistent font/size controls. Automated parsing, cache/offline, locked-content, Unicode, RTL, attribution, preference, and long-reader checks are configured. Technical build validation and the debug APK are recorded in `docs/P2_FLUTTER_READER.md`; real-device reading acceptance remains required before the P2 gate is complete. P3 audio work has not started.
+**Status: Complete — real-device gate passed August 29, 2026.** Ajmal accepted the P2 core reader operational gate after testing the final QA APK on real Android hardware. The Android-first Flutter project is in `mobile/` under package `com.hindara.pitswal` and uses the public Laravel API with a `content_version`-keyed JSON cache, locally bundled Noto Nastaliq Urdu and Scheherazade New fonts, explicit RTL, Light/Sepia/Dark reader palettes, persistent font-size control, and a Nastaliq/Naskh toggle. Debug QA fixtures remain isolated from release builds, and real production content remains governed by API publication state. Detailed visual polish and final Play Store screenshots/assets remain P6 launch-stage work. P3 audio work has not started.
 
 ## P3 — Audio experience
 
