@@ -17,7 +17,7 @@ class PoemReaderScreen extends StatefulWidget {
   final int poemId;
   final String initialTitle;
   final int contentVersion;
-  final PoetryRepository repository;
+  final PoetryDataSource repository;
   final ReaderSettings settings;
 
   @override

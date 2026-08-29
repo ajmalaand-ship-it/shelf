@@ -33,7 +33,14 @@ class CollectionBundle {
   final List<PoemSummary> poems;
 }
 
-class PoetryRepository {
+abstract interface class PoetryDataSource {
+  Future<CatalogueSnapshot?> loadCachedCatalogue();
+  Future<CatalogueSnapshot> refreshCatalogue(CatalogueSnapshot? cached);
+  Future<CollectionBundle> loadCollection(String slug, int contentVersion);
+  Future<PoemDetail> loadPoem(int id, int contentVersion);
+}
+
+class PoetryRepository implements PoetryDataSource {
   PoetryRepository({required ApiClient api, required CacheStore cache})
     : this._(api, cache);
 
@@ -45,6 +52,7 @@ class PoetryRepository {
   final ApiClient _api;
   final CacheStore _cache;
 
+  @override
   Future<CatalogueSnapshot?> loadCachedCatalogue() async {
     final raw = await _cache.read(_catalogueKey);
     if (raw == null) return null;
@@ -63,6 +71,7 @@ class PoetryRepository {
     }
   }
 
+  @override
   Future<CatalogueSnapshot> refreshCatalogue(CatalogueSnapshot? cached) async {
     try {
       final config = AppConfig.fromJson(await _api.getObject('app-config'));
@@ -101,6 +110,7 @@ class PoetryRepository {
     }
   }
 
+  @override
   Future<CollectionBundle> loadCollection(
     String slug,
     int contentVersion,
@@ -133,6 +143,7 @@ class PoetryRepository {
     }
   }
 
+  @override
   Future<PoemDetail> loadPoem(int id, int contentVersion) async {
     final key = '$_contentPrefix$contentVersion.poem.$id';
     try {

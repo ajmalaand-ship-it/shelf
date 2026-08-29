@@ -16,7 +16,7 @@ class CollectionDetailScreen extends StatefulWidget {
 
   final String slug;
   final int contentVersion;
-  final PoetryRepository repository;
+  final PoetryDataSource repository;
   final ReaderSettings readerSettings;
 
   @override

@@ -14,7 +14,7 @@ class CollectionsScreen extends StatelessWidget {
   });
 
   final CatalogueSnapshot snapshot;
-  final PoetryRepository repository;
+  final PoetryDataSource repository;
   final ReaderSettings readerSettings;
 
   @override

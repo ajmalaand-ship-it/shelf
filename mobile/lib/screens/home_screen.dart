@@ -11,11 +11,13 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({
     required this.repository,
     required this.readerSettings,
+    required this.qaMode,
     super.key,
   });
 
-  final PoetryRepository repository;
+  final PoetryDataSource repository;
   final ReaderSettings readerSettings;
+  final bool qaMode;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -47,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final snapshot = _snapshot;
     return Scaffold(
-      appBar: AppBar(title: const Text('پېڅوَل')),
       body: SafeArea(
         child: snapshot == null
             ? _error == null
@@ -63,25 +64,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       sliver: SliverList.list(
                         children: [
                           _BrandHeader(config: snapshot.config),
+                          if (widget.qaMode) ...[
+                            const SizedBox(height: 16),
+                            const _QaNotice(),
+                          ],
                           if (snapshot.refreshError != null) ...[
                             const SizedBox(height: 16),
                             const _OfflineNotice(),
                           ],
                           const SizedBox(height: 32),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'ټولګې',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineMedium,
+                          Semantics(
+                            button: true,
+                            header: true,
+                            label: 'ټولګې',
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(8),
+                              onTap: () => _openCollections(snapshot),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 6,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'ټولګې',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineMedium,
+                                      ),
+                                    ),
+                                    const Icon(Icons.arrow_back_rounded),
+                                  ],
+                                ),
                               ),
-                              TextButton(
-                                onPressed: () => _openCollections(snapshot),
-                                child: const Text('ټولې ټولګې'),
-                              ),
-                            ],
+                            ),
                           ),
                           const SizedBox(height: 14),
                           if (snapshot.collections.isEmpty)
@@ -135,6 +152,30 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+class _QaNotice extends StatelessWidget {
+  const _QaNotice();
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'د ازموینې بڼه، يوازې ډيبګ',
+    child: Container(
+      key: const Key('debug-qa-notice'),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.science_outlined, size: 18),
+          SizedBox(width: 8),
+          Expanded(child: Text('د لوست ازموينه — ډيبګ')),
+        ],
+      ),
+    ),
+  );
 }
 
 class _BrandHeader extends StatelessWidget {

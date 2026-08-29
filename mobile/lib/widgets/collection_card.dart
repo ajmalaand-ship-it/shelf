@@ -72,6 +72,8 @@ class _Cover extends StatelessWidget {
         height: 108,
         child: url == null
             ? placeholder
+            : url!.startsWith('qa-cover:')
+            ? const _QaCover()
             : CachedNetworkImage(
                 imageUrl: url!,
                 fit: BoxFit.contain,
@@ -81,4 +83,24 @@ class _Cover extends StatelessWidget {
       ),
     );
   }
+}
+
+class _QaCover extends StatelessWidget {
+  const _QaCover();
+
+  @override
+  Widget build(BuildContext context) => ColoredBox(
+    color: const Color(0xff765430),
+    child: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Text(
+          'QA',
+          textDirection: TextDirection.ltr,
+          style: Theme.of(context).textTheme.titleLarge
+              ?.copyWith(color: const Color(0xfffffbf4), fontFamily: null),
+        ),
+      ),
+    ),
+  );
 }

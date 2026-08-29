@@ -27,12 +27,15 @@ void main() {
       PitswalApp(
         repository: fixtureRepository(),
         readerSettings: await settings(),
+        qaMode: false,
       ),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('پېڅوَل'), findsWidgets);
     expect(find.text('اجمل اند بشپړه شاعري'), findsOneWidget);
+    expect(find.text('ټولګې'), findsOneWidget);
+    expect(find.text('ټولې ټولګې'), findsNothing);
     final hasRtlRoot = tester
         .widgetList<Directionality>(find.byType(Directionality))
         .any((widget) => widget.textDirection == TextDirection.rtl);

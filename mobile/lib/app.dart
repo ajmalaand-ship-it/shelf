@@ -9,11 +9,13 @@ class PitswalApp extends StatelessWidget {
   const PitswalApp({
     required this.repository,
     required this.readerSettings,
+    this.qaMode = false,
     super.key,
   });
 
-  final PoetryRepository repository;
+  final PoetryDataSource repository;
   final ReaderSettings readerSettings;
+  final bool qaMode;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -24,6 +26,10 @@ class PitswalApp extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: child ?? const SizedBox.shrink(),
     ),
-    home: HomeScreen(repository: repository, readerSettings: readerSettings),
+    home: HomeScreen(
+      repository: repository,
+      readerSettings: readerSettings,
+      qaMode: qaMode,
+    ),
   );
 }
