@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../audio/audio_playback_controller.dart';
 import '../models/poem.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
@@ -10,6 +11,7 @@ class PoemReaderScreen extends StatefulWidget {
     required this.contentVersion,
     required this.repository,
     required this.settings,
+    this.audioController,
     super.key,
   });
 
@@ -17,6 +19,7 @@ class PoemReaderScreen extends StatefulWidget {
   final int contentVersion;
   final PoetryDataSource repository;
   final ReaderSettings settings;
+  final AudioPlaybackController? audioController;
 
   @override
   State<PoemReaderScreen> createState() => _PoemReaderScreenState();
@@ -76,6 +79,8 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
                 poem: snapshot.requireData,
                 settings: widget.settings,
                 colors: colors,
+                audioController:
+                    widget.audioController ?? InactiveAudioController(),
               );
             },
           ),
@@ -162,11 +167,13 @@ class _PoemBody extends StatelessWidget {
     required this.poem,
     required this.settings,
     required this.colors,
+    required this.audioController,
   });
 
   final PoemDetail poem;
   final ReaderSettings settings;
   final _ReaderColors colors;
+  final AudioPlaybackController audioController;
 
   @override
   Widget build(BuildContext context) => Directionality(
@@ -212,6 +219,14 @@ class _PoemBody extends StatelessWidget {
                       style: TextStyle(color: colors.muted),
                     ),
                   ],
+                  if (poem.hasPlayableAudio) ...[
+                    const SizedBox(height: 24),
+                    _AudioPlayerPanel(
+                      poem: poem,
+                      controller: audioController,
+                      colors: colors,
+                    ),
+                  ],
                   const SizedBox(height: 28),
                   if (poem.locked) _LockedNotice(color: colors.foreground),
                   SelectableText(
@@ -226,20 +241,6 @@ class _PoemBody extends StatelessWidget {
                       height: 2.2,
                     ),
                   ),
-                  if (poem.audioAvailable) ...[
-                    const SizedBox(height: 26),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.graphic_eq_rounded, color: colors.muted),
-                        const SizedBox(width: 8),
-                        Text(
-                          'غږيزه بڼه شته',
-                          style: TextStyle(color: colors.muted),
-                        ),
-                      ],
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -248,6 +249,153 @@ class _PoemBody extends StatelessWidget {
       ),
     ),
   );
+}
+
+class _AudioPlayerPanel extends StatelessWidget {
+  const _AudioPlayerPanel({
+    required this.poem,
+    required this.controller,
+    required this.colors,
+  });
+
+  final PoemDetail poem;
+  final AudioPlaybackController controller;
+  final _ReaderColors colors;
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: controller,
+    builder: (context, _) {
+      final active = controller.activePoemId == poem.id;
+      final state = active ? controller.state : AudioControlState.idle;
+      final position = active ? controller.position : Duration.zero;
+      final duration = active
+          ? controller.duration
+          : poem.audioDurationSeconds == null
+          ? null
+          : Duration(seconds: poem.audioDurationSeconds!);
+      final maxMilliseconds = (duration?.inMilliseconds ?? 0).clamp(1, 1 << 31);
+      final positionMilliseconds = position.inMilliseconds.clamp(
+        0,
+        maxMilliseconds,
+      );
+      final loading =
+          state == AudioControlState.loading ||
+          state == AudioControlState.buffering;
+      final playing = state == AudioControlState.playing;
+
+      return Semantics(
+        container: true,
+        label: 'د شعر غږ',
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: colors.muted.withValues(alpha: 0.35)),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.graphic_eq_rounded, color: colors.muted),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        poem.audioLabel ?? 'د شعر غږ',
+                        style: TextStyle(color: colors.muted),
+                      ),
+                    ),
+                  ],
+                ),
+                if (state == AudioControlState.error) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    controller.errorMessage ?? 'غږ ونه غږېد.',
+                    key: const Key('audio-error'),
+                    style: TextStyle(color: colors.foreground),
+                  ),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: TextButton.icon(
+                      onPressed: () => controller.retry(poem),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('بيا هڅه وکړئ'),
+                    ),
+                  ),
+                ] else ...[
+                  Slider(
+                    key: const Key('audio-seek-slider'),
+                    min: 0,
+                    max: maxMilliseconds.toDouble(),
+                    value: positionMilliseconds.toDouble(),
+                    secondaryTrackValue: active
+                        ? controller.bufferedPosition.inMilliseconds
+                              .clamp(0, maxMilliseconds)
+                              .toDouble()
+                        : 0,
+                    onChanged: duration == null
+                        ? null
+                        : (value) => controller.seek(
+                            Duration(milliseconds: value.round()),
+                          ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton.filledTonal(
+                        key: const Key('audio-play-pause'),
+                        tooltip: playing ? 'تم' : 'غږول',
+                        onPressed: loading
+                            ? null
+                            : () => controller.toggle(poem),
+                        icon: loading
+                            ? const SizedBox.square(
+                                dimension: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Icon(
+                                playing
+                                    ? Icons.pause_rounded
+                                    : Icons.play_arrow_rounded,
+                              ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '${_durationText(position)} / ${_durationText(duration)}',
+                          key: const Key('audio-time'),
+                          textDirection: TextDirection.ltr,
+                          style: TextStyle(color: colors.muted),
+                        ),
+                      ),
+                      if (active && controller.cacheProgress != null)
+                        Text(
+                          controller.cacheProgress! >= 1
+                              ? 'ساتل شوی'
+                              : '${(controller.cacheProgress! * 100).round()}٪',
+                          key: const Key('audio-cache-status'),
+                          style: TextStyle(color: colors.muted),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+
+  static String _durationText(Duration? duration) {
+    if (duration == null) return '--:--';
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
 }
 
 class _LockedNotice extends StatelessWidget {

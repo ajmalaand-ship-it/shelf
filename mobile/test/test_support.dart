@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:pitswal/audio/audio_playback_controller.dart';
+import 'package:pitswal/models/poem.dart';
 import 'package:pitswal/repository/poetry_repository.dart';
 import 'package:pitswal/services/api_client.dart';
 import 'package:pitswal/services/cache_store.dart';
@@ -60,6 +62,12 @@ Map<String, dynamic> poemDetailJson({
   String? title,
   String? body = 'ټ ډ ړ ږ ښ ڼ ې ۍ\nدويمه کرښه\n\nنوی بند',
   String workType = 'ORIGINAL',
+  bool audioAvailable = false,
+  bool audioLocked = false,
+  int? audioDurationSeconds,
+  String? audioCacheKey,
+  String? audioFormat,
+  String? audioLabel,
 }) => {
   'id': 301,
   'collection_slug': 'hendaray-aw-chine',
@@ -73,10 +81,13 @@ Map<String, dynamic> poemDetailJson({
   'excerpt': 'لنډه برخه\nدويمه کرښه',
   'body': locked ? null : body,
   'audio': {
-    'available': false,
-    'locked': locked,
-    'duration_seconds': null,
-    'metadata_url': null,
+    'available': audioAvailable,
+    'locked': audioLocked || locked,
+    'duration_seconds': audioDurationSeconds,
+    'metadata_url': audioAvailable ? '/api/poems/301/audio' : null,
+    'cache_key': audioCacheKey,
+    'format': audioFormat,
+    'label': audioLabel,
   },
 };
 
@@ -110,6 +121,79 @@ PoetryRepository fixtureRepository({bool failNetwork = false}) {
     ),
     cache: MemoryCacheStore(),
   );
+}
+
+class FakeAudioController extends AudioPlaybackController {
+  int? poemId;
+  AudioControlState controlState = AudioControlState.idle;
+  Duration currentPosition = Duration.zero;
+  Duration? currentDuration;
+  Duration currentBufferedPosition = Duration.zero;
+  double? currentCacheProgress;
+  String? currentError;
+  int toggleCount = 0;
+  int retryCount = 0;
+  Duration? lastSeek;
+
+  @override
+  int? get activePoemId => poemId;
+  @override
+  AudioControlState get state => controlState;
+  @override
+  Duration get position => currentPosition;
+  @override
+  Duration? get duration => currentDuration;
+  @override
+  Duration get bufferedPosition => currentBufferedPosition;
+  @override
+  double? get cacheProgress => currentCacheProgress;
+  @override
+  String? get errorMessage => currentError;
+
+  @override
+  Future<void> toggle(PoemDetail poem) async {
+    toggleCount++;
+    poemId = poem.id;
+    controlState = controlState == AudioControlState.playing
+        ? AudioControlState.paused
+        : AudioControlState.playing;
+    currentDuration ??= poem.audioDurationSeconds == null
+        ? null
+        : Duration(seconds: poem.audioDurationSeconds!);
+    notifyListeners();
+  }
+
+  @override
+  Future<void> retry(PoemDetail poem) async {
+    retryCount++;
+    await toggle(poem);
+  }
+
+  @override
+  Future<void> seek(Duration position) async {
+    lastSeek = position;
+    currentPosition = position;
+    notifyListeners();
+  }
+
+  void emit({
+    required int activePoemId,
+    required AudioControlState state,
+    Duration position = Duration.zero,
+    Duration? duration,
+    Duration buffered = Duration.zero,
+    double? cacheProgress,
+    String? error,
+  }) {
+    poemId = activePoemId;
+    controlState = state;
+    currentPosition = position;
+    currentDuration = duration;
+    currentBufferedPosition = buffered;
+    currentCacheProgress = cacheProgress;
+    currentError = error;
+    notifyListeners();
+  }
 }
 
 class MemoryCacheStore implements CacheStore {

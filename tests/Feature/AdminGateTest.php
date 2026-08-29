@@ -79,6 +79,54 @@ class AdminGateTest extends TestCase
             ->assertHasFormErrors(['audio_path']);
     }
 
+    public function test_owner_can_replace_and_remove_audio_without_losing_private_files(): void
+    {
+        Storage::fake('audio');
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'audio-owner-flow']);
+
+        Livewire::test(CreatePoem::class)
+            ->fillForm([
+                'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن',
+                'excerpt' => 'متن',
+                'audio_path' => [UploadedFile::fake()->create('first.m4a', 20, 'audio/mp4')],
+                'sort_order' => 1, 'is_free_sample' => true, 'is_active' => false,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $poem = Poem::where('title', 'TEST ONLY')->firstOrFail();
+        $firstPath = $poem->audio_path;
+        Storage::disk('audio')->assertExists($firstPath);
+        $version = (int) AppSetting::where('key', 'content_version')->value('value');
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->fillForm([
+                'audio_path' => [UploadedFile::fake()->create('replacement.mp3', 20, 'audio/mpeg')],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $poem->refresh();
+        $replacementPath = $poem->audio_path;
+        $this->assertNotSame($firstPath, $replacementPath);
+        Storage::disk('audio')->assertExists($firstPath);
+        Storage::disk('audio')->assertExists($replacementPath);
+        $this->assertSame($version + 1, (int) AppSetting::where('key', 'content_version')->value('value'));
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->fillForm(['audio_path' => []])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $poem->refresh();
+        $this->assertNull($poem->audio_path);
+        $this->assertNull($poem->audio_duration_seconds);
+        Storage::disk('audio')->assertExists($replacementPath);
+        $this->assertSame($version + 2, (int) AppSetting::where('key', 'content_version')->value('value'));
+    }
+
     public function test_collection_form_rejects_non_image_cover(): void
     {
         Storage::fake('covers');

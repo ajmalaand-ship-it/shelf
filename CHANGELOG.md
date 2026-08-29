@@ -23,6 +23,13 @@ All notable repository governance changes are recorded here.
 - Android-first Flutter reader in `mobile/` with Home, Collections, collection detail, and Unicode poem-reader surfaces.
 - Explicit Pashto RTL, bundled Nastaliq/Naskh fonts with license notices, Light/Sepia/Dark palettes, persistent font controls, and resilient `content_version` caching.
 - Flutter model, API-cache, offline, locked-state, translation-attribution, typography-preference, and reader widget tests.
+- P3 spoken-poetry playback with play/pause/seek, elapsed/duration state, loading/buffering/error/retry UI, background media controls, interruption handling, and one global player.
+- Simultaneous streaming/disk caching with stable recording identities, offline replay, replacement invalidation, partial-download recovery, and bounded retention.
+- Debug-only generated non-voice audio acceptance fixture; it is explicitly synthetic and excluded from release content.
+
+### P3 owner decision
+
+- Ajmal explicitly authorized P3 and designated original voice recordings as ongoing Filament-managed content. Production zero-audio state is valid, and the former 10-recording pre-launch expectation is superseded as a launch blocker.
 
 ### Security
 

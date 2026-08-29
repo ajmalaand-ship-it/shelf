@@ -79,9 +79,9 @@ void main() {
 
     await tester.tap(find.text('د لوست ازموينه — پوښ لري'));
     await tester.pumpAndSettle();
-    expect(find.text('لنډه ازموينه'), findsOneWidget);
+    expect(find.text('مصنوعي غږ ازموينه'), findsOneWidget);
 
-    await tester.tap(find.text('لنډه ازموينه'));
+    await tester.tap(find.text('مصنوعي غږ ازموينه'));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('poem-body')), findsOneWidget);
     expect(find.textContaining('پښتو توري'), findsOneWidget);

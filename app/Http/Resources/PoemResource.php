@@ -28,6 +28,8 @@ class PoemResource extends JsonResource
                 'locked' => $locked,
                 'duration_seconds' => $this->audio_duration_seconds,
                 'metadata_url' => $this->audio_path ? route('poems.audio', $this->resource) : null,
+                'cache_key' => $this->audioCacheKey(),
+                'format' => $this->audioFormat(),
             ],
         ];
     }

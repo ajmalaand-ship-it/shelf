@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../audio/audio_playback_controller.dart';
 import '../models/app_config.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
@@ -12,12 +13,14 @@ class HomeScreen extends StatefulWidget {
     required this.repository,
     required this.readerSettings,
     required this.qaMode,
+    required this.audioController,
     super.key,
   });
 
   final PoetryDataSource repository;
   final ReaderSettings readerSettings;
   final bool qaMode;
+  final AudioPlaybackController audioController;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -135,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
           snapshot: snapshot,
           repository: widget.repository,
           readerSettings: widget.readerSettings,
+          audioController: widget.audioController,
         ),
       ),
     );
@@ -148,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
           contentVersion: snapshot.config.contentVersion,
           repository: widget.repository,
           readerSettings: widget.readerSettings,
+          audioController: widget.audioController,
         ),
       ),
     );

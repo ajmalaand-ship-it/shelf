@@ -4,11 +4,11 @@ This is a concise summary of the approved **Pashto Poetry App Roadmap Revision 2
 
 ## P0 — Content, identity, and store setup
 
-Choose the app identity and first collection; prepare 30–50 proofread Unicode poems, select 10–15 free samples, record at least 10 poems in Ajmal's voice, choose fonts and reading themes, and maintain off-server backups of poem text and recordings. Start Google Play developer verification and line up closed-test testers, confirming current Play Console requirements when registering. P0 runs in parallel with P1.
+Choose the app identity and first collection; prepare 30–50 proofread Unicode poems, select 10–15 free samples, establish Ajmal's original voice as the only production narration source, choose fonts and reading themes, and maintain off-server backups of poem text and every recording once supplied. Start Google Play developer verification and line up closed-test testers, confirming current Play Console requirements when registering. P0 runs in parallel with P1.
 
 **Gate:** Launch content is ready for administration entry, the Play account is registered and verifying, and the tester group is lined up.
 
-**Current approved preparation baseline:** The public identity is `پېڅوَل` with slogan `اجمل اند بشپړه شاعري`. The reader typography decision is Noto Nastaliq Urdu for primary body text and Scheherazade New as the Naskh alternate, with Light, Sepia, and Dark themes, explicit RTL, font-size control, and approximately 2.2 poem line height. The safely structured private catalogue currently contains 148 works and 15 configured free samples. At least 10 original Ajmal voice recordings, an owner-verified off-server archive copy, Google Play developer-account evidence, and a closed-test tester group remain owner/external gate actions.
+**Current approved preparation baseline:** The public identity is `پېڅوَل` with slogan `اجمل اند بشپړه شاعري`. The reader typography decision is Noto Nastaliq Urdu for primary body text and Scheherazade New as the Naskh alternate, with Light, Sepia, and Dark themes, explicit RTL, font-size control, and approximately 2.2 poem line height. The safely structured private catalogue currently contains 148 works and 15 configured free samples. By explicit owner decision on August 29, 2026, Ajmal's original recordings are ongoing content added through Filament over time; the former expectation of 10 recordings before launch is superseded and is not a launch blocker. Every actual recording still requires protected storage and verified off-server backup once supplied. Google Play developer-account evidence and a closed-test tester group remain owner/external gate actions.
 
 ## P1 — Laravel and Filament backend
 
@@ -29,6 +29,8 @@ After P1 passes, build the Android-first Flutter home, collection, poem list, an
 Add streaming with local caching, play/pause/seek and loading/error states, duration display, interruption handling, and background playback within the poem screen. Free audio uses its normal route; paid audio uses short-lived signed URLs after entitlement verification.
 
 **Gate:** Reading and Ajmal's voice playback work smoothly together, and cached audio replays without a network request.
+
+**Status: Technical build implemented — owner real-device audio acceptance required.** P3 was explicitly authorized by Ajmal on August 29, 2026. The reader uses one global `just_audio` player with `LockCachingAudioSource`, `audio_session` spoken-audio focus/interruption handling, and `just_audio_background` media controls. Audio cache identity comes from the backend recording path hash, cache size is bounded, and authoritative replacement/removal changes `content_version`. Production having zero recordings is valid; no audio poem is degraded, and new owner recordings require no app update. P4 remains not started.
 
 ## P4 — Share and download cards
 

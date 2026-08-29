@@ -49,6 +49,35 @@ void main() {
     },
   );
 
+  test('audio metadata parses signed URL and stable cache identity', () async {
+    final repository = PoetryRepository(
+      api: ApiClient(
+        client: MockClient(
+          (_) async => http.Response.bytes(
+            utf8.encode(
+              jsonEncode({
+                'locked': false,
+                'url': 'https://poetry.ajmalaand.com/media/audio/301?signature=test',
+                'duration_seconds': 75,
+                'cache_key': 'stable-recording-v1',
+                'format': 'm4a',
+              }),
+            ),
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
+        ),
+      ),
+      cache: MemoryCacheStore(),
+    );
+
+    final audio = await repository.loadAudio(301);
+
+    expect(audio.url.isScheme('https'), isTrue);
+    expect(audio.cacheKey, 'stable-recording-v1');
+    expect(audio.durationSeconds, 75);
+  });
+
   test('failed refresh preserves a valid offline catalogue', () async {
     final cache = MemoryCacheStore();
     cache.values['pitswal.catalogue.v1'] = jsonEncode({

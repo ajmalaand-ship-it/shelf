@@ -91,9 +91,60 @@ class PoetryApiTest extends TestCase
         $this->getJson('/api/collections/media-test')
             ->assertOk()->assertJsonPath('data.cover_url', Storage::disk('covers')->url('cover.webp'));
         $response = $this->getJson("/api/poems/{$poem->id}/audio")
-            ->assertOk()->assertJsonPath('locked', false)->assertJsonPath('duration_seconds', 15);
+            ->assertOk()->assertJsonPath('locked', false)->assertJsonPath('duration_seconds', 15)
+            ->assertJsonPath('cache_key', hash('sha256', 'test-only.m4a'))
+            ->assertJsonPath('format', 'm4a')
+            ->assertJsonMissingPath('audio_path');
         $stream = $this->get($response->json('url'))->assertOk();
         $this->assertSame('TEST ONLY AUDIO', $stream->streamedContent());
+    }
+
+    public function test_audio_replacement_and_removal_change_identity_and_public_availability(): void
+    {
+        Storage::fake('audio');
+        Storage::disk('audio')->put('first/test.m4a', 'FIRST');
+        Storage::disk('audio')->put('second/test.mp3', 'SECOND');
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'audio-change', 'is_active' => true]);
+        $poem = Poem::create([
+            'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن',
+            'excerpt' => 'متن', 'audio_path' => 'first/test.m4a',
+            'is_free_sample' => true, 'is_active' => true,
+        ]);
+        $initialVersion = (int) AppSetting::where('key', 'content_version')->value('value');
+
+        $this->getJson("/api/poems/{$poem->id}")
+            ->assertOk()
+            ->assertJsonPath('data.audio.available', true)
+            ->assertJsonPath('data.audio.cache_key', hash('sha256', 'first/test.m4a'));
+
+        $poem->update(['audio_path' => 'second/test.mp3']);
+        $this->assertSame($initialVersion + 1, (int) AppSetting::where('key', 'content_version')->value('value'));
+        $this->getJson("/api/poems/{$poem->id}/audio")
+            ->assertOk()
+            ->assertJsonPath('cache_key', hash('sha256', 'second/test.mp3'))
+            ->assertJsonPath('format', 'mp3');
+
+        $poem->update(['audio_path' => null, 'audio_duration_seconds' => null]);
+        $this->assertSame($initialVersion + 2, (int) AppSetting::where('key', 'content_version')->value('value'));
+        $this->getJson("/api/poems/{$poem->id}")
+            ->assertOk()->assertJsonPath('data.audio.available', false)
+            ->assertJsonPath('data.audio.cache_key', null);
+        $this->getJson("/api/poems/{$poem->id}/audio")->assertNotFound();
+    }
+
+    public function test_missing_private_audio_file_returns_not_found_without_exposing_path(): void
+    {
+        Storage::fake('audio');
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'missing-audio', 'is_active' => true]);
+        $poem = Poem::create([
+            'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن',
+            'excerpt' => 'متن', 'audio_path' => 'private/missing.m4a',
+            'is_free_sample' => true, 'is_active' => true,
+        ]);
+
+        $this->getJson("/api/poems/{$poem->id}/audio")
+            ->assertNotFound()
+            ->assertJsonMissingPath('audio_path');
     }
 
     public function test_published_collection_returns_reader_safe_front_matter_and_active_poem_count(): void

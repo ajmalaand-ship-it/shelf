@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../audio/audio_playback_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
 import '../widgets/collection_card.dart';
@@ -10,12 +11,14 @@ class CollectionsScreen extends StatelessWidget {
     required this.snapshot,
     required this.repository,
     required this.readerSettings,
+    this.audioController,
     super.key,
   });
 
   final CatalogueSnapshot snapshot;
   final PoetryDataSource repository;
   final ReaderSettings readerSettings;
+  final AudioPlaybackController? audioController;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -37,6 +40,7 @@ class CollectionsScreen extends StatelessWidget {
                       contentVersion: snapshot.config.contentVersion,
                       repository: repository,
                       readerSettings: readerSettings,
+                      audioController: audioController,
                     ),
                   ),
                 ),

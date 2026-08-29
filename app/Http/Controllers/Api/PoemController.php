@@ -32,6 +32,8 @@ class PoemController extends Controller
             'locked' => false,
             'url' => URL::temporarySignedRoute('poems.audio.stream', now()->addMinutes(10), ['poem' => $poem]),
             'duration_seconds' => $poem->audio_duration_seconds,
+            'cache_key' => $poem->audioCacheKey(),
+            'format' => $poem->audioFormat(),
         ]);
     }
 

@@ -38,6 +38,7 @@ abstract interface class PoetryDataSource {
   Future<CatalogueSnapshot> refreshCatalogue(CatalogueSnapshot? cached);
   Future<CollectionBundle> loadCollection(String slug, int contentVersion);
   Future<PoemDetail> loadPoem(int id, int contentVersion);
+  Future<AudioAccess> loadAudio(int poemId);
 }
 
 class PoetryRepository implements PoetryDataSource {
@@ -160,6 +161,10 @@ class PoetryRepository implements PoetryDataSource {
       return PoemDetail.fromJson(_asMap(jsonDecode(cached)));
     }
   }
+
+  @override
+  Future<AudioAccess> loadAudio(int poemId) async =>
+      AudioAccess.fromJson(await _api.getObject('poems/$poemId/audio'));
 
   CollectionBundle _parseBundle(
     Map<String, dynamic> collectionJson,

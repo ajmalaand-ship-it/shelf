@@ -19,6 +19,7 @@ class PoemSummaryResource extends JsonResource
             'locked' => ! $this->is_free_sample,
             'has_audio' => (bool) $this->audio_path,
             'audio_duration_seconds' => $this->audio_duration_seconds,
+            'audio_cache_key' => $this->audioCacheKey(),
             'sort_order' => $this->sort_order,
         ];
     }

@@ -31,8 +31,11 @@ class PoemForm
                 Textarea::make('source_note')->rows(3)->extraInputAttributes(['dir' => 'rtl']),
                 FileUpload::make('audio_path')->disk('audio')->visibility('private')
                     ->acceptedFileTypes(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/x-wav'])
-                    ->maxSize(51200),
-                TextInput::make('audio_duration_seconds')->numeric()->minValue(0),
+                    ->maxSize(51200)
+                    ->helperText('Owner recording only. Upload M4A, MP3, or WAV up to 50 MB. Replacing or removing audio changes the public content version; old private files remain available to the backup process.'),
+                TextInput::make('audio_duration_seconds')->numeric()->minValue(0)
+                    ->disabled()->dehydrated(false)
+                    ->helperText('Detected automatically after upload when ffprobe can read the file.'),
                 TextInput::make('sort_order')->numeric()->minValue(0)->required()->default(0),
                 Toggle::make('is_free_sample')->default(false),
                 Toggle::make('is_active')->default(false),

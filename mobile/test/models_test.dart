@@ -51,4 +51,26 @@ void main() {
       throwsFormatException,
     );
   });
+
+  test('playable audio requires free access and stable identity', () {
+    final playable = PoemDetail.fromJson(
+      poemDetailJson(
+        audioAvailable: true,
+        audioDurationSeconds: 15,
+        audioCacheKey: 'recording-v1',
+        audioFormat: 'm4a',
+      ),
+    );
+    final locked = PoemDetail.fromJson(
+      poemDetailJson(
+        locked: true,
+        audioAvailable: true,
+        audioLocked: true,
+        audioCacheKey: 'recording-v1',
+      ),
+    );
+
+    expect(playable.hasPlayableAudio, isTrue);
+    expect(locked.hasPlayableAudio, isFalse);
+  });
 }

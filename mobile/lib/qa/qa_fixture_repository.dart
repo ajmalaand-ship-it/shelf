@@ -2,6 +2,7 @@ import '../models/app_config.dart';
 import '../models/poem.dart';
 import '../models/poetry_collection.dart';
 import '../repository/poetry_repository.dart';
+import 'qa_audio_server.dart';
 
 /// Synthetic, local-only reader acceptance data. None of this text is
 /// represented as Ajmal Aand's authored or published poetry.
@@ -42,11 +43,12 @@ class QaFixtureRepository implements PoetryDataSource {
     'qa-reader-covered': [
       PoemSummary(
         id: 9101,
-        title: 'لنډه ازموينه',
+        title: 'مصنوعي غږ ازموينه',
         workType: 'ORIGINAL',
         excerpt: 'پښتو توري: ټ ډ ړ ږ ښ ڼ ې ۍ',
         locked: false,
-        hasAudio: false,
+        hasAudio: true,
+        audioDurationSeconds: 8,
         sortOrder: 1,
       ),
       PoemSummary(
@@ -113,8 +115,9 @@ class QaFixtureRepository implements PoetryDataSource {
     9101: _detail(
       id: 9101,
       slug: _covered.slug,
-      title: 'لنډه ازموينه',
+      title: 'مصنوعي غږ ازموينه',
       body: 'پښتو توري: ټ ډ ړ ږ ښ ڼ ې ۍ\nاعراب: زړۀ، مينهٔ، رؤيا',
+      audioAvailable: true,
     ),
     9102: _detail(
       id: 9102,
@@ -194,6 +197,17 @@ class QaFixtureRepository implements PoetryDataSource {
     if (poem == null) throw StateError('Unknown QA poem');
     return poem;
   }
+
+  @override
+  Future<AudioAccess> loadAudio(int poemId) async {
+    if (poemId != 9101) throw StateError('QA poem has no audio');
+    return AudioAccess(
+      url: await QaAudioServer.instance.url,
+      cacheKey: 'qa-synthetic-tone-v1',
+      durationSeconds: 8,
+      format: 'wav',
+    );
+  }
 }
 
 PoemDetail _detail({
@@ -206,6 +220,7 @@ PoemDetail _detail({
   bool locked = false,
   String? excerpt,
   String? body,
+  bool audioAvailable = false,
 }) => PoemDetail(
   id: id,
   collectionSlug: slug,
@@ -218,5 +233,13 @@ PoemDetail _detail({
   locked: locked,
   excerpt: excerpt,
   body: locked ? null : body,
-  audioAvailable: false,
+  audioAvailable: audioAvailable,
+  audioLocked: locked,
+  audioDurationSeconds: audioAvailable ? 8 : null,
+  audioMetadataUrl: audioAvailable ? 'qa://synthetic-audio' : null,
+  audioCacheKey: audioAvailable ? 'qa-synthetic-tone-v1' : null,
+  audioFormat: audioAvailable ? 'wav' : null,
+  audioLabel: audioAvailable
+      ? 'مصنوعي ازموينيز غږ — د اجمل اند ثبت نه دی'
+      : null,
 );

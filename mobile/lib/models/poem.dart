@@ -69,6 +69,12 @@ class PoemDetail {
     this.excerpt,
     this.body,
     required this.audioAvailable,
+    this.audioLocked = false,
+    this.audioDurationSeconds,
+    this.audioMetadataUrl,
+    this.audioCacheKey,
+    this.audioFormat,
+    this.audioLabel,
   });
 
   factory PoemDetail.fromJson(Map<String, dynamic> json) {
@@ -89,6 +95,12 @@ class PoemDetail {
       excerpt: _string(json, 'excerpt'),
       body: _string(json, 'body'),
       audioAvailable: _bool(audio, 'available'),
+      audioLocked: _bool(audio, 'locked'),
+      audioDurationSeconds: _int(audio, 'duration_seconds'),
+      audioMetadataUrl: _string(audio, 'metadata_url'),
+      audioCacheKey: _string(audio, 'cache_key'),
+      audioFormat: _string(audio, 'format'),
+      audioLabel: _string(audio, 'label'),
     );
   }
 
@@ -104,12 +116,54 @@ class PoemDetail {
   final String? excerpt;
   final String? body;
   final bool audioAvailable;
+  final bool audioLocked;
+  final int? audioDurationSeconds;
+  final String? audioMetadataUrl;
+  final String? audioCacheKey;
+  final String? audioFormat;
+  final String? audioLabel;
 
   bool get isTranslation => workType == 'TRANSLATION';
   bool get isUntitled => title == null || title!.trim().isEmpty;
   String get displayTitle =>
       isUntitled ? firstNonEmptyLine(body ?? excerpt) : title!.trim();
   String get readableText => locked ? (excerpt ?? '') : (body ?? excerpt ?? '');
+  bool get hasPlayableAudio =>
+      audioAvailable && !locked && !audioLocked && audioCacheKey != null;
+}
+
+class AudioAccess {
+  const AudioAccess({
+    required this.url,
+    required this.cacheKey,
+    this.durationSeconds,
+    this.format,
+  });
+
+  factory AudioAccess.fromJson(Map<String, dynamic> json) {
+    if (_bool(json, 'locked')) throw const AudioLockedException();
+    final rawUrl = _string(json, 'url', required: true)!;
+    final cacheKey = _string(json, 'cache_key', required: true)!;
+    final uri = Uri.tryParse(rawUrl);
+    if (uri == null || (!uri.isScheme('https') && !uri.isScheme('http'))) {
+      throw const FormatException('audio url must be HTTP(S)');
+    }
+    return AudioAccess(
+      url: uri,
+      cacheKey: cacheKey,
+      durationSeconds: _int(json, 'duration_seconds'),
+      format: _string(json, 'format'),
+    );
+  }
+
+  final Uri url;
+  final String cacheKey;
+  final int? durationSeconds;
+  final String? format;
+}
+
+class AudioLockedException implements Exception {
+  const AudioLockedException();
 }
 
 String firstNonEmptyLine(String? text) {

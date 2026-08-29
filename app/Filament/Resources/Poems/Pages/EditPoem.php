@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Poems\Pages;
 
 use App\Filament\Resources\Poems\PoemResource;
+use App\Support\AudioDurationProbe;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -15,5 +16,14 @@ class EditPoem extends EditRecord
         return [
             DeleteAction::make(),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        if ($this->record->wasChanged('audio_path')) {
+            $this->record->updateQuietly([
+                'audio_duration_seconds' => app(AudioDurationProbe::class)->seconds($this->record->audio_path),
+            ]);
+        }
     }
 }
