@@ -31,7 +31,7 @@ Ajmal tested the final P2 QA APK on real Android hardware and accepted the core 
 
 The accepted technical baseline is the `com.hindara.pitswal` Flutter reader with RTL Pashto, bundled Noto Nastaliq Urdu and Scheherazade New, Light/Sepia/Dark palettes, font-size control, Nastaliq/Naskh toggle, and the versioned public API/cache architecture. Synthetic QA wording remains test-only; fixtures remain debug-only. Real production content remains governed by API publication state and was not published for acceptance.
 
-P2 acceptance closes the core operational reader gate, not final launch presentation. Detailed visual polish and final Play Store screenshots/assets remain P6 launch-stage work. P3 has not started and requires its own authorized task.
+P2 acceptance closed the core operational reader gate, not final launch presentation. Detailed visual polish and final Play Store screenshots/assets remain P6 launch-stage work. P3 was subsequently authorized and passed its owner real-device audio gate on August 29, 2026; P4 remains not started.
 
 ## Technical validation
 

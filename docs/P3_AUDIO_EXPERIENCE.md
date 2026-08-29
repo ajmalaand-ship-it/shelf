@@ -1,10 +1,14 @@
 # P3 Audio Experience
 
-P3 was explicitly authorized by Ajmal Aand on August 29, 2026. The technical build is complete; owner real-device audio acceptance remains the phase gate.
+P3 was explicitly authorized by Ajmal Aand on August 29, 2026. The technical build was completed in commit `d06d7f579ebae80c69e392a08e21032b43cf9c42`, and Ajmal passed the owner real-device audio gate on August 29, 2026. Testing on real Android hardware confirmed basic playback and play/pause, background and lock-screen playback, sufficient system playback behavior, and offline cached replay after prior playback.
 
 ## Content and phase boundary
 
-Ajmal's original voice recordings are ongoing owner content added through Filament before and after publication. Production may contain zero recordings. The former expectation of 10 recordings before launch is superseded by owner decision and is not a launch blocker. No recording is fabricated, no AI voice is used, and a poem without audio remains a clean, complete reading experience. P4 share cards, P5 payments/entitlements, P6 launch work, and store submission have not started.
+Ajmal's original voice recordings are ongoing owner content added through Filament before and after publication. Production may contain zero or only some recordings. The former expectation of 10 recordings before launch is superseded by owner decision, and an incomplete planned recording batch is not a launch blocker. No recording is fabricated, no AI voice is used, and a poem without audio remains a clean, complete reading experience. P4 share cards, P5 payments/entitlements, P6 launch work, and store submission have not started.
+
+## Accepted technical baseline
+
+The accepted P3 baseline is a `just_audio`-based single player with play/pause/seek/duration, streaming, bounded local caching, offline replay, interruption/audio-focus handling, and background/system media controls. Poems without audio remain clean, locked audio remains protected, and authoritative recording replacement/removal invalidates stale cache. The application requests no microphone, storage, location, or camera permission. AI voice remains excluded, and the synthetic acceptance recording remains debug-only and excluded from release builds.
 
 ## Backend contract and owner workflow
 

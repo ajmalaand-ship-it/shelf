@@ -6,6 +6,8 @@ All notable repository governance changes are recorded here.
 
 ### Changed
 
+- Closed the P3 Audio Experience gate on August 29, 2026, after owner testing on real Android hardware confirmed basic play/pause, background and lock-screen playback, sufficient system playback behavior, and offline replay from populated local cache.
+- Recorded the accepted P3 baseline and preserved ongoing Filament-managed owner recordings as non-blocking launch content; P4 and P5 remain not started, and Google Play submission has not occurred.
 - Closed the P2 Flutter Reader gate on August 29, 2026, after owner testing on real Android hardware confirmed the core RTL reader flow, long scrolling, toolbar boundary, title hierarchy, bundled font choices, reader settings, and locked/translation representations.
 - Preserved debug-only QA fixture isolation and API publication control over real production content; deferred detailed visual polish and final Play Store screenshots/assets to the P6 launch stage.
 
