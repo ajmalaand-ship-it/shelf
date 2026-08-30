@@ -5,13 +5,18 @@ import 'package:http/http.dart' as http;
 import '../purchases/entitlement_controller.dart';
 
 class ApiClient {
-  ApiClient({http.Client? client, Uri? baseUri, this.entitlements})
-    : _client = client ?? http.Client(),
-      baseUri = baseUri ?? Uri.parse('https://poetry.ajmalaand.com/api/');
+  ApiClient({
+    http.Client? client,
+    Uri? baseUri,
+    this.entitlements,
+    this.authorizationToken,
+  }) : _client = client ?? http.Client(),
+       baseUri = baseUri ?? Uri.parse('https://poetry.ajmalaand.com/api/');
 
   final http.Client _client;
   final Uri baseUri;
   final EntitlementController? entitlements;
+  final String? authorizationToken;
 
   Future<Map<String, dynamic>> getObject(
     String path, {
@@ -58,6 +63,9 @@ class ApiClient {
     bool refreshEntitlement = false,
   }) async {
     final headers = <String, String>{'Accept': 'application/json'};
+    if (authorizationToken case final token? when token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
     final userId = entitlements?.userId;
     if (userId != null && userId.isNotEmpty) {
       headers['X-RC-User-Id'] = userId;

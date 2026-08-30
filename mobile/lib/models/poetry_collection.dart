@@ -13,6 +13,7 @@ class PoetryCollection {
     this.coverUrl,
     this.poemCount,
     required this.sortOrder,
+    this.isActive = true,
   });
 
   factory PoetryCollection.fromJson(Map<String, dynamic> json) =>
@@ -30,6 +31,9 @@ class PoetryCollection {
         coverUrl: _string(json, 'cover_url'),
         poemCount: _integer(json, 'poem_count'),
         sortOrder: _integer(json, 'sort_order') ?? 0,
+        isActive: json['is_active'] == null
+            ? true
+            : _boolean(json, 'is_active'),
       );
 
   final String title;
@@ -45,6 +49,7 @@ class PoetryCollection {
   final String? coverUrl;
   final int? poemCount;
   final int sortOrder;
+  final bool isActive;
 
   Map<String, dynamic> toJson() => {
     'title': title,
@@ -60,6 +65,7 @@ class PoetryCollection {
     'cover_url': coverUrl,
     'poem_count': poemCount,
     'sort_order': sortOrder,
+    'is_active': isActive,
   };
 }
 
@@ -78,5 +84,11 @@ int? _integer(Map<String, dynamic> json, String key) {
   final value = json[key];
   if (value == null) return null;
   if (value is! int) throw FormatException('$key must be an integer');
+  return value;
+}
+
+bool _boolean(Map<String, dynamic> json, String key) {
+  final value = json[key];
+  if (value is! bool) throw FormatException('$key must be a boolean');
   return value;
 }

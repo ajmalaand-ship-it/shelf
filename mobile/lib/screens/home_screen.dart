@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
     required this.readerSettings,
     required this.qaMode,
     required this.audioController,
+    this.ownerPreviewMode = false,
     this.entitlements,
     super.key,
   });
@@ -23,6 +24,7 @@ class HomeScreen extends StatefulWidget {
   final ReaderSettings readerSettings;
   final bool qaMode;
   final AudioPlaybackController audioController;
+  final bool ownerPreviewMode;
   final EntitlementController? entitlements;
 
   @override
@@ -117,6 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     padding: const EdgeInsets.only(bottom: 14),
                                     child: CollectionCard(
                                       collection: collection,
+                                      ownerPreviewMode: widget.ownerPreviewMode,
                                       onTap: () => _openCollection(
                                         snapshot,
                                         collection.slug,
@@ -143,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
           readerSettings: widget.readerSettings,
           audioController: widget.audioController,
           entitlements: widget.entitlements,
+          ownerPreviewMode: widget.ownerPreviewMode,
         ),
       ),
     );
@@ -158,6 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
           readerSettings: widget.readerSettings,
           audioController: widget.audioController,
           entitlements: widget.entitlements,
+          ownerPreviewMode: widget.ownerPreviewMode,
         ),
       ),
     );

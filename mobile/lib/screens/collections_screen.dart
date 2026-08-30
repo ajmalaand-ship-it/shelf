@@ -14,6 +14,7 @@ class CollectionsScreen extends StatelessWidget {
     required this.readerSettings,
     this.audioController,
     this.entitlements,
+    this.ownerPreviewMode = false,
     super.key,
   });
 
@@ -22,6 +23,7 @@ class CollectionsScreen extends StatelessWidget {
   final ReaderSettings readerSettings;
   final AudioPlaybackController? audioController;
   final EntitlementController? entitlements;
+  final bool ownerPreviewMode;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -36,6 +38,7 @@ class CollectionsScreen extends StatelessWidget {
               final collection = snapshot.collections[index];
               return CollectionCard(
                 collection: collection,
+                ownerPreviewMode: ownerPreviewMode,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => CollectionDetailScreen(
@@ -45,6 +48,7 @@ class CollectionsScreen extends StatelessWidget {
                       readerSettings: readerSettings,
                       audioController: audioController,
                       entitlements: entitlements,
+                      ownerPreviewMode: ownerPreviewMode,
                     ),
                   ),
                 ),

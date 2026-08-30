@@ -57,4 +57,13 @@ class PoemController extends Controller
 
         return Storage::disk('audio')->response($poem->audio_path);
     }
+
+    public function streamOwnerPreview(Poem $poem)
+    {
+        abort_unless($poem->audio_path && Storage::disk('audio')->exists($poem->audio_path), 404);
+
+        return Storage::disk('audio')->response($poem->audio_path, null, [
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
 }

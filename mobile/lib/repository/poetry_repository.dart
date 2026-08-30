@@ -53,16 +53,27 @@ class PoetryRepository implements PoetryDataSource {
     required ApiClient api,
     required CacheStore cache,
     EntitlementController? entitlements,
-  }) : this._(api, cache, entitlements);
+    String cacheNamespace = 'public',
+  }) : this._(api, cache, entitlements, cacheNamespace);
 
-  PoetryRepository._(this._api, this._cache, this._entitlements);
-
-  static const _catalogueKey = 'pitswal.catalogue.v1';
-  static const _contentPrefix = 'pitswal.content.v1.';
+  PoetryRepository._(
+    this._api,
+    this._cache,
+    this._entitlements,
+    this._cacheNamespace,
+  );
 
   final ApiClient _api;
   final CacheStore _cache;
   final EntitlementController? _entitlements;
+  final String _cacheNamespace;
+
+  String get _catalogueKey => _cacheNamespace == 'public'
+      ? 'pitswal.catalogue.v1'
+      : 'pitswal.$_cacheNamespace.catalogue.v1';
+  String get _contentPrefix => _cacheNamespace == 'public'
+      ? 'pitswal.content.v1.'
+      : 'pitswal.$_cacheNamespace.content.v1.';
 
   @override
   Future<CatalogueSnapshot?> loadCachedCatalogue() async {
@@ -210,6 +221,11 @@ class PoetryRepository implements PoetryDataSource {
       keys.where((key) => key.startsWith(_contentPrefix)).map(_cache.remove),
     );
   }
+}
+
+class OwnerPreviewRepository extends PoetryRepository {
+  OwnerPreviewRepository({required super.api, required super.cache})
+    : super(cacheNamespace: 'owner-preview');
 }
 
 Map<String, dynamic> _asMap(dynamic value) {

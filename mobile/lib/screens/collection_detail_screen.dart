@@ -15,6 +15,7 @@ class CollectionDetailScreen extends StatefulWidget {
     required this.readerSettings,
     this.audioController,
     this.entitlements,
+    this.ownerPreviewMode = false,
     super.key,
   });
 
@@ -24,6 +25,7 @@ class CollectionDetailScreen extends StatefulWidget {
   final ReaderSettings readerSettings;
   final AudioPlaybackController? audioController;
   final EntitlementController? entitlements;
+  final bool ownerPreviewMode;
 
   @override
   State<CollectionDetailScreen> createState() => _CollectionDetailScreenState();
@@ -71,6 +73,19 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                     const SizedBox(height: 12),
                     Text(author, textAlign: TextAlign.center),
                   ],
+                  if (widget.ownerPreviewMode) ...[
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Chip(
+                        key: const Key(
+                          'owner-preview-collection-detail-status',
+                        ),
+                        label: Text(
+                          bundle.collection.isActive ? 'خپره' : 'مسوده',
+                        ),
+                      ),
+                    ),
+                  ],
                   if (bundle.collection.publicationInfo case final info?)
                     _FrontMatter(title: 'د چاپ معلومات', body: info),
                   if (bundle.collection.dedication case final dedication?)
@@ -97,6 +112,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                     ...bundle.poems.map(
                       (poem) => _PoemTile(
                         poem: poem,
+                        ownerPreviewMode: widget.ownerPreviewMode,
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
                             builder: (_) => PoemReaderScreen(
@@ -109,6 +125,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                                   widget.audioController ??
                                   InactiveAudioController(),
                               entitlements: widget.entitlements,
+                              ownerPreviewMode: widget.ownerPreviewMode,
                             ),
                           ),
                         ),
@@ -148,9 +165,14 @@ class _FrontMatter extends StatelessWidget {
 }
 
 class _PoemTile extends StatelessWidget {
-  const _PoemTile({required this.poem, required this.onTap});
+  const _PoemTile({
+    required this.poem,
+    required this.onTap,
+    required this.ownerPreviewMode,
+  });
   final PoemSummary poem;
   final VoidCallback onTap;
+  final bool ownerPreviewMode;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -163,17 +185,38 @@ class _PoemTile extends StatelessWidget {
       onTap: onTap,
       leading: CircleAvatar(child: Text('${poem.sortOrder}')),
       title: Text(poem.displayTitle),
-      subtitle: poem.isTranslation
-          ? Text(
-              'اصلي شاعر: ${poem.originalAuthor ?? '—'}\n'
-              'پښتو ژباړه: ${poem.translator ?? '—'}',
-            )
-          : poem.isUntitled
-          ? const Text('بې سرليکه')
-          : null,
+      subtitle:
+          [
+            if (poem.isTranslation)
+              'اصلي شاعر: ${poem.originalAuthor ?? '—'}\nپښتو ژباړه: ${poem.translator ?? '—'}'
+            else if (poem.isUntitled)
+              'بې سرليکه',
+            if (ownerPreviewMode)
+              '${poem.isActive ? 'خپور' : 'مسوده'} • ${poem.isFreeSample ? 'وړيا' : 'تړلی'}'
+                  '${poem.isTranslation ? ' • ژباړه' : ''}',
+          ].isEmpty
+          ? null
+          : Text(
+              [
+                if (poem.isTranslation)
+                  'اصلي شاعر: ${poem.originalAuthor ?? '—'}\nپښتو ژباړه: ${poem.translator ?? '—'}'
+                else if (poem.isUntitled)
+                  'بې سرليکه',
+                if (ownerPreviewMode)
+                  '${poem.isActive ? 'خپور' : 'مسوده'} • ${poem.isFreeSample ? 'وړيا' : 'تړلی'}'
+                      '${poem.isTranslation ? ' • ژباړه' : ''}',
+              ].join('\n'),
+              key: ownerPreviewMode
+                  ? const Key('owner-preview-poem-status')
+                  : null,
+            ),
       trailing: Icon(
-        poem.locked ? Icons.lock_outline_rounded : Icons.menu_book_rounded,
-        semanticLabel: poem.locked ? 'تړلی' : 'وړيا',
+        (ownerPreviewMode ? !poem.isFreeSample : poem.locked)
+            ? Icons.lock_outline_rounded
+            : Icons.menu_book_rounded,
+        semanticLabel: (ownerPreviewMode ? !poem.isFreeSample : poem.locked)
+            ? 'تړلی'
+            : 'وړيا',
       ),
     ),
   );

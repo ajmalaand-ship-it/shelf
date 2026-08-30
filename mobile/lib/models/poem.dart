@@ -10,6 +10,8 @@ class PoemSummary {
     required this.hasAudio,
     this.audioDurationSeconds,
     required this.sortOrder,
+    this.isActive = true,
+    this.isFreeSample = true,
   });
 
   factory PoemSummary.fromJson(Map<String, dynamic> json) => PoemSummary(
@@ -23,6 +25,10 @@ class PoemSummary {
     hasAudio: _bool(json, 'has_audio'),
     audioDurationSeconds: _int(json, 'audio_duration_seconds'),
     sortOrder: _int(json, 'sort_order') ?? 0,
+    isActive: json['is_active'] == null ? true : _bool(json, 'is_active'),
+    isFreeSample: json['is_free_sample'] == null
+        ? !(_bool(json, 'locked'))
+        : _bool(json, 'is_free_sample'),
   );
 
   final int id;
@@ -35,6 +41,8 @@ class PoemSummary {
   final bool hasAudio;
   final int? audioDurationSeconds;
   final int sortOrder;
+  final bool isActive;
+  final bool isFreeSample;
 
   bool get isTranslation => workType == 'TRANSLATION';
   bool get isUntitled => title == null || title!.trim().isEmpty;
@@ -52,6 +60,8 @@ class PoemSummary {
     'has_audio': hasAudio,
     'audio_duration_seconds': audioDurationSeconds,
     'sort_order': sortOrder,
+    'is_active': isActive,
+    'is_free_sample': isFreeSample,
   };
 }
 
@@ -77,6 +87,8 @@ class PoemDetail {
     this.audioFormat,
     this.audioLabel,
     this.shareAuthorLabel,
+    this.isActive = true,
+    this.isFreeSample = true,
   });
 
   factory PoemDetail.fromJson(Map<String, dynamic> json) {
@@ -106,6 +118,10 @@ class PoemDetail {
       audioCacheKey: _string(audio, 'cache_key'),
       audioFormat: _string(audio, 'format'),
       audioLabel: _string(audio, 'label'),
+      isActive: json['is_active'] == null ? true : _bool(json, 'is_active'),
+      isFreeSample: json['is_free_sample'] == null
+          ? !(_bool(json, 'requires_entitlement'))
+          : _bool(json, 'is_free_sample'),
     );
   }
 
@@ -129,6 +145,8 @@ class PoemDetail {
   final String? audioFormat;
   final String? audioLabel;
   final String? shareAuthorLabel;
+  final bool isActive;
+  final bool isFreeSample;
 
   bool get isTranslation => workType == 'TRANSLATION';
   bool get isUntitled => title == null || title!.trim().isEmpty;

@@ -6,6 +6,7 @@ All notable repository governance changes are recorded here.
 
 ### Changed
 
+- Added PC-A protected owner preview: expiring server-authenticated draft/full-text read APIs, signed private preview audio, debug-only real-content Flutter mode, isolated preview caches, persistent non-release banner, and stored Draft/Published plus Free/Locked/Translation review labels. Public publication behavior remains unchanged.
 - Recorded Ajmal Aand's August 30, 2026 approval of Amendment A-003 and Poetry Roadmap Revision 3, updating the governing Constitution to v1.3 and inserting mandatory PC Product Completion & Owner Acceptance before P6.
 - Made PC the active System C stage and PC-A Protected Owner Preview / Real-Content Visibility the first eligible implementation area without starting it. P0 remains open/partial, P1–P5 technical foundations remain valid, and P6/P7 remain not started.
 - Preserved P5's fail-closed real-provider deferral for P6 and superseded the fixed ten-recording launch blocker: original recordings remain ongoing owner-managed editorial content, while synthetic QA cannot replace final real-content acceptance.

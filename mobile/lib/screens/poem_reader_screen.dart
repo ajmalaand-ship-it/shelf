@@ -16,6 +16,7 @@ class PoemReaderScreen extends StatefulWidget {
     this.collectionTitle,
     this.audioController,
     this.entitlements,
+    this.ownerPreviewMode = false,
     super.key,
   });
 
@@ -26,6 +27,7 @@ class PoemReaderScreen extends StatefulWidget {
   final String? collectionTitle;
   final AudioPlaybackController? audioController;
   final EntitlementController? entitlements;
+  final bool ownerPreviewMode;
 
   @override
   State<PoemReaderScreen> createState() => _PoemReaderScreenState();
@@ -120,6 +122,7 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
                   _loadedPoem = null;
                   _future = _load(refreshEntitlement: true);
                 }),
+                ownerPreviewMode: widget.ownerPreviewMode,
               );
             },
           ),
@@ -209,6 +212,7 @@ class _PoemBody extends StatelessWidget {
     required this.audioController,
     required this.entitlements,
     required this.onUnlocked,
+    required this.ownerPreviewMode,
   });
 
   final PoemDetail poem;
@@ -217,6 +221,7 @@ class _PoemBody extends StatelessWidget {
   final AudioPlaybackController audioController;
   final EntitlementController? entitlements;
   final VoidCallback onUnlocked;
+  final bool ownerPreviewMode;
 
   @override
   Widget build(BuildContext context) => Directionality(
@@ -260,6 +265,18 @@ class _PoemBody extends StatelessWidget {
                       datePlace,
                       textAlign: TextAlign.center,
                       style: TextStyle(color: colors.muted),
+                    ),
+                  ],
+                  if (ownerPreviewMode) ...[
+                    const SizedBox(height: 14),
+                    Center(
+                      child: Text(
+                        '${poem.isActive ? 'خپور' : 'مسوده'} • '
+                        '${poem.isFreeSample ? 'وړيا' : 'تړلی'}'
+                        '${poem.isTranslation ? ' • ژباړه' : ''}',
+                        key: const Key('owner-preview-reader-status'),
+                        style: TextStyle(color: colors.muted),
+                      ),
                     ),
                   ],
                   if (poem.hasPlayableAudio) ...[

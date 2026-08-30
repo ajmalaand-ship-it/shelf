@@ -20,9 +20,17 @@ Future<void> main() async {
   const publicRevenueCatKey = String.fromEnvironment(
     'REVENUECAT_PUBLIC_SDK_KEY',
   );
+  const ownerPreviewRequested = bool.fromEnvironment('OWNER_PREVIEW');
+  const ownerPreviewToken = String.fromEnvironment('OWNER_PREVIEW_TOKEN');
+  final sourceMode = selectPoetrySourceMode(
+    productBuild: kReleaseMode,
+    requestedMode: currentBuildMode,
+    ownerPreviewRequested: ownerPreviewRequested,
+    ownerPreviewToken: ownerPreviewToken,
+  );
   final entitlements = EntitlementController(
     createPurchaseProvider(
-      qaMode: kDebugMode,
+      qaMode: sourceMode == PoetrySourceMode.qa,
       publicSdkKey: publicRevenueCatKey,
     ),
   );
@@ -39,7 +47,9 @@ Future<void> main() async {
   final cacheRoot = await getApplicationCacheDirectory();
   final audioController = await JustAudioController.create(
     repository: repository,
-    cache: AudioCacheStore(Directory('${cacheRoot.path}/pitswal_audio')),
+    cache: AudioCacheStore(
+      Directory('${cacheRoot.path}/pitswal_audio_${sourceMode.name}'),
+    ),
     entitlements: entitlements,
   );
   runApp(
@@ -48,7 +58,8 @@ Future<void> main() async {
       readerSettings: settings,
       audioController: audioController,
       entitlements: entitlements,
-      qaMode: kDebugMode,
+      qaMode: sourceMode == PoetrySourceMode.qa,
+      ownerPreviewMode: sourceMode == PoetrySourceMode.ownerPreview,
     ),
   );
 }

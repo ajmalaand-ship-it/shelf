@@ -7,11 +7,13 @@ class CollectionCard extends StatelessWidget {
   const CollectionCard({
     required this.collection,
     required this.onTap,
+    this.ownerPreviewMode = false,
     super.key,
   });
 
   final PoetryCollection collection;
   final VoidCallback onTap;
+  final bool ownerPreviewMode;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -42,6 +44,14 @@ class CollectionCard extends StatelessWidget {
                     if (collection.poemCount case final count?) ...[
                       const SizedBox(height: 8),
                       Text('$count شعرونه'),
+                    ],
+                    if (ownerPreviewMode) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        collection.isActive ? 'خپره' : 'مسوده',
+                        key: Key('owner-preview-collection-status'),
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
                     ],
                   ],
                 ),
