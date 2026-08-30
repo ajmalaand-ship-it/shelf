@@ -1,8 +1,9 @@
-# Ajmal Aand Professional Platform — Project Constitution v1.1
+# Ajmal Aand Professional Platform — Project Constitution v1.3
 
 **Status:** Approved and governing  
 **Original approval:** July 31, 2026  
 **Amendment A-001 approval:** August 1, 2026  
+**Amendment A-003 approval:** August 30, 2026
 **Owner and final authority:** Ajmal Aand  
 **Architecture, specification and review:** ChatGPT  
 **Default real-server execution agent:** OpenAI Codex CLI  
@@ -95,7 +96,7 @@ Systems A, B and C use separate repositories, runtimes, databases and database u
 - Server-side entitlement verification before returning paid text or signed audio URLs.
 - Ajmal's recorded voice first; AI voice excluded from Version 1.
 
-The approved **Ajmal Aand — Pashto Poetry App Roadmap Revision 2** is System C's subordinate roadmap. This constitution controls if the two documents conflict.
+The approved **Ajmal Aand — Pashto Poetry App Roadmap Revision 3 — Product Completion Before Release** is System C's subordinate roadmap. Revision 2 remains historical and is superseded where Revision 3 differs. This constitution controls if the documents conflict.
 
 ## 6. System boundaries
 
@@ -129,16 +130,17 @@ Job intake → normalize → lane-aware analysis → Ajmal verdict → resume/le
 
 ## 10. Poetry Platform Version 1 workflow and gates
 
-1. **P0 — Content, identity and store setup:** app identity, first collection, 30–50 proofread Unicode poems, free samples, at least 10 voice recordings, backups, store account verification and testers.
+1. **P0 — Content, identity and store setup:** app identity, real catalogue preparation, proofread Unicode poems, free samples, backups, store account verification and testers. Ajmal's original recordings are ongoing editorial content; no fixed recording count blocks Product Completion.
 2. **P1 — Laravel + Filament backend:** isolated database, collections/poems/app settings, cover/audio uploads and tested HTTPS API with Pashto intact.
 3. **P2 — Flutter reader:** RTL Pashto reader, bundled fonts, themes, font controls and simple offline cache tested on a real Android device.
 4. **P3 — Audio:** streaming/caching, playback controls and interruption/background behavior.
 5. **P4 — Share cards:** branded PNG cards, selected couplets and paginated long poems.
-6. **P5 — Payments and locked content:** one unlock-all product, restore purchases, server-side RevenueCat check and signed audio URLs.
-7. **P6 — Android launch:** current Play requirements, testing, privacy/terms, screenshots and production approval.
-8. **P7 — iOS launch later:** Apple account, iOS build, entitlement mapping and review.
+6. **P5 — Payments and locked content technical foundation:** one unlock-all product contract, restore purchases, server-side RevenueCat check and signed audio URLs. Real Google Play and RevenueCat configuration and sandbox acceptance may remain deferred only until P6.
+7. **PC — Product Completion & Owner Acceptance:** complete and review the intended real-content product, including protected unpublished owner preview, catalogue/content resolution, user-facing completeness and real-device acceptance. Synthetic QA proves capabilities but cannot substitute for final real-content acceptance. Ajmal must explicitly accept **Product Complete / Ready for Release Preparation**.
+8. **P6 — Android Release Preparation & Launch:** only after PC passes, complete current Play/RevenueCat configuration and sandbox gates, closed testing, privacy/terms, screenshots, store materials and production approval. P6 is release work, not unfinished application development.
+9. **P7 — iOS launch later:** Apple account, iOS build, entitlement mapping and review.
 
-Do not jump to Flutter before the backend/API gate passes. Do not move forward before each gate is demonstrated. Recheck current Google Play, Apple and RevenueCat requirements before store work or launch.
+Technical capability is not the same as finished-product acceptance. Do not jump to Flutter before the backend/API gate passes, and do not enter P6 before PC passes through explicit Ajmal approval. Recheck current Google Play, Apple and RevenueCat requirements before store work or launch.
 
 ## 11. AI and authorship controls
 
@@ -225,7 +227,7 @@ Do not claim success for checks not run.
 
 ### Poetry track
 
-P0 through P7 follow Section 10 and the approved Poetry Roadmap Revision 2.
+P0 through P7, including the mandatory PC gate between P5 technical foundations and P6, follow Section 10 and the approved Poetry Roadmap Revision 3.
 
 Career application relief remains urgent. Poetry work may proceed in parallel, but it must not cancel Truth Foundation, weaken security gates or silently take resources assigned to the active approved priority.
 
@@ -251,9 +253,17 @@ Career application relief remains urgent. Poetry work may proceed in parallel, b
 - **Operational:** CSS refinement, internal refactor, copy edit or test improvement — normal task process.
 - **Emergency:** minimum safe stabilization, then documentation and review.
 
-Version 1.1 incorporates **Amendment A-001**, approved by Ajmal Aand on August 1, 2026:
+Version 1.1 incorporated **Amendment A-001**, approved by Ajmal Aand on August 1, 2026:
 
 > “I approve Amendment A-001, adding the Pashto Poetry Platform at poetry.ajmalaand.com as System C and updating the Ajmal Aand Professional Platform Constitution to version 1.1.”
+
+Approved **Amendment A-002 / Constitution v1.2** remains valid. Its approved authority is recorded in this repository, but its exact full authoritative text is not locally available and is not reconstructed here.
+
+Version 1.3 incorporates **Amendment A-003 — System C Product Completion Gate and Release Sequencing**, approved by Ajmal Aand on August 30, 2026 with the statement:
+
+> “I approve A-003 and Roadmap Revision 3.”
+
+A-003 is **APPROVED AND GOVERNING**. It preserves P1–P5 technical work, inserts mandatory PC Product Completion & Owner Acceptance before P6, preserves the P5 real-provider deferral until P6, and removes a fixed minimum voice-recording count as a launch blocker. It changes no architecture, security, privacy, authorship, isolation or paid-content protection boundary.
 
 ## 18. Universal Definition of Done
 
@@ -269,6 +279,7 @@ A feature is done only when all applicable conditions are true:
 - Career AI output passes schema and claim audit.
 - Career documents are checked for layout, facts and ATS simplicity.
 - Poetry text/RTL and audio are tested on a real target device where applicable.
+- The intended real-content Poetry product passes protected owner preview and Ajmal explicitly accepts it as Product Complete / Ready for Release Preparation before P6.
 - Paid Poetry denial, purchase/reinstall and restore behavior are demonstrated before release.
 - Current app-store policies, wording and disclosures are verified before submission.
 - Poetry source text/audio backups are confirmed before production content changes.

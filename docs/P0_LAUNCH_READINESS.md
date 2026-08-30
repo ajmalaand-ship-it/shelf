@@ -22,7 +22,7 @@ Task: SYSC-P0-LAUNCH-READINESS-01
 
 ## Owner and external actions
 
-- **OWNER ACTION REQUIRED:** Record at least 10 of the 15 prepared free-sample candidates in Ajmal's own voice. AI voice remains prohibited.
+- **ONGOING OWNER CONTENT:** Ajmal's original recordings may be added through Filament over time. Amendment A-003 removes the former fixed ten-recording minimum as a launch blocker; AI voice remains prohibited, and every supplied original recording still requires protected storage and verified off-server backup.
 - **OWNER ACTION REQUIRED:** Download the prepared secret-free owner archive to an off-server device and verify its checksum/readability. A server-side package alone does not satisfy the off-server requirement.
 - **OWNER ACTION REQUIRED:** Supply evidence of Google Play developer-account registration/verification. No local evidence currently verifies the account state; current Play requirements must be checked at the later store action.
 - **OWNER ACTION REQUIRED:** Line up the real closed-test tester group. No locally documented tester names or group evidence exists; current Play closed-testing requirements must be checked before configuration.
@@ -39,6 +39,6 @@ These are source-quality limitations, not application or test defects. Their pro
 
 ## Gate status
 
-Software preparation, Unicode content volume, first collection, free-sample selection, typography/theme decisions, production backup tooling, private recording manifest, and bulk-audio ingest tooling are ready. P0 remains open only for the owner/external actions above.
+Software preparation, Unicode content volume, first collection, free-sample selection, typography/theme decisions, production backup tooling, private recording manifest, and bulk-audio ingest tooling are ready. Under Roadmap Revision 3, P0 remains open/partial for unresolved catalogue/source work, protected real-content owner review, off-server owner verification, and external store/tester actions. A fixed recording count is not a gate.
 
-**P0 READY EXCEPT OWNER/EXTERNAL ACTIONS**
+**P0 OPEN / PARTIAL**

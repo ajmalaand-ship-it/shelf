@@ -12,10 +12,11 @@ Ajmal Aand's original Pashto poetry and recorded voice remain his authored work.
 
 ## Build discipline
 
-- Follow `PROJECT_CONSTITUTION.md` and the approved Pashto Poetry App Roadmap Revision 2.
+- Follow `PROJECT_CONSTITUTION.md` v1.3 and the approved Pashto Poetry App Roadmap Revision 3.
 - Stop at each phase gate and demonstrate it before moving forward.
+- PC Product Completion & Owner Acceptance is mandatory before P6; protected real-content owner preview cannot be replaced by synthetic QA acceptance.
 - Preserve real Unicode Pashto text, explicit RTL presentation, and `utf8mb4` storage; poem bodies use `LONGTEXT`.
 - Keep databases, users, credentials, sessions, media, logs, backups, and runtime paths separate from Systems A and B.
 - Never commit secrets, private poems, manuscripts, recordings, or production data.
 
-This baseline contains governance documentation only. It does not yet contain Laravel, Filament, or Flutter application code.
+The repository now contains the Laravel/Filament backend and Flutter Android client technical foundations. PC is the active stage; P6 release preparation has not started.

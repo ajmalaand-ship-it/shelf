@@ -1,6 +1,6 @@
 # System C Decisions
 
-These decisions are approved by the governing project constitution and Pashto Poetry App Roadmap Revision 2. Changes require approved change control.
+These decisions are approved by the governing Project Constitution v1.3 and Pashto Poetry App Roadmap Revision 3. Changes require approved change control.
 
 ## 1. Shared hosting account, isolated systems
 
@@ -81,3 +81,13 @@ Debug purchase simulation is compile-time excluded from product builds and can u
 On August 29, 2026, Ajmal approved the status **TECHNICAL BUILD COMPLETE — REAL PROVIDER/SANDBOX ACCEPTANCE DEFERRED TO RELEASE PREPARATION**. This is a deliberate sequencing decision, not abandonment and not full P5 completion. Creation and activation of `pitswal_unlock_all_v1`, the owner-selected price, real RevenueCat project/app and Google Play connection, attachment of entitlement `unlock_all`, production public and server keys, real sandbox purchase, reinstall/Restore Purchases, and final paid-audio entitlement testing are deferred to final Android/Google Play release preparation.
 
 Until that setup exists, production must remain fail-closed for locked content, free/public behavior remains available, and no fake entitlement may be enabled in a release build. The release-stage blocker is: **Complete Google Play + RevenueCat real configuration and sandbox purchase/restore gate before final closed testing/production submission.** P5 cannot be marked complete and release readiness cannot be approved until that gate passes.
+
+## 16. A-003 and Roadmap Revision 3 approved
+
+On August 30, 2026, Ajmal Aand approved **Amendment A-003 — System C Product Completion Gate and Release Sequencing** and **Ajmal Aand — Pashto Poetry App Roadmap Revision 3 — Product Completion Before Release**, stating:
+
+> “I approve A-003 and Roadmap Revision 3.”
+
+A-003 is **APPROVED AND GOVERNING** and updates the Project Constitution to v1.3. Revision 3 is **APPROVED AND GOVERNING** and supersedes Revision 2 where their sequencing differs. Existing P1–P5 technical work remains valid, but technical capability does not equal finished-product acceptance. Mandatory PC — Product Completion & Owner Acceptance now precedes P6; synthetic QA cannot substitute for final real-content acceptance; and Ajmal must explicitly accept **Product Complete / Ready for Release Preparation** before P6 begins.
+
+P0 remains open/partial where real catalogue, source recovery, owner preview and external launch inputs remain unresolved. Original recordings are ongoing editorial content and no fixed count blocks PC. P5 real Google Play/RevenueCat configuration and sandbox acceptance remain deferred to P6 and mandatory before final closed testing or production submission. P6 and P7 remain not started. **PC is the active stage; PC-A — Protected Owner Preview / Real-Content Visibility is the first eligible implementation area but has not started.** No architecture, security, privacy, authorship, system-isolation or paid-content-protection boundary changes.

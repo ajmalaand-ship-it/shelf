@@ -1,8 +1,8 @@
 # P5 Payments and Locked Content
 
-Ajmal Aand authorized P5 on August 29, 2026. The technical implementation uses one one-time product, `pitswal_unlock_all_v1`, one RevenueCat entitlement, `unlock_all`, and offering `default`. Product price remains an owner decision. P6 and Google Play submission have not started.
+Ajmal Aand authorized P5 on August 29, 2026. The technical implementation uses one one-time product, `pitswal_unlock_all_v1`, one RevenueCat entitlement, `unlock_all`, and offering `default`. Product price remains an owner decision. Under Roadmap Revision 3, PC is active; P6 and Google Play submission have not started.
 
-**Recorded status: TECHNICAL BUILD COMPLETE — REAL PROVIDER/SANDBOX ACCEPTANCE DEFERRED TO RELEASE PREPARATION.** Ajmal approved this sequencing decision on August 29, 2026. It is not abandonment of P5 and does not mark P5 fully complete. Real product activation/pricing, RevenueCat and Play connection, production keys, and real purchase/restore/paid-audio acceptance will be completed during final Android release preparation.
+**Recorded status: TECHNICAL BUILD COMPLETE — REAL PROVIDER/SANDBOX ACCEPTANCE DEFERRED TO RELEASE PREPARATION.** Ajmal approved this sequencing decision on August 29, 2026. It is not abandonment of P5 and does not mark P5 fully complete. Real product activation/pricing, RevenueCat and Play connection, production keys, and real purchase/restore/paid-audio acceptance will be completed during P6 Android Release Preparation, after PC passes.
 
 ## Current provider findings
 

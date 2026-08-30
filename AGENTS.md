@@ -1,4 +1,4 @@
-# AGENTS.md — Ajmal Aand Professional Platform v1.1
+# AGENTS.md — Ajmal Aand Professional Platform v1.3
 
 This repository is governed by `PROJECT_CONSTITUTION.md`. The constitution takes precedence over convenience, prompt wording, refactoring preference or agent initiative.
 
@@ -69,7 +69,7 @@ Never:
 - Flutter mobile client; Android first, iOS later.
 - RevenueCat + official app-store billing.
 - Server-side entitlement verification and short-lived signed paid-audio URLs.
-- The approved Poetry App Roadmap Revision 2 controls phase order and gates.
+- The approved Poetry App Roadmap Revision 3 controls phase order and gates.
 
 Do not replace a repository's approved stack because another stack is more familiar.
 
@@ -112,6 +112,10 @@ Do not replace a repository's approved stack because another stack is more famil
 - Use official app-store purchases through RevenueCat; do not add external-payment links inside the app.
 - Full paid text/audio requires a server-side entitlement check; the client alone is not trusted.
 - Direct API access without entitlement must return locked/excerpt content only.
+- System C must not enter P6 until PC — Product Completion & Owner Acceptance has passed through explicit Ajmal approval.
+- Protected unpublished owner preview and final real-content review belong to PC. Synthetic QA fixtures may prove capabilities but cannot substitute for real-content product acceptance.
+- Real Google Play and RevenueCat configuration remains deferred until P6 and must pass before final closed testing or production submission.
+- Ajmal's original voice recordings are ongoing editorial content; no fixed minimum recording count blocks PC.
 - Recheck current Google Play, Apple and RevenueCat requirements before store configuration or release.
 
 ## 10. Engineering expectations
