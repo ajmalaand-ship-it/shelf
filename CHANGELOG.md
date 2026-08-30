@@ -6,7 +6,8 @@ All notable repository governance changes are recorded here.
 
 ### Changed
 
-- Corrected the P4 Android export pipeline after owner-device review: export now captures the painted preview instead of a separately inserted translucent overlay, waits for frame completion, validates 1080×1350 PNG bytes and temporary files, renders multi-card sets sequentially, and distinguishes render/file/share/gallery failures in debug diagnostics. P4 owner-device acceptance remains pending.
+- Corrected the P4 Android export pipeline after owner-device review: export now captures the painted preview instead of a separately inserted insufficiently painted overlay, waits for frame completion, validates 1080×1350 PNG bytes and temporary files, renders multi-card sets sequentially, and distinguishes render/file/share/gallery failures in debug diagnostics.
+- Closed the P4 Share / Download Poem Image gate on August 29, 2026, after Ajmal confirmed on real Android hardware that share-sheet export, Save to Gallery, and generated PNG output work. P5 and P6 remain not started; no Google Play submission or real-collection publication occurred.
 - Closed the P3 Audio Experience gate on August 29, 2026, after owner testing on real Android hardware confirmed basic play/pause, background and lock-screen playback, sufficient system playback behavior, and offline replay from populated local cache.
 - Recorded the accepted P3 baseline and preserved ongoing Filament-managed owner recordings as non-blocking launch content; P4 had not started at that closeout, P5 remains not started, and Google Play submission has not occurred.
 - Closed the P2 Flutter Reader gate on August 29, 2026, after owner testing on real Android hardware confirmed the core RTL reader flow, long scrolling, toolbar boundary, title hierarchy, bundled font choices, reader settings, and locked/translation representations.
@@ -33,9 +34,9 @@ All notable repository governance changes are recorded here.
 - Deterministic stanza-aware multi-card pagination and one-page-at-a-time 1080×1350 PNG rendering for bounded long-poem memory use.
 - Android single/multi-card sharing through `share_plus`, scoped gallery saving through `gal`, safe filenames, recoverable errors, and stale temporary-file cleanup.
 
-### P4 owner authorization
+### P4 owner authorization and acceptance
 
-- Ajmal explicitly authorized P4 on August 29, 2026. The technical build is implemented; owner real-device share-card acceptance remains required. P5 has not started and no store submission occurred.
+- Ajmal explicitly authorized P4 on August 29, 2026. Technical implementation commit `9c1d6884ddb4cedd5db44794f759e57049eea94a` and export-fix commit `d56cb621cb636f2734073b52c77518f91830075a` established the accepted baseline; the owner real-device gate passed the same day.
 
 ### P3 owner decision
 
