@@ -6,6 +6,7 @@ All notable repository governance changes are recorded here.
 
 ### Changed
 
+- Corrected the P4 Android export pipeline after owner-device review: export now captures the painted preview instead of a separately inserted translucent overlay, waits for frame completion, validates 1080×1350 PNG bytes and temporary files, renders multi-card sets sequentially, and distinguishes render/file/share/gallery failures in debug diagnostics. P4 owner-device acceptance remains pending.
 - Closed the P3 Audio Experience gate on August 29, 2026, after owner testing on real Android hardware confirmed basic play/pause, background and lock-screen playback, sufficient system playback behavior, and offline replay from populated local cache.
 - Recorded the accepted P3 baseline and preserved ongoing Filament-managed owner recordings as non-blocking launch content; P4 had not started at that closeout, P5 remains not started, and Google Play submission has not occurred.
 - Closed the P2 Flutter Reader gate on August 29, 2026, after owner testing on real Android hardware confirmed the core RTL reader flow, long scrolling, toolbar boundary, title hierarchy, bundled font choices, reader settings, and locked/translation representations.

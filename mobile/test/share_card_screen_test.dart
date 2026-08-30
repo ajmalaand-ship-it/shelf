@@ -51,6 +51,21 @@ void main() {
     await tester.pump();
     expect(find.byType(PoemCardWidget), findsOneWidget);
     expect(tester.takeException(), isNull);
+
+    await _scrollToShare(tester);
+    final shareButton = tester.widget<FilledButton>(
+      find.byKey(const Key('share-cards')),
+    );
+    shareButton.onPressed!();
+    await tester.pump();
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 100)),
+    );
+    await tester.pump();
+    final renderer =
+        tester.widget<ShareCardScreen>(find.byType(ShareCardScreen)).renderer
+            as _FakeRenderer;
+    expect(renderer.preparedPaintedPage, isTrue);
   });
 
   testWidgets('locked poem shares only its visible excerpt', (tester) async {
@@ -183,16 +198,20 @@ class _FakeFiles extends ShareCardFiles {
 
 class _FakeRenderer extends ShareCardRenderer {
   ShareCardRequest? lastRequest;
+  bool preparedPaintedPage = false;
 
   @override
   Future<List<File>> render({
-    required BuildContext context,
     required ShareCardRequest request,
     required List<ShareCardPage> pages,
     required ShareCardFiles files,
+    required PrepareShareCardPage preparePage,
     DateTime? createdAt,
   }) async {
     lastRequest = request;
+    final boundary = await preparePage(0);
+    preparedPaintedPage =
+        boundary != null && boundary.attached && !boundary.debugNeedsPaint;
     return [File('${files.directory.path}/fake.png')];
   }
 }
@@ -202,10 +221,13 @@ class _FailingRenderer extends ShareCardRenderer {
 
   @override
   Future<List<File>> render({
-    required BuildContext context,
     required ShareCardRequest request,
     required List<ShareCardPage> pages,
     required ShareCardFiles files,
+    required PrepareShareCardPage preparePage,
     DateTime? createdAt,
-  }) => throw StateError('render failed');
+  }) => throw const ShareCardExportException(
+    ShareCardExportStage.render,
+    'render failed',
+  );
 }

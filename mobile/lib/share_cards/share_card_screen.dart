@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/poem.dart';
@@ -36,6 +37,8 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
   ShareCardScope _scope = ShareCardScope.selection;
   ShareLineSelection? _selection;
   bool _working = false;
+  final PageController _previewController = PageController();
+  final List<GlobalKey> _previewKeys = [];
 
   List<ShareablePoemLine> get _lines =>
       selectablePoemLines(widget.poem.readableText);
@@ -68,8 +71,15 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
   }
 
   @override
+  void dispose() {
+    _previewController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final pages = _pages;
+    _syncPreviewKeys(pages.length);
     return Scaffold(
       appBar: AppBar(title: const Text('شريکول او ساتل')),
       body: SafeArea(
@@ -173,13 +183,17 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
                 height: 450,
                 child: PageView.builder(
                   key: const Key('card-preview'),
+                  controller: _previewController,
                   itemCount: pages.length,
                   itemBuilder: (context, index) => Center(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: PoemCardWidget(
-                        request: _request,
-                        page: pages[index],
+                      child: RepaintBoundary(
+                        key: _previewKeys[index],
+                        child: PoemCardWidget(
+                          request: _request,
+                          page: pages[index],
+                        ),
                       ),
                     ),
                   ),
@@ -231,15 +245,33 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
       await files.cleanStale(now: DateTime.now());
       if (!mounted) return;
       rendered = await widget.renderer.render(
-        context: context,
         request: _request,
         pages: _pages,
         files: files,
+        preparePage: _preparePreviewPage,
       );
       if (save) {
-        await widget.output.save(rendered);
+        try {
+          await widget.output.save(rendered);
+        } catch (error, stackTrace) {
+          _debugOutputFailure(ShareCardExportStage.gallery, error, stackTrace);
+          throw ShareCardExportException(
+            ShareCardExportStage.gallery,
+            'Gallery insertion failed',
+            error,
+          );
+        }
       } else {
-        await widget.output.share(rendered);
+        try {
+          await widget.output.share(rendered);
+        } catch (error, stackTrace) {
+          _debugOutputFailure(ShareCardExportStage.share, error, stackTrace);
+          throw ShareCardExportException(
+            ShareCardExportStage.share,
+            'Android share failed',
+            error,
+          );
+        }
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -251,15 +283,56 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
           ),
         ),
       );
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('کارت جوړ نه شو. بيا هڅه وکړئ.')),
-      );
+      final message = error is ShareCardExportException
+          ? switch (error.stage) {
+              ShareCardExportStage.share => 'کارت شريک نه شو. بيا هڅه وکړئ.',
+              ShareCardExportStage.gallery =>
+                'کارت په ګالرۍ کې ونه ساتل شو. بيا هڅه وکړئ.',
+              _ => 'کارت جوړ نه شو. بيا هڅه وکړئ.',
+            }
+          : 'کارت جوړ نه شو. بيا هڅه وکړئ.';
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (save && files != null) await files.remove(rendered);
       if (mounted) setState(() => _working = false);
     }
+  }
+
+  void _syncPreviewKeys(int count) {
+    while (_previewKeys.length < count) {
+      _previewKeys.add(GlobalKey());
+    }
+    if (_previewKeys.length > count) {
+      _previewKeys.removeRange(count, _previewKeys.length);
+    }
+  }
+
+  Future<RenderRepaintBoundary?> _preparePreviewPage(int index) async {
+    if (!mounted || index >= _previewKeys.length) return null;
+    if (_previewController.hasClients) {
+      _previewController.jumpToPage(index);
+    }
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted || index >= _previewKeys.length) return null;
+    final renderObject = _previewKeys[index].currentContext?.findRenderObject();
+    return renderObject is RenderRepaintBoundary ? renderObject : null;
+  }
+
+  void _debugOutputFailure(
+    ShareCardExportStage stage,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    assert(() {
+      debugPrint(
+        '[P4 export] FAILURE stage=${stage.name} '
+        'type=${error.runtimeType} error=$error\n$stackTrace',
+      );
+      return true;
+    }());
   }
 
   Future<ShareCardFiles> _defaultFiles() async {

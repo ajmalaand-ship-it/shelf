@@ -12,7 +12,9 @@ Locked poems never gain access to hidden text: their full-text option is explici
 
 `ShareCardPaginator` is deterministic and independent from PNG encoding. It measures explicit RTL Noto Nastaliq Urdu at the fixed content width/height, keeps a short stanza together where it fits, otherwise splits at line boundaries, and splits an individually oversized line only at word boundaries. Every non-empty input segment appears in order exactly once. Multi-card results carry `1/n` numbering.
 
-`PoemCardWidget` is a fixed 360×450 logical composition. `ShareCardRenderer` captures one `RepaintBoundary` page at a time with pixel ratio 3, producing 1080×1350 PNGs while disposing each decoded image before the next page. It never builds an enormous full-poem bitmap. Rendering and output failures are caught, partial output is removed, a Pashto error is shown, and the user can retry.
+`PoemCardWidget` is a fixed 360×450 logical composition. After the first owner-device build exposed an Android export failure, the renderer stopped constructing a separate nearly transparent overlay that could still be awaiting paint after its single-frame delay. It now captures the actual preview `RepaintBoundary`: each requested page is brought into the `PageView`, the frame is completed, and attachment/paint readiness is checked before capture. Pixel ratio 3 produces 1080×1350 PNGs while each decoded image is disposed before the next page, so it never builds an enormous full-poem bitmap.
+
+The shared render/file pipeline validates non-empty PNG bytes, the PNG signature, exact IHDR dimensions, and the existence, readability, and length of every temporary file before either `share_plus` or `gal` runs. Partial output is removed on failure. Debug builds log the failing stage, exception type, stack trace, output dimensions, pixel ratio, encoded byte count, and temporary-file state without poem text or secrets. Render, PNG encoding, temporary-file, Android sharing, and gallery failures remain distinct internally and produce recoverable Pashto feedback.
 
 ## Designs and branding
 

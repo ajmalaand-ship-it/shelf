@@ -32,6 +32,39 @@ void main() {
     expect(const ShareCardRenderer().outputSize, const Size(1080, 1350));
   });
 
+  test('PNG validation accepts the signature and exact IHDR dimensions', () {
+    final bytes = Uint8List(24);
+    bytes.setAll(0, const [137, 80, 78, 71, 13, 10, 26, 10]);
+    final data = ByteData.sublistView(bytes);
+    data.setUint32(16, 1080);
+    data.setUint32(20, 1350);
+
+    const ShareCardRenderer().validatePng(bytes, 1080, 1350);
+  });
+
+  test('PNG validation rejects empty, corrupt, and wrong-sized output', () {
+    const renderer = ShareCardRenderer();
+    expect(
+      () => renderer.validatePng(Uint8List(0), 1080, 1350),
+      throwsA(
+        isA<ShareCardExportException>().having(
+          (error) => error.stage,
+          'stage',
+          ShareCardExportStage.pngEncode,
+        ),
+      ),
+    );
+    final bytes = Uint8List(24);
+    bytes.setAll(0, const [137, 80, 78, 71, 13, 10, 26, 10]);
+    final data = ByteData.sublistView(bytes);
+    data.setUint32(16, 360);
+    data.setUint32(20, 450);
+    expect(
+      () => renderer.validatePng(bytes, 1080, 1350),
+      throwsA(isA<ShareCardExportException>()),
+    );
+  });
+
   testWidgets('representative P4 cards rasterize without layout failure', (
     tester,
   ) async {
