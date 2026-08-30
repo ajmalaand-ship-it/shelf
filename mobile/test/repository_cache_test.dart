@@ -146,7 +146,7 @@ void main() {
     'authoritative 404 never falls back to previously cached content',
     () async {
       final cache = MemoryCacheStore();
-      cache.values['pitswal.content.v1.7.poem.301'] = jsonEncode(
+      cache.values['pitswal.content.v1.public.7.poem.301'] = jsonEncode(
         poemDetailJson(),
       );
       final repository = PoetryRepository(
@@ -160,7 +160,10 @@ void main() {
         repository.loadPoem(301, 7),
         throwsA(isA<ContentNotFoundException>()),
       );
-      expect(cache.values, isNot(contains('pitswal.content.v1.7.poem.301')));
+      expect(
+        cache.values,
+        isNot(contains('pitswal.content.v1.public.7.poem.301')),
+      );
     },
   );
 }

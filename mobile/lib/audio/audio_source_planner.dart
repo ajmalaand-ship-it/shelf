@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import '../models/poem.dart';
+import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import 'audio_cache_store.dart';
 
@@ -19,18 +20,25 @@ class RemoteAudioPlan extends AudioLoadPlan {
 }
 
 class AudioSourcePlanner {
-  const AudioSourcePlanner(this.repository, this.cache);
+  const AudioSourcePlanner(this.repository, this.cache, {this.entitlements});
 
   final PoetryDataSource repository;
   final AudioCacheStore cache;
+  final EntitlementController? entitlements;
 
   Future<AudioLoadPlan> resolve(PoemDetail poem) async {
     if (!poem.hasPlayableAudio) {
       throw StateError('Poem has no accessible audio');
     }
+    if (poem.requiresEntitlement && entitlements?.entitled != true) {
+      throw const AudioLockedException();
+    }
+    final entitlementScope = poem.requiresEntitlement
+        ? entitlements!.userId ?? 'unidentified'
+        : 'public';
     final target = await cache.fileFor(
       poemId: poem.id,
-      cacheKey: poem.audioCacheKey!,
+      cacheKey: '$entitlementScope:${poem.audioCacheKey!}',
       format: poem.audioFormat,
     );
     await cache.removeOtherVersions(poemId: poem.id, keep: target);

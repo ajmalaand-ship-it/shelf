@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
 import '../models/poem.dart';
+import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
 import 'poem_reader_screen.dart';
@@ -13,6 +14,7 @@ class CollectionDetailScreen extends StatefulWidget {
     required this.repository,
     required this.readerSettings,
     this.audioController,
+    this.entitlements,
     super.key,
   });
 
@@ -21,6 +23,7 @@ class CollectionDetailScreen extends StatefulWidget {
   final PoetryDataSource repository;
   final ReaderSettings readerSettings;
   final AudioPlaybackController? audioController;
+  final EntitlementController? entitlements;
 
   @override
   State<CollectionDetailScreen> createState() => _CollectionDetailScreenState();
@@ -105,6 +108,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                               audioController:
                                   widget.audioController ??
                                   InactiveAudioController(),
+                              entitlements: widget.entitlements,
                             ),
                           ),
                         ),

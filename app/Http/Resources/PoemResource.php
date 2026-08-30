@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\RevenueCatEntitlementService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -9,7 +10,8 @@ class PoemResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $locked = ! $this->is_free_sample;
+        $locked = ! $this->is_free_sample
+            && ! app(RevenueCatEntitlementService::class)->requestIsEntitled($request);
 
         return [
             'id' => $this->id,
@@ -21,6 +23,7 @@ class PoemResource extends JsonResource
             'source_date_place' => $this->source_date_place,
             'source_note' => $this->source_note,
             'locked' => $locked,
+            'requires_entitlement' => ! $this->is_free_sample,
             'excerpt' => $this->excerpt,
             'body' => $locked ? null : $this->body,
             'audio' => [

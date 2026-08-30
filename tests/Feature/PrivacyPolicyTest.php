@@ -21,6 +21,8 @@ class PrivacyPolicyTest extends TestCase
             ->assertSee('does not sell or rent personal data')
             ->assertSee('no end-user accounts')
             ->assertSee('Google Play Billing')
+            ->assertSee('RevenueCat')
+            ->assertSee('anonymous RevenueCat App User ID')
             ->assertDontSee('/home/ajmalaand')
             ->assertDontSee('.env');
     }

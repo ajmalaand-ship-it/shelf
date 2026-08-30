@@ -93,8 +93,11 @@ class _AudioRepository implements PoetryDataSource {
   Future<CollectionBundle> loadCollection(String slug, int contentVersion) =>
       throw UnimplementedError();
   @override
-  Future<PoemDetail> loadPoem(int id, int contentVersion) =>
-      throw UnimplementedError();
+  Future<PoemDetail> loadPoem(
+    int id,
+    int contentVersion, {
+    bool refreshEntitlement = false,
+  }) => throw UnimplementedError();
   @override
   Future<CatalogueSnapshot> refreshCatalogue(CatalogueSnapshot? cached) =>
       throw UnimplementedError();

@@ -10,13 +10,27 @@ import 'app.dart';
 import 'audio/audio_cache_store.dart';
 import 'audio/just_audio_controller.dart';
 import 'bootstrap/data_source_factory.dart';
+import 'purchases/entitlement_controller.dart';
 import 'settings/reader_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final preferences = await SharedPreferences.getInstance();
   final settings = await ReaderSettings.load(preferences);
-  final repository = createPoetryDataSource(preferences: preferences);
+  const publicRevenueCatKey = String.fromEnvironment(
+    'REVENUECAT_PUBLIC_SDK_KEY',
+  );
+  final entitlements = EntitlementController(
+    createPurchaseProvider(
+      qaMode: kDebugMode,
+      publicSdkKey: publicRevenueCatKey,
+    ),
+  );
+  await entitlements.initialize();
+  final repository = createPoetryDataSource(
+    preferences: preferences,
+    entitlements: entitlements,
+  );
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.hindara.pitswal.audio',
     androidNotificationChannelName: 'د پېڅوَل غږ',
@@ -26,12 +40,14 @@ Future<void> main() async {
   final audioController = await JustAudioController.create(
     repository: repository,
     cache: AudioCacheStore(Directory('${cacheRoot.path}/pitswal_audio')),
+    entitlements: entitlements,
   );
   runApp(
     PitswalApp(
       repository: repository,
       readerSettings: settings,
       audioController: audioController,
+      entitlements: entitlements,
       qaMode: kDebugMode,
     ),
   );

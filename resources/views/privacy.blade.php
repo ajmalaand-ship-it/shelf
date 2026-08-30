@@ -116,7 +116,7 @@
             <p class="brand"><span dir="rtl" lang="ps">پېڅوَل</span> — Pitswal</p>
             <p class="slogan" dir="rtl" lang="ps">اجمل اند بشپړه شاعري</p>
             <h1>Privacy Policy</h1>
-            <p class="updated">Last updated: August 28, 2026</p>
+            <p class="updated">Last updated: August 29, 2026</p>
         </header>
 
         <p>This Privacy Policy explains how Hindara, the publisher and developer of <span dir="rtl" lang="ps">پېڅوَل</span> — Pitswal, handles information when you use the app, its website, or its supporting poetry API.</p>
@@ -129,19 +129,19 @@
         <p>Poetry, collection information, covers, and audio are publisher-managed content. The app retrieves that content through the Pitswal API. Audio offered in the app is Ajmal Aand’s original recording where a recording is available. The current service does not invite users to upload recordings or other content, and it does not use AI-generated voice.</p>
 
         <h2>Purchases and payments</h2>
-        <p>The current service does not collect payment-card details. If paid access is enabled in a future release, purchases will be offered through Google Play Billing. Google will process payment and store-account information under its own privacy terms. The app and its supporting service may then process the minimum purchase or entitlement information needed to confirm access and restore a purchase. This policy will be reviewed before that functionality is released.</p>
+        <p>Pitswal does not collect payment-card details. Purchases are offered through Google Play Billing, which processes payment and store-account information under Google’s privacy terms. RevenueCat provides purchase and entitlement management. The app uses a random anonymous RevenueCat App User ID, and RevenueCat and Google Play process purchase history, transaction, product, device/app, and diagnostic information needed to complete purchases, confirm access, prevent fraud, and restore purchases. Pitswal does not provide an app account.</p>
 
         <h2>Advertising, analytics, and sale of data</h2>
         <p>Pitswal does not currently display advertising and does not currently use an advertising or analytics SDK. Hindara does not sell or rent personal data.</p>
 
         <h2>Service providers</h2>
-        <p>Our hosting infrastructure processes technical requests and logs so the service can operate securely. Google Play may process information relating to app distribution, downloads, and—if enabled—purchases under Google’s own privacy policy. We do not disclose data to third parties for advertising.</p>
+        <p>Our hosting infrastructure processes technical requests and logs so the service can operate securely. Google Play processes information relating to app distribution, downloads, and purchases under Google’s own privacy policy. RevenueCat processes the anonymous purchase identifier and purchase/entitlement information as our purchase-management provider. We do not disclose data to third parties for advertising.</p>
 
         <h2>Security</h2>
         <p>We use reasonable technical and organizational safeguards, including encrypted HTTPS connections, access controls, and restricted administration. No method of transmission or storage is completely secure, so absolute security cannot be guaranteed.</p>
 
         <h2>Retention and deletion</h2>
-        <p>Technical logs are kept only as long as reasonably needed for service operation, security, troubleshooting, backup integrity, and applicable legal obligations, then deleted or rotated according to operational procedures. Because the current version has no end-user accounts or user-posted content, there is normally no user profile or social content to delete. For a privacy or deletion question, contact us using the details below. Information controlled by Google Play is subject to Google’s own retention and deletion processes.</p>
+        <p>Technical logs are kept only as long as reasonably needed for service operation, security, troubleshooting, backup integrity, and applicable legal obligations, then deleted or rotated according to operational procedures. Because the app has no end-user accounts or user-posted content, there is normally no user profile or social content to delete. For a privacy or deletion question, contact us using the details below. Purchase information controlled by Google Play or RevenueCat is subject to those providers’ retention and deletion processes.</p>
 
         <h2>Children and audience</h2>
         <p>Pitswal presents poetry and literary content for a general audience. The current version does not knowingly solicit personal information from children through accounts, forms, comments, or social features. The app’s final target-audience and store settings will be reviewed against the released app and its content before Google Play submission.</p>

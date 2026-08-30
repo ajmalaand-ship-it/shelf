@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
 import '../repository/poetry_repository.dart';
+import '../purchases/entitlement_controller.dart';
 import '../settings/reader_settings.dart';
 import '../widgets/collection_card.dart';
 import 'collection_detail_screen.dart';
@@ -12,6 +13,7 @@ class CollectionsScreen extends StatelessWidget {
     required this.repository,
     required this.readerSettings,
     this.audioController,
+    this.entitlements,
     super.key,
   });
 
@@ -19,6 +21,7 @@ class CollectionsScreen extends StatelessWidget {
   final PoetryDataSource repository;
   final ReaderSettings readerSettings;
   final AudioPlaybackController? audioController;
+  final EntitlementController? entitlements;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -41,6 +44,7 @@ class CollectionsScreen extends StatelessWidget {
                       repository: repository,
                       readerSettings: readerSettings,
                       audioController: audioController,
+                      entitlements: entitlements,
                     ),
                   ),
                 ),

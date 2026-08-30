@@ -2,16 +2,22 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../purchases/entitlement_controller.dart';
+
 class ApiClient {
-  ApiClient({http.Client? client, Uri? baseUri})
+  ApiClient({http.Client? client, Uri? baseUri, this.entitlements})
     : _client = client ?? http.Client(),
       baseUri = baseUri ?? Uri.parse('https://poetry.ajmalaand.com/api/');
 
   final http.Client _client;
   final Uri baseUri;
+  final EntitlementController? entitlements;
 
-  Future<Map<String, dynamic>> getObject(String path) async {
-    final value = await _getJson(path);
+  Future<Map<String, dynamic>> getObject(
+    String path, {
+    bool refreshEntitlement = false,
+  }) async {
+    final value = await _getJson(path, refreshEntitlement: refreshEntitlement);
     if (value is! Map<String, dynamic>) {
       throw const FormatException('Expected a JSON object');
     }
@@ -32,8 +38,14 @@ class ApiClient {
         .toList(growable: false);
   }
 
-  Future<Map<String, dynamic>> getDataObject(String path) async {
-    final response = await getObject(path);
+  Future<Map<String, dynamic>> getDataObject(
+    String path, {
+    bool refreshEntitlement = false,
+  }) async {
+    final response = await getObject(
+      path,
+      refreshEntitlement: refreshEntitlement,
+    );
     final data = response['data'];
     if (data is! Map<String, dynamic>) {
       throw const FormatException('Expected a data object');
@@ -41,12 +53,18 @@ class ApiClient {
     return data;
   }
 
-  Future<dynamic> _getJson(String path) async {
+  Future<dynamic> _getJson(
+    String path, {
+    bool refreshEntitlement = false,
+  }) async {
+    final headers = <String, String>{'Accept': 'application/json'};
+    final userId = entitlements?.userId;
+    if (userId != null && userId.isNotEmpty) {
+      headers['X-RC-User-Id'] = userId;
+      if (refreshEntitlement) headers['X-RC-Refresh'] = '1';
+    }
     final response = await _client
-        .get(
-          baseUri.resolve(path),
-          headers: const {'Accept': 'application/json'},
-        )
+        .get(baseUri.resolve(path), headers: headers)
         .timeout(const Duration(seconds: 12));
     if (response.statusCode == 404) throw const ContentNotFoundException();
     if (response.statusCode < 200 || response.statusCode >= 300) {

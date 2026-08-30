@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
+
 import '../models/app_config.dart';
 import '../models/poem.dart';
 import '../models/poetry_collection.dart';
+import '../purchases/entitlement_controller.dart';
 import '../services/api_client.dart';
 import '../services/cache_store.dart';
 
@@ -37,21 +40,29 @@ abstract interface class PoetryDataSource {
   Future<CatalogueSnapshot?> loadCachedCatalogue();
   Future<CatalogueSnapshot> refreshCatalogue(CatalogueSnapshot? cached);
   Future<CollectionBundle> loadCollection(String slug, int contentVersion);
-  Future<PoemDetail> loadPoem(int id, int contentVersion);
+  Future<PoemDetail> loadPoem(
+    int id,
+    int contentVersion, {
+    bool refreshEntitlement = false,
+  });
   Future<AudioAccess> loadAudio(int poemId);
 }
 
 class PoetryRepository implements PoetryDataSource {
-  PoetryRepository({required ApiClient api, required CacheStore cache})
-    : this._(api, cache);
+  PoetryRepository({
+    required ApiClient api,
+    required CacheStore cache,
+    EntitlementController? entitlements,
+  }) : this._(api, cache, entitlements);
 
-  PoetryRepository._(this._api, this._cache);
+  PoetryRepository._(this._api, this._cache, this._entitlements);
 
   static const _catalogueKey = 'pitswal.catalogue.v1';
   static const _contentPrefix = 'pitswal.content.v1.';
 
   final ApiClient _api;
   final CacheStore _cache;
+  final EntitlementController? _entitlements;
 
   @override
   Future<CatalogueSnapshot?> loadCachedCatalogue() async {
@@ -116,7 +127,8 @@ class PoetryRepository implements PoetryDataSource {
     String slug,
     int contentVersion,
   ) async {
-    final key = '$_contentPrefix$contentVersion.collection.$slug';
+    final key =
+        '$_contentPrefix${_accessScope()}.$contentVersion.collection.$slug';
     try {
       final responses = await Future.wait([
         _api.getDataObject('collections/${Uri.encodeComponent(slug)}'),
@@ -145,10 +157,17 @@ class PoetryRepository implements PoetryDataSource {
   }
 
   @override
-  Future<PoemDetail> loadPoem(int id, int contentVersion) async {
-    final key = '$_contentPrefix$contentVersion.poem.$id';
+  Future<PoemDetail> loadPoem(
+    int id,
+    int contentVersion, {
+    bool refreshEntitlement = false,
+  }) async {
+    final key = '$_contentPrefix${_accessScope()}.$contentVersion.poem.$id';
     try {
-      final json = await _api.getDataObject('poems/$id');
+      final json = await _api.getDataObject(
+        'poems/$id',
+        refreshEntitlement: refreshEntitlement,
+      );
       final poem = PoemDetail.fromJson(json);
       await _cache.write(key, jsonEncode(json));
       return poem;
@@ -165,6 +184,17 @@ class PoetryRepository implements PoetryDataSource {
   @override
   Future<AudioAccess> loadAudio(int poemId) async =>
       AudioAccess.fromJson(await _api.getObject('poems/$poemId/audio'));
+
+  String _accessScope() {
+    final entitlements = _entitlements;
+    if (entitlements == null ||
+        !entitlements.entitled ||
+        entitlements.userId == null) {
+      return 'public';
+    }
+    final digest = sha256.convert(utf8.encode(entitlements.userId!)).toString();
+    return 'paid.${digest.substring(0, 16)}';
+  }
 
   CollectionBundle _parseBundle(
     Map<String, dynamic> collectionJson,

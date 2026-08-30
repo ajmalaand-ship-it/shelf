@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
 import '../models/app_config.dart';
+import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
 import '../widgets/collection_card.dart';
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
     required this.readerSettings,
     required this.qaMode,
     required this.audioController,
+    this.entitlements,
     super.key,
   });
 
@@ -21,6 +23,7 @@ class HomeScreen extends StatefulWidget {
   final ReaderSettings readerSettings;
   final bool qaMode;
   final AudioPlaybackController audioController;
+  final EntitlementController? entitlements;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -139,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
           repository: widget.repository,
           readerSettings: widget.readerSettings,
           audioController: widget.audioController,
+          entitlements: widget.entitlements,
         ),
       ),
     );
@@ -153,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
           repository: widget.repository,
           readerSettings: widget.readerSettings,
           audioController: widget.audioController,
+          entitlements: widget.entitlements,
         ),
       ),
     );

@@ -1,12 +1,16 @@
 import '../models/app_config.dart';
 import '../models/poem.dart';
 import '../models/poetry_collection.dart';
+import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import 'qa_audio_server.dart';
 
 /// Synthetic, local-only reader acceptance data. None of this text is
 /// represented as Ajmal Aand's authored or published poetry.
 class QaFixtureRepository implements PoetryDataSource {
+  QaFixtureRepository({this.entitlements});
+
+  final EntitlementController? entitlements;
   static const _version = 900001;
 
   static const _config = AppConfig(
@@ -191,10 +195,25 @@ class QaFixtureRepository implements PoetryDataSource {
   }
 
   @override
-  Future<PoemDetail> loadPoem(int id, int contentVersion) async {
+  Future<PoemDetail> loadPoem(
+    int id,
+    int contentVersion, {
+    bool refreshEntitlement = false,
+  }) async {
     if (contentVersion != _version) throw StateError('Invalid QA version');
     final poem = _poems[id];
     if (poem == null) throw StateError('Unknown QA poem');
+    if (id == 9104 && entitlements?.entitled == true) {
+      return _detail(
+        id: 9104,
+        slug: _covered.slug,
+        title: 'ژباړه — تړلې بېلګه',
+        workType: 'TRANSLATION',
+        originalAuthor: 'د QA اصلي شاعر',
+        translator: 'د QA ژباړن',
+        body: 'پرانيستل شوی مصنوعي QA متن\nدويمه ازموينيزه کرښه',
+      );
+    }
     return poem;
   }
 

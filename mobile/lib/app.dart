@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'audio/audio_playback_controller.dart';
 import 'repository/poetry_repository.dart';
+import 'purchases/entitlement_controller.dart';
 import 'screens/home_screen.dart';
 import 'settings/reader_settings.dart';
 import 'theme/app_theme.dart';
@@ -11,6 +12,7 @@ class PitswalApp extends StatelessWidget {
     required this.repository,
     required this.readerSettings,
     this.audioController,
+    this.entitlements,
     this.qaMode = false,
     super.key,
   });
@@ -18,6 +20,7 @@ class PitswalApp extends StatelessWidget {
   final PoetryDataSource repository;
   final ReaderSettings readerSettings;
   final AudioPlaybackController? audioController;
+  final EntitlementController? entitlements;
   final bool qaMode;
 
   @override
@@ -33,6 +36,7 @@ class PitswalApp extends StatelessWidget {
       repository: repository,
       readerSettings: readerSettings,
       audioController: audioController ?? InactiveAudioController(),
+      entitlements: entitlements,
       qaMode: qaMode,
     ),
   );

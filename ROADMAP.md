@@ -48,6 +48,10 @@ Configure one non-consumable Unlock All Poetry product and the `unlock_all` Reve
 
 **Gate:** A fresh install receives samples only; purchase, reinstall, and restore unlock content; direct API access without entitlement returns locked excerpts only.
 
+**Status: Technical implementation complete — external RevenueCat/Google Play configuration and real sandbox acceptance required.** Ajmal explicitly authorized P5 on August 29, 2026. The implemented identifiers are Google Play one-time product `pitswal_unlock_all_v1`, RevenueCat entitlement `unlock_all`, and offering `default`. Flutter uses `purchases_flutter` with RevenueCat-managed anonymous App User IDs, localized store pricing, purchase/restore controls, entitlement-aware API headers, and isolated public/paid text and audio caches. Laravel independently checks RevenueCat, caches positive results for 24 hours and negative results for 5 minutes, supports an explicit post-purchase refresh, and fails closed for every locked-text/audio provider failure. Free samples and Filament publication/free flags remain authoritative.
+
+The product must be configured as non-consumable in RevenueCat so Google Billing Client 8 can restore it for an anonymous reinstall. No real public SDK key, server secret, Play service credential, offering, product, or price has been fabricated or configured. Product price remains an owner/store decision. P6 remains not started and no Google Play submission has occurred.
+
 ## P6 — Android launch
 
 Prepare Android launch assets, store copy, Pashto screenshots, privacy policy, and terms. Complete the closed test begun in P0 under the then-current Google Play requirements, fix real-device issues, and obtain production approval.

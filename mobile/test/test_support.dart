@@ -78,6 +78,7 @@ Map<String, dynamic> poemDetailJson({
   'source_date_place': 'کابل — ۱۳۸۵',
   'source_note': null,
   'locked': locked,
+  'requires_entitlement': locked,
   'excerpt': 'لنډه برخه\nدويمه کرښه',
   'body': locked ? null : body,
   'audio': {

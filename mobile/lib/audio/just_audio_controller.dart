@@ -6,20 +6,28 @@ import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../models/poem.dart';
+import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import 'audio_cache_store.dart';
 import 'audio_playback_controller.dart';
 import 'audio_source_planner.dart';
 
 class JustAudioController extends AudioPlaybackController {
-  JustAudioController._(this._repository, this._cache, this._player);
+  JustAudioController._(
+    this._repository,
+    this._cache,
+    this._player,
+    this._entitlements,
+  );
 
   final PoetryDataSource _repository;
   final AudioCacheStore _cache;
   final AudioPlayer _player;
+  final EntitlementController? _entitlements;
   late final AudioSourcePlanner _planner = AudioSourcePlanner(
     _repository,
     _cache,
+    entitlements: _entitlements,
   );
   final List<StreamSubscription<dynamic>> _subscriptions = [];
   StreamSubscription<double>? _downloadSubscription;
@@ -36,12 +44,18 @@ class JustAudioController extends AudioPlaybackController {
   static Future<JustAudioController> create({
     required PoetryDataSource repository,
     required AudioCacheStore cache,
+    EntitlementController? entitlements,
   }) async {
     final player = AudioPlayer(
       handleInterruptions: true,
       handleAudioSessionActivation: true,
     );
-    final controller = JustAudioController._(repository, cache, player);
+    final controller = JustAudioController._(
+      repository,
+      cache,
+      player,
+      entitlements,
+    );
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
     controller._listen(session);

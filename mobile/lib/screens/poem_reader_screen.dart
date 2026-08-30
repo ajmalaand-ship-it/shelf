@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
 import '../models/poem.dart';
+import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
 import '../share_cards/share_card_screen.dart';
@@ -14,6 +15,7 @@ class PoemReaderScreen extends StatefulWidget {
     required this.settings,
     this.collectionTitle,
     this.audioController,
+    this.entitlements,
     super.key,
   });
 
@@ -23,6 +25,7 @@ class PoemReaderScreen extends StatefulWidget {
   final ReaderSettings settings;
   final String? collectionTitle;
   final AudioPlaybackController? audioController;
+  final EntitlementController? entitlements;
 
   @override
   State<PoemReaderScreen> createState() => _PoemReaderScreenState();
@@ -38,10 +41,11 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
     _future = _load();
   }
 
-  Future<PoemDetail> _load() async {
+  Future<PoemDetail> _load({bool refreshEntitlement = false}) async {
     final poem = await widget.repository.loadPoem(
       widget.poemId,
       widget.contentVersion,
+      refreshEntitlement: refreshEntitlement,
     );
     if (mounted) setState(() => _loadedPoem = poem);
     return poem;
@@ -111,6 +115,11 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
                 colors: colors,
                 audioController:
                     widget.audioController ?? InactiveAudioController(),
+                entitlements: widget.entitlements,
+                onUnlocked: () => setState(() {
+                  _loadedPoem = null;
+                  _future = _load(refreshEntitlement: true);
+                }),
               );
             },
           ),
@@ -198,12 +207,16 @@ class _PoemBody extends StatelessWidget {
     required this.settings,
     required this.colors,
     required this.audioController,
+    required this.entitlements,
+    required this.onUnlocked,
   });
 
   final PoemDetail poem;
   final ReaderSettings settings;
   final _ReaderColors colors;
   final AudioPlaybackController audioController;
+  final EntitlementController? entitlements;
+  final VoidCallback onUnlocked;
 
   @override
   Widget build(BuildContext context) => Directionality(
@@ -258,7 +271,12 @@ class _PoemBody extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: 28),
-                  if (poem.locked) _LockedNotice(color: colors.foreground),
+                  if (poem.locked)
+                    _LockedNotice(
+                      color: colors.foreground,
+                      entitlements: entitlements,
+                      onUnlocked: onUnlocked,
+                    ),
                   SelectableText(
                     poem.readableText,
                     key: const Key('poem-body'),
@@ -429,21 +447,94 @@ class _AudioPlayerPanel extends StatelessWidget {
 }
 
 class _LockedNotice extends StatelessWidget {
-  const _LockedNotice({required this.color});
+  const _LockedNotice({
+    required this.color,
+    required this.entitlements,
+    required this.onUnlocked,
+  });
   final Color color;
+  final EntitlementController? entitlements;
+  final VoidCallback onUnlocked;
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 18),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    child: Column(
       children: [
-        Icon(Icons.lock_outline_rounded, color: color),
-        const SizedBox(width: 8),
-        Text('دا شعر تړلی دی', style: TextStyle(color: color)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.lock_outline_rounded, color: color),
+            const SizedBox(width: 8),
+            Text('دا شعر تړلی دی', style: TextStyle(color: color)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'يو ځل پېر د اجمل اند ټول اوسني شعرونه او غږونه پرانيزي. راتلونکي د اجمل اند شعرونه هم ښايي بې له بل لګښته ورزيات شي؛ ځانګړې ټولګې يا د نورو شاعرانو آثار جلا کېدای شي.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: color, height: 1.6),
+        ),
+        if (entitlements != null)
+          AnimatedBuilder(
+            animation: entitlements!,
+            builder: (context, _) => Column(
+              children: [
+                const SizedBox(height: 12),
+                if (entitlements!.product?.price case final price?)
+                  Text(price, key: const Key('unlock-price')),
+                const SizedBox(height: 8),
+                FilledButton.icon(
+                  key: const Key('unlock-all'),
+                  onPressed: entitlements!.busy || entitlements!.product == null
+                      ? null
+                      : () => _purchase(context),
+                  icon: const Icon(Icons.lock_open_rounded),
+                  label: const Text('ټول شعرونه پرانيزئ'),
+                ),
+                TextButton(
+                  key: const Key('restore-purchases'),
+                  onPressed: entitlements!.busy
+                      ? null
+                      : () => _restore(context),
+                  child: const Text('پېر بېرته راواخلئ'),
+                ),
+              ],
+            ),
+          ),
       ],
     ),
   );
+
+  Future<void> _purchase(BuildContext context) async {
+    final result = await entitlements!.purchase();
+    if (!context.mounted) return;
+    if (result == PurchaseOutcome.entitled) {
+      onUnlocked();
+    }
+    _message(context, switch (result) {
+      PurchaseOutcome.entitled => 'پېر بريالی شو. شعرونه پرانيستل شول.',
+      PurchaseOutcome.cancelled => 'پېر لغوه شو.',
+      PurchaseOutcome.notEntitled => 'پېر بشپړ شو، خو لاسرسی تاييد نه شو.',
+      PurchaseOutcome.error => 'پېر بشپړ نه شو. بيا هڅه وکړئ.',
+    });
+  }
+
+  Future<void> _restore(BuildContext context) async {
+    final result = await entitlements!.restore();
+    if (!context.mounted) return;
+    if (result == PurchaseOutcome.entitled) onUnlocked();
+    _message(context, switch (result) {
+      PurchaseOutcome.entitled => 'پېر بېرته وموندل شو او شعرونه پرانيستل شول.',
+      PurchaseOutcome.notEntitled => 'پخوانی پېر ونه موندل شو.',
+      PurchaseOutcome.cancelled => 'بېرته راوستل لغوه شول.',
+      PurchaseOutcome.error => 'پېر بېرته راونه وړل شو. بيا هڅه وکړئ.',
+    });
+  }
+
+  void _message(BuildContext context, String text) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
 }
 
 class _ReaderError extends StatelessWidget {

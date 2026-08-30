@@ -66,6 +66,7 @@ class PoemDetail {
     this.sourceDatePlace,
     this.sourceNote,
     required this.locked,
+    this.requiresEntitlement = false,
     this.excerpt,
     this.body,
     required this.audioAvailable,
@@ -93,6 +94,9 @@ class PoemDetail {
       sourceDatePlace: _string(json, 'source_date_place'),
       sourceNote: _string(json, 'source_note'),
       locked: _bool(json, 'locked'),
+      requiresEntitlement: json['requires_entitlement'] == null
+          ? false
+          : _bool(json, 'requires_entitlement'),
       excerpt: _string(json, 'excerpt'),
       body: _string(json, 'body'),
       audioAvailable: _bool(audio, 'available'),
@@ -114,6 +118,7 @@ class PoemDetail {
   final String? sourceDatePlace;
   final String? sourceNote;
   final bool locked;
+  final bool requiresEntitlement;
   final String? excerpt;
   final String? body;
   final bool audioAvailable;

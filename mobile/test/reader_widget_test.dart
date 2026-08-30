@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:pitswal/app.dart';
+import 'package:pitswal/purchases/entitlement_controller.dart';
 import 'package:pitswal/repository/poetry_repository.dart';
 import 'package:pitswal/screens/collection_detail_screen.dart';
 import 'package:pitswal/screens/poem_reader_screen.dart';
@@ -183,35 +184,63 @@ void main() {
     expect(readerSettings.fontSize, greaterThan(24));
   });
 
-  testWidgets('locked reader shows excerpt without a purchase control', (
-    tester,
-  ) async {
-    final repository = PoetryRepository(
-      api: ApiClient(
-        client: MockClient(
-          (_) async => http.Response.bytes(
-            utf8.encode(jsonEncode({'data': poemDetailJson(locked: true)})),
-            200,
-            headers: {'content-type': 'application/json; charset=utf-8'},
+  testWidgets(
+    'locked reader shows excerpt with purchase and restore controls',
+    (tester) async {
+      final entitlements = EntitlementController(_ReaderPurchaseProvider());
+      await entitlements.initialize();
+      final repository = PoetryRepository(
+        api: ApiClient(
+          client: MockClient(
+            (_) async => http.Response.bytes(
+              utf8.encode(jsonEncode({'data': poemDetailJson(locked: true)})),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            ),
           ),
         ),
-      ),
-      cache: MemoryCacheStore(),
-    );
-    await tester.pumpWidget(
-      MaterialApp(
-        home: PoemReaderScreen(
-          poemId: 301,
-          contentVersion: 7,
-          repository: repository,
-          settings: await settings(),
+        cache: MemoryCacheStore(),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PoemReaderScreen(
+            poemId: 301,
+            contentVersion: 7,
+            repository: repository,
+            settings: await settings(),
+            entitlements: entitlements,
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('دا شعر تړلی دی'), findsOneWidget);
-    expect(find.textContaining('لنډه برخه'), findsOneWidget);
-    expect(find.textContaining('پېرود'), findsNothing);
-  });
+      expect(find.text('دا شعر تړلی دی'), findsOneWidget);
+      expect(find.textContaining('لنډه برخه'), findsOneWidget);
+      expect(find.text('TEST PRICE'), findsOneWidget);
+      expect(find.byKey(const Key('unlock-all')), findsOneWidget);
+      expect(find.byKey(const Key('restore-purchases')), findsOneWidget);
+      expect(find.textContaining('ټ ډ ړ ږ ښ ڼ ې ۍ'), findsNothing);
+    },
+  );
+}
+
+class _ReaderPurchaseProvider implements PurchaseProvider {
+  @override
+  Future<String?> appUserId() async => r'$RCAnonymousID:reader-test';
+  @override
+  Future<void> configure() async {}
+  @override
+  Future<PurchaseSnapshot> customerInfo() async =>
+      const PurchaseSnapshot(entitled: false);
+  @override
+  Future<PurchaseProduct?> product() async => const PurchaseProduct(
+    identifier: revenueCatProductId,
+    price: 'TEST PRICE',
+  );
+  @override
+  Future<PurchaseSnapshot> purchase() async =>
+      const PurchaseSnapshot(entitled: false);
+  @override
+  Future<PurchaseSnapshot> restore() async =>
+      const PurchaseSnapshot(entitled: false);
 }

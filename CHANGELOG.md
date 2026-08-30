@@ -6,6 +6,7 @@ All notable repository governance changes are recorded here.
 
 ### Changed
 
+- Implemented the authorized P5 technical foundation: RevenueCat anonymous purchase/restore state, localized pricing, real locked-reader actions, entitlement-aware text/audio caches, server-authoritative `unlock_all` verification, fail-closed paid text/audio, bounded entitlement caching, and refreshed purchase privacy disclosure. External RevenueCat/Google Play configuration, owner pricing, and real sandbox acceptance remain required; P6 has not started.
 - Corrected the P4 Android export pipeline after owner-device review: export now captures the painted preview instead of a separately inserted insufficiently painted overlay, waits for frame completion, validates 1080×1350 PNG bytes and temporary files, renders multi-card sets sequentially, and distinguishes render/file/share/gallery failures in debug diagnostics.
 - Closed the P4 Share / Download Poem Image gate on August 29, 2026, after Ajmal confirmed on real Android hardware that share-sheet export, Save to Gallery, and generated PNG output work. P5 and P6 remain not started; no Google Play submission or real-collection publication occurred.
 - Closed the P3 Audio Experience gate on August 29, 2026, after owner testing on real Android hardware confirmed basic play/pause, background and lock-screen playback, sufficient system playback behavior, and offline replay from populated local cache.
