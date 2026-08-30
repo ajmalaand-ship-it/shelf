@@ -101,6 +101,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                               contentVersion: widget.contentVersion,
                               repository: widget.repository,
                               settings: widget.readerSettings,
+                              collectionTitle: bundle.collection.title,
                               audioController:
                                   widget.audioController ??
                                   InactiveAudioController(),

@@ -4,6 +4,7 @@ import '../audio/audio_playback_controller.dart';
 import '../models/poem.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
+import '../share_cards/share_card_screen.dart';
 
 class PoemReaderScreen extends StatefulWidget {
   const PoemReaderScreen({
@@ -11,6 +12,7 @@ class PoemReaderScreen extends StatefulWidget {
     required this.contentVersion,
     required this.repository,
     required this.settings,
+    this.collectionTitle,
     this.audioController,
     super.key,
   });
@@ -19,6 +21,7 @@ class PoemReaderScreen extends StatefulWidget {
   final int contentVersion;
   final PoetryDataSource repository;
   final ReaderSettings settings;
+  final String? collectionTitle;
   final AudioPlaybackController? audioController;
 
   @override
@@ -27,6 +30,7 @@ class PoemReaderScreen extends StatefulWidget {
 
 class _PoemReaderScreenState extends State<PoemReaderScreen> {
   late Future<PoemDetail> _future;
+  PoemDetail? _loadedPoem;
 
   @override
   void initState() {
@@ -34,8 +38,14 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
     _future = _load();
   }
 
-  Future<PoemDetail> _load() =>
-      widget.repository.loadPoem(widget.poemId, widget.contentVersion);
+  Future<PoemDetail> _load() async {
+    final poem = await widget.repository.loadPoem(
+      widget.poemId,
+      widget.contentVersion,
+    );
+    if (mounted) setState(() => _loadedPoem = poem);
+    return poem;
+  }
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -52,6 +62,23 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
           shadowColor: Colors.transparent,
           scrolledUnderElevation: 0,
           actions: [
+            IconButton(
+              key: const Key('reader-share'),
+              tooltip: 'شريکول او ساتل',
+              onPressed:
+                  _loadedPoem == null ||
+                      _loadedPoem!.readableText.trim().isEmpty
+                  ? null
+                  : () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => ShareCardScreen(
+                          poem: _loadedPoem!,
+                          collectionTitle: widget.collectionTitle,
+                        ),
+                      ),
+                    ),
+              icon: const Icon(Icons.ios_share_rounded),
+            ),
             IconButton(
               tooltip: 'د لوست بڼه',
               onPressed: () => _showControls(context),
@@ -72,7 +99,10 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
               if (snapshot.hasError || !snapshot.hasData) {
                 return _ReaderError(
                   color: colors.foreground,
-                  onRetry: () => setState(() => _future = _load()),
+                  onRetry: () => setState(() {
+                    _loadedPoem = null;
+                    _future = _load();
+                  }),
                 );
               }
               return _PoemBody(

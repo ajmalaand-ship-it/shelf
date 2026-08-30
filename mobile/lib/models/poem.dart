@@ -75,6 +75,7 @@ class PoemDetail {
     this.audioCacheKey,
     this.audioFormat,
     this.audioLabel,
+    this.shareAuthorLabel,
   });
 
   factory PoemDetail.fromJson(Map<String, dynamic> json) {
@@ -122,6 +123,7 @@ class PoemDetail {
   final String? audioCacheKey;
   final String? audioFormat;
   final String? audioLabel;
+  final String? shareAuthorLabel;
 
   bool get isTranslation => workType == 'TRANSLATION';
   bool get isUntitled => title == null || title!.trim().isEmpty;
@@ -130,6 +132,7 @@ class PoemDetail {
   String get readableText => locked ? (excerpt ?? '') : (body ?? excerpt ?? '');
   bool get hasPlayableAudio =>
       audioAvailable && !locked && !audioLocked && audioCacheKey != null;
+  String get cardAuthor => shareAuthorLabel ?? 'اجمل اند';
 }
 
 class AudioAccess {

@@ -242,4 +242,5 @@ PoemDetail _detail({
   audioLabel: audioAvailable
       ? 'مصنوعي ازموينيز غږ — د اجمل اند ثبت نه دی'
       : null,
+  shareAuthorLabel: 'مصنوعي QA — د اجمل اند شعر نه دی',
 );

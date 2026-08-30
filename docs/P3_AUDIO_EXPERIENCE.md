@@ -4,7 +4,7 @@ P3 was explicitly authorized by Ajmal Aand on August 29, 2026. The technical bui
 
 ## Content and phase boundary
 
-Ajmal's original voice recordings are ongoing owner content added through Filament before and after publication. Production may contain zero or only some recordings. The former expectation of 10 recordings before launch is superseded by owner decision, and an incomplete planned recording batch is not a launch blocker. No recording is fabricated, no AI voice is used, and a poem without audio remains a clean, complete reading experience. P4 share cards, P5 payments/entitlements, P6 launch work, and store submission have not started.
+Ajmal's original voice recordings are ongoing owner content added through Filament before and after publication. Production may contain zero or only some recordings. The former expectation of 10 recordings before launch is superseded by owner decision, and an incomplete planned recording batch is not a launch blocker. No recording is fabricated, no AI voice is used, and a poem without audio remains a clean, complete reading experience. P4 share cards were subsequently authorized; P5 payments/entitlements, P6 launch work, and store submission have not started.
 
 ## Accepted technical baseline
 
