@@ -2,6 +2,8 @@
 
 Ajmal Aand authorized P5 on August 29, 2026. The technical implementation uses one one-time product, `pitswal_unlock_all_v1`, one RevenueCat entitlement, `unlock_all`, and offering `default`. Product price remains an owner decision. P6 and Google Play submission have not started.
 
+**Recorded status: TECHNICAL BUILD COMPLETE — REAL PROVIDER/SANDBOX ACCEPTANCE DEFERRED TO RELEASE PREPARATION.** Ajmal approved this sequencing decision on August 29, 2026. It is not abandonment of P5 and does not mark P5 fully complete. Real product activation/pricing, RevenueCat and Play connection, production keys, and real purchase/restore/paid-audio acceptance will be completed during final Android release preparation.
+
 ## Current provider findings
 
 The implementation was checked against current official RevenueCat and Google Play documentation on August 29, 2026. `purchases_flutter` 10.10.x is the current compatible SDK line. It uses Google Billing Client 8+, for which consumed one-time products cannot be restored by anonymous users. Therefore the Play product must be marked **non-consumable in RevenueCat**; RevenueCat otherwise consumes it. RevenueCat-generated anonymous IDs are cached on-device, change after reinstall, and are reconciled through a user-triggered `restorePurchases` under the dashboard's transfer-to-new-App-User-ID behavior.
@@ -33,6 +35,10 @@ The server reads only `subscriber.entitlements.unlock_all`. Its secret is never 
 Free samples remain full without RevenueCat. Unpublished collections/poems remain unavailable even when entitled. List endpoints never return poem bodies. Paid audio metadata requires entitlement and returns a ten-minute signed URL; private storage paths and identifiers are absent from that URL.
 
 ## External owner setup still required
+
+**Mandatory release-stage blocker:** Complete Google Play + RevenueCat real configuration and sandbox purchase/restore gate before final closed testing/production submission.
+
+Until the following work is completed, production remains fail-closed for locked content, free/public content remains available, and fake/debug entitlement cannot be used in release. These items are intentionally deferred, not waived:
 
 1. In Google Play Console, create/confirm the app `پېڅوَل — Pitswal` with package `com.hindara.pitswal`; upload only to an internal/closed testing track when owner-approved. Do not submit production.
 2. Under Monetize → Products → One-time products, create `pitswal_unlock_all_v1` as a permanent/non-consumed unlock. Ajmal selects localized price and activates the product.
