@@ -38,9 +38,29 @@ void main() {
     await tester.tap(find.byKey(const Key('home-font-chooser')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('reading-font-selector')), findsOneWidget);
-    await tester.tap(find.text('نسخ'));
+    expect(find.byType(RadioListTile<ReaderFont>), findsExactly(3));
+    expect(find.text('وزيرمتن — Vazirmatn'), findsOneWidget);
+    expect(find.text('شهرزاد نو — Scheherazade New'), findsOneWidget);
+    expect(find.text('نوټو نستعليق — Noto Nastaliq Urdu'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('font-choice-scheherazade')));
     await tester.pumpAndSettle();
     expect(settings.font, ReaderFont.naskh);
+  });
+
+  test('each reading selection maps to its intended bundled family', () async {
+    SharedPreferences.setMockInitialValues({});
+    final settings = await ReaderSettings.load(
+      await SharedPreferences.getInstance(),
+    );
+    const expected = {
+      ReaderFont.vazirmatn: 'Vazirmatn',
+      ReaderFont.naskh: 'ScheherazadeNew',
+      ReaderFont.literary: 'NotoNastaliqUrdu',
+    };
+    for (final entry in expected.entries) {
+      await settings.setFont(entry.key);
+      expect(settings.fontFamily, entry.value);
+    }
   });
 
   test(

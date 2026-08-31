@@ -86,6 +86,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('owner-preview-banner')), findsOneWidget);
+      expect(
+        find.textContaining('PC-TYPOGRAPHY-01A • BUILD 2'),
+        findsOneWidget,
+      );
       expect(find.text('څپو کې انځورونه'), findsOneWidget);
       expect(find.text('مسوده'), findsOneWidget);
 

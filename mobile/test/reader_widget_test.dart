@@ -169,7 +169,8 @@ void main() {
     await tester.tap(find.byTooltip('د لوست بڼه'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('نسخ'));
+    expect(find.byType(RadioListTile<ReaderFont>), findsExactly(3));
+    await tester.tap(find.byKey(const Key('font-choice-scheherazade')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('تياره'));
     await tester.pumpAndSettle();

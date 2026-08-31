@@ -72,23 +72,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                       sliver: SliverList.list(
                         children: [
-                          Stack(
-                            children: [
-                              _BrandHeader(config: snapshot.config),
-                              PositionedDirectional(
-                                end: 0,
-                                top: 0,
-                                child: IconButton.filledTonal(
-                                  key: const Key('home-font-chooser'),
-                                  tooltip: 'د لوست بڼه',
-                                  onPressed: () => showReadingPreferences(
-                                    context,
-                                    widget.readerSettings,
-                                  ),
-                                  icon: const Icon(Icons.text_fields_rounded),
-                                ),
+                          _BrandHeader(config: snapshot.config),
+                          const SizedBox(height: 18),
+                          Center(
+                            child: OutlinedButton.icon(
+                              key: const Key('home-font-chooser'),
+                              onPressed: () => showReadingPreferences(
+                                context,
+                                widget.readerSettings,
                               ),
-                            ],
+                              icon: const Icon(Icons.text_fields_rounded),
+                              label: const Text('د شعر ليکدود بدلول'),
+                            ),
                           ),
                           if (widget.qaMode) ...[
                             const SizedBox(height: 16),

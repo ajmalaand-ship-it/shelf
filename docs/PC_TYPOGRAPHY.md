@@ -38,3 +38,7 @@ The broken-looking forms are therefore a font-design/contextual-glyph appearance
 Protected local review selected record IDs only: titled 7, untitled 4, long 74, multi-stanza 95, stored date/place 85, translation 143, and final-heh example 4. Poem bodies were not copied into this document or reports.
 
 P6 remains not started. PC-B catalogue recovery remains out of scope.
+
+## Owner device mismatch correction — SYSC-PC-TYPOGRAPHY-01A
+
+The first owner screenshot showed the superseded two-option selector even though the delivered APK contained the three-font source and assets. The original and corrected builds both initially identified as Android version 1.0.0 (code 1), which made an older installed artifact impossible to distinguish on device. The correction uses fully named, vertically listed font choices, a labeled Home button, explicit migration of the legacy `nastaliq` preference to `literary`, and an owner-preview-only `PC-TYPOGRAPHY-01A • BUILD 2` banner marker. The replacement preview APK is built as version code 2 so Android installs it as an unambiguous upgrade; release builds retain no preview marker.

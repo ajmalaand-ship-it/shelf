@@ -35,12 +35,21 @@ class ReaderSettings extends ChangeNotifier {
     final paletteName = preferences.getString(_paletteKey);
     final fontName = preferences.getString(_fontKey);
     final fontSize = preferences.getDouble(_fontSizeKey) ?? 24;
+    final font = switch (fontName) {
+      'naskh' => ReaderFont.naskh,
+      'nastaliq' => ReaderFont.literary,
+      'literary' => ReaderFont.literary,
+      'vazirmatn' => ReaderFont.vazirmatn,
+      _ => ReaderFont.vazirmatn,
+    };
+    if (fontName != null && fontName != font.name) {
+      await preferences.setString(_fontKey, font.name);
+    }
     return ReaderSettings._(
       preferences,
       ReaderPalette.values.where((v) => v.name == paletteName).firstOrNull ??
           ReaderPalette.light,
-      ReaderFont.values.where((v) => v.name == fontName).firstOrNull ??
-          ReaderFont.vazirmatn,
+      font,
       fontSize.clamp(18, 38),
     );
   }

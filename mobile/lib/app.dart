@@ -48,7 +48,9 @@ class PitswalApp extends StatelessWidget {
                       child: SizedBox(
                         width: double.infinity,
                         child: Text(
-                          'OWNER PREVIEW — UNPUBLISHED CONTENT\nد مالک کتنه — ناچاپه منځپانګه',
+                          'OWNER PREVIEW — UNPUBLISHED CONTENT\n'
+                          'PC-TYPOGRAPHY-01A • BUILD 2\n'
+                          'د مالک کتنه — ناچاپه منځپانګه',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
