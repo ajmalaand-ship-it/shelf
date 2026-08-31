@@ -12,9 +12,17 @@ class Poem extends Model
     /** @use HasFactory<PoemFactory> */
     use HasFactory;
 
+    public const LAYOUT_SOURCE = 'SOURCE';
+
+    public const LAYOUT_COUPLET = 'COUPLET';
+
+    public const LAYOUT_FOUR_LINES = 'FOUR_LINES';
+
+    public const LAYOUT_MODES = [self::LAYOUT_SOURCE, self::LAYOUT_COUPLET, self::LAYOUT_FOUR_LINES];
+
     protected $fillable = [
         'collection_id', 'title', 'body', 'excerpt', 'work_type', 'original_author', 'translator',
-        'source_date_place', 'source_note', 'audio_path', 'audio_duration_seconds', 'sort_order',
+        'source_date_place', 'source_note', 'layout_mode', 'audio_path', 'audio_duration_seconds', 'sort_order',
         'is_free_sample', 'is_active',
     ];
 
@@ -26,10 +34,13 @@ class Poem extends Model
     protected static function booted(): void
     {
         static::saved(function (Poem $poem): void {
-            $audioWasAddedOnCreate = $poem->wasRecentlyCreated && filled($poem->audio_path);
-            if ($audioWasAddedOnCreate || $poem->wasChanged('audio_path')) {
+            if ($poem->wasRecentlyCreated || $poem->wasChanged()) {
                 AppSetting::query()->where('key', 'content_version')->increment('value');
             }
+        });
+
+        static::deleted(function (): void {
+            AppSetting::query()->where('key', 'content_version')->increment('value');
         });
     }
 

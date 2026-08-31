@@ -70,7 +70,7 @@ Complete and review the actual Version 1 product before release work: provide pr
 
 **Gate:** Ajmal explicitly accepts **Product Complete / Ready for Release Preparation**. Only that approval permits P6 to begin.
 
-**Status: ACTIVE.** **PC-A — Protected Owner Preview / Real-Content Visibility** is technically implemented and awaits Ajmal's real-content owner-device review. The two currently imported collections remain review content rather than an accepted final Version 1 catalogue. PC-B and P6 have not started.
+**Status: ACTIVE.** **PC-A — Protected Owner Preview / Real-Content Visibility** is technically implemented. **SYSC-PC-TYPOGRAPHY-01** replaces the real-content typography baseline with Vazirmatn as the default UI/reading foundation, retained Scheherazade New and Noto Nastaliq Urdu alternatives, owner-controlled source/couplet/four-line presentation, and automatic editorial content-version invalidation; it requires Ajmal's fresh real-content device review. The two currently imported collections remain review content rather than an accepted final Version 1 catalogue. PC-B and P6 have not started.
 
 ## P6 — Android Release Preparation and Launch
 

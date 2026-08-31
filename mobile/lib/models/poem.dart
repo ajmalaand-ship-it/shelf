@@ -65,6 +65,14 @@ class PoemSummary {
   };
 }
 
+enum PoemLayoutMode { source, couplet, fourLines }
+
+PoemLayoutMode _layoutMode(String? value) => switch (value) {
+  'COUPLET' => PoemLayoutMode.couplet,
+  'FOUR_LINES' => PoemLayoutMode.fourLines,
+  _ => PoemLayoutMode.source,
+};
+
 class PoemDetail {
   const PoemDetail({
     required this.id,
@@ -75,6 +83,7 @@ class PoemDetail {
     this.translator,
     this.sourceDatePlace,
     this.sourceNote,
+    this.layoutMode = PoemLayoutMode.source,
     required this.locked,
     this.requiresEntitlement = false,
     this.excerpt,
@@ -105,6 +114,7 @@ class PoemDetail {
       translator: _string(json, 'translator'),
       sourceDatePlace: _string(json, 'source_date_place'),
       sourceNote: _string(json, 'source_note'),
+      layoutMode: _layoutMode(_string(json, 'layout_mode')),
       locked: _bool(json, 'locked'),
       requiresEntitlement: json['requires_entitlement'] == null
           ? false
@@ -133,6 +143,7 @@ class PoemDetail {
   final String? translator;
   final String? sourceDatePlace;
   final String? sourceNote;
+  final PoemLayoutMode layoutMode;
   final bool locked;
   final bool requiresEntitlement;
   final String? excerpt;

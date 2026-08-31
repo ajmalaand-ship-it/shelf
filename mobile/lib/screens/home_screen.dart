@@ -5,6 +5,7 @@ import '../models/app_config.dart';
 import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
+import '../settings/reading_preferences_sheet.dart';
 import '../widgets/collection_card.dart';
 import 'collection_detail_screen.dart';
 import 'collections_screen.dart';
@@ -71,7 +72,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                       sliver: SliverList.list(
                         children: [
-                          _BrandHeader(config: snapshot.config),
+                          Stack(
+                            children: [
+                              _BrandHeader(config: snapshot.config),
+                              PositionedDirectional(
+                                end: 0,
+                                top: 0,
+                                child: IconButton.filledTonal(
+                                  key: const Key('home-font-chooser'),
+                                  tooltip: 'د لوست بڼه',
+                                  onPressed: () => showReadingPreferences(
+                                    context,
+                                    widget.readerSettings,
+                                  ),
+                                  icon: const Icon(Icons.text_fields_rounded),
+                                ),
+                              ),
+                            ],
+                          ),
                           if (widget.qaMode) ...[
                             const SizedBox(height: 16),
                             const _QaNotice(),

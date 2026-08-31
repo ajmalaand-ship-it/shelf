@@ -5,7 +5,9 @@ import '../models/poem.dart';
 import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
+import '../settings/reading_preferences_sheet.dart';
 import '../share_cards/share_card_screen.dart';
+import '../widgets/poetry_text.dart';
 
 class PoemReaderScreen extends StatefulWidget {
   const PoemReaderScreen({
@@ -80,6 +82,7 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
                         builder: (_) => ShareCardScreen(
                           poem: _loadedPoem!,
                           collectionTitle: widget.collectionTitle,
+                          fontFamily: widget.settings.fontFamily,
                         ),
                       ),
                     ),
@@ -87,7 +90,7 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
             ),
             IconButton(
               tooltip: 'د لوست بڼه',
-              onPressed: () => _showControls(context),
+              onPressed: () => showReadingPreferences(context, widget.settings),
               icon: const Icon(Icons.text_fields_rounded),
             ),
           ],
@@ -129,78 +132,6 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
         ),
       );
     },
-  );
-
-  Future<void> _showControls(
-    BuildContext context,
-  ) => showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    builder: (_) => AnimatedBuilder(
-      animation: widget.settings,
-      builder: (context, _) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('د ليک کچه', style: Theme.of(context).textTheme.titleMedium),
-              Row(
-                children: [
-                  const Icon(Icons.text_decrease_rounded),
-                  Expanded(
-                    child: Slider(
-                      key: const Key('font-size-slider'),
-                      min: 18,
-                      max: 38,
-                      divisions: 10,
-                      value: widget.settings.fontSize,
-                      label: widget.settings.fontSize.round().toString(),
-                      onChanged: widget.settings.setFontSize,
-                    ),
-                  ),
-                  const Icon(Icons.text_increase_rounded),
-                ],
-              ),
-              const SizedBox(height: 8),
-              SegmentedButton<ReaderFont>(
-                segments: const [
-                  ButtonSegment(
-                    value: ReaderFont.nastaliq,
-                    label: Text('نستعليق'),
-                  ),
-                  ButtonSegment(value: ReaderFont.naskh, label: Text('نسخ')),
-                ],
-                selected: {widget.settings.font},
-                onSelectionChanged: (value) =>
-                    widget.settings.setFont(value.first),
-              ),
-              const SizedBox(height: 14),
-              SegmentedButton<ReaderPalette>(
-                segments: const [
-                  ButtonSegment(
-                    value: ReaderPalette.light,
-                    label: Text('روښانه'),
-                  ),
-                  ButtonSegment(
-                    value: ReaderPalette.sepia,
-                    label: Text('سپيا'),
-                  ),
-                  ButtonSegment(
-                    value: ReaderPalette.dark,
-                    label: Text('تياره'),
-                  ),
-                ],
-                selected: {widget.settings.palette},
-                onSelectionChanged: (value) =>
-                    widget.settings.setPalette(value.first),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
   );
 }
 
@@ -246,8 +177,11 @@ class _PoemBody extends StatelessWidget {
                       style: TextStyle(
                         color: colors.foreground,
                         fontFamily: settings.fontFamily,
-                        fontSize: settings.fontSize + 5,
-                        height: 1.8,
+                        fontSize: settings.fontSize + 8,
+                        fontWeight: settings.font == ReaderFont.vazirmatn
+                            ? FontWeight.w700
+                            : FontWeight.w400,
+                        height: 1.6,
                       ),
                     ),
                   if (poem.isTranslation) ...[
@@ -294,11 +228,9 @@ class _PoemBody extends StatelessWidget {
                       entitlements: entitlements,
                       onUnlocked: onUnlocked,
                     ),
-                  SelectableText(
-                    poem.readableText,
-                    key: const Key('poem-body'),
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.start,
+                  PoetryText(
+                    text: poem.readableText,
+                    layoutMode: poem.layoutMode,
                     style: TextStyle(
                       color: colors.foreground,
                       fontFamily: settings.fontFamily,

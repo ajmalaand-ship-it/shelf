@@ -37,7 +37,7 @@ class PoemCardWidget extends StatelessWidget {
                     'پېڅوَل  •  Pitswal',
                     style: TextStyle(
                       color: palette.watermark,
-                      fontFamily: 'ScheherazadeNew',
+                      fontFamily: 'Vazirmatn',
                       fontSize: 11,
                       letterSpacing: 1.1,
                     ),
@@ -56,7 +56,8 @@ class PoemCardWidget extends StatelessWidget {
                             'پېڅوَل',
                             style: TextStyle(
                               color: palette.accent,
-                              fontFamily: 'NotoNastaliqUrdu',
+                              fontFamily: 'Vazirmatn',
+                              fontWeight: FontWeight.w700,
                               fontSize: 20,
                               height: 1.4,
                             ),
@@ -67,7 +68,7 @@ class PoemCardWidget extends StatelessWidget {
                           textDirection: TextDirection.ltr,
                           style: TextStyle(
                             color: palette.muted,
-                            fontFamily: 'ScheherazadeNew',
+                            fontFamily: 'Vazirmatn',
                             fontSize: 9,
                             letterSpacing: 1.4,
                           ),
@@ -83,7 +84,10 @@ class PoemCardWidget extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: palette.muted,
-                          fontFamily: 'NotoNastaliqUrdu',
+                          fontFamily: request.fontFamily,
+                          fontWeight: request.fontFamily == 'Vazirmatn'
+                              ? FontWeight.w700
+                              : FontWeight.w400,
                           fontSize: 13,
                           height: 1.7,
                         ),
@@ -99,7 +103,7 @@ class PoemCardWidget extends StatelessWidget {
                           textAlign: TextAlign.start,
                           style: TextStyle(
                             color: palette.foreground,
-                            fontFamily: 'NotoNastaliqUrdu',
+                            fontFamily: request.fontFamily,
                             fontSize: 20,
                             height: 2,
                           ),
@@ -113,7 +117,7 @@ class PoemCardWidget extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: palette.muted,
-                          fontFamily: 'ScheherazadeNew',
+                          fontFamily: 'Vazirmatn',
                           fontSize: 11,
                           height: 1.4,
                         ),
@@ -124,7 +128,7 @@ class PoemCardWidget extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: palette.muted,
-                          fontFamily: 'NotoNastaliqUrdu',
+                          fontFamily: request.fontFamily,
                           fontSize: 13,
                           height: 1.5,
                         ),
@@ -139,7 +143,7 @@ class PoemCardWidget extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: palette.muted,
-                              fontFamily: 'ScheherazadeNew',
+                              fontFamily: 'Vazirmatn',
                               fontSize: 9,
                             ),
                           ),
@@ -150,7 +154,7 @@ class PoemCardWidget extends StatelessWidget {
                             textDirection: TextDirection.ltr,
                             style: TextStyle(
                               color: palette.muted,
-                              fontFamily: 'ScheherazadeNew',
+                              fontFamily: 'Vazirmatn',
                               fontSize: 9,
                             ),
                           ),

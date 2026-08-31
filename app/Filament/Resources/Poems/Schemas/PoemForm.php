@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Poems\Schemas;
 
+use App\Models\Poem;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -29,6 +30,12 @@ class PoemForm
                 TextInput::make('source_date_place')->maxLength(255)
                     ->helperText('Preserve the authored date/place exactly; do not convert calendars.'),
                 Textarea::make('source_note')->rows(3)->extraInputAttributes(['dir' => 'rtl']),
+                Select::make('layout_mode')->label('Poetry layout')->options([
+                    Poem::LAYOUT_SOURCE => 'Source / manual — preserve authored stanza breaks',
+                    Poem::LAYOUT_COUPLET => 'Couplets — visual gap after every 2 lines',
+                    Poem::LAYOUT_FOUR_LINES => 'Four-line groups — visual gap after every 4 lines',
+                ])->required()->default(Poem::LAYOUT_SOURCE)
+                    ->helperText('Presentation only. This never changes the stored poem text.'),
                 FileUpload::make('audio_path')->disk('audio')->visibility('private')
                     ->acceptedFileTypes(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/x-wav'])
                     ->maxSize(51200)

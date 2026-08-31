@@ -199,4 +199,37 @@ class PoetryApiTest extends TestCase
             ->assertJsonMissingPath('data.source_location')
             ->assertJsonMissingPath('data.source_path');
     }
+
+    public function test_layout_mode_is_validated_by_owner_form_and_returned_without_changing_body(): void
+    {
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'layout-api', 'is_active' => true]);
+        $body = "لومړۍ کرښه\nدويمه کرښه\n\nڅلورمه کرښه";
+        $poem = Poem::create([
+            'collection_id' => $collection->id,
+            'body' => $body,
+            'excerpt' => 'لنډ',
+            'layout_mode' => Poem::LAYOUT_COUPLET,
+            'is_free_sample' => true,
+            'is_active' => true,
+        ]);
+
+        $this->getJson("/api/poems/{$poem->id}")
+            ->assertOk()
+            ->assertJsonPath('data.layout_mode', Poem::LAYOUT_COUPLET)
+            ->assertJsonPath('data.body', $body);
+        $this->assertSame($body, $poem->fresh()->body);
+    }
+
+    public function test_editorial_and_collection_changes_increment_content_version(): void
+    {
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'version-all']);
+        $poem = Poem::create(['collection_id' => $collection->id, 'body' => 'متن', 'excerpt' => 'لنډ']);
+        $version = (int) AppSetting::where('key', 'content_version')->value('value');
+
+        $poem->update(['layout_mode' => Poem::LAYOUT_FOUR_LINES]);
+        $poem->update(['sort_order' => 8, 'is_active' => true, 'is_free_sample' => true]);
+        $collection->update(['title' => 'TEST ONLY UPDATED']);
+
+        $this->assertSame($version + 3, (int) AppSetting::where('key', 'content_version')->value('value'));
+    }
 }

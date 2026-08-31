@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum ReaderPalette { light, sepia, dark }
 
-enum ReaderFont { nastaliq, naskh }
+enum ReaderFont { vazirmatn, naskh, literary }
 
 class ReaderSettings extends ChangeNotifier {
   ReaderSettings._(
@@ -25,8 +25,11 @@ class ReaderSettings extends ChangeNotifier {
   ReaderPalette get palette => _palette;
   ReaderFont get font => _font;
   double get fontSize => _fontSize;
-  String get fontFamily =>
-      _font == ReaderFont.nastaliq ? 'NotoNastaliqUrdu' : 'ScheherazadeNew';
+  String get fontFamily => switch (_font) {
+    ReaderFont.vazirmatn => 'Vazirmatn',
+    ReaderFont.naskh => 'ScheherazadeNew',
+    ReaderFont.literary => 'NotoNastaliqUrdu',
+  };
 
   static Future<ReaderSettings> load(SharedPreferences preferences) async {
     final paletteName = preferences.getString(_paletteKey);
@@ -37,7 +40,7 @@ class ReaderSettings extends ChangeNotifier {
       ReaderPalette.values.where((v) => v.name == paletteName).firstOrNull ??
           ReaderPalette.light,
       ReaderFont.values.where((v) => v.name == fontName).firstOrNull ??
-          ReaderFont.nastaliq,
+          ReaderFont.vazirmatn,
       fontSize.clamp(18, 38),
     );
   }

@@ -22,6 +22,7 @@ class PoemResource extends JsonResource
             'translator' => $this->translator,
             'source_date_place' => $this->source_date_place,
             'source_note' => $this->source_note,
+            'layout_mode' => $this->layout_mode,
             'locked' => $locked,
             'requires_entitlement' => ! $this->is_free_sample,
             'excerpt' => $this->excerpt,

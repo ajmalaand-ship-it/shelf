@@ -11,6 +11,7 @@ class ShareCardRequest {
     required this.scope,
     required this.text,
     required this.theme,
+    this.fontFamily = 'Vazirmatn',
   });
 
   final PoemDetail poem;
@@ -18,6 +19,7 @@ class ShareCardRequest {
   final ShareCardScope scope;
   final String text;
   final ShareCardTheme theme;
+  final String fontFamily;
 }
 
 class ShareCardPage {

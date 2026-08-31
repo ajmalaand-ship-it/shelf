@@ -22,6 +22,19 @@ class Collection extends Model
         return ['is_active' => 'boolean', 'sort_order' => 'integer'];
     }
 
+    protected static function booted(): void
+    {
+        static::saved(function (Collection $collection): void {
+            if ($collection->wasRecentlyCreated || $collection->wasChanged()) {
+                AppSetting::query()->where('key', 'content_version')->increment('value');
+            }
+        });
+
+        static::deleted(function (): void {
+            AppSetting::query()->where('key', 'content_version')->increment('value');
+        });
+    }
+
     public function poems(): HasMany
     {
         return $this->hasMany(Poem::class)->orderBy('sort_order');

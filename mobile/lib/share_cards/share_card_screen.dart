@@ -16,6 +16,7 @@ class ShareCardScreen extends StatefulWidget {
   const ShareCardScreen({
     required this.poem,
     this.collectionTitle,
+    this.fontFamily = 'Vazirmatn',
     this.output = const PlatformShareCardOutput(),
     this.renderer = const ShareCardRenderer(),
     this.files,
@@ -24,6 +25,7 @@ class ShareCardScreen extends StatefulWidget {
 
   final PoemDetail poem;
   final String? collectionTitle;
+  final String fontFamily;
   final ShareCardOutput output;
   final ShareCardRenderer renderer;
   final ShareCardFiles? files;
@@ -58,11 +60,12 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
     scope: _scope,
     text: _cardText,
     theme: _theme,
+    fontFamily: widget.fontFamily,
   );
 
   List<ShareCardPage> get _pages => _cardText.trim().isEmpty
       ? const []
-      : const ShareCardPaginator().paginate(_cardText);
+      : ShareCardPaginator(fontFamily: widget.fontFamily).paginate(_cardText);
 
   @override
   void initState() {
@@ -136,8 +139,8 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
                       title: Text(
                         _lines[index].text,
                         textDirection: TextDirection.rtl,
-                        style: const TextStyle(
-                          fontFamily: 'NotoNastaliqUrdu',
+                        style: TextStyle(
+                          fontFamily: widget.fontFamily,
                           height: 1.8,
                         ),
                       ),

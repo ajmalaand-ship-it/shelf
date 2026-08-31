@@ -18,6 +18,7 @@ class OwnerPreviewPoemResource extends JsonResource
             'translator' => $this->translator,
             'source_date_place' => $this->source_date_place,
             'source_note' => $this->source_note,
+            'layout_mode' => $this->layout_mode,
             'locked' => false,
             'requires_entitlement' => ! $this->is_free_sample,
             'is_free_sample' => (bool) $this->is_free_sample,

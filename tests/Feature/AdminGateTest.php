@@ -347,4 +347,31 @@ class AdminGateTest extends TestCase
         $this->assertFalse($collection->fresh()->is_active);
         $this->assertSame(1, $collection->poems()->where('is_active', true)->count());
     }
+
+    public function test_owner_can_select_poem_layout_and_invalid_value_is_rejected(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'layout-owner']);
+
+        Livewire::test(CreatePoem::class)
+            ->fillForm([
+                'collection_id' => $collection->id,
+                'body' => "لومړۍ\nدويمه",
+                'excerpt' => 'لنډ',
+                'layout_mode' => Poem::LAYOUT_COUPLET,
+                'sort_order' => 1,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $poem = Poem::where('collection_id', $collection->id)->firstOrFail();
+        $this->assertSame(Poem::LAYOUT_COUPLET, $poem->layout_mode);
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->fillForm(['layout_mode' => 'GUESSED_BY_AI'])
+            ->call('save')
+            ->assertHasFormErrors(['layout_mode']);
+        $this->assertSame(Poem::LAYOUT_COUPLET, $poem->fresh()->layout_mode);
+    }
 }

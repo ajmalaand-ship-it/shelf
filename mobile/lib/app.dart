@@ -52,7 +52,8 @@ class PitswalApp extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
-                            fontFamily: 'ScheherazadeNew',
+                            fontFamily: 'Vazirmatn',
+                            fontWeight: FontWeight.w500,
                             height: 1.2,
                           ),
                         ),

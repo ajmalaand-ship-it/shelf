@@ -6,7 +6,7 @@ class ShareCardPaginator {
   const ShareCardPaginator({
     this.textWidth = 288,
     this.textHeight = 244,
-    this.fontFamily = 'NotoNastaliqUrdu',
+    this.fontFamily = 'Vazirmatn',
     this.fontSize = 20,
     this.lineHeight = 2,
   });
