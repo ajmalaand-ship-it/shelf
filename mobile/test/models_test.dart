@@ -25,6 +25,7 @@ void main() {
     expect(poem.title, isNull);
     expect(poem.isUntitled, isTrue);
     expect(poem.displayTitle, 'د لومړۍ کرښې پېژندنه');
+    expect(poem.toJson()['title'], isNull);
   });
 
   test('translated and locked work parsing preserves truthful attribution', () {

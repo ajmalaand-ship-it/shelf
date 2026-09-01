@@ -129,6 +129,35 @@ void main() {
   );
 
   testWidgets(
+    'small Android reader defaults to 16 and exposes 336px body width',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PoemReaderScreen(
+            poemId: 301,
+            contentVersion: 7,
+            repository: fixtureRepository(),
+            settings: await settings(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final body = tester.widget<SelectableText>(
+        find.byKey(const Key('poem-body')),
+      );
+      expect(body.style!.fontSize, 16);
+      expect(tester.getSize(find.byKey(const Key('poem-body'))).width, 336);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'poem list distinguishes untitled identity and translated attribution',
     (tester) async {
       await tester.pumpWidget(
@@ -144,10 +173,34 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('د لومړۍ کرښې پېژندنه'), findsOneWidget);
-      expect(find.text('بې سرليکه'), findsOneWidget);
+      expect(find.text('بې سرليکه'), findsNothing);
       expect(find.text('ژمى'), findsOneWidget);
       expect(find.textContaining('اصلي شاعر: پروین پژواک'), findsOneWidget);
       expect(find.textContaining('پښتو ژباړه: اجمل اند'), findsOneWidget);
+
+      final readerSettings = tester
+          .widget<CollectionDetailScreen>(find.byType(CollectionDetailScreen))
+          .readerSettings;
+      expect(
+        tester
+            .widget<Text>(find.byKey(const Key('poem-list-title-301')))
+            .style!
+            .fontFamily,
+        'Vazirmatn',
+      );
+      await tester.tap(find.byKey(const Key('collection-font-chooser')));
+      await tester.pumpAndSettle();
+      expect(find.byType(RadioListTile<ReaderFont>), findsExactly(3));
+      await tester.tap(find.byKey(const Key('font-choice-noto-nastaliq')));
+      await tester.pumpAndSettle();
+      expect(readerSettings.font, ReaderFont.literary);
+      expect(
+        tester
+            .widget<Text>(find.byKey(const Key('poem-list-title-301')))
+            .style!
+            .fontFamily,
+        'NotoNastaliqUrdu',
+      );
     },
   );
 
@@ -166,7 +219,9 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('د لوست بڼه'));
+    expect(find.text('شریکول'), findsOneWidget);
+    expect(find.text('لیکبڼه'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('reader-font-chooser')));
     await tester.pumpAndSettle();
 
     expect(find.byType(RadioListTile<ReaderFont>), findsExactly(3));
@@ -183,6 +238,107 @@ void main() {
     expect(readerSettings.font, ReaderFont.naskh);
     expect(readerSettings.palette, ReaderPalette.dark);
     expect(readerSettings.fontSize, greaterThan(24));
+  });
+
+  testWidgets(
+    'untitled reader uses an indicator and never promotes its first line',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PoemReaderScreen(
+            poemId: 301,
+            contentVersion: 7,
+            repository: fixtureRepository(),
+            settings: await settings(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
+      expect(find.byKey(const Key('poem-title')), findsNothing);
+      expect(find.text('بې سرليکه'), findsNothing);
+    },
+  );
+
+  testWidgets('reader font controls title and body and date follows body', (
+    tester,
+  ) async {
+    final readerSettings = await settings();
+    final repository = PoetryRepository(
+      api: ApiClient(
+        client: MockClient(
+          (_) async => http.Response.bytes(
+            utf8.encode(
+              jsonEncode({'data': poemDetailJson(title: 'رښتینی سرليک')}),
+            ),
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
+        ),
+      ),
+      cache: MemoryCacheStore(),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PoemReaderScreen(
+          poemId: 301,
+          contentVersion: 7,
+          repository: repository,
+          settings: readerSettings,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await readerSettings.setFont(ReaderFont.naskh);
+    await tester.pump();
+
+    final title = tester.widget<Text>(find.byKey(const Key('poem-title')));
+    final body = tester.widget<SelectableText>(
+      find.byKey(const Key('poem-body')),
+    );
+    final date = tester.widget<Text>(find.byKey(const Key('poem-date-place')));
+    expect(title.style!.fontFamily, 'ScheherazadeNew');
+    expect(body.style!.fontFamily, 'ScheherazadeNew');
+    expect(date.style!.fontSize, lessThan(body.style!.fontSize!));
+    expect(
+      tester.getTopLeft(find.byKey(const Key('poem-title'))).dy,
+      lessThan(tester.getTopLeft(find.byKey(const Key('poem-body'))).dy),
+    );
+    expect(
+      tester.getTopLeft(find.byKey(const Key('poem-body'))).dy,
+      lessThan(tester.getTopLeft(find.byKey(const Key('poem-date-place'))).dy),
+    );
+  });
+
+  testWidgets('missing date and place creates no placeholder', (tester) async {
+    final repository = PoetryRepository(
+      api: ApiClient(
+        client: MockClient(
+          (_) async => http.Response.bytes(
+            utf8.encode(
+              jsonEncode({'data': poemDetailJson(sourceDatePlace: null)}),
+            ),
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          ),
+        ),
+      ),
+      cache: MemoryCacheStore(),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PoemReaderScreen(
+          poemId: 301,
+          contentVersion: 7,
+          repository: repository,
+          settings: await settings(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('poem-date-place')), findsNothing);
+    expect(find.text('—'), findsNothing);
   });
 
   testWidgets(

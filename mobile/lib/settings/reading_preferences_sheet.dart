@@ -26,10 +26,13 @@ Future<void> showReadingPreferences(
                   Expanded(
                     child: Slider(
                       key: const Key('font-size-slider'),
-                      min: 18,
-                      max: 38,
-                      divisions: 10,
-                      value: settings.fontSize,
+                      min: ReaderSettings.minimumFontSize,
+                      max: ReaderSettings.maximumFontSize,
+                      divisions: 11,
+                      value: settings.fontSize.clamp(
+                        ReaderSettings.minimumFontSize,
+                        ReaderSettings.maximumFontSize,
+                      ),
                       label: settings.fontSize.round().toString(),
                       onChanged: settings.setFontSize,
                     ),

@@ -70,9 +70,8 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
           shadowColor: Colors.transparent,
           scrolledUnderElevation: 0,
           actions: [
-            IconButton(
+            TextButton.icon(
               key: const Key('reader-share'),
-              tooltip: 'شريکول او ساتل',
               onPressed:
                   _loadedPoem == null ||
                       _loadedPoem!.readableText.trim().isEmpty
@@ -87,11 +86,13 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
                       ),
                     ),
               icon: const Icon(Icons.ios_share_rounded),
+              label: const Text('شریکول'),
             ),
-            IconButton(
-              tooltip: 'د لوست بڼه',
+            TextButton.icon(
+              key: const Key('reader-font-chooser'),
               onPressed: () => showReadingPreferences(context, widget.settings),
               icon: const Icon(Icons.text_fields_rounded),
+              label: const Text('لیکبڼه'),
             ),
           ],
         ),
@@ -163,7 +164,7 @@ class _PoemBody extends StatelessWidget {
         child: SingleChildScrollView(
           key: const Key('poem-scroll-view'),
           clipBehavior: Clip.hardEdge,
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 72),
+          padding: const EdgeInsets.fromLTRB(12, 24, 12, 72),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
@@ -173,6 +174,7 @@ class _PoemBody extends StatelessWidget {
                   if (!poem.isUntitled)
                     Text(
                       poem.title!,
+                      key: const Key('poem-title'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: colors.foreground,
@@ -183,6 +185,16 @@ class _PoemBody extends StatelessWidget {
                             : FontWeight.w400,
                         height: 1.6,
                       ),
+                    )
+                  else
+                    Semantics(
+                      label: 'بې نومه شعر',
+                      child: Icon(
+                        Icons.insert_drive_file_outlined,
+                        key: const Key('untitled-poem-indicator'),
+                        size: 24,
+                        color: colors.muted,
+                      ),
                     ),
                   if (poem.isTranslation) ...[
                     const SizedBox(height: 18),
@@ -191,14 +203,6 @@ class _PoemBody extends StatelessWidget {
                       'پښتو ژباړه: ${poem.translator ?? '—'}',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: colors.muted, height: 1.6),
-                    ),
-                  ],
-                  if (poem.sourceDatePlace case final datePlace?) ...[
-                    const SizedBox(height: 14),
-                    Text(
-                      datePlace,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: colors.muted),
                     ),
                   ],
                   if (ownerPreviewMode) ...[
@@ -238,6 +242,21 @@ class _PoemBody extends StatelessWidget {
                       height: 2.2,
                     ),
                   ),
+                  if (poem.sourceDatePlace case final datePlace?) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      datePlace,
+                      key: const Key('poem-date-place'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: colors.muted,
+                        fontSize: settings.fontSize > 16
+                            ? settings.fontSize - 3
+                            : 13,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

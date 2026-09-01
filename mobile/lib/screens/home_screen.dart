@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 widget.readerSettings,
                               ),
                               icon: const Icon(Icons.text_fields_rounded),
-                              label: const Text('د شعر ليکدود بدلول'),
+                              label: const Text('لیکبڼه'),
                             ),
                           ),
                           if (widget.qaMode) ...[
@@ -132,6 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     padding: const EdgeInsets.only(bottom: 14),
                                     child: CollectionCard(
                                       collection: collection,
+                                      readerSettings: widget.readerSettings,
                                       ownerPreviewMode: widget.ownerPreviewMode,
                                       onTap: () => _openCollection(
                                         snapshot,

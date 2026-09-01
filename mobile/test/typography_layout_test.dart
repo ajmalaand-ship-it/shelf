@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pitswal/app.dart';
 import 'package:pitswal/models/poem.dart';
@@ -35,6 +36,10 @@ void main() {
       PitswalApp(repository: fixtureRepository(), readerSettings: settings),
     );
     await tester.pumpAndSettle();
+    Text collectionTitle() => tester.widget<Text>(
+      find.byKey(const Key('collection-title-hendaray-aw-chine')),
+    );
+    expect(collectionTitle().style!.fontFamily, 'Vazirmatn');
     await tester.tap(find.byKey(const Key('home-font-chooser')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('reading-font-selector')), findsOneWidget);
@@ -45,6 +50,7 @@ void main() {
     await tester.tap(find.byKey(const Key('font-choice-scheherazade')));
     await tester.pumpAndSettle();
     expect(settings.font, ReaderFont.naskh);
+    expect(collectionTitle().style!.fontFamily, 'ScheherazadeNew');
   });
 
   test('each reading selection maps to its intended bundled family', () async {
@@ -96,6 +102,54 @@ void main() {
         await tester.pump();
         expect(find.text(sample), findsOneWidget);
         expect(tester.takeException(), isNull);
+      }
+    },
+  );
+
+  testWidgets(
+    '16 point poetry uses small Android width efficiently across all fonts',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      const shortLine = 'لنډه کرښه';
+      const normalLine = 'زړۀ مې د وطن په مينه ژوندی دی';
+      const longLine =
+          'د ژوند پر اوږده لاره د هيلو او ارمانونو رڼا له موږ سره روانه ده او تر لرې منزل پورې رسيږي';
+
+      for (final font in {
+        'Vazirmatn': 'assets/fonts/vazirmatn/Vazirmatn-wght.ttf',
+        'ScheherazadeNew':
+            'assets/fonts/scheherazade_new/ScheherazadeNew-Regular.ttf',
+        'NotoNastaliqUrdu':
+            'assets/fonts/noto_nastaliq_urdu/NotoNastaliqUrdu.ttf',
+      }.entries) {
+        await (FontLoader(
+          font.key,
+        )..addFont(rootBundle.load(font.value))).load();
+      }
+
+      for (final family in [
+        'Vazirmatn',
+        'ScheherazadeNew',
+        'NotoNastaliqUrdu',
+      ]) {
+        int visualLineCount(String text) {
+          final painter = TextPainter(
+            text: TextSpan(
+              text: text,
+              style: TextStyle(fontFamily: family, fontSize: 16, height: 2.2),
+            ),
+            textDirection: TextDirection.rtl,
+          )..layout(maxWidth: 336);
+          return painter.computeLineMetrics().length;
+        }
+
+        expect(visualLineCount(shortLine), 1, reason: family);
+        expect(visualLineCount(normalLine), 1, reason: family);
+        expect(visualLineCount(longLine), greaterThan(1), reason: family);
       }
     },
   );

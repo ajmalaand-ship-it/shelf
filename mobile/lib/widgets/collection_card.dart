@@ -2,62 +2,70 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../models/poetry_collection.dart';
+import '../settings/reader_settings.dart';
 
 class CollectionCard extends StatelessWidget {
   const CollectionCard({
     required this.collection,
     required this.onTap,
+    required this.readerSettings,
     this.ownerPreviewMode = false,
     super.key,
   });
 
   final PoetryCollection collection;
   final VoidCallback onTap;
+  final ReaderSettings readerSettings;
   final bool ownerPreviewMode;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: 'ټولګه ${collection.title}',
-    child: Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              _Cover(url: collection.coverUrl),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      collection.title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    if (collection.author case final author?) ...[
-                      const SizedBox(height: 8),
-                      Text(author),
-                    ],
-                    if (collection.poemCount case final count?) ...[
-                      const SizedBox(height: 8),
-                      Text('$count شعرونه'),
-                    ],
-                    if (ownerPreviewMode) ...[
-                      const SizedBox(height: 8),
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: readerSettings,
+    builder: (context, _) => Semantics(
+      button: true,
+      label: 'ټولګه ${collection.title}',
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                _Cover(url: collection.coverUrl),
+                const SizedBox(width: 18),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        collection.isActive ? 'خپره' : 'مسوده',
-                        key: Key('owner-preview-collection-status'),
-                        style: Theme.of(context).textTheme.labelMedium,
+                        collection.title,
+                        key: Key('collection-title-${collection.slug}'),
+                        style: Theme.of(context).textTheme.titleLarge
+                            ?.copyWith(fontFamily: readerSettings.fontFamily),
                       ),
+                      if (collection.author case final author?) ...[
+                        const SizedBox(height: 8),
+                        Text(author),
+                      ],
+                      if (collection.poemCount case final count?) ...[
+                        const SizedBox(height: 8),
+                        Text('$count شعرونه'),
+                      ],
+                      if (ownerPreviewMode) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          collection.isActive ? 'خپره' : 'مسوده',
+                          key: Key('owner-preview-collection-status'),
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 18),
-            ],
+                const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+              ],
+            ),
           ),
         ),
       ),

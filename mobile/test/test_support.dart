@@ -69,6 +69,7 @@ Map<String, dynamic> poemDetailJson({
   String? audioFormat,
   String? audioLabel,
   String layoutMode = 'SOURCE',
+  String? sourceDatePlace = 'کابل — ۱۳۸۵',
 }) => {
   'id': 301,
   'collection_slug': 'hendaray-aw-chine',
@@ -76,7 +77,7 @@ Map<String, dynamic> poemDetailJson({
   'work_type': workType,
   'original_author': workType == 'TRANSLATION' ? 'پروین پژواک' : null,
   'translator': workType == 'TRANSLATION' ? 'اجمل اند' : null,
-  'source_date_place': 'کابل — ۱۳۸۵',
+  'source_date_place': sourceDatePlace,
   'source_note': null,
   'layout_mode': layoutMode,
   'locked': locked,

@@ -16,6 +16,9 @@ class ReaderSettings extends ChangeNotifier {
   static const _paletteKey = 'reader.palette';
   static const _fontKey = 'reader.font';
   static const _fontSizeKey = 'reader.font_size';
+  static const defaultFontSize = 16.0;
+  static const minimumFontSize = 18.0;
+  static const maximumFontSize = 38.0;
 
   final SharedPreferences _preferences;
   ReaderPalette _palette;
@@ -34,7 +37,7 @@ class ReaderSettings extends ChangeNotifier {
   static Future<ReaderSettings> load(SharedPreferences preferences) async {
     final paletteName = preferences.getString(_paletteKey);
     final fontName = preferences.getString(_fontKey);
-    final fontSize = preferences.getDouble(_fontSizeKey) ?? 24;
+    final savedFontSize = preferences.getDouble(_fontSizeKey);
     final font = switch (fontName) {
       'naskh' => ReaderFont.naskh,
       'nastaliq' => ReaderFont.literary,
@@ -50,7 +53,9 @@ class ReaderSettings extends ChangeNotifier {
       ReaderPalette.values.where((v) => v.name == paletteName).firstOrNull ??
           ReaderPalette.light,
       font,
-      fontSize.clamp(18, 38),
+      savedFontSize == null
+          ? defaultFontSize
+          : savedFontSize.clamp(minimumFontSize, maximumFontSize),
     );
   }
 
@@ -67,7 +72,7 @@ class ReaderSettings extends ChangeNotifier {
   }
 
   Future<void> setFontSize(double value) async {
-    _fontSize = value.clamp(18, 38);
+    _fontSize = value.clamp(minimumFontSize, maximumFontSize);
     notifyListeners();
     await _preferences.setDouble(_fontSizeKey, _fontSize);
   }

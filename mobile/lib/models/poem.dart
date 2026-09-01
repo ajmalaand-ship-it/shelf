@@ -204,11 +204,11 @@ class AudioLockedException implements Exception {
 }
 
 String firstNonEmptyLine(String? text) {
-  if (text == null) return 'بې سرليکه';
+  if (text == null) return '';
   return text
       .split('\n')
       .map((line) => line.trim())
-      .firstWhere((line) => line.isNotEmpty, orElse: () => 'بې سرليکه');
+      .firstWhere((line) => line.isNotEmpty, orElse: () => '');
 }
 
 String? _string(

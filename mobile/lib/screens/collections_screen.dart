@@ -38,6 +38,7 @@ class CollectionsScreen extends StatelessWidget {
               final collection = snapshot.collections[index];
               return CollectionCard(
                 collection: collection,
+                readerSettings: readerSettings,
                 ownerPreviewMode: ownerPreviewMode,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
