@@ -6,6 +6,7 @@ All notable repository governance changes are recorded here.
 
 ### Changed
 
+- Reconciled the 47 authoritative combined date/place values missing from the 81-poem `څپو کې انځورونه` production collection using checksum-verified source manifest sequence identity, a verified pre-write System C backup, missing-only transaction updates, and aggregate post-write fingerprints. No conflicts or ambiguities remained; no poem text or other collection changed; broader PC-B catalogue work remains open.
 - Recorded owner-approved **PC-D-001 — Source-Text Poetry Presentation for V1**: plain Unicode source text/newlines are the accepted baseline; automatic `COUPLET`/`FOUR_LINES` and special half-line spacing are postponed and are not PC blockers. The deployed checkpoint is `0c011b10da011f8cbab050338f2c11d8731a4088`; all 148 production poems use simple source presentation without poetry-record rewrites. PC remains active, PC-B Catalogue Completion & Editorial Reconciliation is next, and P6 remains not started.
 - Added PC-A protected owner preview: expiring server-authenticated draft/full-text read APIs, signed private preview audio, debug-only real-content Flutter mode, isolated preview caches, persistent non-release banner, and stored Draft/Published plus Free/Locked/Translation review labels. Public publication behavior remains unchanged.
 - Recorded Ajmal Aand's August 30, 2026 approval of Amendment A-003 and Poetry Roadmap Revision 3, updating the governing Constitution to v1.3 and inserting mandatory PC Product Completion & Owner Acceptance before P6.

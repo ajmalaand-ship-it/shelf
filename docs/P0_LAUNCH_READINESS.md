@@ -11,6 +11,13 @@ Task: SYSC-P0-LAUNCH-READINESS-01
 - Total safely structured records: 148.
 - All collections and works remain unpublished/private.
 
+**September 1, 2026 date/place reconciliation:** The authoritative first-
+collection import manifest contained 47 combined date/place values. All 47
+were restored through deterministic manifest-sequence matching after verified
+backup `/home/ajmalaand/backups/poetry/20260901-194656`; post-write comparison
+found 47 exact matches and no unresolved record. No poem text or other
+collection was changed. Broader catalogue completion remains open.
+
 ## Reader baseline
 
 - Primary body font: Noto Nastaliq Urdu.
