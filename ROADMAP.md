@@ -70,7 +70,9 @@ Complete and review the actual Version 1 product before release work: provide pr
 
 **Gate:** Ajmal explicitly accepts **Product Complete / Ready for Release Preparation**. Only that approval permits P6 to begin.
 
-**Status: ACTIVE.** **PC-A — Protected Owner Preview / Real-Content Visibility** is technically implemented. **SYSC-PC-TYPOGRAPHY-01** replaces the real-content typography baseline with Vazirmatn as the default UI/reading foundation, retained Scheherazade New and Noto Nastaliq Urdu alternatives, owner-controlled source/couplet/four-line presentation, and automatic editorial content-version invalidation; it requires Ajmal's fresh real-content device review. The two currently imported collections remain review content rather than an accepted final Version 1 catalogue. PC-B and P6 have not started.
+**Status: ACTIVE.** **PC-A — Protected Owner Preview / Real-Content Visibility** is technically implemented. Vazirmatn remains the default UI/reading foundation, with Scheherazade New and Noto Nastaliq Urdu retained as alternatives. Under the September 1, 2026 owner decision **PC-D-001**, source-text/newline presentation is the accepted V1 baseline; owner-controlled `SOURCE`/`COUPLET`/`FOUR_LINES` modes and mandatory half-line grouping are superseded and postponed, not PC blockers. Deployed checkpoint `0c011b10da011f8cbab050338f2c11d8731a4088` presents all 148 production poems this way without rewriting poetry records.
+
+**Next major priority: PC-B — Catalogue Completion & Editorial Reconciliation.** Select the intended V1 catalogue; address remaining source-blocked original collections only from trustworthy sources or approved transcription; decide the treatment of `سيند په پرخه کې`; reconcile the 47 missing first-collection date/place values; confirm or revise the current 15 free-sample decisions; complete missing covers, front matter, and metadata; preserve truthful translation attribution; and verify the off-server source archive. PC-B implementation has not started. P6 remains **NOT STARTED**.
 
 ## P6 — Android Release Preparation and Launch
 

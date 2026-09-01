@@ -4,6 +4,14 @@
 
 **Status:** TECHNICAL BUILD COMPLETE — OWNER ADMIN/BROWSER REVIEW REQUIRED
 
+## Later owner-decision addendum — 2026-09-01
+
+This document preserves the historical scope of SYSC-PC-OWNER-ADMIN-01.
+PC-D-001 and SYSC-PC-LAYOUT-SIMPLIFY-06 later removed layout modes from the
+normal owner workflow: the layout selector, layout table column/filter, and
+Presentation section are no longer current behavior. `Order in book` remains
+in the main Poem section. Normal reading follows source text/newlines only.
+
 ## Existing foundation retained
 
 The package improves the existing Filament 5 resources; it does not introduce

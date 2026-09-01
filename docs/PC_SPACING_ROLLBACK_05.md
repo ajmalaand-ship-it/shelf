@@ -2,6 +2,10 @@
 
 **Stage:** PC — Product Completion & Owner Acceptance
 
+**Current governing decision:** **PC-D-001 — Source-Text Poetry Presentation
+for V1**, owner approved September 1, 2026. Source presentation is the accepted
+V1 baseline; spacing refinement is postponed and is not a PC blocker.
+
 Bayt and paragraph spacing refinement is **postponed and not currently being
 pursued**. Multiple implementation attempts added complexity without producing
 an owner-acceptable visual result.
@@ -26,3 +30,9 @@ non-null values at rollback.
 The later approved untitled marker is intentionally retained: one subtle,
 secular manuscript page with a quill, no visible fake title, and accessibility
 semantics.
+
+The current deployed checkpoint is
+`0c011b10da011f8cbab050338f2c11d8731a4088`. All 148 production poems use the
+simple source presentation, and no poetry records were rewritten. PC remains
+active; PC-B — Catalogue Completion & Editorial Reconciliation is next; P6
+remains not started.

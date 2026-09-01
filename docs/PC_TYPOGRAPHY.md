@@ -6,6 +6,19 @@
 
 **Status:** TECHNICAL BUILD COMPLETE — OWNER REAL-CONTENT DEVICE REVIEW REQUIRED
 
+## Current owner-decision addendum — 2026-09-01
+
+**PC-D-001 — Source-Text Poetry Presentation for V1** supersedes the earlier
+working requirement for owner-controlled `SOURCE`, `COUPLET`, and `FOUR_LINES`
+modes and half-line gaps after two-line or four-line groups. Normal reading now
+uses the plain Unicode source text and authored newlines only. Special spacing
+refinement is postponed, is not a Product Completion blocker, and requires a
+new explicit owner-approved product task before any future reintroduction.
+
+This addendum changes no font, theme, title/date/place, audio, share,
+entitlement, security, authorship, or `content_version` behavior. The historical
+typography investigation and implementation evidence below remain preserved.
+
 ## Font system
 
 - Vazirmatn 33.003 variable (100–900) is the default application and reading font. The UI scale uses real 400, 500, 600 and 700 instances.
@@ -48,7 +61,9 @@ The broken-looking forms are therefore a font-design/contextual-glyph appearance
 
 Protected local review selected record IDs only: titled 7, untitled 4, long 74, multi-stanza 95, stored date/place 85, translation 143, and final-heh example 4. Poem bodies were not copied into this document or reports.
 
-P6 remains not started. PC-B catalogue recovery remains out of scope.
+P6 remains not started. PC-B catalogue recovery was outside this historical
+typography task; it is now the next major Product Completion priority under
+PC-D-001.
 
 ## Owner device mismatch correction — SYSC-PC-TYPOGRAPHY-01A
 

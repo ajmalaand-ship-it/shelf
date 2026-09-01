@@ -32,7 +32,7 @@ The approved P0/P2 reader baseline is Noto Nastaliq Urdu for primary poem text a
 
 **PC supersession (August 30, 2026):** Real unpublished content review supersedes the P0/P2 font default without invalidating those technical gates. Vazirmatn 33.003 is now the default UI and reading foundation; Scheherazade New 4.500 remains the traditional Naskh option; Noto Nastaliq Urdu remains an optional literary face. One shared persistent control is available from Home and Reader. Details and licensing evidence are recorded in `docs/PC_TYPOGRAPHY.md`.
 
-**Layout simplification (September 1, 2026):** Normal poetry presentation follows the stored source text and newlines only. The owner-facing `SOURCE`, `COUPLET`, and `FOUR_LINES` controls and automatic two-line/four-line gaps are removed. The `layout_mode` column and compatible API field remain dormant legacy schema/data; existing values are not rewritten and do not drive reader presentation.
+**Layout simplification (September 1, 2026):** Normal poetry presentation follows the stored source text and newlines only. The owner-facing `SOURCE`, `COUPLET`, and `FOUR_LINES` controls and automatic two-line/four-line gaps are removed. The `layout_mode` column and compatible API field remain dormant legacy schema/data; existing values are not rewritten and do not drive reader presentation. This owner-approved decision is formally recorded as **PC-D-001 — Source-Text Poetry Presentation for V1** in `docs/governance/PC_D_001_SOURCE_TEXT_PRESENTATION.md`. Special spacing refinement is postponed, is not a PC blocker, and may return only through a new explicit owner-approved product task.
 
 ## 8. P2 mobile reader architecture
 
@@ -101,3 +101,20 @@ P0 remains open/partial where real catalogue, source recovery, owner preview and
 PC-A uses a separate `/api/owner-preview` read namespace protected by a seven-day HMAC bearer token derived from the server-only `POETRY_OWNER_PREVIEW_SECRET`. It may read draft and locked real content for owner review while returning the stored publication/free/translation metadata. Public controllers and publication filtering remain unchanged. Preview audio metadata requires the bearer token and issues a ten-minute signed private stream URL; no private path is exposed.
 
 Flutter keeps QA, owner-preview and public modes separate. Owner preview requires both debug compilation and explicit build configuration, uses its own JSON and audio-cache namespaces, and shows a persistent bilingual unpublished-content banner plus restrained status labels. Release mode takes precedence over preview flags and cannot select the preview repository. This is a review capability only: it publishes nothing, changes no content, and does not accept the two imported collections as the final Version 1 catalogue.
+
+## 18. PC-D-001 and next Product Completion priority
+
+On September 1, 2026, Ajmal approved source-text/newline presentation as the
+Version 1 baseline after repeated real-content testing. At deployed commit
+`0c011b10da011f8cbab050338f2c11d8731a4088`, all 148 production poems use this
+simple presentation, automatic layout controls are absent, and no poetry
+records were rewritten.
+
+PC remains **ACTIVE**. The next major Product Completion priority is **PC-B —
+Catalogue Completion & Editorial Reconciliation**: select the intended V1
+catalogue; resolve source-blocked originals only from trustworthy sources or
+approved transcription; decide the treatment of `سيند په پرخه کې`; reconcile
+47 missing first-collection date/place values; confirm or revise the current 15
+free-sample decisions; complete missing covers, front matter, and metadata;
+preserve truthful translation attribution; and verify the off-server source
+archive. PC-B implementation has not started. P6 remains **NOT STARTED**.

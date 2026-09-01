@@ -6,6 +6,7 @@ All notable repository governance changes are recorded here.
 
 ### Changed
 
+- Recorded owner-approved **PC-D-001 — Source-Text Poetry Presentation for V1**: plain Unicode source text/newlines are the accepted baseline; automatic `COUPLET`/`FOUR_LINES` and special half-line spacing are postponed and are not PC blockers. The deployed checkpoint is `0c011b10da011f8cbab050338f2c11d8731a4088`; all 148 production poems use simple source presentation without poetry-record rewrites. PC remains active, PC-B Catalogue Completion & Editorial Reconciliation is next, and P6 remains not started.
 - Added PC-A protected owner preview: expiring server-authenticated draft/full-text read APIs, signed private preview audio, debug-only real-content Flutter mode, isolated preview caches, persistent non-release banner, and stored Draft/Published plus Free/Locked/Translation review labels. Public publication behavior remains unchanged.
 - Recorded Ajmal Aand's August 30, 2026 approval of Amendment A-003 and Poetry Roadmap Revision 3, updating the governing Constitution to v1.3 and inserting mandatory PC Product Completion & Owner Acceptance before P6.
 - Made PC the active System C stage and PC-A Protected Owner Preview / Real-Content Visibility the first eligible implementation area without starting it. P0 remains open/partial, P1–P5 technical foundations remain valid, and P6/P7 remain not started.
