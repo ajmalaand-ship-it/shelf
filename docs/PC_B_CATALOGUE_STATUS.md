@@ -18,7 +18,8 @@ poems by original poet پروین پژواک, translated into Pashto by Ajmal Aa
 2. `هېندارې او چینې` — **IMPORTED AND READY FOR OWNER REVIEW** — 67 draft
    poems: 63 Ajmal originals and 4 correctly attributed translations.
 3. `د زړه پر پاڼه مې انځور دی ګلاب` — **SOURCE-BLOCKED**.
-4. `دا ښار، هاغه غرونه` — **SOURCE-BLOCKED**.
+4. `دا ښار، هاغه غرونه` — **MANUAL TRANSCRIPTION PACKAGE PREPARED —
+   TRANSCRIPTION NOT YET COMPLETE**; still source-blocked for import.
 5. `دلته ډېر لرې له غرونو` — **SOURCE-BLOCKED**.
 6. `سيند په پرخه کې` — **SOURCE-BLOCKED**; its catalogue inclusion and
    translation classification are resolved, but its text source is not safe
@@ -61,6 +62,15 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
   cannot be imported without unsafe reconstruction.
 - Unblock with: a trustworthy Unicode original/editable document or
   owner-approved manual transcription and proofreading.
+- Manual transcription preparation (2026-09-01): the owner-approved,
+  page-based workspace was generated directly from the authoritative PDF at
+  300 DPI. It contains all 36 ordered page images, a checksum/dimensions
+  manifest, 36 empty UTF-8 transcription templates, and transcription rules.
+  No OCR was used and no poetry was transcribed or imported.
+- Protected owner package:
+  `/home/ajmalaand/backups/poetry/owner-downloads/da-shaar-hagha-gharona-transcription-pack-20260901-161820.zip`
+  (SHA-256
+  `b91611b67f48a87454a9c59a1c9ccac3f2c17c295ce573801e41cdfe59e26b39`).
 
 ### دلته ډېر لرې له غرونو
 
@@ -141,8 +151,10 @@ date/place values rather than inferred separate date and place counts.
 
 ## Remaining PC-B catalogue work
 
+- complete the approved page-by-page manual transcription and owner
+  proofreading of `دا ښار، هاغه غرونه`;
 - obtain trustworthy Unicode sources or approve manual
-  transcription/proofreading for the four source-blocked books;
+  transcription/proofreading for the other three source-blocked books;
 - confirm or revise the current 15 free-sample decisions;
 - complete missing covers, front matter, and remaining metadata;
 - preserve and verify truthful translation attribution; and

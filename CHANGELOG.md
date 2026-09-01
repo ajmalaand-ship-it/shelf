@@ -4,6 +4,15 @@ All notable repository governance changes are recorded here.
 
 ## Unreleased
 
+### `دا ښار، هاغه غرونه` transcription package prepared — 2026-09-01
+
+- Added a protected-source transcription-package generator that renders PDF
+  pages without OCR, creates checksum/dimensions metadata and empty UTF-8 page
+  templates, and refuses sources outside System C's protected source tree.
+- Prepared and verified the owner-only 36-page manual transcription package
+  for `دا ښار، هاغه غرونه`; no poetry was transcribed or imported and no
+  production data changed.
+
 ### Changed
 
 - Recorded owner-approved PC-D-002: the intended complete پېڅوَل catalogue contains all six identified books—five Ajmal Aand original-poetry collections plus the separate translation book `سيند په پرخه کې`, selected poems by original poet پروین پژواک translated into Pashto by Ajmal Aand. Audited all four not-yet-imported protected source sets; each remains source-blocked because the preserved scanned/legacy PDFs lack complete authoritative Unicode text and deterministic poem structure. No OCR-derived import, production write, or publication occurred.
