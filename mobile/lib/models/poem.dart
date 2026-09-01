@@ -67,40 +67,6 @@ class PoemSummary {
 
 enum PoemLayoutMode { source, couplet, fourLines }
 
-enum PoemGap { half, full }
-
-class PoemPresentationSpacing {
-  const PoemPresentationSpacing({required this.lineCount, required this.gaps});
-
-  static PoemPresentationSpacing? fromJson(Object? value) {
-    if (value is! Map<String, dynamic> || value['version'] != 1) return null;
-    final lineCount = value['line_count'];
-    final rawGaps = value['gaps'];
-    if (lineCount is! int || lineCount < 0 || rawGaps is! List) return null;
-    final gaps = <int, PoemGap>{};
-    for (final entry in rawGaps) {
-      if (entry is! Map<String, dynamic>) return null;
-      final afterLine = entry['after_line'];
-      final gap = switch (entry['gap']) {
-        'HALF' => PoemGap.half,
-        'FULL' => PoemGap.full,
-        _ => null,
-      };
-      if (afterLine is! int ||
-          afterLine < 1 ||
-          afterLine >= lineCount ||
-          gap == null) {
-        return null;
-      }
-      gaps[afterLine] = gap;
-    }
-    return PoemPresentationSpacing(lineCount: lineCount, gaps: gaps);
-  }
-
-  final int lineCount;
-  final Map<int, PoemGap> gaps;
-}
-
 PoemLayoutMode _layoutMode(String? value) => switch (value) {
   'COUPLET' => PoemLayoutMode.couplet,
   'FOUR_LINES' => PoemLayoutMode.fourLines,
@@ -118,7 +84,6 @@ class PoemDetail {
     this.sourceDatePlace,
     this.sourceNote,
     this.layoutMode = PoemLayoutMode.source,
-    this.presentationSpacing,
     required this.locked,
     this.requiresEntitlement = false,
     this.excerpt,
@@ -150,9 +115,6 @@ class PoemDetail {
       sourceDatePlace: _string(json, 'source_date_place'),
       sourceNote: _string(json, 'source_note'),
       layoutMode: _layoutMode(_string(json, 'layout_mode')),
-      presentationSpacing: PoemPresentationSpacing.fromJson(
-        json['presentation_spacing'],
-      ),
       locked: _bool(json, 'locked'),
       requiresEntitlement: json['requires_entitlement'] == null
           ? false
@@ -182,7 +144,6 @@ class PoemDetail {
   final String? sourceDatePlace;
   final String? sourceNote;
   final PoemLayoutMode layoutMode;
-  final PoemPresentationSpacing? presentationSpacing;
   final bool locked;
   final bool requiresEntitlement;
   final String? excerpt;

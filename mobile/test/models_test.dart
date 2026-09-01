@@ -53,24 +53,6 @@ void main() {
     );
   });
 
-  test('manual presentation spacing parses none half and full safely', () {
-    final poem = PoemDetail.fromJson(
-      poemDetailJson(
-        presentationSpacing: {
-          'version': 1,
-          'line_count': 4,
-          'gaps': [
-            {'after_line': 1, 'gap': 'HALF'},
-            {'after_line': 3, 'gap': 'FULL'},
-          ],
-        },
-      ),
-    );
-
-    expect(poem.presentationSpacing!.lineCount, 4);
-    expect(poem.presentationSpacing!.gaps, {1: PoemGap.half, 3: PoemGap.full});
-  });
-
   test('playable audio requires free access and stable identity', () {
     final playable = PoemDetail.fromJson(
       poemDetailJson(

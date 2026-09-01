@@ -3,81 +3,58 @@
 namespace Tests\Unit;
 
 use App\Models\Poem;
+use App\Support\PoetryEditorDocument;
 use App\Support\PoetryPresentation;
 use PHPUnit\Framework\TestCase;
 
 class PoetryPresentationTest extends TestCase
 {
-    public function test_source_preserves_the_complete_source_as_one_unchanged_block(): void
+    public function test_editor_round_trips_plain_unicode_lines_and_paragraphs(): void
     {
-        $body = "لومړۍ\n\nدويمه\n\n\nدرېيمه";
+        $body = "لومړۍ — «کرښه»\nدويمه\n\nدرېيمه\nڅلورمه";
+        $html = PoetryEditorDocument::toEditorHtml($body);
 
-        $this->assertSame(
-            [['text' => $body, 'gap_after_em' => 0.0]],
-            PoetryPresentation::blocks($body, Poem::LAYOUT_SOURCE),
-        );
+        $this->assertSame('<p>لومړۍ — «کرښه»<br>دويمه</p><p>درېيمه<br>څلورمه</p>', $html);
+        $this->assertSame($body, PoetryEditorDocument::toPlainText($html));
+        $this->assertStringNotContainsString('<', PoetryEditorDocument::toPlainText($html));
     }
 
-    public function test_couplet_uses_one_half_line_for_plain_or_single_blank_separated_bayts(): void
+    public function test_enter_and_shift_enter_have_deterministic_plain_text_meanings(): void
     {
-        $expected = [
+        $this->assertSame("لومړۍ\nدويمه", PoetryEditorDocument::toPlainText('<p>لومړۍ<br>دويمه</p>'));
+        $this->assertSame("لومړۍ\n\nدويمه", PoetryEditorDocument::toPlainText('<p>لومړۍ</p><p>دويمه</p>'));
+    }
+
+    public function test_paragraph_boundaries_are_explicit_half_em_gaps_not_empty_rows(): void
+    {
+        $blocks = PoetryPresentation::blocks("۱\n۲\n\n۳\n۴", Poem::LAYOUT_SOURCE);
+
+        $this->assertSame([
             ['text' => "۱\n۲", 'gap_after_em' => 0.5],
             ['text' => "۳\n۴", 'gap_after_em' => 0.0],
-        ];
-
-        $this->assertSame($expected, PoetryPresentation::blocks("۱\n۲\n۳\n۴", Poem::LAYOUT_COUPLET));
-        $this->assertSame($expected, PoetryPresentation::blocks("۱\n۲\n\n۳\n۴", Poem::LAYOUT_COUPLET));
+        ], $blocks);
+        $this->assertNotContains('', array_column($blocks, 'text'));
     }
 
-    public function test_couplet_preserves_larger_breaks_as_additional_full_line_space(): void
+    public function test_repeated_blank_boundaries_increase_spacing_conservatively(): void
     {
-        $blocks = PoetryPresentation::blocks("۱\n۲\n\n\n۳\n۴", Poem::LAYOUT_COUPLET);
-
-        $this->assertSame(2.7, $blocks[0]['gap_after_em']);
-        $this->assertSame("۱\n۲\n\n\n۳\n۴", "{$blocks[0]['text']}\n\n\n{$blocks[1]['text']}");
+        $blocks = PoetryPresentation::blocks("۱\n۲\n\n\n۳\n۴", Poem::LAYOUT_SOURCE);
+        $this->assertSame(1.0, $blocks[0]['gap_after_em']);
     }
 
-    public function test_four_line_grouping_retains_the_existing_blank_group_behavior(): void
+    public function test_legacy_modes_group_only_when_no_paragraph_boundary_exists(): void
     {
-        $blocks = PoetryPresentation::blocks("۱\n۲\n\n۳\n۴\n۵\n۶", Poem::LAYOUT_FOUR_LINES);
-
-        $this->assertSame(["۱\n۲", '', "۳\n۴\n۵\n۶"], array_column($blocks, 'text'));
-        $this->assertSame([1.1, 1.1, 0.0], array_column($blocks, 'gap_after_em'));
-    }
-
-    public function test_manual_spacing_represents_none_half_and_full_without_changing_body(): void
-    {
-        $body = "۱\n۲\n\n۳\n۴";
-        $spacing = PoetryPresentation::fromControls($body, true, [
-            ['after_line' => 1, 'gap' => PoetryPresentation::GAP_HALF],
-            ['after_line' => 2, 'gap' => PoetryPresentation::GAP_NONE],
-            ['after_line' => 3, 'gap' => PoetryPresentation::GAP_FULL],
-        ]);
-
-        $this->assertSame([
-            'version' => 1,
-            'line_count' => 4,
-            'gaps' => [
-                ['after_line' => 1, 'gap' => 'HALF'],
-                ['after_line' => 3, 'gap' => 'FULL'],
-            ],
-        ], $spacing);
-        $this->assertSame([
-            ['text' => '۱', 'gap_after_em' => 0.5],
-            ['text' => "۲\n۳", 'gap_after_em' => 1.0],
-            ['text' => '۴', 'gap_after_em' => 0.0],
-        ], PoetryPresentation::blocks($body, Poem::LAYOUT_COUPLET, $spacing));
-        $this->assertSame("۱\n۲\n\n۳\n۴", $body);
-    }
-
-    public function test_manual_spacing_is_ignored_safely_if_line_count_becomes_stale(): void
-    {
-        $spacing = ['version' => 1, 'line_count' => 4, 'gaps' => [['after_line' => 2, 'gap' => 'HALF']]];
-
-        $this->assertFalse(PoetryPresentation::isValidForBody($spacing, "۱\n۲\n۳"));
-        $this->assertSame(
-            PoetryPresentation::blocks("۱\n۲\n۳", Poem::LAYOUT_COUPLET),
-            PoetryPresentation::blocks("۱\n۲\n۳", Poem::LAYOUT_COUPLET, $spacing),
-        );
+        $this->assertSame([0.5, 0.0], array_column(
+            PoetryPresentation::blocks("۱\n۲\n۳\n۴", Poem::LAYOUT_COUPLET),
+            'gap_after_em',
+        ));
+        $this->assertSame([0.5, 0.0], array_column(
+            PoetryPresentation::blocks("۱\n۲\n\n۳\n۴", Poem::LAYOUT_FOUR_LINES),
+            'gap_after_em',
+        ));
+        $this->assertSame([1.1, 0.0], array_column(
+            PoetryPresentation::blocks("۱\n۲\n۳\n۴\n۵", Poem::LAYOUT_FOUR_LINES),
+            'gap_after_em',
+        ));
     }
 }

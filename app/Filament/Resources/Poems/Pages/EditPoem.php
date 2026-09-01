@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Poems\Pages;
 use App\Filament\Resources\Collections\CollectionResource;
 use App\Filament\Resources\Poems\PoemResource;
 use App\Support\AudioDurationProbe;
-use App\Support\PoetryPresentation;
+use App\Support\PoetryEditorDocument;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -16,22 +16,7 @@ class EditPoem extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $spacing = is_array($data['presentation_spacing'] ?? null) ? $data['presentation_spacing'] : null;
-        $data['manual_spacing_enabled'] = $spacing !== null;
-        $data['manual_spacing_controls'] = PoetryPresentation::controlRowsFromStored((string) $data['body'], $spacing);
-        unset($data['presentation_spacing']);
-
-        return $data;
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        $data['presentation_spacing'] = PoetryPresentation::fromControls(
-            (string) $data['body'],
-            (bool) ($data['manual_spacing_enabled'] ?? false),
-            $data['manual_spacing_controls'] ?? null,
-        );
-        unset($data['manual_spacing_enabled'], $data['manual_spacing_controls']);
+        $data['body'] = PoetryEditorDocument::toEditorHtml($data['body'] ?? '');
 
         return $data;
     }

@@ -69,7 +69,6 @@ Map<String, dynamic> poemDetailJson({
   String? audioFormat,
   String? audioLabel,
   String layoutMode = 'SOURCE',
-  Map<String, dynamic>? presentationSpacing,
   String? sourceDatePlace = 'کابل — ۱۳۸۵',
 }) => {
   'id': 301,
@@ -81,7 +80,6 @@ Map<String, dynamic> poemDetailJson({
   'source_date_place': sourceDatePlace,
   'source_note': null,
   'layout_mode': layoutMode,
-  'presentation_spacing': presentationSpacing,
   'locked': locked,
   'requires_entitlement': locked,
   'excerpt': 'لنډه برخه\nدويمه کرښه',

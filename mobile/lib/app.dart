@@ -49,7 +49,7 @@ class PitswalApp extends StatelessWidget {
                         width: double.infinity,
                         child: Text(
                           'OWNER PREVIEW — UNPUBLISHED CONTENT\n'
-                          'PC-POETRY-PRESENTATION-03 • BUILD 6\n'
+                          'PC-POETRY-EDITOR-04 • BUILD 7\n'
                           'د مالک کتنه — ناچاپه منځپانګه',
                           textAlign: TextAlign.center,
                           style: TextStyle(

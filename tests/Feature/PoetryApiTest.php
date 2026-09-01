@@ -38,15 +38,11 @@ class PoetryApiTest extends TestCase
         $poem = Poem::create([
             'collection_id' => $collection->id, 'title' => 'پټ شعر', 'body' => 'بشپړ پټ متن',
             'excerpt' => 'لنډه برخه', 'audio_path' => 'source.mp3', 'is_free_sample' => false, 'is_active' => true,
-            'presentation_spacing' => [
-                'version' => 1, 'line_count' => 2,
-                'gaps' => [['after_line' => 1, 'gap' => 'FULL']],
-            ],
         ]);
 
         $this->getJson("/api/poems/{$poem->id}")
             ->assertOk()->assertJsonPath('data.locked', true)->assertJsonPath('data.body', null)
-            ->assertJsonPath('data.presentation_spacing', null);
+            ->assertJsonMissingPath('data.presentation_spacing');
         $this->getJson("/api/poems/{$poem->id}/audio")
             ->assertOk()->assertExactJson(['locked' => true, 'excerpt' => 'لنډه برخه']);
     }
@@ -214,29 +210,14 @@ class PoetryApiTest extends TestCase
             'body' => $body,
             'excerpt' => 'لنډ',
             'layout_mode' => Poem::LAYOUT_COUPLET,
-            'presentation_spacing' => [
-                'version' => 1,
-                'line_count' => 3,
-                'gaps' => [['after_line' => 2, 'gap' => 'HALF']],
-            ],
             'is_free_sample' => true,
             'is_active' => true,
         ]);
 
-        $this->assertSame('HALF', $poem->presentation_spacing['gaps'][0]['gap']);
-
         $this->getJson("/api/poems/{$poem->id}")
             ->assertOk()
             ->assertJsonPath('data.layout_mode', Poem::LAYOUT_COUPLET)
-            ->assertJson([
-                'data' => [
-                    'presentation_spacing' => [
-                        'version' => 1,
-                        'line_count' => 3,
-                        'gaps' => [['after_line' => 2, 'gap' => 'HALF']],
-                    ],
-                ],
-            ])
+            ->assertJsonMissingPath('data.presentation_spacing')
             ->assertJsonPath('data.body', $body);
         $this->assertSame($body, $poem->fresh()->body);
     }
@@ -248,14 +229,9 @@ class PoetryApiTest extends TestCase
         $version = (int) AppSetting::where('key', 'content_version')->value('value');
 
         $poem->update(['layout_mode' => Poem::LAYOUT_FOUR_LINES]);
-        $poem->update(['presentation_spacing' => [
-            'version' => 1,
-            'line_count' => 1,
-            'gaps' => [],
-        ]]);
         $poem->update(['sort_order' => 8, 'is_active' => true, 'is_free_sample' => true]);
         $collection->update(['title' => 'TEST ONLY UPDATED']);
 
-        $this->assertSame($version + 4, (int) AppSetting::where('key', 'content_version')->value('value'));
+        $this->assertSame($version + 3, (int) AppSetting::where('key', 'content_version')->value('value'));
     }
 }

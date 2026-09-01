@@ -91,11 +91,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final text = tester.widget<SelectableText>(
-        find.byKey(const Key('poem-body')),
+      final bodyTexts = tester.widgetList<SelectableText>(
+        find.descendant(
+          of: find.byKey(const Key('poem-body')),
+          matching: find.byType(SelectableText),
+        ),
       );
-      expect(text.data, longBody);
-      expect(text.data, contains('\n\nنوی بند'));
+      final text = bodyTexts.first;
+      expect(bodyTexts.map((item) => item.data).join('\n\n'), longBody);
       expect(text.textDirection, TextDirection.rtl);
       expect(text.style!.fontSize, 38);
       expect(find.byKey(const Key('poem-scroll-view')), findsOneWidget);
@@ -150,7 +153,12 @@ void main() {
       await tester.pumpAndSettle();
 
       final body = tester.widget<SelectableText>(
-        find.byKey(const Key('poem-body')),
+        find
+            .descendant(
+              of: find.byKey(const Key('poem-body')),
+              matching: find.byType(SelectableText),
+            )
+            .first,
       );
       expect(body.style!.fontSize, 16);
       expect(tester.getSize(find.byKey(const Key('poem-body'))).width, 336);
@@ -260,7 +268,7 @@ void main() {
       final marker = tester.widget<CustomPaint>(
         find.byKey(const Key('untitled-poem-indicator')),
       );
-      expect(marker.painter, isA<LiteraryPageQuillPainter>());
+      expect(marker.painter, isA<ManuscriptPageQuillPainter>());
       expect(
         find.descendant(
           of: find.byKey(const Key('untitled-poem-indicator')),
@@ -336,7 +344,12 @@ void main() {
 
     final title = tester.widget<Text>(find.byKey(const Key('poem-title')));
     final body = tester.widget<SelectableText>(
-      find.byKey(const Key('poem-body')),
+      find
+          .descendant(
+            of: find.byKey(const Key('poem-body')),
+            matching: find.byType(SelectableText),
+          )
+          .first,
     );
     final date = tester.widget<Text>(find.byKey(const Key('poem-date-place')));
     expect(title.style!.fontFamily, 'ScheherazadeNew');

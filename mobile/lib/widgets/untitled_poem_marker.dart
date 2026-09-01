@@ -13,14 +13,14 @@ class UntitledPoemMarker extends StatelessWidget {
       child: CustomPaint(
         key: const Key('untitled-poem-indicator'),
         size: const Size(38, 34),
-        painter: LiteraryPageQuillPainter(color),
+        painter: ManuscriptPageQuillPainter(color),
       ),
     ),
   );
 }
 
-class LiteraryPageQuillPainter extends CustomPainter {
-  const LiteraryPageQuillPainter(this.color);
+class ManuscriptPageQuillPainter extends CustomPainter {
+  const ManuscriptPageQuillPainter(this.color);
 
   final Color color;
 
@@ -33,39 +33,31 @@ class LiteraryPageQuillPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
     final page = Path()
-      ..moveTo(5, 3)
-      ..lineTo(25, 3)
-      ..lineTo(31, 9)
-      ..lineTo(31, 30)
-      ..lineTo(5, 30)
+      ..moveTo(7, 4)
+      ..quadraticBezierTo(17, 2, 27, 4)
+      ..quadraticBezierTo(29, 16, 27, 29)
+      ..quadraticBezierTo(17, 31, 7, 28)
+      ..quadraticBezierTo(5, 16, 7, 4)
       ..close()
-      ..moveTo(25, 3)
-      ..lineTo(25, 9)
-      ..lineTo(31, 9);
+      ..moveTo(11, 10)
+      ..quadraticBezierTo(18, 8.5, 24, 10)
+      ..moveTo(11, 15)
+      ..quadraticBezierTo(17, 13.5, 22, 15)
+      ..moveTo(11, 20)
+      ..quadraticBezierTo(15, 19, 18, 20);
     canvas.drawPath(page, ink);
-    canvas.drawLine(
-      const Offset(10, 13),
-      const Offset(23, 13),
-      ink..strokeWidth = 0.9,
-    );
-    canvas.drawLine(const Offset(10, 17), const Offset(21, 17), ink);
-    canvas.drawLine(const Offset(10, 21), const Offset(18, 21), ink);
 
     final quill = Path()
-      ..moveTo(16, 29)
-      ..quadraticBezierTo(25, 17, 36, 7)
-      ..quadraticBezierTo(35, 16, 27, 21)
-      ..quadraticBezierTo(22, 25, 16, 29)
-      ..moveTo(18, 27)
-      ..lineTo(34, 9)
-      ..moveTo(28, 15)
-      ..lineTo(33, 15)
-      ..moveTo(24, 20)
-      ..lineTo(29, 20);
+      ..moveTo(17, 31)
+      ..quadraticBezierTo(27, 20, 36, 8)
+      ..quadraticBezierTo(35, 17, 29, 22)
+      ..quadraticBezierTo(23, 27, 17, 31)
+      ..moveTo(19, 29)
+      ..lineTo(34, 10);
     canvas.drawPath(quill, ink..strokeWidth = 1.15);
   }
 
   @override
-  bool shouldRepaint(covariant LiteraryPageQuillPainter oldDelegate) =>
+  bool shouldRepaint(covariant ManuscriptPageQuillPainter oldDelegate) =>
       oldDelegate.color != color;
 }

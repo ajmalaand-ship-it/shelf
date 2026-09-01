@@ -69,73 +69,44 @@ void main() {
     }
   });
 
-  test(
-    'visual grouping preserves exact lines and authored blank separators',
-    () {
-      const source = '۱\n۲\n\n۳\n۴\n۵\n۶';
-      expect(poetryDisplayGroups(source, 2), ['۱\n۲', '', '۳\n۴', '۵\n۶']);
-      expect(poetryDisplayGroups(source, 4), ['۱\n۲', '', '۳\n۴\n۵\n۶']);
-      expect(poetryDisplayGroups(source, 2).join('\n'), source);
-    },
-  );
-
-  test(
-    'couplet uses one half-line gap with or without one blank separator',
-    () {
-      for (final source in ['۱\n۲\n۳\n۴', '۱\n۲\n\n۳\n۴']) {
-        final blocks = coupletDisplayBlocks(source);
-        expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
-        expect(blocks.map((block) => block.gapAfterEm), [0.5, 0]);
-      }
-    },
-  );
-
-  test('couplet keeps deliberate larger section breaks visible', () {
-    final blocks = coupletDisplayBlocks('۱\n۲\n\n\n۳\n۴');
+  test('paragraph structure preserves lines and uses explicit gaps', () {
+    final blocks = paragraphDisplayBlocks('۱\n۲\n\n۳\n۴');
     expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
-    expect(blocks.map((block) => block.gapAfterEm), [2.7, 0]);
+    expect(blocks.map((block) => block.gapAfterEm), [0.5, 0]);
   });
 
-  testWidgets('couplet gap is half an em rather than half the tall line box', (
+  test('repeated paragraph boundaries conservatively increase space', () {
+    final blocks = paragraphDisplayBlocks('۱\n۲\n\n\n۳\n۴');
+    expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
+    expect(blocks.map((block) => block.gapAfterEm), [1, 0]);
+  });
+
+  test('legacy couplet grouping remains for bodies without paragraphs', () {
+    final blocks = poetryDisplayBlocks('۱\n۲\n۳\n۴', PoemLayoutMode.couplet);
+    expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
+    expect(blocks.map((block) => block.gapAfterEm), [0.5, 0]);
+  });
+
+  testWidgets('paragraph gap is half an em rather than an empty tall line', (
     tester,
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PoetryText(
           text: '۱\n۲\n\n۳\n۴',
-          layoutMode: PoemLayoutMode.couplet,
+          layoutMode: PoemLayoutMode.source,
           style: TextStyle(fontSize: 20, height: 2),
         ),
       ),
     );
 
-    expect(tester.getSize(find.byKey(const ValueKey<double>(0.5))).height, 10);
+    expect(
+      tester
+          .getSize(find.byKey(const ValueKey<String>('paragraph-gap-0.5em')))
+          .height,
+      10,
+    );
     expect(find.text(''), findsNothing);
-  });
-
-  testWidgets('manual none half and full spacing override blank heuristics', (
-    tester,
-  ) async {
-    const spacing = PoemPresentationSpacing(
-      lineCount: 4,
-      gaps: {1: PoemGap.half, 3: PoemGap.full},
-    );
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: PoetryText(
-          text: '۱\n۲\n\n۳\n۴',
-          layoutMode: PoemLayoutMode.couplet,
-          presentationSpacing: spacing,
-          style: TextStyle(fontSize: 20, height: 2.2),
-        ),
-      ),
-    );
-
-    expect(find.text('۱'), findsOneWidget);
-    expect(find.text('۲\n۳'), findsOneWidget);
-    expect(find.text('۴'), findsOneWidget);
-    expect(tester.getSize(find.byKey(const ValueKey<double>(0.5))).height, 10);
-    expect(tester.getSize(find.byKey(const ValueKey<double>(1))).height, 20);
   });
 
   testWidgets(
