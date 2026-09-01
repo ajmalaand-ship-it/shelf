@@ -87,7 +87,7 @@ void main() {
 
       expect(find.byKey(const Key('owner-preview-banner')), findsOneWidget);
       expect(
-        find.textContaining('PC-PARAGRAPH-SPACING-04A • BUILD 7'),
+        find.textContaining('PC-SPACING-ROLLBACK-05 • BUILD 8'),
         findsOneWidget,
       );
       expect(find.text('څپو کې انځورونه'), findsOneWidget);

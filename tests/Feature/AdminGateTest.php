@@ -18,6 +18,7 @@ use App\Models\Collection;
 use App\Models\Poem;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Textarea;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -72,6 +73,11 @@ class AdminGateTest extends TestCase
         $collection = Collection::create(['title' => 'ټولګه', 'slug' => 'upload-test', 'is_active' => true]);
 
         Livewire::test(CreatePoem::class)
+            ->assertFormFieldExists('body', fn ($field): bool => $field instanceof Textarea)
+            ->assertFormFieldDoesNotExist('manual_spacing_enabled')
+            ->assertFormFieldDoesNotExist('manual_spacing_controls')
+            ->assertDontSee('Presentation preview')
+            ->assertDontSee('Shift+Enter')
             ->fillForm([
                 'collection_id' => $collection->id, 'title' => 'شعر', 'body' => 'متن',
                 'excerpt' => 'لنډ متن', 'audio_path' => [UploadedFile::fake()->create('attack.php', 2, 'application/x-php')],
@@ -350,7 +356,7 @@ class AdminGateTest extends TestCase
         $this->assertSame(1, $collection->poems()->where('is_active', true)->count());
     }
 
-    public function test_legacy_poem_layout_can_be_preserved_and_safely_changed_on_edit(): void
+    public function test_owner_can_select_poem_layout_and_invalid_value_is_rejected(): void
     {
         $this->actingAs(User::factory()->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
@@ -361,73 +367,20 @@ class AdminGateTest extends TestCase
                 'collection_id' => $collection->id,
                 'body' => "لومړۍ\nدويمه",
                 'excerpt' => 'لنډ',
+                'layout_mode' => Poem::LAYOUT_COUPLET,
                 'sort_order' => 1,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $poem = Poem::where('collection_id', $collection->id)->firstOrFail();
-        $this->assertSame(Poem::LAYOUT_SOURCE, $poem->layout_mode);
-
-        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
-            ->fillForm(['layout_mode' => Poem::LAYOUT_COUPLET])
-            ->call('save')
-            ->assertHasNoFormErrors();
-        $this->assertSame(Poem::LAYOUT_COUPLET, $poem->fresh()->layout_mode);
+        $this->assertSame(Poem::LAYOUT_COUPLET, $poem->layout_mode);
 
         Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
             ->fillForm(['layout_mode' => 'GUESSED_BY_AI'])
             ->call('save')
             ->assertHasFormErrors(['layout_mode']);
         $this->assertSame(Poem::LAYOUT_COUPLET, $poem->fresh()->layout_mode);
-    }
-
-    public function test_plain_poetry_editor_preserves_lines_paragraphs_and_dormant_spacing_column(): void
-    {
-        $this->actingAs(User::factory()->create());
-        Filament::setCurrentPanel(Filament::getPanel('admin'));
-        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'poetry-preview']);
-        $body = "د زړه کرښه — «همداسې»\nدويمه کرښه\n\nدرېيمه کرښه\nڅلورمه کرښه";
-
-        Livewire::test(CreatePoem::class)
-            ->fillForm([
-                'collection_id' => $collection->id,
-                'title' => null,
-                'body' => $body,
-                'excerpt' => 'لنډ',
-                'source_date_place' => 'کابل — ۱۳۶۰',
-                'sort_order' => 1,
-            ])
-            ->assertSeeHtml('data-testid="poem-presentation-preview"')
-            ->assertSeeHtml('data-testid="preview-untitled-marker"')
-            ->assertSeeHtml('data-gap-em="0.5"')
-            ->assertDontSee('Choose spacing manually')
-            ->assertDontSee('No extra gap')
-            ->assertSee('کابل — ۱۳۶۰')
-            ->call('create')
-            ->assertHasNoFormErrors();
-
-        $poem = Poem::where('collection_id', $collection->id)->firstOrFail();
-        $this->assertNull($poem->title);
-        $this->assertSame($body, $poem->body);
-        $this->assertSame(Poem::LAYOUT_SOURCE, $poem->layout_mode);
-        $this->assertNull($poem->getRawOriginal('presentation_spacing'));
-
-        $preview = view('filament.poem-presentation-preview', [
-            'title' => null,
-            'body' => $body,
-            'layoutMode' => Poem::LAYOUT_SOURCE,
-            'datePlace' => 'کابل — ۱۳۶۰',
-        ])->render();
-        $this->assertLessThan(strpos($preview, 'data-testid="preview-body"'), strpos($preview, 'data-testid="preview-untitled-marker"'));
-        $this->assertLessThan(strpos($preview, 'data-testid="preview-date-place"'), strpos($preview, 'data-testid="preview-body"'));
-
-        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
-            ->assertFormSet(['body' => $body])
-            ->assertDontSee('Shift+Enter')
-            ->call('save')
-            ->assertHasNoFormErrors();
-        $this->assertSame($body, $poem->fresh()->body);
     }
 
     public function test_owner_navigation_prominently_names_books_and_poems(): void

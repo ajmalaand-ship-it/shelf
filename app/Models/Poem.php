@@ -29,12 +29,7 @@ class Poem extends Model
 
     protected function casts(): array
     {
-        return [
-            'is_free_sample' => 'boolean',
-            'is_active' => 'boolean',
-            'sort_order' => 'integer',
-            'audio_duration_seconds' => 'integer',
-        ];
+        return ['is_free_sample' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'audio_duration_seconds' => 'integer'];
     }
 
     protected static function booted(): void

@@ -91,14 +91,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final bodyTexts = tester.widgetList<SelectableText>(
-        find.descendant(
-          of: find.byKey(const Key('poem-body')),
-          matching: find.byType(SelectableText),
-        ),
+      final text = tester.widget<SelectableText>(
+        find.byKey(const Key('poem-body')),
       );
-      final text = bodyTexts.first;
-      expect(bodyTexts.map((item) => item.data).join('\n\n'), longBody);
+      expect(text.data, longBody);
+      expect(text.data, contains('\n\nنوی بند'));
       expect(text.textDirection, TextDirection.rtl);
       expect(text.style!.fontSize, 38);
       expect(find.byKey(const Key('poem-scroll-view')), findsOneWidget);
@@ -153,12 +150,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final body = tester.widget<SelectableText>(
-        find
-            .descendant(
-              of: find.byKey(const Key('poem-body')),
-              matching: find.byType(SelectableText),
-            )
-            .first,
+        find.byKey(const Key('poem-body')),
       );
       expect(body.style!.fontSize, 16);
       expect(tester.getSize(find.byKey(const Key('poem-body'))).width, 336);
@@ -344,12 +336,7 @@ void main() {
 
     final title = tester.widget<Text>(find.byKey(const Key('poem-title')));
     final body = tester.widget<SelectableText>(
-      find
-          .descendant(
-            of: find.byKey(const Key('poem-body')),
-            matching: find.byType(SelectableText),
-          )
-          .first,
+      find.byKey(const Key('poem-body')),
     );
     final date = tester.widget<Text>(find.byKey(const Key('poem-date-place')));
     expect(title.style!.fontFamily, 'ScheherazadeNew');

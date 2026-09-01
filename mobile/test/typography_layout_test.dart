@@ -69,44 +69,32 @@ void main() {
     }
   });
 
-  test('paragraph structure preserves lines and uses explicit gaps', () {
-    final blocks = paragraphDisplayBlocks('۱\n۲\n\n۳\n۴');
-    expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
-    expect(blocks.map((block) => block.gapAfterEm), [0.5, 0]);
-  });
+  test(
+    'visual grouping preserves exact lines and authored blank separators',
+    () {
+      const source = '۱\n۲\n\n۳\n۴\n۵\n۶';
+      expect(poetryDisplayGroups(source, 2), ['۱\n۲', '', '۳\n۴', '۵\n۶']);
+      expect(poetryDisplayGroups(source, 4), ['۱\n۲', '', '۳\n۴\n۵\n۶']);
+      expect(poetryDisplayGroups(source, 2).join('\n'), source);
+    },
+  );
 
-  test('repeated paragraph boundaries conservatively increase space', () {
-    final blocks = paragraphDisplayBlocks('۱\n۲\n\n\n۳\n۴');
-    expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
-    expect(blocks.map((block) => block.gapAfterEm), [1, 0]);
-  });
-
-  test('legacy couplet grouping remains for bodies without paragraphs', () {
-    final blocks = poetryDisplayBlocks('۱\n۲\n۳\n۴', PoemLayoutMode.couplet);
-    expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
-    expect(blocks.map((block) => block.gapAfterEm), [0.5, 0]);
-  });
-
-  testWidgets('paragraph gap is half an em rather than an empty tall line', (
+  testWidgets('repeated structural pattern has no duplicate paragraph keys', (
     tester,
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PoetryText(
-          text: '۱\n۲\n\n۳\n۴',
+          text: '۱\n۲\n\n۳\n۴\n\n۵\n۶',
           layoutMode: PoemLayoutMode.source,
-          style: TextStyle(fontSize: 20, height: 2),
+          style: TextStyle(fontSize: 20, height: 2.2),
         ),
       ),
     );
 
-    expect(
-      tester
-          .getSize(find.byKey(const ValueKey<String>('paragraph-gap-0.5em')))
-          .height,
-      10,
-    );
-    expect(find.text(''), findsNothing);
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const Key('poem-body')), findsOneWidget);
+    expect(find.byKey(const Key('paragraph-gap-0.5em')), findsNothing);
   });
 
   testWidgets(
