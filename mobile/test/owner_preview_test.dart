@@ -87,7 +87,7 @@ void main() {
 
       expect(find.byKey(const Key('owner-preview-banner')), findsOneWidget);
       expect(
-        find.textContaining('PC-POETRY-EDITOR-02 • BUILD 5'),
+        find.textContaining('PC-POETRY-PRESENTATION-03 • BUILD 6'),
         findsOneWidget,
       );
       expect(find.text('څپو کې انځورونه'), findsOneWidget);

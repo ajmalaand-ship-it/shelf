@@ -23,13 +23,19 @@ class Poem extends Model
 
     protected $fillable = [
         'collection_id', 'title', 'body', 'excerpt', 'work_type', 'original_author', 'translator',
-        'source_date_place', 'source_note', 'layout_mode', 'audio_path', 'audio_duration_seconds', 'sort_order',
+        'source_date_place', 'source_note', 'layout_mode', 'presentation_spacing', 'audio_path', 'audio_duration_seconds', 'sort_order',
         'is_free_sample', 'is_active',
     ];
 
     protected function casts(): array
     {
-        return ['is_free_sample' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'audio_duration_seconds' => 'integer'];
+        return [
+            'presentation_spacing' => 'array',
+            'is_free_sample' => 'boolean',
+            'is_active' => 'boolean',
+            'sort_order' => 'integer',
+            'audio_duration_seconds' => 'integer',
+        ];
     }
 
     protected static function booted(): void

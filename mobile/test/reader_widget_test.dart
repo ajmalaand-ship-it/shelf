@@ -11,6 +11,7 @@ import 'package:pitswal/screens/collection_detail_screen.dart';
 import 'package:pitswal/screens/poem_reader_screen.dart';
 import 'package:pitswal/services/api_client.dart';
 import 'package:pitswal/settings/reader_settings.dart';
+import 'package:pitswal/widgets/untitled_poem_marker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'test_support.dart';
@@ -256,6 +257,17 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
+      final marker = tester.widget<CustomPaint>(
+        find.byKey(const Key('untitled-poem-indicator')),
+      );
+      expect(marker.painter, isA<LiteraryPageQuillPainter>());
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('untitled-poem-indicator')),
+          matching: find.byType(InkWell),
+        ),
+        findsNothing,
+      );
       expect(find.byKey(const Key('poem-title')), findsNothing);
       expect(find.text('بې سرليکه'), findsNothing);
     },

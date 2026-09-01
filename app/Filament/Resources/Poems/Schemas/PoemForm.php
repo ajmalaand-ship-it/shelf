@@ -3,13 +3,17 @@
 namespace App\Filament\Resources\Poems\Schemas;
 
 use App\Models\Poem;
+use App\Support\PoetryPresentation;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 
@@ -29,6 +33,10 @@ class PoemForm
                         TextInput::make('title')->label('Original poem title')->maxLength(255)->live(debounce: 400)
                             ->helperText('Optional. Leave blank when the poem has no original title; the first line is never saved as a title.'),
                         Textarea::make('body')->label('Poem text')->required()->rows(20)->live(debounce: 400)
+                            ->afterStateUpdated(fn (?string $state, Get $get, Set $set) => $set(
+                                'manual_spacing_controls',
+                                PoetryPresentation::controlRows($state ?? '', $get('manual_spacing_controls')),
+                            ))
                             ->extraInputAttributes(['dir' => 'rtl'])->columnSpanFull(),
                     ]),
                 Section::make('Source / Literary metadata')
@@ -50,12 +58,32 @@ class PoemForm
                         ])->required()->default(Poem::LAYOUT_SOURCE)->live()
                             ->helperText('Display only; the saved Unicode poem text and its newlines never change.'),
                         TextInput::make('sort_order')->label('Order in book')->numeric()->minValue(0)->required()->default(0),
+                        Toggle::make('manual_spacing_enabled')->label('Choose spacing manually')
+                            ->helperText('When enabled, choose no gap, half gap, or full gap after each literary line. Source blank lines remain unchanged in Source spacing mode.')
+                            ->default(false)->live()->columnSpanFull(),
+                        Repeater::make('manual_spacing_controls')->label('Poetry structure / د شعر جوړښت')
+                            ->schema([
+                                Hidden::make('after_line'),
+                                TextInput::make('line')->label('Source line')->disabled()->dehydrated(false),
+                                Select::make('gap')->label('Space after this line')->options([
+                                    PoetryPresentation::GAP_NONE => 'No extra gap',
+                                    PoetryPresentation::GAP_HALF => 'Half gap',
+                                    PoetryPresentation::GAP_FULL => 'Full gap',
+                                ])->required()->default(PoetryPresentation::GAP_NONE)->live(),
+                            ])->columns(2)->addable(false)->deletable(false)->reorderable(false)
+                            ->visible(fn (Get $get): bool => (bool) $get('manual_spacing_enabled'))
+                            ->columnSpanFull(),
                         View::make('filament.poem-presentation-preview')
                             ->viewData(fn (Get $get): array => [
                                 'title' => $get('title'),
                                 'body' => $get('body'),
                                 'layoutMode' => $get('layout_mode'),
                                 'datePlace' => $get('source_date_place'),
+                                'manualSpacing' => PoetryPresentation::fromControls(
+                                    (string) ($get('body') ?? ''),
+                                    (bool) $get('manual_spacing_enabled'),
+                                    $get('manual_spacing_controls'),
+                                ),
                             ])->columnSpanFull(),
                     ]),
                 Section::make('Access / Publication')

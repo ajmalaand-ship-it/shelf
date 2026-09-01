@@ -85,7 +85,7 @@ void main() {
       for (final source in ['۱\n۲\n۳\n۴', '۱\n۲\n\n۳\n۴']) {
         final blocks = coupletDisplayBlocks(source);
         expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
-        expect(blocks.map((block) => block.gapAfterLines), [0.5, 0]);
+        expect(blocks.map((block) => block.gapAfterEm), [0.5, 0]);
       }
     },
   );
@@ -93,10 +93,10 @@ void main() {
   test('couplet keeps deliberate larger section breaks visible', () {
     final blocks = coupletDisplayBlocks('۱\n۲\n\n\n۳\n۴');
     expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
-    expect(blocks.map((block) => block.gapAfterLines), [1.5, 0]);
+    expect(blocks.map((block) => block.gapAfterEm), [2.7, 0]);
   });
 
-  testWidgets('couplet gap is half of the typography line extent', (
+  testWidgets('couplet gap is half an em rather than half the tall line box', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -109,8 +109,33 @@ void main() {
       ),
     );
 
-    expect(tester.getSize(find.byKey(const ValueKey<double>(0.5))).height, 20);
+    expect(tester.getSize(find.byKey(const ValueKey<double>(0.5))).height, 10);
     expect(find.text(''), findsNothing);
+  });
+
+  testWidgets('manual none half and full spacing override blank heuristics', (
+    tester,
+  ) async {
+    const spacing = PoemPresentationSpacing(
+      lineCount: 4,
+      gaps: {1: PoemGap.half, 3: PoemGap.full},
+    );
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PoetryText(
+          text: '۱\n۲\n\n۳\n۴',
+          layoutMode: PoemLayoutMode.couplet,
+          presentationSpacing: spacing,
+          style: TextStyle(fontSize: 20, height: 2.2),
+        ),
+      ),
+    );
+
+    expect(find.text('۱'), findsOneWidget);
+    expect(find.text('۲\n۳'), findsOneWidget);
+    expect(find.text('۴'), findsOneWidget);
+    expect(tester.getSize(find.byKey(const ValueKey<double>(0.5))).height, 10);
+    expect(tester.getSize(find.byKey(const ValueKey<double>(1))).height, 20);
   });
 
   testWidgets(

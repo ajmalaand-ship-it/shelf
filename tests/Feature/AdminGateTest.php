@@ -391,11 +391,19 @@ class AdminGateTest extends TestCase
                 'body' => $body,
                 'excerpt' => 'لنډ',
                 'layout_mode' => Poem::LAYOUT_COUPLET,
+                'manual_spacing_enabled' => true,
+                'manual_spacing_controls' => [
+                    ['after_line' => 1, 'line' => 'د زړه کرښه — «همداسې»', 'gap' => 'HALF'],
+                    ['after_line' => 2, 'line' => 'دويمه کرښه', 'gap' => 'NONE'],
+                    ['after_line' => 3, 'line' => 'درېيمه کرښه', 'gap' => 'FULL'],
+                ],
                 'source_date_place' => 'کابل — ۱۳۶۰',
                 'sort_order' => 1,
             ])
             ->assertSeeHtml('data-testid="poem-presentation-preview"')
             ->assertSeeHtml('data-testid="preview-untitled-marker"')
+            ->assertSeeHtml('data-gap-em="0.5"')
+            ->assertSeeHtml('data-gap-em="1"')
             ->assertSee('Ghazal / 2-line bayts — subtle half-line gap')
             ->assertSee('کابل — ۱۳۶۰')
             ->call('create')
@@ -405,15 +413,32 @@ class AdminGateTest extends TestCase
         $this->assertNull($poem->title);
         $this->assertSame($body, $poem->body);
         $this->assertSame(Poem::LAYOUT_COUPLET, $poem->layout_mode);
+        $this->assertSame([
+            'version' => 1,
+            'line_count' => 4,
+            'gaps' => [
+                ['after_line' => 1, 'gap' => 'HALF'],
+                ['after_line' => 3, 'gap' => 'FULL'],
+            ],
+        ], $poem->presentation_spacing);
 
         $preview = view('filament.poem-presentation-preview', [
             'title' => null,
             'body' => $body,
             'layoutMode' => Poem::LAYOUT_COUPLET,
             'datePlace' => 'کابل — ۱۳۶۰',
+            'manualSpacing' => $poem->presentation_spacing,
         ])->render();
         $this->assertLessThan(strpos($preview, 'data-testid="preview-body"'), strpos($preview, 'data-testid="preview-untitled-marker"'));
         $this->assertLessThan(strpos($preview, 'data-testid="preview-date-place"'), strpos($preview, 'data-testid="preview-body"'));
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->assertFormSet(['manual_spacing_enabled' => true])
+            ->fillForm(['manual_spacing_enabled' => false])
+            ->call('save')
+            ->assertHasNoFormErrors();
+        $this->assertNull($poem->fresh()->presentation_spacing);
+        $this->assertSame($body, $poem->fresh()->body);
     }
 
     public function test_owner_navigation_prominently_names_books_and_poems(): void

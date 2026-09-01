@@ -12,15 +12,15 @@ class UntitledPoemMarker extends StatelessWidget {
     child: ExcludeSemantics(
       child: CustomPaint(
         key: const Key('untitled-poem-indicator'),
-        size: const Size(44, 30),
-        painter: _ManuscriptOrnamentPainter(color),
+        size: const Size(38, 34),
+        painter: LiteraryPageQuillPainter(color),
       ),
     ),
   );
 }
 
-class _ManuscriptOrnamentPainter extends CustomPainter {
-  const _ManuscriptOrnamentPainter(this.color);
+class LiteraryPageQuillPainter extends CustomPainter {
+  const LiteraryPageQuillPainter(this.color);
 
   final Color color;
 
@@ -32,70 +32,40 @@ class _ManuscriptOrnamentPainter extends CustomPainter {
       ..strokeWidth = 1.25
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
-    final center = size.width / 2;
-
-    final pages = Path()
-      ..moveTo(center, size.height * 0.82)
-      ..cubicTo(
-        center - 5,
-        size.height * 0.66,
-        center - 12,
-        size.height * 0.62,
-        4,
-        size.height * 0.7,
-      )
-      ..lineTo(4, size.height * 0.2)
-      ..cubicTo(
-        center - 12,
-        size.height * 0.12,
-        center - 5,
-        size.height * 0.22,
-        center,
-        size.height * 0.36,
-      )
-      ..cubicTo(
-        center + 5,
-        size.height * 0.22,
-        center + 12,
-        size.height * 0.12,
-        size.width - 4,
-        size.height * 0.2,
-      )
-      ..lineTo(size.width - 4, size.height * 0.7)
-      ..cubicTo(
-        center + 12,
-        size.height * 0.62,
-        center + 5,
-        size.height * 0.66,
-        center,
-        size.height * 0.82,
-      );
-    canvas.drawPath(pages, ink);
-
+    final page = Path()
+      ..moveTo(5, 3)
+      ..lineTo(25, 3)
+      ..lineTo(31, 9)
+      ..lineTo(31, 30)
+      ..lineTo(5, 30)
+      ..close()
+      ..moveTo(25, 3)
+      ..lineTo(25, 9)
+      ..lineTo(31, 9);
+    canvas.drawPath(page, ink);
     canvas.drawLine(
-      Offset(center, size.height * 0.36),
-      Offset(center, size.height * 0.82),
+      const Offset(10, 13),
+      const Offset(23, 13),
       ink..strokeWidth = 0.9,
     );
+    canvas.drawLine(const Offset(10, 17), const Offset(21, 17), ink);
+    canvas.drawLine(const Offset(10, 21), const Offset(18, 21), ink);
 
-    final flourish = Path()
-      ..moveTo(center - 7, size.height * 0.93)
-      ..quadraticBezierTo(
-        center - 2,
-        size.height * 0.82,
-        center,
-        size.height * 0.94,
-      )
-      ..quadraticBezierTo(
-        center + 2,
-        size.height * 0.82,
-        center + 7,
-        size.height * 0.93,
-      );
-    canvas.drawPath(flourish, ink);
+    final quill = Path()
+      ..moveTo(16, 29)
+      ..quadraticBezierTo(25, 17, 36, 7)
+      ..quadraticBezierTo(35, 16, 27, 21)
+      ..quadraticBezierTo(22, 25, 16, 29)
+      ..moveTo(18, 27)
+      ..lineTo(34, 9)
+      ..moveTo(28, 15)
+      ..lineTo(33, 15)
+      ..moveTo(24, 20)
+      ..lineTo(29, 20);
+    canvas.drawPath(quill, ink..strokeWidth = 1.15);
   }
 
   @override
-  bool shouldRepaint(covariant _ManuscriptOrnamentPainter oldDelegate) =>
+  bool shouldRepaint(covariant LiteraryPageQuillPainter oldDelegate) =>
       oldDelegate.color != color;
 }

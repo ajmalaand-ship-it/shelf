@@ -228,6 +228,7 @@ class _PoemBody extends StatelessWidget {
                   PoetryText(
                     text: poem.readableText,
                     layoutMode: poem.layoutMode,
+                    presentationSpacing: poem.presentationSpacing,
                     style: TextStyle(
                       color: colors.foreground,
                       fontFamily: settings.fontFamily,
