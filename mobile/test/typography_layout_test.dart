@@ -79,6 +79,40 @@ void main() {
     },
   );
 
+  test(
+    'couplet uses one half-line gap with or without one blank separator',
+    () {
+      for (final source in ['۱\n۲\n۳\n۴', '۱\n۲\n\n۳\n۴']) {
+        final blocks = coupletDisplayBlocks(source);
+        expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
+        expect(blocks.map((block) => block.gapAfterLines), [0.5, 0]);
+      }
+    },
+  );
+
+  test('couplet keeps deliberate larger section breaks visible', () {
+    final blocks = coupletDisplayBlocks('۱\n۲\n\n\n۳\n۴');
+    expect(blocks.map((block) => block.text), ['۱\n۲', '۳\n۴']);
+    expect(blocks.map((block) => block.gapAfterLines), [1.5, 0]);
+  });
+
+  testWidgets('couplet gap is half of the typography line extent', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PoetryText(
+          text: '۱\n۲\n\n۳\n۴',
+          layoutMode: PoemLayoutMode.couplet,
+          style: TextStyle(fontSize: 20, height: 2),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byKey(const ValueKey<double>(0.5))).height, 20);
+    expect(find.text(''), findsNothing);
+  });
+
   testWidgets(
     'representative final heh and Pashto letters render unclipped in three fonts',
     (tester) async {

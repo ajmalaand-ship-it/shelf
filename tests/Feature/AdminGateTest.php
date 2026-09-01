@@ -377,6 +377,45 @@ class AdminGateTest extends TestCase
         $this->assertSame(Poem::LAYOUT_COUPLET, $poem->fresh()->layout_mode);
     }
 
+    public function test_poetry_preview_reacts_to_presentation_without_modifying_saved_unicode_body(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'poetry-preview']);
+        $body = "د زړه کرښه — «همداسې»\nدويمه کرښه\n\nدرېيمه کرښه\nڅلورمه کرښه";
+
+        Livewire::test(CreatePoem::class)
+            ->fillForm([
+                'collection_id' => $collection->id,
+                'title' => null,
+                'body' => $body,
+                'excerpt' => 'لنډ',
+                'layout_mode' => Poem::LAYOUT_COUPLET,
+                'source_date_place' => 'کابل — ۱۳۶۰',
+                'sort_order' => 1,
+            ])
+            ->assertSeeHtml('data-testid="poem-presentation-preview"')
+            ->assertSeeHtml('data-testid="preview-untitled-marker"')
+            ->assertSee('Ghazal / 2-line bayts — subtle half-line gap')
+            ->assertSee('کابل — ۱۳۶۰')
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $poem = Poem::where('collection_id', $collection->id)->firstOrFail();
+        $this->assertNull($poem->title);
+        $this->assertSame($body, $poem->body);
+        $this->assertSame(Poem::LAYOUT_COUPLET, $poem->layout_mode);
+
+        $preview = view('filament.poem-presentation-preview', [
+            'title' => null,
+            'body' => $body,
+            'layoutMode' => Poem::LAYOUT_COUPLET,
+            'datePlace' => 'کابل — ۱۳۶۰',
+        ])->render();
+        $this->assertLessThan(strpos($preview, 'data-testid="preview-body"'), strpos($preview, 'data-testid="preview-untitled-marker"'));
+        $this->assertLessThan(strpos($preview, 'data-testid="preview-date-place"'), strpos($preview, 'data-testid="preview-body"'));
+    }
+
     public function test_owner_navigation_prominently_names_books_and_poems(): void
     {
         $this->assertSame('Collections / کتابونه', CollectionResource::getNavigationLabel());
