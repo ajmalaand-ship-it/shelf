@@ -261,6 +261,35 @@ void main() {
     },
   );
 
+  testWidgets('literary untitled marker remains subtle in every theme', (
+    tester,
+  ) async {
+    final readerSettings = await settings();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PoemReaderScreen(
+          poemId: 301,
+          contentVersion: 7,
+          repository: fixtureRepository(),
+          settings: readerSettings,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (final palette in ReaderPalette.values) {
+      await readerSettings.setPalette(palette);
+      await tester.pump();
+      expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('بې نومه شعر؛ اصلي سرليک نه لري'),
+        findsOneWidget,
+      );
+      expect(find.text('بې سرليکه'), findsNothing);
+      expect(tester.takeException(), isNull, reason: palette.name);
+    }
+  });
+
   testWidgets('reader font controls title and body and date follows body', (
     tester,
   ) async {

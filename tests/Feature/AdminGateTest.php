@@ -5,12 +5,14 @@ namespace Tests\Feature;
 use App\Filament\Resources\AppSettings\AppSettingResource;
 use App\Filament\Resources\AppSettings\Pages\EditAppSetting;
 use App\Filament\Resources\AppSettings\Pages\ListAppSettings;
+use App\Filament\Resources\Collections\CollectionResource;
 use App\Filament\Resources\Collections\Pages\CreateCollection;
 use App\Filament\Resources\Collections\Pages\EditCollection;
 use App\Filament\Resources\Collections\Pages\ListCollections;
 use App\Filament\Resources\Poems\Pages\CreatePoem;
 use App\Filament\Resources\Poems\Pages\EditPoem;
 use App\Filament\Resources\Poems\Pages\ListPoems;
+use App\Filament\Resources\Poems\PoemResource;
 use App\Models\AppSetting;
 use App\Models\Collection;
 use App\Models\Poem;
@@ -373,5 +375,169 @@ class AdminGateTest extends TestCase
             ->call('save')
             ->assertHasFormErrors(['layout_mode']);
         $this->assertSame(Poem::LAYOUT_COUPLET, $poem->fresh()->layout_mode);
+    }
+
+    public function test_owner_navigation_prominently_names_books_and_poems(): void
+    {
+        $this->assertSame('Collections / کتابونه', CollectionResource::getNavigationLabel());
+        $this->assertSame('Poems / شعرونه', PoemResource::getNavigationLabel());
+        $this->assertSame('Poetry Library / شعري کتابتون', CollectionResource::getNavigationGroup());
+        $this->assertSame('Poetry Library / شعري کتابتون', PoemResource::getNavigationGroup());
+    }
+
+    public function test_collection_actions_open_filtered_poems_and_prefilled_poem_creation(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'owner-navigation']);
+        $manageUrl = PoemResource::getUrl('index', [
+            'filters' => ['collection' => ['value' => $collection->getKey()]],
+        ]);
+        $createUrl = PoemResource::getUrl('create', ['collection_id' => $collection->getKey()]);
+
+        Livewire::test(ListCollections::class)
+            ->assertTableActionHasUrl('managePoems', $manageUrl, $collection)
+            ->assertTableActionHasUrl('addPoem', $createUrl, $collection);
+
+        Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
+            ->assertActionHasUrl('managePoems', $manageUrl)
+            ->assertActionHasUrl('addPoem', $createUrl);
+
+        Livewire::withQueryParams(['collection_id' => $collection->getKey()])
+            ->test(CreatePoem::class)
+            ->assertFormSet(['collection_id' => $collection->getKey()]);
+
+        $included = Poem::create([
+            'collection_id' => $collection->id,
+            'body' => 'د همدې کتاب شعر',
+            'excerpt' => 'لنډ',
+        ]);
+        $otherCollection = Collection::create(['title' => 'OTHER', 'slug' => 'other-navigation']);
+        $excluded = Poem::create([
+            'collection_id' => $otherCollection->id,
+            'body' => 'د بل کتاب شعر',
+            'excerpt' => 'لنډ',
+        ]);
+
+        Livewire::withQueryParams([
+            'filters' => ['collection' => ['value' => $collection->getKey()]],
+        ])->test(ListPoems::class)
+            ->assertCanSeeTableRecords([$included])
+            ->assertCanNotSeeTableRecords([$excluded]);
+    }
+
+    public function test_poem_edit_links_back_to_its_collection(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'poem-back-link']);
+        $poem = Poem::create([
+            'collection_id' => $collection->id,
+            'body' => 'متن',
+            'excerpt' => 'لنډ متن',
+        ]);
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->assertActionHasUrl('editCollection', CollectionResource::getUrl('edit', ['record' => $collection]));
+    }
+
+    public function test_translation_requires_truthful_attribution_but_original_does_not(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'translation-validation']);
+
+        Livewire::test(CreatePoem::class)
+            ->fillForm([
+                'collection_id' => $collection->id,
+                'title' => null,
+                'body' => "لومړۍ کرښه\nدويمه کرښه",
+                'excerpt' => 'لومړۍ کرښه',
+                'work_type' => 'TRANSLATION',
+                'original_author' => null,
+                'translator' => null,
+                'sort_order' => 1,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['original_author', 'translator']);
+
+        Livewire::test(CreatePoem::class)
+            ->fillForm([
+                'collection_id' => $collection->id,
+                'title' => null,
+                'body' => "لومړۍ کرښه\nدويمه کرښه",
+                'excerpt' => 'لومړۍ کرښه',
+                'work_type' => 'ORIGINAL',
+                'sort_order' => 1,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $poem = Poem::where('collection_id', $collection->id)->firstOrFail();
+        $this->assertNull($poem->title);
+        $this->assertNull($poem->original_author);
+        $this->assertNull($poem->translator);
+    }
+
+    public function test_untitled_admin_label_uses_first_non_empty_line_without_storing_title(): void
+    {
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'untitled-admin']);
+        $poem = Poem::create([
+            'collection_id' => $collection->id,
+            'title' => null,
+            'body' => "\n   \nد شعر لومړۍ رښتینې کرښه\nدويمه کرښه",
+            'excerpt' => 'لنډ متن',
+        ]);
+
+        $this->assertSame('د شعر لومړۍ رښتینې کرښه', $poem->admin_display_title);
+        $this->assertNull($poem->title);
+        $this->assertDatabaseHas('poems', ['id' => $poem->id, 'title' => null]);
+    }
+
+    public function test_filament_crud_continues_to_increment_content_version(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'version-admin']);
+        $version = (int) AppSetting::where('key', 'content_version')->value('value');
+
+        Livewire::test(CreatePoem::class)
+            ->fillForm([
+                'collection_id' => $collection->id,
+                'body' => 'متن',
+                'excerpt' => 'لنډ متن',
+                'sort_order' => 1,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $poem = Poem::where('collection_id', $collection->id)->firstOrFail();
+        $this->assertSame($version + 1, (int) AppSetting::where('key', 'content_version')->value('value'));
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->fillForm(['sort_order' => 2])
+            ->call('save')
+            ->assertHasNoFormErrors();
+        $this->assertSame($version + 2, (int) AppSetting::where('key', 'content_version')->value('value'));
+    }
+
+    public function test_owner_can_deliberately_delete_poems_and_empty_collections(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'delete-owner-flow']);
+        $poem = Poem::create([
+            'collection_id' => $collection->id,
+            'body' => 'د ړنګولو ازموينه',
+            'excerpt' => 'لنډ متن',
+        ]);
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->callAction('delete');
+        $this->assertDatabaseMissing('poems', ['id' => $poem->id]);
+
+        Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
+            ->callAction('delete');
+        $this->assertDatabaseMissing('collections', ['id' => $collection->id]);
     }
 }

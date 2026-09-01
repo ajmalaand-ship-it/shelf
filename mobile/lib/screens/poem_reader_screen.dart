@@ -8,6 +8,7 @@ import '../settings/reader_settings.dart';
 import '../settings/reading_preferences_sheet.dart';
 import '../share_cards/share_card_screen.dart';
 import '../widgets/poetry_text.dart';
+import '../widgets/untitled_poem_marker.dart';
 
 class PoemReaderScreen extends StatefulWidget {
   const PoemReaderScreen({
@@ -187,15 +188,7 @@ class _PoemBody extends StatelessWidget {
                       ),
                     )
                   else
-                    Semantics(
-                      label: 'بې نومه شعر',
-                      child: Icon(
-                        Icons.insert_drive_file_outlined,
-                        key: const Key('untitled-poem-indicator'),
-                        size: 24,
-                        color: colors.muted,
-                      ),
-                    ),
+                    Center(child: UntitledPoemMarker(color: colors.muted)),
                   if (poem.isTranslation) ...[
                     const SizedBox(height: 18),
                     Text(

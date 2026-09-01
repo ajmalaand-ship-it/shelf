@@ -22,8 +22,8 @@ class PoemsTable
         return $table
             ->columns([
                 TextColumn::make('sort_order')->label('Order')->sortable(),
-                TextColumn::make('admin_display_title')->label('Poem')
-                    ->description(fn (Poem $record): ?string => blank($record->title) ? 'Untitled — first line for administration only' : null)
+                TextColumn::make('admin_display_title')->label('Poem / شعر')
+                    ->description(fn (Poem $record): ?string => blank($record->title) ? 'No original title — first line shown for navigation only' : null)
                     ->wrap()
                     ->searchable(query: fn ($query, string $search) => $query->where(function ($query) use ($search): void {
                         $query->where('title', 'like', "%{$search}%")
@@ -32,6 +32,8 @@ class PoemsTable
                 TextColumn::make('collection.title')->label('Collection')->searchable()->sortable(),
                 TextColumn::make('work_type')->label('Work type')->badge()
                     ->color(fn (string $state): string => $state === 'TRANSLATION' ? 'info' : 'gray'),
+                TextColumn::make('layout_mode')->label('Layout')->badge()
+                    ->color('gray')->toggleable(),
                 IconColumn::make('is_active')->label('Published')->boolean(),
                 ToggleColumn::make('is_free_sample')->label('Free sample')
                     ->tooltip(fn (bool $state): string => $state ? 'Free sample' : 'Locked'),
@@ -40,8 +42,10 @@ class PoemsTable
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
+            ->paginationPageOptions([10, 25, 50, 100])
+            ->defaultPaginationPageOption(25)
             ->filters([
-                SelectFilter::make('collection')->relationship('collection', 'title')->searchable()->preload(),
+                SelectFilter::make('collection')->label('Collection / Book')->relationship('collection', 'title')->searchable()->preload(),
                 SelectFilter::make('work_type')->label('Work type')->options([
                     'ORIGINAL' => 'Original work',
                     'TRANSLATION' => 'Translation',
@@ -53,6 +57,11 @@ class PoemsTable
                 TernaryFilter::make('audio_path')->label('Audio')
                     ->trueLabel('Audio present')->falseLabel('Audio missing')->placeholder('All audio states')
                     ->nullable(),
+                SelectFilter::make('layout_mode')->label('Layout')->options([
+                    Poem::LAYOUT_SOURCE => 'SOURCE',
+                    Poem::LAYOUT_COUPLET => 'COUPLET',
+                    Poem::LAYOUT_FOUR_LINES => 'FOUR_LINES',
+                ]),
             ])
             ->recordActions([
                 Action::make('publish')->label('Publish')->color('success')

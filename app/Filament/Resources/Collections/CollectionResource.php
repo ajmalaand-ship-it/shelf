@@ -14,12 +14,23 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
+
+    protected static ?string $navigationLabel = 'Collections / کتابونه';
+
+    protected static ?string $modelLabel = 'collection / book';
+
+    protected static ?string $pluralModelLabel = 'Collections / کتابونه';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Poetry Library / شعري کتابتون';
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {

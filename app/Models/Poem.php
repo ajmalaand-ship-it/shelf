@@ -6,6 +6,7 @@ use Database\Factories\PoemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Poem extends Model
 {
@@ -51,7 +52,17 @@ class Poem extends Model
 
     public function getAdminDisplayTitleAttribute(): string
     {
-        return $this->title ?: str($this->body)->before("\n")->limit(80)->toString();
+        if (filled($this->title)) {
+            return $this->title;
+        }
+
+        foreach (preg_split('/\R/u', $this->body) ?: [] as $line) {
+            if (filled(trim($line))) {
+                return Str::limit(trim($line), 80);
+            }
+        }
+
+        return '';
     }
 
     public function audioCacheKey(): ?string

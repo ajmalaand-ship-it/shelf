@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Collections\Tables;
 
+use App\Filament\Resources\Poems\PoemResource;
 use App\Models\Collection;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -29,11 +30,21 @@ class CollectionsTable
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
+            ->paginationPageOptions([10, 25, 50, 100])
+            ->defaultPaginationPageOption(25)
             ->filters([
                 TernaryFilter::make('is_active')->label('Publication')
                     ->trueLabel('Published')->falseLabel('Draft')->placeholder('All publication states'),
             ])
             ->recordActions([
+                Action::make('managePoems')->label('Manage poems')->icon('heroicon-o-document-text')
+                    ->url(fn (Collection $record): string => PoemResource::getUrl('index', [
+                        'filters' => ['collection' => ['value' => $record->getKey()]],
+                    ])),
+                Action::make('addPoem')->label('Add poem')->icon('heroicon-o-document-plus')
+                    ->url(fn (Collection $record): string => PoemResource::getUrl('create', [
+                        'collection_id' => $record->getKey(),
+                    ])),
                 Action::make('publish')->label('Publish')->color('success')
                     ->visible(fn (Collection $record): bool => ! $record->is_active)
                     ->requiresConfirmation()

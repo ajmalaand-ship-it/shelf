@@ -13,12 +13,23 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class PoemResource extends Resource
 {
     protected static ?string $model = Poem::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+
+    protected static ?string $navigationLabel = 'Poems / شعرونه';
+
+    protected static ?string $modelLabel = 'poem';
+
+    protected static ?string $pluralModelLabel = 'Poems / شعرونه';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Poetry Library / شعري کتابتون';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
