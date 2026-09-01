@@ -17,7 +17,6 @@ use App\Models\AppSetting;
 use App\Models\Collection;
 use App\Models\Poem;
 use App\Models\User;
-use App\Support\PoetryEditorDocument;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -188,7 +187,7 @@ class AdminGateTest extends TestCase
         $body = "لومړۍ کرښه\nدويمه کرښه\n\nدويم بند";
         Livewire::test(CreatePoem::class)
             ->fillForm([
-                'collection_id' => $collection->id, 'title' => 'TEST ONLY شعر', 'body' => PoetryEditorDocument::toEditorHtml($body),
+                'collection_id' => $collection->id, 'title' => 'TEST ONLY شعر', 'body' => $body,
                 'excerpt' => 'TEST ONLY',
                 'work_type' => 'TRANSLATION', 'original_author' => 'پروین پژواک', 'translator' => 'اجمل اند',
                 'audio_path' => [UploadedFile::fake()->create('voice.m4a', 20, 'audio/mp4')],
@@ -360,7 +359,7 @@ class AdminGateTest extends TestCase
         Livewire::test(CreatePoem::class)
             ->fillForm([
                 'collection_id' => $collection->id,
-                'body' => PoetryEditorDocument::toEditorHtml("لومړۍ\nدويمه"),
+                'body' => "لومړۍ\nدويمه",
                 'excerpt' => 'لنډ',
                 'sort_order' => 1,
             ])
@@ -383,19 +382,18 @@ class AdminGateTest extends TestCase
         $this->assertSame(Poem::LAYOUT_COUPLET, $poem->fresh()->layout_mode);
     }
 
-    public function test_poetry_editor_serializes_lines_and_paragraphs_without_modifying_unicode(): void
+    public function test_plain_poetry_editor_preserves_lines_paragraphs_and_dormant_spacing_column(): void
     {
         $this->actingAs(User::factory()->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'poetry-preview']);
         $body = "د زړه کرښه — «همداسې»\nدويمه کرښه\n\nدرېيمه کرښه\nڅلورمه کرښه";
-        $editorHtml = '<p>د زړه کرښه — «همداسې»<br>دويمه کرښه</p><p>درېيمه کرښه<br>څلورمه کرښه</p>';
 
         Livewire::test(CreatePoem::class)
             ->fillForm([
                 'collection_id' => $collection->id,
                 'title' => null,
-                'body' => $editorHtml,
+                'body' => $body,
                 'excerpt' => 'لنډ',
                 'source_date_place' => 'کابل — ۱۳۶۰',
                 'sort_order' => 1,
@@ -413,8 +411,7 @@ class AdminGateTest extends TestCase
         $this->assertNull($poem->title);
         $this->assertSame($body, $poem->body);
         $this->assertSame(Poem::LAYOUT_SOURCE, $poem->layout_mode);
-        $this->assertStringNotContainsString('<p>', $poem->body);
-        $this->assertStringNotContainsString('<br', $poem->body);
+        $this->assertNull($poem->getRawOriginal('presentation_spacing'));
 
         $preview = view('filament.poem-presentation-preview', [
             'title' => null,
@@ -426,7 +423,8 @@ class AdminGateTest extends TestCase
         $this->assertLessThan(strpos($preview, 'data-testid="preview-date-place"'), strpos($preview, 'data-testid="preview-body"'));
 
         Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
-            ->assertFormSet(['body' => $editorHtml])
+            ->assertFormSet(['body' => $body])
+            ->assertDontSee('Shift+Enter')
             ->call('save')
             ->assertHasNoFormErrors();
         $this->assertSame($body, $poem->fresh()->body);
@@ -506,7 +504,7 @@ class AdminGateTest extends TestCase
             ->fillForm([
                 'collection_id' => $collection->id,
                 'title' => null,
-                'body' => PoetryEditorDocument::toEditorHtml("لومړۍ کرښه\nدويمه کرښه"),
+                'body' => "لومړۍ کرښه\nدويمه کرښه",
                 'excerpt' => 'لومړۍ کرښه',
                 'work_type' => 'TRANSLATION',
                 'original_author' => null,
@@ -520,7 +518,7 @@ class AdminGateTest extends TestCase
             ->fillForm([
                 'collection_id' => $collection->id,
                 'title' => null,
-                'body' => PoetryEditorDocument::toEditorHtml("لومړۍ کرښه\nدويمه کرښه"),
+                'body' => "لومړۍ کرښه\nدويمه کرښه",
                 'excerpt' => 'لومړۍ کرښه',
                 'work_type' => 'ORIGINAL',
                 'sort_order' => 1,

@@ -1,20 +1,17 @@
-# PC Simple Poetry Editor — SYSC-PC-POETRY-EDITOR-04
+# PC Simple Paragraph Spacing — SYSC-PC-PARAGRAPH-SPACING-04A
 
 **Stage:** PC — Product Completion & Owner Acceptance
 
 ## One owner workflow
 
-The poem editor is a deliberately minimal authenticated Filament rich editor.
-Its only toolbar actions are Undo and Redo. Shift+Enter creates the next poetic
-line inside the current paragraph; Enter creates a new bayt/paragraph. The live
-preview shows those same RTL lines, paragraph gaps, true title state, and
-date/place at the bottom.
+The poem editor is an ordinary authenticated Filament plain-text textarea.
+Enter creates one source newline. Leaving one empty line (pressing Enter twice)
+creates a paragraph/block boundary. The live preview shows the same RTL lines,
+paragraph gaps, true title state, and date/place at the bottom. There is no
+special key command, rich-text document, or line-by-line spacing control.
 
-The rich editor document exists only in the browser/form state. On save,
-`<br>` becomes one newline and adjacent paragraph nodes are joined by two
-newlines. `poems.body` remains plain Unicode `LONGTEXT`; HTML and Tiptap JSON are
-never canonical poem storage. Loading performs the inverse conversion, so one
-newline becomes a hard line break and two newlines become a paragraph boundary.
+`poems.body` remains plain Unicode `LONGTEXT`. The form loads and saves the text
+directly, preserving words, punctuation, Unicode, and source newlines exactly.
 
 ## Reader presentation
 

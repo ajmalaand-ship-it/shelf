@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Poems\Pages;
 use App\Filament\Resources\Collections\CollectionResource;
 use App\Filament\Resources\Poems\PoemResource;
 use App\Support\AudioDurationProbe;
-use App\Support\PoetryEditorDocument;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -13,13 +12,6 @@ use Filament\Resources\Pages\EditRecord;
 class EditPoem extends EditRecord
 {
     protected static string $resource = PoemResource::class;
-
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        $data['body'] = PoetryEditorDocument::toEditorHtml($data['body'] ?? '');
-
-        return $data;
-    }
 
     protected function getHeaderActions(): array
     {

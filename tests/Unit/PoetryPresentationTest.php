@@ -3,26 +3,17 @@
 namespace Tests\Unit;
 
 use App\Models\Poem;
-use App\Support\PoetryEditorDocument;
 use App\Support\PoetryPresentation;
 use PHPUnit\Framework\TestCase;
 
 class PoetryPresentationTest extends TestCase
 {
-    public function test_editor_round_trips_plain_unicode_lines_and_paragraphs(): void
+    public function test_plain_unicode_body_is_not_modified_by_presentation(): void
     {
         $body = "لومړۍ — «کرښه»\nدويمه\n\nدرېيمه\nڅلورمه";
-        $html = PoetryEditorDocument::toEditorHtml($body);
+        $blocks = PoetryPresentation::blocks($body, Poem::LAYOUT_SOURCE);
 
-        $this->assertSame('<p>لومړۍ — «کرښه»<br>دويمه</p><p>درېيمه<br>څلورمه</p>', $html);
-        $this->assertSame($body, PoetryEditorDocument::toPlainText($html));
-        $this->assertStringNotContainsString('<', PoetryEditorDocument::toPlainText($html));
-    }
-
-    public function test_enter_and_shift_enter_have_deterministic_plain_text_meanings(): void
-    {
-        $this->assertSame("لومړۍ\nدويمه", PoetryEditorDocument::toPlainText('<p>لومړۍ<br>دويمه</p>'));
-        $this->assertSame("لومړۍ\n\nدويمه", PoetryEditorDocument::toPlainText('<p>لومړۍ</p><p>دويمه</p>'));
+        $this->assertSame($body, $blocks[0]['text']."\n\n".$blocks[1]['text']);
     }
 
     public function test_paragraph_boundaries_are_explicit_half_em_gaps_not_empty_rows(): void

@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\Poems\Schemas;
 
 use App\Models\Poem;
-use App\Support\PoetryEditorDocument;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -30,11 +28,9 @@ class PoemForm
                             ->default(fn (): ?int => request()->integer('collection_id') ?: null),
                         TextInput::make('title')->label('Original poem title')->maxLength(255)->live(debounce: 400)
                             ->helperText('Optional. Leave blank when the poem has no original title; the first line is never saved as a title.'),
-                        RichEditor::make('body')->label('Poem text / د شعر متن')->required()->live(debounce: 400)
-                            ->toolbarButtons([['undo', 'redo']])
-                            ->dehydrateStateUsing(fn (?string $state): string => PoetryEditorDocument::toPlainText($state))
-                            ->helperText('Shift+Enter = next poetry line / بله شعري کرښه · Enter = new bayt or paragraph / نوی بیت یا پراګراف')
-                            ->extraAttributes(['dir' => 'rtl', 'data-testid' => 'poetry-structure-editor'])
+                        Textarea::make('body')->label('Poem text / د شعر متن')->required()->rows(20)->live(debounce: 400)
+                            ->helperText('Enter = next line. Leave one empty line where you want a small space between parts of the poem. / د شعر د برخو ترمنځ د لږ واټن لپاره يوه تشه کرښه پرېږدئ.')
+                            ->extraInputAttributes(['dir' => 'rtl', 'data-testid' => 'poetry-text-editor'])
                             ->columnSpanFull(),
                     ]),
                 Section::make('Source / Literary metadata')
@@ -60,7 +56,7 @@ class PoemForm
                         View::make('filament.poem-presentation-preview')
                             ->viewData(fn (Get $get): array => [
                                 'title' => $get('title'),
-                                'body' => PoetryEditorDocument::toPlainText($get('body')),
+                                'body' => $get('body'),
                                 'layoutMode' => $get('layout_mode'),
                                 'datePlace' => $get('source_date_place'),
                             ])->columnSpanFull(),
