@@ -118,3 +118,20 @@ approved transcription; decide the treatment of `سيند په پرخه کې`; r
 free-sample decisions; complete missing covers, front matter, and metadata;
 preserve truthful translation attribution; and verify the off-server source
 archive. PC-B implementation has not started. P6 remains **NOT STARTED**.
+
+## 19. PC-D-002 complete catalogue scope
+
+On September 1, 2026, Ajmal decided that all six identified books belong in
+the intended complete پېڅوَل catalogue: five Ajmal Aand original-poetry
+collections and the separate translation book `سيند په پرخه کې`. The
+translation book contains selected poems by original poet پروین پژواک,
+translated into Pashto by Ajmal Aand, and must never be represented as Ajmal's
+original-authored poetry.
+
+This resolves catalogue scope but does not relax source fidelity. The first two
+collections are imported as 148 draft poems. The other four remain
+source-blocked after the SYSC-CATALOGUE-COMPLETE-02 audit because their
+preserved scanned/legacy PDFs do not provide complete authoritative Unicode
+text and deterministic poem structure. They require better Unicode/editable
+sources or owner-approved manual transcription and proofreading. No OCR-based
+or guessed import is authorized. PC remains active; P6 remains not started.

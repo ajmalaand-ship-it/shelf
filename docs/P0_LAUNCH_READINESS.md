@@ -42,7 +42,12 @@ collection was changed. Broader catalogue completion remains open.
 
 These are source-quality limitations, not application or test defects. Their protected sources and recovery evidence remain in System C backups. Recovery should resume only from better Unicode sources or a separately approved transcription/proofreading project; automated OCR is not to be rerun by default.
 
-`سيند په پرخه کې` remains **SEPARATE TRANSLATION WORK — SOURCE PRESERVED — NOT YET IMPORTED**. Original poet: پروین پژواک. Pashto translator: اجمل اند. It is not part of the original-poetry catalogue.
+**September 1, 2026 scope supersession:** PC-D-002 includes `سيند په پرخه
+کې` in the intended complete پېڅوَل catalogue as a separate translation book.
+It remains distinct from the five original-poetry collections. Original poet:
+پروین پژواک. Pashto translator: Ajmal Aand. Its preserved scanned PDFs are not
+safe authoritative Unicode sources, so it remains source-blocked and not yet
+imported.
 
 ## Gate status
 
