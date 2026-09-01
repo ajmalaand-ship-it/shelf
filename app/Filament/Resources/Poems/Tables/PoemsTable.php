@@ -32,8 +32,6 @@ class PoemsTable
                 TextColumn::make('collection.title')->label('Collection')->searchable()->sortable(),
                 TextColumn::make('work_type')->label('Work type')->badge()
                     ->color(fn (string $state): string => $state === 'TRANSLATION' ? 'info' : 'gray'),
-                TextColumn::make('layout_mode')->label('Layout')->badge()
-                    ->color('gray')->toggleable(),
                 IconColumn::make('is_active')->label('Published')->boolean(),
                 ToggleColumn::make('is_free_sample')->label('Free sample')
                     ->tooltip(fn (bool $state): string => $state ? 'Free sample' : 'Locked'),
@@ -57,11 +55,6 @@ class PoemsTable
                 TernaryFilter::make('audio_path')->label('Audio')
                     ->trueLabel('Audio present')->falseLabel('Audio missing')->placeholder('All audio states')
                     ->nullable(),
-                SelectFilter::make('layout_mode')->label('Layout')->options([
-                    Poem::LAYOUT_SOURCE => 'SOURCE',
-                    Poem::LAYOUT_COUPLET => 'COUPLET',
-                    Poem::LAYOUT_FOUR_LINES => 'FOUR_LINES',
-                ]),
             ])
             ->recordActions([
                 Action::make('publish')->label('Publish')->color('success')

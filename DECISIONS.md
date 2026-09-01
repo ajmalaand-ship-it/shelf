@@ -30,7 +30,9 @@ Ajmal Aand's recorded voice is primary. AI voice is excluded from Version 1, and
 
 The approved P0/P2 reader baseline is Noto Nastaliq Urdu for primary poem text and Scheherazade New as the Naskh/alternate font. Reading themes are Light, Sepia, and Dark. Poem reading uses explicit RTL, owner-adjustable font size, and approximately 2.2 line height. The economical Nastaliq/Naskh toggle is included in the owner-authorized P2 implementation.
 
-**PC supersession (August 30, 2026):** Real unpublished content review supersedes the P0/P2 font default without invalidating those technical gates. Vazirmatn 33.003 is now the default UI and reading foundation; Scheherazade New 4.500 remains the traditional Naskh option; Noto Nastaliq Urdu remains an optional literary face. One shared persistent control is available from Home and Reader. Per-poem `SOURCE`, `COUPLET`, and `FOUR_LINES` presentation metadata controls display spacing without changing authored text. Details and licensing evidence are recorded in `docs/PC_TYPOGRAPHY.md`.
+**PC supersession (August 30, 2026):** Real unpublished content review supersedes the P0/P2 font default without invalidating those technical gates. Vazirmatn 33.003 is now the default UI and reading foundation; Scheherazade New 4.500 remains the traditional Naskh option; Noto Nastaliq Urdu remains an optional literary face. One shared persistent control is available from Home and Reader. Details and licensing evidence are recorded in `docs/PC_TYPOGRAPHY.md`.
+
+**Layout simplification (September 1, 2026):** Normal poetry presentation follows the stored source text and newlines only. The owner-facing `SOURCE`, `COUPLET`, and `FOUR_LINES` controls and automatic two-line/four-line gaps are removed. The `layout_mode` column and compatible API field remain dormant legacy schema/data; existing values are not rewritten and do not drive reader presentation.
 
 ## 8. P2 mobile reader architecture
 

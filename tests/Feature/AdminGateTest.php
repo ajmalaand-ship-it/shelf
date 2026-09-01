@@ -356,31 +356,31 @@ class AdminGateTest extends TestCase
         $this->assertSame(1, $collection->poems()->where('is_active', true)->count());
     }
 
-    public function test_owner_can_select_poem_layout_and_invalid_value_is_rejected(): void
+    public function test_poem_form_hides_legacy_layout_and_keeps_order_in_book(): void
     {
         $this->actingAs(User::factory()->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
-        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'layout-owner']);
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'simple-layout-owner']);
 
         Livewire::test(CreatePoem::class)
+            ->assertFormFieldDoesNotExist('layout_mode')
+            ->assertFormFieldExists('sort_order')
             ->fillForm([
                 'collection_id' => $collection->id,
                 'body' => "لومړۍ\nدويمه",
                 'excerpt' => 'لنډ',
-                'layout_mode' => Poem::LAYOUT_COUPLET,
                 'sort_order' => 1,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $poem = Poem::where('collection_id', $collection->id)->firstOrFail();
-        $this->assertSame(Poem::LAYOUT_COUPLET, $poem->layout_mode);
+        $this->assertSame(Poem::LAYOUT_SOURCE, $poem->layout_mode);
+        $this->assertSame(1, $poem->sort_order);
 
         Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
-            ->fillForm(['layout_mode' => 'GUESSED_BY_AI'])
-            ->call('save')
-            ->assertHasFormErrors(['layout_mode']);
-        $this->assertSame(Poem::LAYOUT_COUPLET, $poem->fresh()->layout_mode);
+            ->assertFormFieldDoesNotExist('layout_mode')
+            ->assertFormFieldExists('sort_order');
     }
 
     public function test_owner_navigation_prominently_names_books_and_poems(): void

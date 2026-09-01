@@ -34,16 +34,14 @@ The broken-looking forms are therefore a font-design/contextual-glyph appearance
   value does not rewrite the preference key.
 - General UI and metadata remain Vazirmatn for consistency and usable real weights. The selected reading family applies to poem text, poem titles, and share-card poetry.
 - Reader titles are larger and separated from secondary translation/date/place/status metadata. The existing source date/place value is displayed only when stored; missing first-collection values remain PC-B work.
-- `SOURCE` preserves source newlines and blank stanza boundaries with no automatic grouping.
-- `COUPLET` adds a half-line visual gap after each two non-blank source lines.
-- `FOUR_LINES` adds a half-line visual gap after each four non-blank source lines.
-- Grouping is renderer-only; it never inserts whitespace into the stored poem body.
+- Normal reader presentation preserves source newlines and blank boundaries with no automatic grouping or added spacing.
+- The former `SOURCE`, `COUPLET`, and `FOUR_LINES` owner controls were superseded by SYSC-PC-LAYOUT-SIMPLIFY-06. Their legacy schema/API values remain compatible but no longer drive reader presentation.
 - The reader uses 12 logical pixels of horizontal padding on each side and the
   available device width up to the existing 720-pixel readability cap. Source
   newlines remain authoritative; lines are never merged or edited. A line that
   still cannot fit wraps naturally inside the viewport without clipping or
   horizontal overflow.
-- Existing poems migrate safely to `SOURCE`. Filament provides an owner-controlled presentation selector.
+- Existing poem bodies and legacy layout values remain unchanged. Filament no longer exposes a presentation selector.
 - Poem and collection create/update/delete events now invalidate `content_version`, including order, publication, free/locked and layout changes.
 
 ## Real-content QA matrix

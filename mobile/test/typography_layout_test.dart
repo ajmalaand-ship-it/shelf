@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pitswal/app.dart';
-import 'package:pitswal/models/poem.dart';
 import 'package:pitswal/settings/reader_settings.dart';
 import 'package:pitswal/widgets/poetry_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,24 +68,14 @@ void main() {
     }
   });
 
-  test(
-    'visual grouping preserves exact lines and authored blank separators',
-    () {
-      const source = '۱\n۲\n\n۳\n۴\n۵\n۶';
-      expect(poetryDisplayGroups(source, 2), ['۱\n۲', '', '۳\n۴', '۵\n۶']);
-      expect(poetryDisplayGroups(source, 4), ['۱\n۲', '', '۳\n۴\n۵\n۶']);
-      expect(poetryDisplayGroups(source, 2).join('\n'), source);
-    },
-  );
-
-  testWidgets('repeated structural pattern has no duplicate paragraph keys', (
+  testWidgets('reader preserves source newlines without automatic grouping', (
     tester,
   ) async {
+    const source = '۱\n۲\n\n۳\n۴\n۵\n۶';
     await tester.pumpWidget(
       const MaterialApp(
         home: PoetryText(
-          text: '۱\n۲\n\n۳\n۴\n\n۵\n۶',
-          layoutMode: PoemLayoutMode.source,
+          text: source,
           style: TextStyle(fontSize: 20, height: 2.2),
         ),
       ),
@@ -94,7 +83,8 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byKey(const Key('poem-body')), findsOneWidget);
-    expect(find.byKey(const Key('paragraph-gap-0.5em')), findsNothing);
+    expect(find.text(source), findsOneWidget);
+    expect(find.byType(SizedBox), findsNothing);
   });
 
   testWidgets(
@@ -111,7 +101,6 @@ void main() {
             home: Scaffold(
               body: PoetryText(
                 text: sample,
-                layoutMode: PoemLayoutMode.source,
                 style: TextStyle(fontFamily: family, fontSize: 28, height: 2),
               ),
             ),

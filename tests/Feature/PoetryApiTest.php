@@ -201,7 +201,7 @@ class PoetryApiTest extends TestCase
             ->assertJsonMissingPath('data.source_path');
     }
 
-    public function test_layout_mode_is_validated_by_owner_form_and_returned_without_changing_body(): void
+    public function test_legacy_layout_mode_remains_api_compatible_without_changing_body(): void
     {
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'layout-api', 'is_active' => true]);
         $body = "لومړۍ کرښه\nدويمه کرښه\n\nڅلورمه کرښه";

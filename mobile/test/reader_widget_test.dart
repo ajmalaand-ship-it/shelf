@@ -49,7 +49,7 @@ void main() {
   });
 
   testWidgets(
-    'reader preserves free verse, stanza breaks, and long scrolling',
+    'reader ignores legacy layout mode and preserves source newlines',
     (tester) async {
       tester.view.physicalSize = const Size(360, 640);
       tester.view.devicePixelRatio = 1;
@@ -68,7 +68,11 @@ void main() {
             (_) async => http.Response.bytes(
               utf8.encode(
                 jsonEncode({
-                  'data': poemDetailJson(title: poemTitle, body: longBody),
+                  'data': poemDetailJson(
+                    title: poemTitle,
+                    body: longBody,
+                    layoutMode: 'COUPLET',
+                  ),
                 }),
               ),
               200,
@@ -96,6 +100,7 @@ void main() {
       );
       expect(text.data, longBody);
       expect(text.data, contains('\n\nنوی بند'));
+      expect(find.byKey(const Key('poem-body')), findsOneWidget);
       expect(text.textDirection, TextDirection.rtl);
       expect(text.style!.fontSize, 38);
       expect(find.byKey(const Key('poem-scroll-view')), findsOneWidget);

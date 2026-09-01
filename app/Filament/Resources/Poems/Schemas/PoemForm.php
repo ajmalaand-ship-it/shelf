@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Poems\Schemas;
 
-use App\Models\Poem;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -29,6 +28,7 @@ class PoemForm
                             ->helperText('Optional. Leave blank when the poem has no original title; the first line is never saved as a title.'),
                         Textarea::make('body')->label('Poem text')->required()->rows(20)
                             ->extraInputAttributes(['dir' => 'rtl'])->columnSpanFull(),
+                        TextInput::make('sort_order')->label('Order in book')->numeric()->minValue(0)->required()->default(0),
                     ]),
                 Section::make('Source / Literary metadata')
                     ->columns(2)
@@ -38,17 +38,6 @@ class PoemForm
                             ->columnSpanFull(),
                         Textarea::make('source_note')->label('Source note')->rows(3)
                             ->extraInputAttributes(['dir' => 'rtl'])->columnSpanFull(),
-                    ]),
-                Section::make('Presentation / ښودنه')
-                    ->columns(2)
-                    ->schema([
-                        Select::make('layout_mode')->label('Poetry layout')->options([
-                            Poem::LAYOUT_SOURCE => 'SOURCE — preserve authored spacing',
-                            Poem::LAYOUT_COUPLET => 'COUPLET — gap after every 2 lines',
-                            Poem::LAYOUT_FOUR_LINES => 'FOUR_LINES — gap after every 4 lines',
-                        ])->required()->default(Poem::LAYOUT_SOURCE)
-                            ->helperText('Display only. This never changes the stored poem text.'),
-                        TextInput::make('sort_order')->label('Order in book')->numeric()->minValue(0)->required()->default(0),
                     ]),
                 Section::make('Access / Publication')
                     ->description('Draft/published and free/locked are separate decisions.')

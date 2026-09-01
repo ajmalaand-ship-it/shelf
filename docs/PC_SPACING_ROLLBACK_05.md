@@ -11,9 +11,12 @@ The product has returned to the stable `SYSC-PC-OWNER-ADMIN-01` behavior:
 - the Admin poem body is an ordinary plain Unicode textarea;
 - no spacing preview, manual spacing controls, rich editor, special key
   commands, or paragraph parser are present;
-- SOURCE, COUPLET, and FOUR_LINES render exactly as they did at the stable
-  owner-admin baseline;
 - source text and existing blank lines are preserved without reinterpretation.
+
+SYSC-PC-LAYOUT-SIMPLIFY-06 subsequently removed the owner-facing `SOURCE`,
+`COUPLET`, and `FOUR_LINES` controls and their automatic two-line/four-line
+rendering. The legacy `layout_mode` schema/API value remains unchanged but is
+ignored by normal reading presentation.
 
 The already-applied nullable `poems.presentation_spacing` column remains as
 dormant legacy schema. Normal application code does not read, write, or expose
