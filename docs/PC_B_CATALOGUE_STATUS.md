@@ -129,6 +129,24 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
 
 ### سيند په پرخه کې
 
+#### Private artwork inventory — 2026-09-02
+
+- Owner artwork sources were received as two page-image DOCX packages plus an
+  original cover and preserved under the protected System C source folder
+  `storage/app/source/collections/sind-pa-parkha-ke/`.
+- Ajmal confirmed that he has permission to use the artwork from this book in
+  the app.
+- The artwork-only inventory and private owner-review package were prepared
+  from all 44 ordered embedded spread images (88 visible book pages). No OCR
+  was used and no poetry text was imported.
+- Protected owner package:
+  `/home/ajmalaand/backups/poetry/owner-downloads/sind-pa-parkha-ke-artwork-review-pack-20260902-030149.zip`
+  (SHA-256
+  `1bdd04743c24a65784ce95324920577f8f8d0d5b07d457c4af725c4edb0ea2ac`).
+- The DOCX sources remain image/page based and are not considered trustworthy
+  editable poem text. The book itself has not been imported and remains
+  source-blocked for text import.
+
 - Primary sources:
   `storage/app/source/catalogue-bundle-20260828/translations/sind_pa_parkha_ke_part1.pdf`
   and `sind_pa_parkha_ke_part2.pdf`.
