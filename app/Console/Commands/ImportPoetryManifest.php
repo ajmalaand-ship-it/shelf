@@ -7,6 +7,7 @@ use App\Models\Poem;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 class ImportPoetryManifest extends Command
@@ -28,6 +29,7 @@ class ImportPoetryManifest extends Command
 
         $manifest = json_decode(File::get($path), true, flags: JSON_THROW_ON_ERROR);
         $this->validateManifest($manifest);
+        $cover = $this->validatedCover($manifest['cover'] ?? null, $manifest['collection']);
 
         $collection = Collection::query()->where('title', $manifest['collection']['title'])->first();
         $poems = collect($manifest['poems']);
@@ -71,7 +73,11 @@ class ImportPoetryManifest extends Command
             return self::SUCCESS;
         }
 
-        DB::transaction(function () use (&$collection, $manifest, $poems): void {
+        DB::transaction(function () use (&$collection, $manifest, $poems, $cover): void {
+            if ($cover !== null && ! Storage::disk('covers')->exists($cover['target_path'])) {
+                Storage::disk('covers')->put($cover['target_path'], File::get($cover['source_path']));
+            }
+
             $collection = $collection
                 ? Collection::query()->lockForUpdate()->findOrFail($collection->id)
                 : Collection::create($this->collectionAttributes($manifest['collection']));
@@ -168,6 +174,7 @@ class ImportPoetryManifest extends Command
             'foreword_author' => $collection['foreword_author'] ?? null,
             'foreword' => $collection['foreword'] ?? null,
             'publication_info' => $collection['publication_info'] ?? null,
+            'cover_image' => $collection['cover_image'] ?? null,
             'sort_order' => $collection['catalogue_order'] ?? 0,
             'is_active' => false,
         ];
@@ -184,6 +191,7 @@ class ImportPoetryManifest extends Command
             'foreword_author' => 'foreword_author',
             'foreword' => 'foreword',
             'publication_info' => 'publication_info',
+            'cover_image' => 'cover_image',
             'catalogue_order' => 'sort_order',
         ];
         $expected = collect($mapping)
@@ -192,5 +200,37 @@ class ImportPoetryManifest extends Command
             ->put('is_active', false);
 
         return $expected->every(fn (mixed $value, string $key): bool => $collection->{$key} === $value);
+    }
+
+    private function validatedCover(?array $cover, array $collection): ?array
+    {
+        if ($cover === null) {
+            return null;
+        }
+
+        foreach (['private_path', 'sha256', 'target_path'] as $key) {
+            if (blank($cover[$key] ?? null)) {
+                throw new RuntimeException("Cover is missing {$key}.");
+            }
+        }
+
+        $sourcePath = $this->sourcePath(['private_path' => $cover['private_path']]);
+        if (! hash_equals($cover['sha256'], hash_file('sha256', $sourcePath))) {
+            throw new RuntimeException('Protected cover checksum mismatch.');
+        }
+
+        $targetPath = (string) $cover['target_path'];
+        if (str_starts_with($targetPath, '/') || str_contains($targetPath, '..')) {
+            throw new RuntimeException('Cover target path is unsafe.');
+        }
+        if (($collection['cover_image'] ?? null) !== $targetPath) {
+            throw new RuntimeException('Cover target does not match collection cover image.');
+        }
+        if (Storage::disk('covers')->exists($targetPath)
+            && ! hash_equals($cover['sha256'], hash_file('sha256', Storage::disk('covers')->path($targetPath)))) {
+            throw new RuntimeException('Existing application cover conflicts with protected source.');
+        }
+
+        return ['source_path' => $sourcePath, 'target_path' => $targetPath];
     }
 }

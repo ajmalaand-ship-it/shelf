@@ -6,6 +6,7 @@ use App\Models\Collection;
 use App\Models\Poem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -90,6 +91,50 @@ class ImportPoetryManifestTest extends TestCase
 
         File::delete($manifestPath);
         File::delete($source);
+        File::deleteDirectory(dirname($source));
+    }
+
+    public function test_manifest_imports_a_checksum_guarded_cover_idempotently(): void
+    {
+        Storage::fake('covers');
+        $source = storage_path('app/source/testing/collection-cover-source.docx');
+        $cover = storage_path('app/source/testing/collection-cover.jpg');
+        File::ensureDirectoryExists(dirname($source));
+        File::put($source, 'private word source');
+        File::put($cover, 'private cover source');
+        $manifestPath = storage_path('app/test-cover-import-manifest.json');
+        File::put($manifestPath, json_encode([
+            'source' => [
+                'private_path' => 'source/testing/collection-cover-source.docx',
+                'sha256' => hash_file('sha256', $source),
+            ],
+            'cover' => [
+                'private_path' => 'source/testing/collection-cover.jpg',
+                'sha256' => hash_file('sha256', $cover),
+                'target_path' => 'collection-test/original-cover.jpg',
+            ],
+            'collection' => [
+                'title' => 'TEST COVER', 'slug' => 'test-cover', 'author' => 'اجمل اند',
+                'cover_image' => 'collection-test/original-cover.jpg',
+            ],
+            'poems' => [[
+                'sequence' => 1, 'title' => null, 'untitled' => true,
+                'body' => 'متن', 'source_location' => 'Word paragraph 1',
+            ]],
+        ], JSON_UNESCAPED_UNICODE));
+
+        $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath, '--apply' => true])->assertSuccessful();
+        $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath, '--apply' => true])->assertSuccessful();
+
+        Storage::disk('covers')->assertExists('collection-test/original-cover.jpg');
+        $this->assertSame('private cover source', Storage::disk('covers')->get('collection-test/original-cover.jpg'));
+        $this->assertDatabaseHas('collections', [
+            'title' => 'TEST COVER', 'cover_image' => 'collection-test/original-cover.jpg', 'is_active' => false,
+        ]);
+
+        File::delete($manifestPath);
+        File::delete($source);
+        File::delete($cover);
         File::deleteDirectory(dirname($source));
     }
 

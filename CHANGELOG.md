@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-02 — Owner Unicode import: د زړه پر پاڼه مې انځور دی ګلاب
+
+- Securely preserved and checksum-verified the owner-supplied authoritative
+  DOCX and original cover in private System C source storage.
+- Imported 57 source-ordered poems (56 titled, 1 untitled) plus supported
+  publication information, dedication, attributed critical text, and 25 exact
+  combined date/place values as draft/private and locked content.
+- Attached a checksum-identical application cover copy, added guarded cover
+  support to the idempotent manifest importer, and kept the collection out of
+  the public API while making it available to protected owner preview.
+- No OCR was used and no prior collection or poem was modified.
+
 All notable repository governance changes are recorded here.
 
 ## Unreleased

@@ -17,7 +17,9 @@ poems by original poet پروین پژواک, translated into Pashto by Ajmal Aa
    poems.
 2. `هېندارې او چینې` — **IMPORTED AND READY FOR OWNER REVIEW** — 67 draft
    poems: 63 Ajmal originals and 4 correctly attributed translations.
-3. `د زړه پر پاڼه مې انځور دی ګلاب` — **SOURCE-BLOCKED**.
+3. `د زړه پر پاڼه مې انځور دی ګلاب` — **IMPORTED FROM OWNER-APPROVED
+   UNICODE SOURCE — OWNER REVIEW REQUIRED** — 57 draft poems: 56 titled and
+   1 genuinely untitled.
 4. `دا ښار، هاغه غرونه` — **MANUAL TRANSCRIPTION PACKAGE PREPARED —
    TRANSCRIPTION NOT YET COMPLETE**; still source-blocked for import.
 5. `دلته ډېر لرې له غرونو` — **SOURCE-BLOCKED**.
@@ -30,7 +32,40 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
 
 ## Four-book protected-source audit — 2026-09-01
 
-### د زړه پر پاڼه مې انځور دی ګلاب
+### د زړه پر پاڼه مې انځور دی ګلاب — Unicode source import 2026-09-02
+
+- Owner-approved exact collection title:
+  `د زړه پر پاڼه مې انځور دی ګلاب`. This deliberately overrides only the
+  slightly different collection-title wording in the Word source.
+- Authoritative Unicode source:
+  `storage/app/source/collections/d-zra-par-pana-me-anzor-de-gulab/owner-authoritative-unicode-20260901.docx`
+  (74,138 bytes; SHA-256
+  `0a7b706c5a6b3894de2d0ec7360f7a0029a856d5d2c9ce68539317f7373d0709`).
+- Source validation: valid Microsoft Word DOCX package; 749 text-bearing
+  paragraphs and 30,028 Unicode characters; no embedded media; no U+FFFD,
+  private-use characters, Arabic presentation forms, abnormal controls, ZWJ,
+  or ZWNJ. No OCR was used.
+- Deterministic structure: publication information, dedication, and
+  attributed critical text were stored as collection front matter; 57 poems
+  were imported in source order, comprising 56 titled poems and 1 genuinely
+  untitled poem; 25 poems carry exact combined date/place metadata. There
+  were no unresolved poem-boundary or title ambiguities.
+- Protected original cover:
+  `storage/app/source/collections/d-zra-par-pana-me-anzor-de-gulab/original-cover.jpg`
+  (1306×1879 sRGB JPEG; SHA-256
+  `ab846c44d7894b286eefc257b5124e9ed7c20ed3febb447e141f249672c16d63`).
+  A checksum-identical normal application cover copy is attached.
+- Import status: one draft/private collection and 57 draft, locked poems;
+  zero audio attachments. The public API does not expose the collection; the
+  protected owner-preview API does. Owner review remains required.
+- Verified pre-import backup:
+  `/home/ajmalaand/backups/poetry/20260902-040753`. Pre-import production was
+  2 collections / 148 poems with content version 50. Post-import production
+  is 3 collections / 205 poems with content version 108. Aggregate
+  fingerprints prove that the two prior collections and 148 prior poems did
+  not change.
+
+### Historical blocked-source evidence for د زړه پر پاڼه مې انځور دی ګلاب
 
 - Primary source:
   `storage/app/source/catalogue-bundle-20260828/original-poetry/01_d_zra_pa_pana_me_anzor_de_gulab.pdf`
@@ -39,13 +74,13 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
   cover and front/content pages are preserved in source order.
 - Existing recovery evidence: 38 rendered page images and 38 OCR text files
   under `storage/app/source/catalogue-bundle-20260828/recovery/c1-*`.
-- Trust result: **SOURCE-BLOCKED**. The PDF text extraction is mixed/legacy
+- Historical trust result: **SOURCE-BLOCKED**. The PDF text extraction is mixed/legacy
   encoded and contains substantial control/encoding artifacts; the recovery
   text is OCR-derived. Complete exact Unicode, poem boundaries, titles,
   dates/places, notes, and front matter cannot be imported safely from it.
-- Unblock with: an original Unicode Word/document source, an editable PDF with
-  a verified valid Unicode text layer, or owner-approved manual transcription
-  and proofreading against the preserved pages.
+- Resolution: the owner-supplied DOCX above is now the authoritative Unicode
+  source. The old PDF/OCR material was used only as supporting visual evidence
+  for one untitled-work boundary and did not supply imported text.
 
 ### دا ښار، هاغه غرونه
 
@@ -154,7 +189,7 @@ date/place values rather than inferred separate date and place counts.
 - complete the approved page-by-page manual transcription and owner
   proofreading of `دا ښار، هاغه غرونه`;
 - obtain trustworthy Unicode sources or approve manual
-  transcription/proofreading for the other three source-blocked books;
+  transcription/proofreading for the remaining three source-blocked books;
 - confirm or revise the current 15 free-sample decisions;
 - complete missing covers, front matter, and remaining metadata;
 - preserve and verify truthful translation attribution; and
