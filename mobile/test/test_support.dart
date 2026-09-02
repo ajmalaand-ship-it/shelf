@@ -68,6 +68,7 @@ Map<String, dynamic> poemDetailJson({
   String? audioCacheKey,
   String? audioFormat,
   String? audioLabel,
+  String? artworkUrl,
   String layoutMode = 'SOURCE',
   String? sourceDatePlace = 'کابل — ۱۳۸۵',
 }) => {
@@ -84,6 +85,12 @@ Map<String, dynamic> poemDetailJson({
   'requires_entitlement': locked,
   'excerpt': 'لنډه برخه\nدويمه کرښه',
   'body': locked ? null : body,
+  'artwork': {
+    'available': artworkUrl != null,
+    'locked': locked,
+    'url': locked ? null : artworkUrl,
+    'cache_key': artworkUrl == null ? null : 'artwork-v1',
+  },
   'audio': {
     'available': audioAvailable,
     'locked': audioLocked || locked,

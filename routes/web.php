@@ -16,3 +16,11 @@ Route::get('/media/audio/{poem}', [PoemController::class, 'stream'])
 Route::get('/media/owner-preview/audio/{poem}', [PoemController::class, 'streamOwnerPreview'])
     ->middleware('signed')
     ->name('owner-preview.poems.audio.stream');
+
+Route::get('/media/artwork/{poem}', [PoemController::class, 'streamArtwork'])
+    ->middleware('signed')
+    ->name('poems.artwork.stream');
+
+Route::get('/media/owner-preview/artwork/{poem}', [PoemController::class, 'streamOwnerPreviewArtwork'])
+    ->middleware('signed')
+    ->name('owner-preview.poems.artwork.stream');

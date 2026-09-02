@@ -5,6 +5,8 @@ namespace App\Http\Resources;
 use App\Services\RevenueCatEntitlementService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class PoemResource extends JsonResource
 {
@@ -12,6 +14,7 @@ class PoemResource extends JsonResource
     {
         $locked = ! $this->is_free_sample
             && ! app(RevenueCatEntitlementService::class)->requestIsEntitled($request);
+        $hasArtwork = (bool) $this->artwork_path && Storage::disk('artwork')->exists($this->artwork_path);
 
         return [
             'id' => $this->id,
@@ -27,6 +30,15 @@ class PoemResource extends JsonResource
             'requires_entitlement' => ! $this->is_free_sample,
             'excerpt' => $this->excerpt,
             'body' => $locked ? null : $this->body,
+            'artwork' => [
+                'available' => $hasArtwork,
+                'locked' => $hasArtwork && $locked,
+                'url' => $hasArtwork && ! $locked ? URL::temporarySignedRoute(
+                    'poems.artwork.stream', now()->addMinutes(10),
+                    ['poem' => $this->resource, 'access' => $this->is_free_sample ? 'free' : 'paid'],
+                ) : null,
+                'cache_key' => $this->artworkCacheKey(),
+            ],
             'audio' => [
                 'available' => (bool) $this->audio_path,
                 'locked' => $locked,

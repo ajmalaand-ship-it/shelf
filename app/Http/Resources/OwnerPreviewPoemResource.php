@@ -4,11 +4,15 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class OwnerPreviewPoemResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $hasArtwork = (bool) $this->artwork_path && Storage::disk('artwork')->exists($this->artwork_path);
+
         return [
             'id' => $this->id,
             'collection_slug' => $this->collection->slug,
@@ -25,6 +29,14 @@ class OwnerPreviewPoemResource extends JsonResource
             'is_active' => (bool) $this->is_active,
             'excerpt' => $this->excerpt,
             'body' => $this->body,
+            'artwork' => [
+                'available' => $hasArtwork,
+                'locked' => false,
+                'url' => $hasArtwork ? URL::temporarySignedRoute(
+                    'owner-preview.poems.artwork.stream', now()->addMinutes(10), ['poem' => $this->resource],
+                ) : null,
+                'cache_key' => $this->artworkCacheKey(),
+            ],
             'audio' => [
                 'available' => (bool) $this->audio_path,
                 'locked' => false,

@@ -129,6 +129,27 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
 
 ### سيند په پرخه کې
 
+#### Poem artwork capability and transcription checkpoint — 2026-09-02
+
+- Ajmal approved the minimal additive `poems.artwork_path` field. A verified
+  System C backup was created at
+  `/home/ajmalaand/backups/poetry/20260902-083908` before migration; migration
+  `2026_09_02_084459_add_artwork_path_to_poems_table` added one nullable string
+  column. Production remained 3 collections / 205 poems and every existing
+  poem retained a null artwork path.
+- Artwork now uses dedicated private storage, signed access governed by the
+  poem's draft/free/locked boundary, owner-preview authorization, a simple
+  Filament `Artwork / انځور` field, and optional responsive Flutter reader
+  rendering. Private storage paths are not returned by either API.
+- The 44 preserved spread scans were split into 74 protected upright poem-page
+  working derivatives. All 74 poem pages were visually classified in source
+  order; the separate 75th internal artwork candidate is the front-matter
+  publisher emblem, not a poem.
+- Normalized text extracted from the old PDF layer is retained only as an aid.
+  It has not been accepted as authority. Exact line-by-line visual verification
+  is still incomplete, so no collection or poem from this book has been
+  imported and no text has been guessed.
+
 #### Private artwork inventory — 2026-09-02
 
 - Owner artwork sources were received as two page-image DOCX packages plus an

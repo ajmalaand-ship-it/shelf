@@ -66,4 +66,29 @@ class PoemController extends Controller
             'Cache-Control' => 'private, no-store',
         ]);
     }
+
+    public function streamArtwork(Request $request, Poem $poem)
+    {
+        $signedPaidAccess = $request->query('access') === 'paid';
+        abort_unless(
+            $poem->is_active
+            && $poem->collection?->is_active
+            && ($poem->is_free_sample || $signedPaidAccess),
+            404,
+        );
+        abort_unless($poem->artwork_path && Storage::disk('artwork')->exists($poem->artwork_path), 404);
+
+        return Storage::disk('artwork')->response($poem->artwork_path, null, [
+            'Cache-Control' => 'private, max-age=600',
+        ]);
+    }
+
+    public function streamOwnerPreviewArtwork(Poem $poem)
+    {
+        abort_unless($poem->artwork_path && Storage::disk('artwork')->exists($poem->artwork_path), 404);
+
+        return Storage::disk('artwork')->response($poem->artwork_path, null, [
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
 }

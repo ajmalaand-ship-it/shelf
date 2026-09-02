@@ -113,6 +113,22 @@ class OwnerPreviewApiTest extends TestCase
         $this->assertStringContainsString('no-store', $stream->headers->get('Cache-Control'));
     }
 
+    public function test_preview_artwork_requires_token_and_never_leaks_private_path(): void
+    {
+        Storage::fake('artwork');
+        Storage::disk('artwork')->put('draft/original.png', 'PRIVATE ARTWORK');
+        $this->draftLockedPoem->update(['artwork_path' => 'draft/original.png']);
+
+        $this->getJson('/api/owner-preview/poems/'.$this->draftLockedPoem->id)->assertUnauthorized();
+        $response = $this->previewGet('/api/owner-preview/poems/'.$this->draftLockedPoem->id)
+            ->assertOk()->assertJsonPath('data.artwork.available', true)
+            ->assertJsonPath('data.artwork.locked', false)
+            ->assertJsonMissingPath('data.artwork_path');
+        $stream = $this->get($response->json('data.artwork.url'))->assertOk();
+        $this->assertSame('PRIVATE ARTWORK', $stream->streamedContent());
+        $this->assertStringContainsString('no-store', $stream->headers->get('Cache-Control'));
+    }
+
     public function test_denial_does_not_leak_token_or_secret(): void
     {
         Log::spy();

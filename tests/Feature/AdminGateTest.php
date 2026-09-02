@@ -135,6 +135,39 @@ class AdminGateTest extends TestCase
         $this->assertSame($version + 2, (int) AppSetting::where('key', 'content_version')->value('value'));
     }
 
+    public function test_owner_can_attach_replace_and_remove_artwork_without_deleting_preserved_files(): void
+    {
+        Storage::fake('artwork');
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'artwork-owner-flow']);
+
+        Livewire::test(CreatePoem::class)
+            ->fillForm([
+                'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن', 'excerpt' => 'متن',
+                'artwork_path' => [UploadedFile::fake()->image('first.png', 200, 300)],
+                'sort_order' => 1, 'is_free_sample' => false, 'is_active' => false,
+            ])->call('create')->assertHasNoFormErrors();
+
+        $poem = Poem::where('title', 'TEST ONLY')->firstOrFail();
+        $firstPath = $poem->artwork_path;
+        Storage::disk('artwork')->assertExists($firstPath);
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->fillForm(['artwork_path' => [UploadedFile::fake()->image('replacement.png', 300, 200)]])
+            ->call('save')->assertHasNoFormErrors();
+        $poem->refresh();
+        $replacementPath = $poem->artwork_path;
+        $this->assertNotSame($firstPath, $replacementPath);
+        Storage::disk('artwork')->assertExists($firstPath);
+        Storage::disk('artwork')->assertExists($replacementPath);
+
+        Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
+            ->fillForm(['artwork_path' => []])->call('save')->assertHasNoFormErrors();
+        $this->assertNull($poem->fresh()->artwork_path);
+        Storage::disk('artwork')->assertExists($replacementPath);
+    }
+
     public function test_collection_form_rejects_non_image_cover(): void
     {
         Storage::fake('covers');

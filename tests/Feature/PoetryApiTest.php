@@ -133,6 +133,37 @@ class PoetryApiTest extends TestCase
         $this->getJson("/api/poems/{$poem->id}/audio")->assertNotFound();
     }
 
+    public function test_artwork_is_private_and_follows_free_locked_and_draft_boundaries(): void
+    {
+        Storage::fake('artwork');
+        Storage::disk('artwork')->put('poems/test.png', 'PRIVATE ARTWORK');
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'artwork-access', 'is_active' => true]);
+        $free = Poem::create([
+            'collection_id' => $collection->id, 'body' => 'متن', 'excerpt' => 'متن',
+            'artwork_path' => 'poems/test.png', 'is_free_sample' => true, 'is_active' => true,
+        ]);
+        $locked = Poem::create([
+            'collection_id' => $collection->id, 'body' => 'پټ', 'excerpt' => 'لنډ',
+            'artwork_path' => 'poems/test.png', 'is_free_sample' => false, 'is_active' => true,
+        ]);
+        $draft = Poem::create([
+            'collection_id' => $collection->id, 'body' => 'مسوده', 'excerpt' => 'مسوده',
+            'artwork_path' => 'poems/test.png', 'is_free_sample' => true, 'is_active' => false,
+        ]);
+
+        $freeResponse = $this->getJson("/api/poems/{$free->id}")
+            ->assertOk()->assertJsonPath('data.artwork.available', true)
+            ->assertJsonPath('data.artwork.locked', false)
+            ->assertJsonMissingPath('data.artwork_path');
+        $stream = $this->get($freeResponse->json('data.artwork.url'))->assertOk();
+        $this->assertSame('PRIVATE ARTWORK', $stream->streamedContent());
+        $this->getJson("/api/poems/{$locked->id}")
+            ->assertOk()->assertJsonPath('data.artwork.locked', true)
+            ->assertJsonPath('data.artwork.url', null)
+            ->assertJsonMissingPath('data.artwork_path');
+        $this->getJson("/api/poems/{$draft->id}")->assertNotFound();
+    }
+
     public function test_missing_private_audio_file_returns_not_found_without_exposing_path(): void
     {
         Storage::fake('audio');

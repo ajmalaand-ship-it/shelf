@@ -138,6 +138,40 @@ class ImportPoetryManifestTest extends TestCase
         File::deleteDirectory(dirname($source));
     }
 
+    public function test_manifest_imports_checksum_guarded_private_artwork_idempotently(): void
+    {
+        Storage::fake('artwork');
+        $source = storage_path('app/source/testing/artwork-source.docx');
+        $artwork = storage_path('app/source/testing/artwork.png');
+        File::ensureDirectoryExists(dirname($source));
+        File::put($source, 'scanned source');
+        File::put($artwork, 'original illustration');
+        $manifestPath = storage_path('app/test-artwork-import-manifest.json');
+        File::put($manifestPath, json_encode([
+            'source' => ['private_path' => 'source/testing/artwork-source.docx', 'sha256' => hash_file('sha256', $source)],
+            'collection' => ['title' => 'TEST ARTWORK', 'slug' => 'test-artwork'],
+            'poems' => [[
+                'sequence' => 1, 'title' => null, 'untitled' => true, 'body' => 'متن',
+                'source_location' => 'Part 1 spread 9 left',
+                'artwork' => [
+                    'private_path' => 'source/testing/artwork.png',
+                    'sha256' => hash_file('sha256', $artwork),
+                    'target_path' => 'sind-pa-parkha-ke/001.png',
+                ],
+            ]],
+        ], JSON_UNESCAPED_UNICODE));
+
+        $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath, '--apply' => true])->assertSuccessful();
+        $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath, '--apply' => true])->assertSuccessful();
+
+        $this->assertDatabaseCount('poems', 1);
+        $this->assertDatabaseHas('poems', ['artwork_path' => 'sind-pa-parkha-ke/001.png']);
+        Storage::disk('artwork')->assertExists('sind-pa-parkha-ke/001.png');
+
+        File::delete($manifestPath);
+        File::deleteDirectory(dirname($source));
+    }
+
     public function test_manifest_rejects_a_private_source_path_outside_system_c_source_storage(): void
     {
         $manifestPath = storage_path('app/test-invalid-source-manifest.json');

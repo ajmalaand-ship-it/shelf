@@ -83,6 +83,10 @@ class PoemDetail {
     this.translator,
     this.sourceDatePlace,
     this.sourceNote,
+    this.artworkAvailable = false,
+    this.artworkLocked = false,
+    this.artworkUrl,
+    this.artworkCacheKey,
     this.layoutMode = PoemLayoutMode.source,
     required this.locked,
     this.requiresEntitlement = false,
@@ -105,6 +109,11 @@ class PoemDetail {
     if (audio is! Map<String, dynamic>) {
       throw const FormatException('audio must be an object');
     }
+    final artwork = json['artwork'];
+    if (artwork != null && artwork is! Map<String, dynamic>) {
+      throw const FormatException('artwork must be an object');
+    }
+    final artworkData = artwork as Map<String, dynamic>?;
     return PoemDetail(
       id: _int(json, 'id', required: true)!,
       collectionSlug: _string(json, 'collection_slug', required: true)!,
@@ -114,6 +123,14 @@ class PoemDetail {
       translator: _string(json, 'translator'),
       sourceDatePlace: _string(json, 'source_date_place'),
       sourceNote: _string(json, 'source_note'),
+      artworkAvailable: artworkData == null
+          ? false
+          : _bool(artworkData, 'available'),
+      artworkLocked: artworkData == null ? false : _bool(artworkData, 'locked'),
+      artworkUrl: artworkData == null ? null : _uri(artworkData, 'url'),
+      artworkCacheKey: artworkData == null
+          ? null
+          : _string(artworkData, 'cache_key'),
       layoutMode: _layoutMode(_string(json, 'layout_mode')),
       locked: _bool(json, 'locked'),
       requiresEntitlement: json['requires_entitlement'] == null
@@ -143,6 +160,10 @@ class PoemDetail {
   final String? translator;
   final String? sourceDatePlace;
   final String? sourceNote;
+  final bool artworkAvailable;
+  final bool artworkLocked;
+  final Uri? artworkUrl;
+  final String? artworkCacheKey;
   final PoemLayoutMode layoutMode;
   final bool locked;
   final bool requiresEntitlement;
@@ -233,4 +254,14 @@ bool _bool(Map<String, dynamic> json, String key) {
   final value = json[key];
   if (value is! bool) throw FormatException('$key must be a boolean');
   return value;
+}
+
+Uri? _uri(Map<String, dynamic> json, String key) {
+  final value = _string(json, key);
+  if (value == null) return null;
+  final uri = Uri.tryParse(value);
+  if (uri == null || (!uri.isScheme('https') && !uri.isScheme('http'))) {
+    throw FormatException('$key must be an HTTP(S) URL');
+  }
+  return uri;
 }

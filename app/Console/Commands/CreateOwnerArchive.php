@@ -64,6 +64,7 @@ class CreateOwnerArchive extends Command
                 storage_path('app/source') => 'sources',
                 storage_path('app/public/covers') => 'covers',
                 storage_path('app/private/audio') => 'audio',
+                storage_path('app/private/artwork') => 'artwork',
             ] as $directory => $prefix) {
                 if (! is_dir($directory)) {
                     continue;

@@ -46,10 +46,10 @@ class BackupPoetry extends Command
         }
 
         $zip->addFromString('.backup-scope.json', json_encode([
-            'paths' => ['app/public/covers', 'app/private/audio', 'app/source'],
+            'paths' => ['app/public/covers', 'app/private/audio', 'app/private/artwork', 'app/source'],
         ], JSON_THROW_ON_ERROR));
 
-        foreach (['app/public/covers', 'app/private/audio', 'app/source'] as $relative) {
+        foreach (['app/public/covers', 'app/private/audio', 'app/private/artwork', 'app/source'] as $relative) {
             $path = storage_path($relative);
             if (! is_dir($path)) {
                 continue;

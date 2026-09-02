@@ -62,6 +62,13 @@ return [
             'throw' => true,
         ],
 
+        'artwork' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/artwork'),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

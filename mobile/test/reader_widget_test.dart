@@ -357,6 +357,54 @@ void main() {
     );
   });
 
+  testWidgets(
+    'reader places protected artwork between true title and poem text',
+    (tester) async {
+      final repository = PoetryRepository(
+        api: ApiClient(
+          client: MockClient(
+            (_) async => http.Response.bytes(
+              utf8.encode(
+                jsonEncode({
+                  'data': poemDetailJson(
+                    title: 'رښتینی سرليک',
+                    artworkUrl:
+                        'https://poetry.example.test/signed-artwork.png',
+                  ),
+                }),
+              ),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            ),
+          ),
+        ),
+        cache: MemoryCacheStore(),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PoemReaderScreen(
+            poemId: 301,
+            contentVersion: 7,
+            repository: repository,
+            settings: await settings(),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byKey(const Key('poem-artwork')), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.byKey(const Key('poem-title'))).dy,
+        lessThan(tester.getTopLeft(find.byKey(const Key('poem-artwork'))).dy),
+      );
+      expect(
+        tester.getTopLeft(find.byKey(const Key('poem-artwork'))).dy,
+        lessThan(tester.getTopLeft(find.byKey(const Key('poem-body'))).dy),
+      );
+    },
+  );
+
   testWidgets('missing date and place creates no placeholder', (tester) async {
     final repository = PoetryRepository(
       api: ApiClient(

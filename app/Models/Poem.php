@@ -23,7 +23,7 @@ class Poem extends Model
 
     protected $fillable = [
         'collection_id', 'title', 'body', 'excerpt', 'work_type', 'original_author', 'translator',
-        'source_date_place', 'source_note', 'layout_mode', 'audio_path', 'audio_duration_seconds', 'sort_order',
+        'source_date_place', 'source_note', 'layout_mode', 'artwork_path', 'audio_path', 'audio_duration_seconds', 'sort_order',
         'is_free_sample', 'is_active',
     ];
 
@@ -68,6 +68,11 @@ class Poem extends Model
     public function audioCacheKey(): ?string
     {
         return $this->audio_path ? hash('sha256', $this->audio_path) : null;
+    }
+
+    public function artworkCacheKey(): ?string
+    {
+        return $this->artwork_path ? hash('sha256', $this->artwork_path) : null;
     }
 
     public function audioFormat(): ?string

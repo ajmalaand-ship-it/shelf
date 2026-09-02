@@ -189,6 +189,23 @@ class _PoemBody extends StatelessWidget {
                     )
                   else
                     Center(child: UntitledPoemMarker(color: colors.muted)),
+                  if (poem.artworkAvailable &&
+                      !poem.artworkLocked &&
+                      poem.artworkUrl != null) ...[
+                    const SizedBox(height: 22),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 420),
+                      child: Image.network(
+                        poem.artworkUrl.toString(),
+                        key: const Key('poem-artwork'),
+                        fit: BoxFit.contain,
+                        alignment: Alignment.center,
+                        semanticLabel: 'د شعر اصلي انځور',
+                        errorBuilder: (context, error, stackTrace) =>
+                            const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
                   if (poem.isTranslation) ...[
                     const SizedBox(height: 18),
                     Text(

@@ -37,6 +37,8 @@ class PoemsTable
                     ->tooltip(fn (bool $state): string => $state ? 'Free sample' : 'Locked'),
                 IconColumn::make('audio_path')->label('Audio')->boolean()
                     ->getStateUsing(fn (Poem $record): bool => filled($record->audio_path)),
+                IconColumn::make('artwork_path')->label('Artwork')->boolean()
+                    ->getStateUsing(fn (Poem $record): bool => filled($record->artwork_path)),
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
@@ -54,6 +56,9 @@ class PoemsTable
                     ->trueLabel('Free sample')->falseLabel('Locked')->placeholder('All access states'),
                 TernaryFilter::make('audio_path')->label('Audio')
                     ->trueLabel('Audio present')->falseLabel('Audio missing')->placeholder('All audio states')
+                    ->nullable(),
+                TernaryFilter::make('artwork_path')->label('Artwork')
+                    ->trueLabel('Artwork present')->falseLabel('Artwork missing')->placeholder('All artwork states')
                     ->nullable(),
             ])
             ->recordActions([

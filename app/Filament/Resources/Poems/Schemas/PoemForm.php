@@ -63,6 +63,17 @@ class PoemForm
                             ->helperText('Read automatically after upload when the audio can be inspected.'),
                     ])
                     ->collapsible(),
+                Section::make('Artwork / انځور')
+                    ->description('One original illustration associated with this poem. It remains protected by the poem access rules.')
+                    ->schema([
+                        FileUpload::make('artwork_path')->label('Artwork / انځور')->disk('artwork')->visibility('private')
+                            ->image()
+                            ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp'])
+                            ->maxSize(20480)
+                            ->helperText('PNG, JPEG, or WebP up to 20 MB. Replaced files remain available to the protected backup process.')
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
                 Section::make('Translation / ژباړه')
                     ->description('Use Translation only when the poem is translated, and preserve complete truthful attribution.')
                     ->columns(2)

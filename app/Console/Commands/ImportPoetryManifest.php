@@ -30,6 +30,7 @@ class ImportPoetryManifest extends Command
         $manifest = json_decode(File::get($path), true, flags: JSON_THROW_ON_ERROR);
         $this->validateManifest($manifest);
         $cover = $this->validatedCover($manifest['cover'] ?? null, $manifest['collection']);
+        $artwork = collect($manifest['poems'])->map(fn (array $poem): ?array => $this->validatedArtwork($poem['artwork'] ?? null))->all();
 
         $collection = Collection::query()->where('title', $manifest['collection']['title'])->first();
         $poems = collect($manifest['poems']);
@@ -45,7 +46,7 @@ class ImportPoetryManifest extends Command
         if ($existing->isNotEmpty()) {
             $matches = $this->collectionMatches($collection, $manifest['collection'])
                 && $existing->count() === $poems->count()
-                && $existing->values()->every(function (Poem $poem, int $index) use ($poems): bool {
+                && $existing->values()->every(function (Poem $poem, int $index) use ($poems, $artwork): bool {
                     $source = $poems[$index];
 
                     return $poem->sort_order === $source['sequence']
@@ -55,7 +56,8 @@ class ImportPoetryManifest extends Command
                         && $poem->original_author === ($source['original_author'] ?? null)
                         && $poem->translator === ($source['translator'] ?? null)
                         && $poem->source_date_place === ($source['source_date_place_text'] ?? null)
-                        && $poem->source_note === ($source['source_note'] ?? null);
+                        && $poem->source_note === ($source['source_note'] ?? null)
+                        && $poem->artwork_path === ($artwork[$index]['target_path'] ?? null);
                 });
 
             if (! $matches) {
@@ -73,7 +75,7 @@ class ImportPoetryManifest extends Command
             return self::SUCCESS;
         }
 
-        DB::transaction(function () use (&$collection, $manifest, $poems, $cover): void {
+        DB::transaction(function () use (&$collection, $manifest, $poems, $cover, $artwork): void {
             if ($cover !== null && ! Storage::disk('covers')->exists($cover['target_path'])) {
                 Storage::disk('covers')->put($cover['target_path'], File::get($cover['source_path']));
             }
@@ -82,7 +84,11 @@ class ImportPoetryManifest extends Command
                 ? Collection::query()->lockForUpdate()->findOrFail($collection->id)
                 : Collection::create($this->collectionAttributes($manifest['collection']));
 
-            foreach ($poems as $source) {
+            foreach ($poems as $index => $source) {
+                $poemArtwork = $artwork[$index];
+                if ($poemArtwork !== null && ! Storage::disk('artwork')->exists($poemArtwork['target_path'])) {
+                    Storage::disk('artwork')->put($poemArtwork['target_path'], File::get($poemArtwork['source_path']));
+                }
                 $collection->poems()->create([
                     'title' => $source['title'],
                     'body' => $source['body'],
@@ -93,6 +99,7 @@ class ImportPoetryManifest extends Command
                     'source_date_place' => $source['source_date_place_text'] ?? null,
                     'source_note' => $source['source_note'] ?? null,
                     'sort_order' => $source['sequence'],
+                    'artwork_path' => $poemArtwork['target_path'] ?? null,
                     'is_free_sample' => false,
                     'is_active' => false,
                     'audio_path' => null,
@@ -229,6 +236,35 @@ class ImportPoetryManifest extends Command
         if (Storage::disk('covers')->exists($targetPath)
             && ! hash_equals($cover['sha256'], hash_file('sha256', Storage::disk('covers')->path($targetPath)))) {
             throw new RuntimeException('Existing application cover conflicts with protected source.');
+        }
+
+        return ['source_path' => $sourcePath, 'target_path' => $targetPath];
+    }
+
+    private function validatedArtwork(?array $artwork): ?array
+    {
+        if ($artwork === null) {
+            return null;
+        }
+
+        foreach (['private_path', 'sha256', 'target_path'] as $key) {
+            if (blank($artwork[$key] ?? null)) {
+                throw new RuntimeException("Artwork is missing {$key}.");
+            }
+        }
+
+        $sourcePath = $this->sourcePath(['private_path' => $artwork['private_path']]);
+        if (! hash_equals($artwork['sha256'], hash_file('sha256', $sourcePath))) {
+            throw new RuntimeException('Protected artwork checksum mismatch.');
+        }
+
+        $targetPath = (string) $artwork['target_path'];
+        if (str_starts_with($targetPath, '/') || str_contains($targetPath, '..')) {
+            throw new RuntimeException('Artwork target path is unsafe.');
+        }
+        if (Storage::disk('artwork')->exists($targetPath)
+            && ! hash_equals($artwork['sha256'], hash_file('sha256', Storage::disk('artwork')->path($targetPath)))) {
+            throw new RuntimeException('Existing application artwork conflicts with protected source.');
         }
 
         return ['source_path' => $sourcePath, 'target_path' => $targetPath];
