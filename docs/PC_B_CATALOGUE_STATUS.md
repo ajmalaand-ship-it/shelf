@@ -142,13 +142,31 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
   Filament `Artwork / انځور` field, and optional responsive Flutter reader
   rendering. Private storage paths are not returned by either API.
 - The 44 preserved spread scans were split into 74 protected upright poem-page
-  working derivatives. All 74 poem pages were visually classified in source
-  order; the separate 75th internal artwork candidate is the front-matter
-  publisher emblem, not a poem.
-- Normalized text extracted from the old PDF layer is retained only as an aid.
-  It has not been accepted as authority. Exact line-by-line visual verification
-  is still incomplete, so no collection or poem from this book has been
-  imported and no text has been guessed.
+  working derivatives. Every poem page was visually verified at full
+  resolution in source order; the separate 75th internal artwork candidate is
+  the front-matter publisher emblem, not a poem. The old PDF layer was used
+  only as a positional transcription aid, never as authority.
+- Final result: 74 verified poems (73 titled, 1 genuinely untitled), zero
+  unresolved readings, and 74 deterministic source-page artwork associations.
+  The scan review preserved the three visible stanza gaps and corrected one
+  character omitted by the aid layer; no text was guessed or modernized.
+- Fresh verified pre-import backup:
+  `/home/ajmalaand/backups/poetry/20260902-093801` (database SHA-256
+  `dc5b808a54f4ceff82af12fa2cc574f5ebe9115386f7601b904417220979254c`,
+  media SHA-256
+  `1a360174d697fd90ebc161ff07eb3808e56efab5b3c80939b4ec2b629fbd32ed`).
+- The checksum/member-guarded manifest imported one draft/private translation
+  collection and 74 draft, locked poems, all attributed to original poet
+  پروین پژواک and Pashto translator Ajmal Aand. The second importer run made
+  no changes. Production is now 4 collections / 279 poems; the protected
+  fingerprints of the prior 3 collections / 205 poems are unchanged.
+- The cover and 74 original-quality illustrations are attached through
+  protected storage. Public APIs hide the draft book; protected owner preview
+  displays its Unicode text and signed artwork. Private owner-preview APK build
+  9 is at
+  `/home/ajmalaand/backups/poetry/owner-downloads/sind-pa-parkha-ke-owner-preview-build9-20260902-0946.apk`
+  (SHA-256
+  `a20c84898ab57377329ac2c139f462adf5e82263df10c3e136f5d43cf63a3eb0`).
 
 #### Private artwork inventory — 2026-09-02
 
@@ -187,20 +205,14 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
   `0d4fb651362c24340b00404083be408982d8024627777d974ac0ed10572186a3`.
   The cover/front matter in part 1 and the source-bundle manifest support the
   book title, original poet پروین پژواک, and Pashto translator Ajmal Aand.
-- Trust result: **SOURCE-BLOCKED**. The PDFs are rotated scanned page images.
-  Their hidden extracted text is OCR-derived and is not authoritative Unicode.
-  Exact poem boundaries, titles, ordering across works, notes, and metadata
-  cannot be safely converted into an import manifest.
-- Schema fit: no migration is currently required. The existing collection
-  author plus source-supported subtitle/description fields can preserve the
-  original-poet and Pashto-translation context, while each poem must use
-  `work_type=TRANSLATION`, `original_author=پروین پژواک`, and
-  `translator=اجمل اند`. This mapping must be validated again against the
-  eventual authoritative Unicode source before import.
-- Unblock with: the original translated Unicode Word/editable document, a PDF
-  with a verified authoritative Unicode text layer, or owner-approved manual
-  transcription and proofreading that preserves original-poet and translator
-  attribution for every imported work.
+- Trust result: **VISUALLY VERIFIED FROM PRESERVED SCANS**. Ajmal directed that
+  the preserved visible page images are authoritative and approved manual
+  transcription from them. All 74 poem pages were checked line by line before
+  import; no hidden/OCR reading overrode a scan.
+- Schema fit: the owner-approved nullable poem artwork field is in production.
+  Every imported work uses `work_type=TRANSLATION`,
+  `original_author=پروین پژواک`, and `translator=Ajmal Aand`; the book is not
+  represented as Ajmal's original poetry.
 
 No repeated OCR was run during this audit. Existing OCR derivatives were
 treated only as recovery evidence, never as import authority.

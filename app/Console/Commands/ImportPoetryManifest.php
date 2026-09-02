@@ -125,6 +125,12 @@ class ImportPoetryManifest extends Command
         if (! File::isFile($source) || ! hash_equals($manifest['source']['sha256'], hash_file('sha256', $source))) {
             throw new RuntimeException('Authoritative source checksum mismatch.');
         }
+        foreach ($manifest['source']['members'] ?? [] as $member) {
+            $memberPath = $this->sourcePath($member);
+            if (! File::isFile($memberPath) || ! hash_equals($member['sha256'], hash_file('sha256', $memberPath))) {
+                throw new RuntimeException('Authoritative source member checksum mismatch.');
+            }
+        }
 
         $sequences = array_column($manifest['poems'], 'sequence');
         if ($sequences !== range(1, count($sequences))) {

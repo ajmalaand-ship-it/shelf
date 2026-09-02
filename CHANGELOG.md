@@ -1,6 +1,6 @@
 # Changelog
 
-- Added the owner-approved nullable poem artwork reference with dedicated private storage, signed free/entitled and owner-preview delivery, simple Filament upload/replace/remove controls, responsive Flutter reader display, checksum-guarded idempotent manifest artwork import, backup/archive coverage, and access-boundary tests. Applied the additive migration after a verified System C backup; the existing production baseline remained 3 collections / 205 poems with all prior artwork references null. Began the preserved-scan transcription review for `سيند په پرخه کې`, classified all 74 poem pages in source order, and kept the old PDF layer aid-only; no book text or collection was imported because exact visual line verification remains incomplete.
+- Completed `سيند په پرخه کې` from the preserved full-resolution scans: 74 poems (73 titled, 1 untitled) were visually verified line by line and imported as a private, locked translation collection attributed to original poet پروین پژواک and Pashto translator Ajmal Aand. Attached the verified cover and 74 protected original illustrations, preserved three visible stanza gaps, resolved all aid-layer uncertainties from the scans, and left zero guessed or unresolved text. The checksum/member-guarded importer is idempotent; a verified pre-import backup exists, the prior 3 collections / 205 poems retained identical fingerprints, public APIs hide the draft, and protected owner-preview build 9 displays the book with artwork.
 
 ## 2026-09-02 — Owner Unicode import: د زړه پر پاڼه مې انځور دی ګلاب
 

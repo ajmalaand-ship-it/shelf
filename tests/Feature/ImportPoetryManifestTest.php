@@ -193,4 +193,40 @@ class ImportPoetryManifestTest extends TestCase
             File::delete($manifestPath);
         }
     }
+
+    public function test_manifest_rejects_a_changed_authoritative_source_member(): void
+    {
+        $directory = storage_path('app/source/testing/source-bundle');
+        File::ensureDirectoryExists($directory);
+        $authority = $directory.'/authority.json';
+        $page = $directory.'/page-001.png';
+        File::put($authority, 'authority record');
+        File::put($page, 'changed page');
+        $manifestPath = storage_path('app/test-source-member-manifest.json');
+        File::put($manifestPath, json_encode([
+            'source' => [
+                'private_path' => 'source/testing/source-bundle/authority.json',
+                'sha256' => hash_file('sha256', $authority),
+                'members' => [[
+                    'private_path' => 'source/testing/source-bundle/page-001.png',
+                    'sha256' => hash('sha256', 'original page'),
+                ]],
+            ],
+            'collection' => ['title' => 'TEST SOURCE MEMBERS'],
+            'poems' => [[
+                'sequence' => 1, 'title' => null, 'untitled' => true,
+                'body' => 'متن', 'source_location' => 'Page 1',
+            ]],
+        ], JSON_UNESCAPED_UNICODE));
+
+        try {
+            $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath])->run();
+            $this->fail('A changed source-bundle member was accepted.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Authoritative source member checksum mismatch.', $exception->getMessage());
+        } finally {
+            File::delete($manifestPath);
+            File::deleteDirectory($directory);
+        }
+    }
 }
