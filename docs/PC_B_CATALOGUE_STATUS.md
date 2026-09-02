@@ -146,6 +146,16 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
 - The DOCX sources remain image/page based and are not considered trustworthy
   editable poem text. The book itself has not been imported and remains
   source-blocked for text import.
+- Ajmal reviewed the first artwork inventory and selected 32 illustrations for
+  a smaller clean-crop review. A separate protected clean-review set preserves
+  every original candidate and provides crop-only derivatives plus
+  original-to-clean comparison sheets. This is not final artwork selection or
+  app integration; no poetry text was imported and no database, collection,
+  poem, publication, or application state changed.
+- Clean-crop owner package:
+  `/home/ajmalaand/backups/poetry/owner-downloads/sind-pa-parkha-ke-clean-artwork-review-20260902-040608.zip`
+  (SHA-256
+  `c4e60413df281c65099a0f4360d1b716c1cb18fea68803c99adb97a699a51fa1`).
 
 - Primary sources:
   `storage/app/source/catalogue-bundle-20260828/translations/sind_pa_parkha_ke_part1.pdf`
