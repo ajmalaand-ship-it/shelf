@@ -1,5 +1,7 @@
 # Changelog
 
+- Fixed protected owner-preview build identity with the preview-only `SIND-ARTWORK • BUILD 10` marker and Android version `1.0.1` (code 10). Home now renders every collection returned by the repository in existing order instead of silently limiting the list to three; regression coverage includes six collections so future catalogue additions appear without another limit change.
+
 - Completed `سيند په پرخه کې` from the preserved full-resolution scans: 74 poems (73 titled, 1 untitled) were visually verified line by line and imported as a private, locked translation collection attributed to original poet پروین پژواک and Pashto translator Ajmal Aand. Attached the verified cover and 74 protected original illustrations, preserved three visible stanza gaps, resolved all aid-layer uncertainties from the scans, and left zero guessed or unresolved text. The checksum/member-guarded importer is idempotent; a verified pre-import backup exists, the prior 3 collections / 205 poems retained identical fingerprints, public APIs hide the draft, and protected owner-preview build 9 displays the book with artwork.
 
 ## 2026-09-02 — Owner Unicode import: د زړه پر پاڼه مې انځور دی ګلاب

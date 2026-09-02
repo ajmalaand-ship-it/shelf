@@ -125,22 +125,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (snapshot.collections.isEmpty)
                             const _EmptyCatalogue()
                           else
-                            ...snapshot.collections
-                                .take(3)
-                                .map(
-                                  (collection) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 14),
-                                    child: CollectionCard(
-                                      collection: collection,
-                                      readerSettings: widget.readerSettings,
-                                      ownerPreviewMode: widget.ownerPreviewMode,
-                                      onTap: () => _openCollection(
-                                        snapshot,
-                                        collection.slug,
-                                      ),
-                                    ),
+                            ...snapshot.collections.map(
+                              (collection) => Padding(
+                                padding: const EdgeInsets.only(bottom: 14),
+                                child: CollectionCard(
+                                  collection: collection,
+                                  readerSettings: widget.readerSettings,
+                                  ownerPreviewMode: widget.ownerPreviewMode,
+                                  onTap: () => _openCollection(
+                                    snapshot,
+                                    collection.slug,
                                   ),
                                 ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
