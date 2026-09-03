@@ -1,5 +1,14 @@
 # Changelog
 
+- Imported `دا ښار، هاغه غرونه` from Ajmal's owner-corrected authoritative
+  Unicode DOCX as one private collection with 22 explicitly titled, locked
+  poems, 17 exact date/place values, four source-supported front-matter
+  sections, and the unchanged trustworthy historical cover. The guarded
+  importer is idempotent, the public API hides the book, owner preview shows
+  it without an APK rebuild, and all prior collection fingerprints remain
+  unchanged. Ajmal completed real-device review in Build 10, confirmed the
+  book works, and accepted the import package for closeout.
+
 - Fixed protected owner-preview build identity with the preview-only `SIND-ARTWORK • BUILD 10` marker and Android version `1.0.1` (code 10). Home now renders every collection returned by the repository in existing order instead of silently limiting the list to three; regression coverage includes six collections so future catalogue additions appear without another limit change.
 
 - Completed `سيند په پرخه کې` from the preserved full-resolution scans: 74 poems (73 titled, 1 untitled) were visually verified line by line and imported as a private, locked translation collection attributed to original poet پروین پژواک and Pashto translator Ajmal Aand. Attached the verified cover and 74 protected original illustrations, preserved three visible stanza gaps, resolved all aid-layer uncertainties from the scans, and left zero guessed or unresolved text. The checksum/member-guarded importer is idempotent; a verified pre-import backup exists, the prior 3 collections / 205 poems retained identical fingerprints, public APIs hide the draft, and protected owner-preview build 9 displays the book with artwork.

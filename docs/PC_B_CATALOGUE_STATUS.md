@@ -20,15 +20,15 @@ poems by original poet پروین پژواک, translated into Pashto by Ajmal Aa
 3. `د زړه پر پاڼه مې انځور دی ګلاب` — **IMPORTED FROM OWNER-APPROVED
    UNICODE SOURCE — OWNER REVIEW REQUIRED** — 57 draft poems: 56 titled and
    1 genuinely untitled.
-4. `دا ښار، هاغه غرونه` — **MANUAL TRANSCRIPTION PACKAGE PREPARED —
-   TRANSCRIPTION NOT YET COMPLETE**; still source-blocked for import.
+4. `دا ښار، هاغه غرونه` — **OWNER-APPROVED AND IMPORT PACKAGE CLOSED** — 22
+   draft poems, all explicitly titled; Ajmal completed real-device review in
+   Build 10 and confirmed the book works.
 5. `دلته ډېر لرې له غرونو` — **SOURCE-BLOCKED**.
-6. `سيند په پرخه کې` — **SOURCE-BLOCKED**; its catalogue inclusion and
-   translation classification are resolved, but its text source is not safe
-   for import.
+6. `سيند په پرخه کې` — **IMPORTED AND READY FOR OWNER REVIEW** — 74 draft
+   poems: 73 titled and 1 genuinely untitled, with protected artwork.
 
-The two imported collections and all 148 poems remain draft/private. No new
-collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
+Five collections and all 301 poems remain draft/private. `دلته ډېر لرې له
+غرونو` remains the only source-blocked book in the approved six-book scope.
 
 ## Four-book protected-source audit — 2026-09-01
 
@@ -84,6 +84,53 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
 
 ### دا ښار، هاغه غرونه
 
+#### Owner-corrected Unicode source import — 2026-09-03
+
+- Ajmal designated the corrected Word document as authoritative for poem text,
+  titles, line breaks, ordering, date/place metadata, front matter, and
+  publication information. The protected source is
+  `storage/app/source/collections/da-shaar-hagha-gharona/owner-authoritative-unicode-20260902.docx`
+  (57,940 bytes; SHA-256
+  `6150eaaeeb028a938918cc575e7a2bfc38475b87191e89bebc62a33669028bcd`).
+- The valid editable DOCX contains 591 non-empty text-bearing paragraphs and
+  19,063 Unicode text characters. Direct XML inspection found no U+FFFD,
+  private-use characters, Arabic presentation forms, abnormal controls, ZWJ,
+  or ZWNJ. No OCR, PDF hidden text, normalization, spelling modernization, or
+  inferred wording was used.
+- Deterministic Word page-break structure produced 22 poems in exact source
+  order: 22 titled, 0 untitled, and 17 with exact combined date/place
+  metadata. Four front-matter sections were preserved: dedication,
+  publication information, the attributed عصمت قانع foreword, and Ajmal
+  Aand's signed reader introduction. There were no unresolved boundaries or
+  structural ambiguities.
+- The trustworthy historical cover page from the preserved original PDF was
+  retained unchanged as
+  `storage/app/source/collections/da-shaar-hagha-gharona/historical-cover-page.png`
+  (2479×3508 grayscale PNG; SHA-256
+  `0b0632f360200fd993b9059ac1967d19de5698ae3f304d61b7a6aa03d841a9b9`).
+  A checksum-identical application cover copy is attached; no cover was
+  fabricated or redesigned.
+- Verified pre-import backup:
+  `/home/ajmalaand/backups/poetry/20260903-010303` (database SHA-256
+  `209f789ba413f7b3395934279121f677272051d74a5c2911da71286638a16bc6`,
+  media SHA-256
+  `1117e3aa58477e0d5664b1ab8ef7b414bda432f499ee8c4afb73611ccde8afbd`).
+  Pre-import production was 4 collections / 279 poems at content version 183.
+- The checksum-guarded manifest imported one draft/private original-poetry
+  collection and 22 draft, locked poems with no audio. The second importer run
+  made zero changes. Production is now 5 collections / 301 poems at content
+  version 206, and fingerprints for all prior 4 collections / 279 poems are
+  unchanged.
+- Public APIs hide the collection. The existing protected owner-preview APK,
+  without a rebuild, has a valid credential and shows the collection and all
+  22 poems.
+- Ajmal completed real-device book review in Build 10, confirmed that `دا ښار،
+  هاغه غرونه` works, and accepted the imported book. Status: **OWNER-APPROVED
+  AND IMPORT PACKAGE CLOSED**. This acceptance changes no publication state;
+  the collection and all 22 poems remain private/draft and locked.
+
+#### Historical blocked-source evidence
+
 - Primary source:
   `storage/app/source/catalogue-bundle-20260828/original-poetry/04_da_shaar_hagha_gharona.pdf`
 - Format/evidence: 36-page PDF, SHA-256
@@ -91,12 +138,14 @@ collection or poem was imported by SYSC-CATALOGUE-COMPLETE-02.
   cover and ordered book pages are preserved.
 - Existing recovery evidence: 36 rendered page images and 36 OCR text files
   under `storage/app/source/catalogue-bundle-20260828/recovery/c4-*`.
-- Trust result: **SOURCE-BLOCKED**. The visible Pashto is not represented by a
+- Historical trust result: **SOURCE-BLOCKED**. The visible Pashto is not represented by a
   usable authoritative Unicode text layer; prior OCR is not source truth.
   Titles, boundaries, date/place values, notes, and front matter therefore
   cannot be imported without unsafe reconstruction.
-- Unblock with: a trustworthy Unicode original/editable document or
-  owner-approved manual transcription and proofreading.
+- Resolution: the owner-corrected DOCX above is now the authoritative Unicode
+  source. The historical PDF supports the original cover and publication
+  history only; its hidden text and OCR derivatives did not supply imported
+  poetry.
 - Manual transcription preparation (2026-09-01): the owner-approved,
   page-based workspace was generated directly from the authoritative PDF at
   300 DPI. It contains all 36 ordered page images, a checksum/dimensions
@@ -247,10 +296,11 @@ date/place values rather than inferred separate date and place counts.
 
 ## Remaining PC-B catalogue work
 
-- complete the approved page-by-page manual transcription and owner
-  proofreading of `دا ښار، هاغه غرونه`;
-- obtain trustworthy Unicode sources or approve manual
-  transcription/proofreading for the remaining three source-blocked books;
+- complete outstanding owner review and editorial reconciliation for the
+  other imported collections;
+- obtain a trustworthy Unicode source or approve manual
+  transcription/proofreading for the remaining source-blocked book,
+  `دلته ډېر لرې له غرونو`;
 - confirm or revise the current 15 free-sample decisions;
 - complete missing covers, front matter, and remaining metadata;
 - preserve and verify truthful translation attribution; and
