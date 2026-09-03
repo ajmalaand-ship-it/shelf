@@ -147,6 +147,10 @@ class AdminGateTest extends TestCase
         $this->assertSame('tmp-for-tests', FileUploadConfiguration::disk());
         $this->assertSame('livewire-tmp', FileUploadConfiguration::path());
         $this->assertTrue(config('livewire.temporary_file_upload.cleanup'));
+
+        $webPhpConfiguration = parse_ini_file(public_path('.user.ini'));
+        $this->assertSame('5M', $webPhpConfiguration['upload_max_filesize']);
+        $this->assertSame('8M', $webPhpConfiguration['post_max_size']);
     }
 
     private function syntheticImage(string $name, int $kilobytes): File
