@@ -1,5 +1,16 @@
 # Changelog
 
+- Imported `دلته ډېر لرې له غرونو` from Ajmal's owner-approved authoritative
+  Unicode DOCX as the sixth private collection with 41 locked poems: 17
+  titled, 24 genuinely untitled, 37 exact date/place values, and one
+  truthfully attributed translation whose source does not name the original
+  author. The checksum-guarded importer was already rerun idempotently; final
+  production verification confirms 6 collections / 342 poems at content
+  version 248, the prior five collection fingerprints are unchanged, the
+  public API hides the book, and protected owner-preview Build 10 can discover
+  it through its versioned six-collection catalogue flow. Owner review remains
+  required; PC-B and PC remain active, and P6 has not started.
+
 - Imported `دا ښار، هاغه غرونه` from Ajmal's owner-corrected authoritative
   Unicode DOCX as one private collection with 22 explicitly titled, locked
   poems, 17 exact date/place values, four source-supported front-matter

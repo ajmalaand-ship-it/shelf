@@ -23,12 +23,15 @@ poems by original poet پروین پژواک, translated into Pashto by Ajmal Aa
 4. `دا ښار، هاغه غرونه` — **OWNER-APPROVED AND IMPORT PACKAGE CLOSED** — 22
    draft poems, all explicitly titled; Ajmal completed real-device review in
    Build 10 and confirmed the book works.
-5. `دلته ډېر لرې له غرونو` — **SOURCE-BLOCKED**.
+5. `دلته ډېر لرې له غرونو` — **IMPORTED FROM OWNER-APPROVED UNICODE
+   SOURCE — OWNER REVIEW REQUIRED** — 41 draft poems: 17 titled and 24
+   genuinely untitled.
 6. `سيند په پرخه کې` — **IMPORTED AND READY FOR OWNER REVIEW** — 74 draft
    poems: 73 titled and 1 genuinely untitled, with protected artwork.
 
-Five collections and all 301 poems remain draft/private. `دلته ډېر لرې له
-غرونو` remains the only source-blocked book in the approved six-book scope.
+All six collections and all 342 poems remain draft/private. The intended
+six-book catalogue is now present in the protected owner-preview app; owner
+review and the broader PC-B editorial decisions remain open.
 
 ## Four-book protected-source audit — 2026-09-01
 
@@ -158,6 +161,51 @@ Five collections and all 301 poems remain draft/private. `دلته ډېر لرې
 
 ### دلته ډېر لرې له غرونو
 
+#### Owner-authoritative Unicode source import — 2026-09-03
+
+- Ajmal designated the supplied editable Word document as authoritative for
+  poem text, titles or intentional absence of titles, line breaks, ordering,
+  date/place metadata, dedication, and publication information. The protected
+  source is
+  `storage/app/source/collections/dalta-der-lare-la-gharono/owner-authoritative-unicode-20260903.docx`
+  (79,085 bytes; SHA-256
+  `606144eb5979ca5bd8d93ddc5b2328f700d781201b48e5f52f401cea1719c8cd`).
+- The valid editable DOCX contains 1,082 non-empty text-bearing paragraphs and
+  30,668 Unicode text characters. Direct inspection found no U+FFFD,
+  private-use characters, Arabic presentation forms, abnormal controls, ZWJ,
+  or ZWNJ. No OCR, PDF hidden text, normalization, spelling modernization, or
+  inferred wording was used.
+- Deterministic source structure produced 41 poems in exact source order: 17
+  titled, 24 genuinely untitled, and 37 with exact combined date/place
+  metadata. One work is truthfully classified as a translation by Ajmal Aand;
+  because the source does not identify its original author, the stored
+  attribution says `نوم نه دی ښودل شوی` rather than inventing a name.
+- The owner-supplied original cover is preserved unchanged (SHA-256
+  `17bafbf9c87a2eecba4bf1138cb8bc0a6b9069b1339ad09ee9bbe19558b504c0`),
+  and a checksum-identical application cover copy is attached.
+- Verified pre-import backup:
+  `/home/ajmalaand/backups/poetry/20260903-023604` (database SHA-256
+  `8bd766e6f5b7fe86f306dfbad6d46b9174618e5f4d93c9252819bf066807e8e0`,
+  media SHA-256
+  `806dde43a7f59d3fa433fd18603a64718a28ceca1a12a85089d5e724cf59fcfd`).
+  Pre-import production was 5 collections / 301 poems at content version 206.
+- The checksum-guarded manifest imported one draft/private original-poetry
+  collection and 41 draft, locked poems with no audio. The second importer run
+  made zero changes. Production is now 6 collections / 342 poems at content
+  version 248, and aggregate fingerprints prove that all prior 5 collections
+  and 301 poems are unchanged.
+- Public APIs hide the collection. The protected owner-preview APIs expose it,
+  and the existing Build 10 renders every collection returned by the
+  repository. Its valid preview credential and versioned refresh path can
+  therefore show the sixth book without another APK rebuild.
+- Import verification passed for exact manifest text and metadata, cover
+  checksum, Unicode round-trip, private/locked state, production totals,
+  content-version increment, and prior-collection fingerprints. Owner
+  real-device review remains required; this import does not mark PC-B or PC
+  complete and does not start P6.
+
+#### Historical blocked-source evidence
+
 - Primary sources:
   `storage/app/source/catalogue-bundle-20260828/original-poetry/05_dalta_der_lare_la_gharono/content.pdf`,
   `frontmatter.pdf`, and `original-cover.jpg` in the same directory.
@@ -169,12 +217,13 @@ Five collections and all 301 poems remain draft/private. `دلته ډېر لرې
 - Existing recovery evidence: 38 rendered content spreads, 76 split-page OCR
   files, 4 rendered front-matter pages, and 8 split-page OCR files under
   `storage/app/source/catalogue-bundle-20260828/recovery/c5-*`.
-- Trust result: **SOURCE-BLOCKED**. The content and front-matter PDFs have no
+- Historical trust result: **SOURCE-BLOCKED**. The content and front-matter PDFs have no
   usable Pashto Unicode text layer. The cover is trustworthy as an asset, but
   a cover alone cannot authorize a text import. Poem boundaries, titles,
   metadata, and front matter would require transcription.
-- Unblock with: the original Unicode/editable document or owner-approved
-  manual transcription and proofreading of both content and front matter.
+- Resolution: the owner-supplied DOCX above is now the authoritative Unicode
+  source. The historical PDFs and OCR recovery material did not supply the
+  imported poetry.
 
 ### سيند په پرخه کې
 
@@ -297,10 +346,7 @@ date/place values rather than inferred separate date and place counts.
 ## Remaining PC-B catalogue work
 
 - complete outstanding owner review and editorial reconciliation for the
-  other imported collections;
-- obtain a trustworthy Unicode source or approve manual
-  transcription/proofreading for the remaining source-blocked book,
-  `دلته ډېر لرې له غرونو`;
+  imported collections, including `دلته ډېر لرې له غرونو`;
 - confirm or revise the current 15 free-sample decisions;
 - complete missing covers, front matter, and remaining metadata;
 - preserve and verify truthful translation attribution; and
