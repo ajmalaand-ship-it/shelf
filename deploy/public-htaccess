@@ -17,10 +17,14 @@ Options -Indexes
 <IfModule php8_module>
     php_value error_log "/home/ajmalaand/apps/poetry/storage/logs/php-error.log"
     php_flag log_errors On
+    php_value upload_max_filesize 5M
+    php_value post_max_size 8M
 </IfModule>
 <IfModule lsapi_module>
     php_value error_log "/home/ajmalaand/apps/poetry/storage/logs/php-error.log"
     php_flag log_errors On
+    php_value upload_max_filesize 5M
+    php_value post_max_size 8M
 </IfModule>
 
 <IfModule mime_module>

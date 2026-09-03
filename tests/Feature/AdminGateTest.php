@@ -20,8 +20,12 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Textarea;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
+use Livewire\Features\SupportFileUploads\FileUploadController;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -63,6 +67,95 @@ class AdminGateTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('collections', ['slug' => 'admin-test']);
+    }
+
+    public function test_collection_cover_accepts_supported_images_up_to_five_megabytes(): void
+    {
+        Storage::fake('covers');
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $images = [
+            ['jpg', 500],
+            ['jpg', 2970],
+            ['jpg', 5120],
+            ['png', 2970],
+            ['webp', 2970],
+        ];
+
+        foreach ($images as $index => [$extension, $kilobytes]) {
+            Livewire::test(CreateCollection::class)
+                ->fillForm([
+                    'title' => "TEST COVER {$index}",
+                    'slug' => "valid-cover-{$index}",
+                    'cover_image' => [$this->syntheticImage("safe.{$extension}", $kilobytes)],
+                    'sort_order' => $index + 1,
+                    'is_active' => false,
+                ])
+                ->call('create')
+                ->assertHasNoFormErrors();
+
+            $collection = Collection::where('slug', "valid-cover-{$index}")->firstOrFail();
+            $this->assertNotNull($collection->cover_image);
+            Storage::disk('covers')->assertExists($collection->cover_image);
+        }
+    }
+
+    public function test_livewire_temporary_upload_rejects_files_over_five_megabytes(): void
+    {
+        Storage::fake(FileUploadConfiguration::disk());
+
+        $this->expectException(ValidationException::class);
+
+        (new FileUploadController)->validateAndStore(
+            [$this->syntheticImage('oversize.jpg', 5121)],
+            FileUploadConfiguration::disk(),
+        );
+    }
+
+    public function test_failed_cover_replacement_preserves_existing_cover(): void
+    {
+        Storage::fake('covers');
+        Storage::disk('covers')->put('existing/cover.jpg', 'preserved-cover');
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $collection = Collection::create([
+            'title' => 'TEST EXISTING COVER',
+            'slug' => 'existing-cover',
+            'cover_image' => 'existing/cover.jpg',
+            'is_active' => false,
+        ]);
+
+        Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
+            ->fillForm([
+                'cover_image' => [UploadedFile::fake()->create('replacement.php', 10, 'application/x-php')],
+            ])
+            ->call('save')
+            ->assertHasFormErrors(['cover_image']);
+
+        $this->assertSame('existing/cover.jpg', $collection->fresh()->cover_image);
+        Storage::disk('covers')->assertExists('existing/cover.jpg');
+    }
+
+    public function test_livewire_temporary_upload_limit_matches_collection_cover_limit(): void
+    {
+        $this->assertSame(
+            ['required', 'file', 'max:5120'],
+            config('livewire.temporary_file_upload.rules'),
+        );
+        $this->assertNull(config('livewire.temporary_file_upload.disk'));
+        $this->assertSame('tmp-for-tests', FileUploadConfiguration::disk());
+        $this->assertSame('livewire-tmp', FileUploadConfiguration::path());
+        $this->assertTrue(config('livewire.temporary_file_upload.cleanup'));
+    }
+
+    private function syntheticImage(string $name, int $kilobytes): File
+    {
+        $file = UploadedFile::fake()->image($name, 64, 64);
+        ftruncate($file->tempFile, $kilobytes * 1024);
+        clearstatcache(true, $file->getPathname());
+
+        return $file;
     }
 
     public function test_poem_form_rejects_non_audio_upload(): void

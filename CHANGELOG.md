@@ -1,5 +1,14 @@
 # Changelog
 
+- Fixed collection-cover uploads whose Filament UI advertised 5 MB while the
+  cPanel EA-PHP request layer still rejected files above its 2 MB default.
+  System C's deployed LSAPI/mod_php configuration now accepts uploads through
+  5 MB within the existing 8 MB POST envelope, and Livewire temporary uploads
+  enforce the same 5 MB ceiling instead of their 12 MB default. JPEG, PNG,
+  and WebP image validation remains fail-closed; oversized or invalid files
+  are rejected before collection data changes, and failed replacements retain
+  the existing cover.
+
 - Imported `دلته ډېر لرې له غرونو` from Ajmal's owner-approved authoritative
   Unicode DOCX as the sixth private collection with 41 locked poems: 17
   titled, 24 genuinely untitled, 37 exact date/place values, and one
