@@ -23,10 +23,10 @@ README.md and any remaining docs describe the old app technically; they are not 
 - If a task conflicts with this file, or something is not covered, STOP and ask.
 
 ## 3. Current step
-Step 1 — Inspect and protect. Done: read-only inspection, baseline backup, GitHub copy.
-Remaining: the change plan, to be approved by Ajmal.
-No Shelf feature work is allowed until Ajmal approves the change plan and says Step 2 has started.
-(Update this section only when Ajmal says so.)
+Step 2 — Build the Shelf foundation (started 25 September 2026).
+Focus: a foundation for a large multi-author online bookstore and reader. The admin must be
+able to add unlimited authors and books. The 6 existing books are examples; do not spend
+effort perfecting them.
 
 ## 4. Rules that are never broken
 1. No change without Ajmal's clear OK for that specific task.
@@ -54,12 +54,12 @@ No Shelf feature work is allowed until Ajmal approves the change plan and says S
     move or delete them without a plan approved by Ajmal.
 13. Report failures honestly. If something goes wrong, stop and report before fixing.
 
-## 5. The live server
-This server is live: poetry.ajmalaand.com serves this repository (document root
-/home/ajmalaand/public_html/poetry). There is no separate test copy yet.
-- Never run tests, seeders or commands that could write to the live database.
-  Check phpunit/env settings first; if a test could touch the live database, do not run it.
-- No composer/npm installs, cache rebuilds, migrations or deploys unless the task says so.
+## 5. The server
+The app is not public yet and has no real readers. There is no separate test copy or
+staging environment (owner decision, 25 September 2026); we build directly on this server.
+Automated tests must use an in-memory or temporary test database, never the real database.
+Shelf's permanent domain is shelf.services (the move is a separate task).
+poetry.ajmalaand.com is temporary.
 
 ## 6. How to work on every task
 1. Plan: say what you will do, why, the risk, and how to undo it. Wait for OK if the
@@ -79,3 +79,9 @@ This server is live: poetry.ajmalaand.com serves this repository (document root
 - No author model, language field, reader accounts or per-book purchases exist yet.
 - Payments: RevenueCat foundation built for one global unlock-all; not live.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
+
+## 8. Owner decisions
+- 2026-09-25: No staging/test copy until the app is live with users.
+- 2026-09-25: Shelf is built on the existing poetry app work; the Pitswal name is retired.
+- 2026-09-25: Permanent domain: shelf.services.
+- 2026-09-25: The admin chooses each book's free sample; no fixed amount.
