@@ -27,6 +27,7 @@ Step 2 — Build the Shelf foundation (started 25 September 2026).
 Focus: a foundation for a large multi-author online bookstore and reader. The admin must be
 able to add unlimited authors and books. The 6 existing books are examples; do not spend
 effort perfecting them.
+Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DNS and SSL.
 
 ## 4. Rules that are never broken
 1. No change without Ajmal's clear OK for that specific task.
@@ -55,11 +56,17 @@ effort perfecting them.
 13. Report failures honestly. If something goes wrong, stop and report before fixing.
 
 ## 5. The server
-The app is not public yet and has no real readers. There is no separate test copy or
-staging environment (owner decision, 25 September 2026); we build directly on this server.
-Automated tests must use an in-memory or temporary test database, never the real database.
-Shelf's permanent domain is shelf.services (the move is a separate task).
-poetry.ajmalaand.com is temporary.
+- Shelf runs in its own cPanel account "shelf": code in /home/shelf/apps/shelf,
+  website root /home/shelf/public_html (a link to /home/shelf/apps/shelf/public),
+  database shelf_app. Domain: shelf.services.
+- The old poetry app in the "ajmalaand" account (poetry.ajmalaand.com) is NOT Shelf.
+  Never read from, write to or change it. It stays untouched and will be retired.
+- The app is not public yet and has no real readers. No staging or test copy until
+  Shelf is live with users. Automated tests use an in-memory or temporary database only.
+- Codex's sandbox cannot reach the database. Any command that needs the real database
+  is given to the owner to run, with exact commands.
+- Daily backup: scripts/shelf_daily_backup.py at 03:00 (shelf crontab), stored in
+  /home/shelf/backups/shelf, 14 kept.
 
 ## 6. How to work on every task
 1. Plan: say what you will do, why, the risk, and how to undo it. Wait for OK if the
@@ -85,3 +92,7 @@ poetry.ajmalaand.com is temporary.
 - 2026-09-25: Shelf is built on the existing poetry app work; the Pitswal name is retired.
 - 2026-09-25: Permanent domain: shelf.services.
 - 2026-09-25: The admin chooses each book's free sample; no fixed amount.
+- 2026-09-27: Master Record amendment v2.1 approved: Shelf moved to its own cPanel account
+  "shelf" and domain shelf.services now; old poetry app untouched then retired; no staging
+  until live; each old collection becomes one book, priority is the foundation for
+  unlimited books; admin chooses each book's free sample.
