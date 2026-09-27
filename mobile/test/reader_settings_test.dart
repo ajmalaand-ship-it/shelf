@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:pitswal/settings/reader_settings.dart';
+import 'package:shelf/settings/reader_settings.dart';
 
 void main() {
   test('fresh installs use the owner-approved 16 point default', () async {

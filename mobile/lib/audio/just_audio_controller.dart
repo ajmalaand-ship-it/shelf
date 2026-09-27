@@ -163,7 +163,7 @@ class JustAudioController extends AudioPlaybackController {
 
       final mediaItem = MediaItem(
         id: 'poem:${poem.id}:${poem.audioCacheKey}',
-        album: 'پېڅوَل',
+        album: 'Shelf',
         title: poem.displayTitle,
         artist: poem.isTranslation && poem.translator != null
             ? 'پښتو ژباړه: ${poem.translator}'

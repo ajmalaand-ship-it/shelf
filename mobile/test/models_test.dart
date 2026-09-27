@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/models/app_config.dart';
-import 'package:pitswal/models/poem.dart';
-import 'package:pitswal/models/poetry_collection.dart';
+import 'package:shelf/models/app_config.dart';
+import 'package:shelf/models/poem.dart';
+import 'package:shelf/models/poetry_collection.dart';
 
 import 'test_support.dart';
 
@@ -11,7 +11,7 @@ void main() {
     final collection = PoetryCollection.fromJson(collectionJson);
     final poem = PoemDetail.fromJson(poemDetailJson());
 
-    expect(config.appName, 'پېڅوَل');
+    expect(config.appName, 'Shelf');
     expect(config.slogan, 'اجمل اند بشپړه شاعري');
     expect(collection.title, 'هېندارې او چینې');
     expect(collection.dedication, 'مينې ته');

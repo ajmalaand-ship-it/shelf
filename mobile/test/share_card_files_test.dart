@@ -2,14 +2,14 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/share_cards/share_card_files.dart';
+import 'package:shelf/share_cards/share_card_files.dart';
 
 void main() {
   late Directory directory;
   late ShareCardFiles files;
 
   setUp(() async {
-    directory = await Directory.systemTemp.createTemp('pitswal-card-files-');
+    directory = await Directory.systemTemp.createTemp('shelf-card-files-');
     files = ShareCardFiles(directory);
   });
 
@@ -23,7 +23,7 @@ void main() {
       pageNumber: 3,
       createdAt: DateTime.utc(2026, 8, 29, 12, 34, 56),
     );
-    expect(name, 'pitswal_poem_42_20260829123456000_03.png');
+    expect(name, 'shelf_poem_42_20260829123456000_03.png');
     expect(name, matches(RegExp(r'^[a-z0-9_]+\.png$')));
   });
 

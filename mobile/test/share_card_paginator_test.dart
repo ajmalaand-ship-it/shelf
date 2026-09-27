@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/share_cards/share_card_models.dart';
-import 'package:pitswal/share_cards/share_card_paginator.dart';
+import 'package:shelf/share_cards/share_card_models.dart';
+import 'package:shelf/share_cards/share_card_paginator.dart';
 
 void main() {
   test('selected lines preserve exact contiguous source text', () {

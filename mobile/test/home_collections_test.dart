@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/app.dart';
-import 'package:pitswal/models/app_config.dart';
-import 'package:pitswal/models/poem.dart';
-import 'package:pitswal/models/poetry_collection.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
-import 'package:pitswal/settings/reader_settings.dart';
+import 'package:shelf/app.dart';
+import 'package:shelf/models/app_config.dart';
+import 'package:shelf/models/poem.dart';
+import 'package:shelf/models/poetry_collection.dart';
+import 'package:shelf/repository/poetry_repository.dart';
+import 'package:shelf/settings/reader_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -18,7 +18,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      PitswalApp(
+      ShelfApp(
         repository: const _SixCollectionDataSource(),
         readerSettings: settings,
         ownerPreviewMode: true,
@@ -105,7 +105,7 @@ class _SixCollectionDataSource implements PoetryDataSource {
   Future<CatalogueSnapshot> refreshCatalogue(CatalogueSnapshot? cached) async =>
       const CatalogueSnapshot(
         config: AppConfig(
-          appName: 'پېڅوَل',
+          appName: 'Shelf',
           slogan: 'اجمل اند بشپړه شاعري',
           contentVersion: 1,
           minAppVersion: '1.0.0',

@@ -7,8 +7,8 @@ import 'screens/home_screen.dart';
 import 'settings/reader_settings.dart';
 import 'theme/app_theme.dart';
 
-class PitswalApp extends StatelessWidget {
-  const PitswalApp({
+class ShelfApp extends StatelessWidget {
+  const ShelfApp({
     required this.repository,
     required this.readerSettings,
     this.audioController,
@@ -28,7 +28,7 @@ class PitswalApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
-    title: 'پېڅوَل — Pitswal',
+    title: 'Shelf',
     theme: AppTheme.light,
     builder: (context, child) => Directionality(
       textDirection: TextDirection.rtl,

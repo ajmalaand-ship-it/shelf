@@ -15,7 +15,7 @@ class ShareCardFiles {
       RegExp(r'[^0-9]'),
       '',
     );
-    return 'pitswal_poem_${poemId}_${timestamp}_'
+    return 'shelf_poem_${poemId}_${timestamp}_'
         '${pageNumber.toString().padLeft(2, '0')}.png';
   }
 

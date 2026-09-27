@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/screens/poem_reader_screen.dart';
-import 'package:pitswal/settings/reader_settings.dart';
-import 'package:pitswal/share_cards/share_card_screen.dart';
+import 'package:shelf/screens/poem_reader_screen.dart';
+import 'package:shelf/settings/reader_settings.dart';
+import 'package:shelf/share_cards/share_card_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'test_support.dart';

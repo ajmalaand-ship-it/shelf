@@ -34,7 +34,7 @@ class PoemCardWidget extends StatelessWidget {
                 child: Transform.rotate(
                   angle: -math.pi / 2,
                   child: Text(
-                    'پېڅوَل  •  Pitswal',
+                    'Shelf',
                     style: TextStyle(
                       color: palette.watermark,
                       fontFamily: 'Vazirmatn',
@@ -53,7 +53,7 @@ class PoemCardWidget extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'پېڅوَل',
+                            'Shelf',
                             style: TextStyle(
                               color: palette.accent,
                               fontFamily: 'Vazirmatn',
@@ -64,7 +64,7 @@ class PoemCardWidget extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Pitswal',
+                          'Shelf',
                           textDirection: TextDirection.ltr,
                           style: TextStyle(
                             color: palette.muted,

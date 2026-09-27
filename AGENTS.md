@@ -96,3 +96,4 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   "shelf" and domain shelf.services now; old poetry app untouched then retired; no staging
   until live; each old collection becomes one book, priority is the foundation for
   unlimited books; admin chooses each book's free sample.
+- 2026-09-27: Android app ID approved: `services.shelf.app`. Flutter package name: `shelf`.

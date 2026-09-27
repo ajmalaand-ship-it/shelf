@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/models/poem.dart';
-import 'package:pitswal/share_cards/poem_card_widget.dart';
-import 'package:pitswal/share_cards/share_card_models.dart';
-import 'package:pitswal/share_cards/share_card_paginator.dart';
-import 'package:pitswal/share_cards/share_card_renderer.dart';
+import 'package:shelf/models/poem.dart';
+import 'package:shelf/share_cards/poem_card_widget.dart';
+import 'package:shelf/share_cards/share_card_models.dart';
+import 'package:shelf/share_cards/share_card_paginator.dart';
+import 'package:shelf/share_cards/share_card_renderer.dart';
 
 import 'test_support.dart';
 

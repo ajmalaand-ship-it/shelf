@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:pitswal/purchases/entitlement_controller.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
-import 'package:pitswal/services/api_client.dart';
+import 'package:shelf/purchases/entitlement_controller.dart';
+import 'package:shelf/repository/poetry_repository.dart';
+import 'package:shelf/services/api_client.dart';
 
 import 'test_support.dart';
 
 void main() {
-  test('API sends anonymous ID only to configured Pitswal API and can force refresh', () async {
+  test('API sends anonymous ID only to configured Shelf API and can force refresh', () async {
     final provider = _MutableProvider()..entitled = true;
     final controller = EntitlementController(provider);
     await controller.initialize();
@@ -24,12 +24,12 @@ void main() {
           200,
         );
       }),
-      baseUri: Uri.parse('https://poetry.ajmalaand.com/api/'),
+      baseUri: Uri.parse('https://shelf.services/api/'),
     );
 
     await client.getDataObject('poems/301', refreshEntitlement: true);
 
-    expect(captured.url.host, 'poetry.ajmalaand.com');
+    expect(captured.url.host, 'shelf.services');
     expect(captured.headers['X-RC-User-Id'], r'$RCAnonymousID:p5-test');
     expect(captured.headers['X-RC-Refresh'], '1');
   });

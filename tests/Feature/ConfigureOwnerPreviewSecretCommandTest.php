@@ -8,7 +8,7 @@ class ConfigureOwnerPreviewSecretCommandTest extends TestCase
 {
     public function test_command_generates_secret_without_printing_it_and_is_idempotent(): void
     {
-        $path = sys_get_temp_dir().'/pitswal-owner-preview-env-'.bin2hex(random_bytes(6));
+        $path = sys_get_temp_dir().'/shelf-owner-preview-env-'.bin2hex(random_bytes(6));
         file_put_contents($path, "APP_NAME=Test\nPOETRY_OWNER_PREVIEW_SECRET=\n");
 
         try {

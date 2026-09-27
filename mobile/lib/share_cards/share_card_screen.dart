@@ -340,6 +340,6 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
 
   Future<ShareCardFiles> _defaultFiles() async {
     final cache = await getTemporaryDirectory();
-    return ShareCardFiles(Directory('${cache.path}/pitswal_share_cards'));
+    return ShareCardFiles(Directory('${cache.path}/shelf_share_cards'));
   }
 }

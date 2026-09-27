@@ -19,7 +19,7 @@ class PlatformShareCardOutput implements ShareCardOutput {
         files: files
             .map((file) => XFile(file.path, mimeType: 'image/png'))
             .toList(),
-        title: 'پېڅوَل — اجمل اند',
+        title: 'Shelf — اجمل اند',
       ),
     );
   }

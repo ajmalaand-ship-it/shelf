@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/audio/audio_cache_store.dart';
+import 'package:shelf/audio/audio_cache_store.dart';
 
 void main() {
   late Directory directory;
 
   setUp(() async {
-    directory = await Directory.systemTemp.createTemp('pitswal-audio-test-');
+    directory = await Directory.systemTemp.createTemp('shelf-audio-test-');
   });
 
   tearDown(() async {

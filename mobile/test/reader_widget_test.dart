@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:pitswal/app.dart';
-import 'package:pitswal/purchases/entitlement_controller.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
-import 'package:pitswal/screens/collection_detail_screen.dart';
-import 'package:pitswal/screens/poem_reader_screen.dart';
-import 'package:pitswal/services/api_client.dart';
-import 'package:pitswal/settings/reader_settings.dart';
-import 'package:pitswal/widgets/untitled_poem_marker.dart';
+import 'package:shelf/app.dart';
+import 'package:shelf/purchases/entitlement_controller.dart';
+import 'package:shelf/repository/poetry_repository.dart';
+import 'package:shelf/screens/collection_detail_screen.dart';
+import 'package:shelf/screens/poem_reader_screen.dart';
+import 'package:shelf/services/api_client.dart';
+import 'package:shelf/settings/reader_settings.dart';
+import 'package:shelf/widgets/untitled_poem_marker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'test_support.dart';
@@ -26,7 +26,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      PitswalApp(
+      ShelfApp(
         repository: fixtureRepository(),
         readerSettings: await settings(),
         qaMode: false,
@@ -34,7 +34,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('پېڅوَل'), findsWidgets);
+    expect(find.text('Shelf'), findsWidgets);
     expect(find.text('اجمل اند بشپړه شاعري'), findsOneWidget);
     expect(find.text('ټولګې'), findsOneWidget);
     expect(find.text('ټولې ټولګې'), findsNothing);

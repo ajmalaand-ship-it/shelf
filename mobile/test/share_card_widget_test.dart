@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/models/poem.dart';
-import 'package:pitswal/share_cards/poem_card_widget.dart';
-import 'package:pitswal/share_cards/share_card_models.dart';
+import 'package:shelf/models/poem.dart';
+import 'package:shelf/share_cards/poem_card_widget.dart';
+import 'package:shelf/share_cards/share_card_models.dart';
 
 import 'test_support.dart';
 
@@ -38,9 +38,8 @@ void main() {
       ),
     );
 
-    expect(find.text('پېڅوَل'), findsOneWidget);
     expect(find.text('اجمل اند'), findsOneWidget);
-    expect(find.textContaining('Pitswal'), findsNWidgets(2));
+    expect(find.text('Shelf'), findsNWidgets(3));
     expect(find.textContaining('ټ ډ ړ ږ ښ ڼ ې ۍ'), findsOneWidget);
     expect(
       Directionality.of(

@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:pitswal/audio/audio_playback_controller.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
-import 'package:pitswal/screens/poem_reader_screen.dart';
-import 'package:pitswal/services/api_client.dart';
-import 'package:pitswal/settings/reader_settings.dart';
+import 'package:shelf/audio/audio_playback_controller.dart';
+import 'package:shelf/repository/poetry_repository.dart';
+import 'package:shelf/screens/poem_reader_screen.dart';
+import 'package:shelf/services/api_client.dart';
+import 'package:shelf/settings/reader_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'test_support.dart';

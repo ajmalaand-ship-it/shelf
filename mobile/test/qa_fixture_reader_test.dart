@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/app.dart';
-import 'package:pitswal/qa/qa_fixture_repository.dart';
-import 'package:pitswal/settings/reader_settings.dart';
+import 'package:shelf/app.dart';
+import 'package:shelf/qa/qa_fixture_repository.dart';
+import 'package:shelf/settings/reader_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -56,7 +56,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      PitswalApp(
+      ShelfApp(
         repository: QaFixtureRepository(),
         readerSettings: await settings(),
         qaMode: true,
@@ -65,7 +65,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('debug-qa-notice')), findsOneWidget);
-    expect(find.text('پېڅوَل'), findsOneWidget);
+    expect(find.text('Shelf'), findsOneWidget);
     expect(find.text('ټولګې'), findsOneWidget);
     expect(find.byIcon(Icons.arrow_forward_rounded), findsOneWidget);
 

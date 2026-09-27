@@ -13,7 +13,8 @@ class PrivacyPolicyTest extends TestCase
         $response
             ->assertOk()
             ->assertSee('Privacy Policy')
-            ->assertSee('پېڅوَل — Pitswal', false)
+            ->assertSee('Shelf', false)
+            ->assertDontSee('Pitswal')
             ->assertSee('اجمل اند بشپړه شاعري', false)
             ->assertSee('Hindara')
             ->assertSee('ajmalaand@gmail.com')

@@ -14,7 +14,7 @@ class QaFixtureRepository implements PoetryDataSource {
   static const _version = 900001;
 
   static const _config = AppConfig(
-    appName: 'پېڅوَل',
+    appName: 'Shelf',
     slogan: 'اجمل اند بشپړه شاعري',
     contentVersion: _version,
     minAppVersion: '1.0.0',

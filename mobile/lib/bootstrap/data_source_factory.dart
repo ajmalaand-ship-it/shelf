@@ -5,6 +5,7 @@ import '../qa/qa_fixture_repository.dart';
 import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../services/api_client.dart';
+import '../services/api_config.dart';
 import '../services/cache_store.dart';
 
 enum AppBuildMode { debug, profile, release }
@@ -96,7 +97,7 @@ PoetryDataSource createPoetryDataSource({
   if (sourceMode == PoetrySourceMode.ownerPreview) {
     return OwnerPreviewRepository(
       api: ApiClient(
-        baseUri: Uri.parse('https://poetry.ajmalaand.com/api/owner-preview/'),
+        baseUri: ownerPreviewBaseUri(),
         authorizationToken: previewToken,
       ),
       cache: PreferencesCacheStore(preferences),

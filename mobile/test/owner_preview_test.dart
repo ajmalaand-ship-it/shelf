@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:pitswal/app.dart';
-import 'package:pitswal/models/app_config.dart';
-import 'package:pitswal/models/poem.dart';
-import 'package:pitswal/models/poetry_collection.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
-import 'package:pitswal/services/api_client.dart';
-import 'package:pitswal/settings/reader_settings.dart';
+import 'package:shelf/app.dart';
+import 'package:shelf/models/app_config.dart';
+import 'package:shelf/models/poem.dart';
+import 'package:shelf/models/poetry_collection.dart';
+import 'package:shelf/repository/poetry_repository.dart';
+import 'package:shelf/services/api_client.dart';
+import 'package:shelf/settings/reader_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'test_support.dart';
@@ -26,12 +26,12 @@ void main() {
       });
       final api = ApiClient(
         client: client,
-        baseUri: Uri.parse('https://poetry.ajmalaand.com/api/owner-preview/'),
+        baseUri: Uri.parse('https://shelf.services/api/owner-preview/'),
         authorizationToken: 'temporary-preview-token',
       );
 
       await api.getObject('app-config');
-      expect(seen.url.host, 'poetry.ajmalaand.com');
+      expect(seen.url.host, 'shelf.services');
       expect(seen.headers['Authorization'], 'Bearer temporary-preview-token');
     },
   );
@@ -64,8 +64,8 @@ void main() {
       await public.refreshCatalogue(null);
       await preview.refreshCatalogue(null);
 
-      expect(cache.values, contains('pitswal.catalogue.v1'));
-      expect(cache.values, contains('pitswal.owner-preview.catalogue.v1'));
+      expect(cache.values, contains('shelf.catalogue.v1'));
+      expect(cache.values, contains('shelf.owner-preview.catalogue.v1'));
     },
   );
 
@@ -77,7 +77,7 @@ void main() {
         await SharedPreferences.getInstance(),
       );
       await tester.pumpWidget(
-        PitswalApp(
+        ShelfApp(
           repository: _PreviewDataSource(),
           readerSettings: settings,
           ownerPreviewMode: true,
@@ -127,7 +127,7 @@ class _PreviewDataSource implements PoetryDataSource {
   Future<CatalogueSnapshot> refreshCatalogue(CatalogueSnapshot? cached) async =>
       const CatalogueSnapshot(
         config: AppConfig(
-          appName: 'پېڅوَل',
+          appName: 'Shelf',
           slogan: 'اجمل اند بشپړه شاعري',
           contentVersion: 17,
           minAppVersion: '1.0.0',

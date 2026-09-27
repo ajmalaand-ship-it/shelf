@@ -13,7 +13,7 @@ class OwnerPreviewTokenCommandTest extends TestCase
     public function test_command_writes_protected_flutter_config_without_printing_token(): void
     {
         config(['poetry.owner_preview_secret' => str_repeat('s', 64)]);
-        $path = sys_get_temp_dir().'/pitswal-owner-preview-command-test-'.bin2hex(random_bytes(6)).'.json';
+        $path = sys_get_temp_dir().'/shelf-owner-preview-command-test-'.bin2hex(random_bytes(6)).'.json';
 
         try {
             $this->artisan('poetry:owner-preview-token', ['--days' => 7, '--output' => $path])

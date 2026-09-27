@@ -14,7 +14,7 @@ class AppConfig {
   );
 
   static const fallback = AppConfig(
-    appName: 'پېڅوَل',
+    appName: 'Shelf',
     slogan: 'اجمل اند بشپړه شاعري',
     contentVersion: 0,
     minAppVersion: '1.0.0',

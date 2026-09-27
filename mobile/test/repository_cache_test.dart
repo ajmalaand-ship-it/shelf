@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
-import 'package:pitswal/services/api_client.dart';
+import 'package:shelf/repository/poetry_repository.dart';
+import 'package:shelf/services/api_client.dart';
 
 import 'test_support.dart';
 
@@ -14,13 +14,13 @@ void main() {
     () async {
       final cache = MemoryCacheStore();
       final oldConfig = {...appConfigJson, 'content_version': 6};
-      cache.values['pitswal.catalogue.v1'] = jsonEncode({
+      cache.values['shelf.catalogue.v1'] = jsonEncode({
         'config': oldConfig,
         'collections': [
           {...collectionJson, 'title': 'پخوانۍ ټولګه'},
         ],
       });
-      cache.values['pitswal.content.v1.6.poem.1'] = '{}';
+      cache.values['shelf.content.v1.6.poem.1'] = '{}';
       final repository = PoetryRepository(
         api: ApiClient(
           client: MockClient((request) async {
@@ -35,7 +35,7 @@ void main() {
               headers: {'content-type': 'application/json; charset=utf-8'},
             );
           }),
-          baseUri: Uri.parse('https://poetry.ajmalaand.com/api/'),
+          baseUri: Uri.parse('https://shelf.services/api/'),
         ),
         cache: cache,
       );
@@ -45,7 +45,7 @@ void main() {
 
       expect(refreshed.config.contentVersion, 7);
       expect(refreshed.collections.single.title, 'هېندارې او چینې');
-      expect(cache.values, isNot(contains('pitswal.content.v1.6.poem.1')));
+      expect(cache.values, isNot(contains('shelf.content.v1.6.poem.1')));
     },
   );
 
@@ -57,7 +57,7 @@ void main() {
             utf8.encode(
               jsonEncode({
                 'locked': false,
-                'url': 'https://poetry.ajmalaand.com/media/audio/301?signature=test',
+                'url': 'https://shelf.services/media/audio/301?signature=test',
                 'duration_seconds': 75,
                 'cache_key': 'stable-recording-v1',
                 'format': 'm4a',
@@ -80,7 +80,7 @@ void main() {
 
   test('failed refresh preserves a valid offline catalogue', () async {
     final cache = MemoryCacheStore();
-    cache.values['pitswal.catalogue.v1'] = jsonEncode({
+    cache.values['shelf.catalogue.v1'] = jsonEncode({
       'config': appConfigJson,
       'collections': [collectionJson],
     });
@@ -146,7 +146,7 @@ void main() {
     'authoritative 404 never falls back to previously cached content',
     () async {
       final cache = MemoryCacheStore();
-      cache.values['pitswal.content.v1.public.7.poem.301'] = jsonEncode(
+      cache.values['shelf.content.v1.public.7.poem.301'] = jsonEncode(
         poemDetailJson(),
       );
       final repository = PoetryRepository(
@@ -162,7 +162,7 @@ void main() {
       );
       expect(
         cache.values,
-        isNot(contains('pitswal.content.v1.public.7.poem.301')),
+        isNot(contains('shelf.content.v1.public.7.poem.301')),
       );
     },
   );

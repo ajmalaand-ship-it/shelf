@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../purchases/entitlement_controller.dart';
+import 'api_config.dart';
 
 class ApiClient {
   ApiClient({
@@ -11,7 +12,7 @@ class ApiClient {
     this.entitlements,
     this.authorizationToken,
   }) : _client = client ?? http.Client(),
-       baseUri = baseUri ?? Uri.parse('https://poetry.ajmalaand.com/api/');
+       baseUri = baseUri ?? apiBaseUri();
 
   final http.Client _client;
   final Uri baseUri;

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:pitswal/services/api_client.dart';
+import 'package:shelf/services/api_client.dart';
 
 void main() {
   test('API client parses UTF-8 data envelopes', () async {

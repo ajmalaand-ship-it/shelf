@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/audio/audio_cache_store.dart';
-import 'package:pitswal/audio/audio_source_planner.dart';
-import 'package:pitswal/models/poem.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
+import 'package:shelf/audio/audio_cache_store.dart';
+import 'package:shelf/audio/audio_source_planner.dart';
+import 'package:shelf/models/poem.dart';
+import 'package:shelf/repository/poetry_repository.dart';
 
 import 'test_support.dart';
 
@@ -12,7 +12,7 @@ void main() {
   late Directory directory;
 
   setUp(() async {
-    directory = await Directory.systemTemp.createTemp('pitswal-plan-test-');
+    directory = await Directory.systemTemp.createTemp('shelf-plan-test-');
   });
 
   tearDown(() async {

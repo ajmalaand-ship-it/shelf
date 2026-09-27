@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/app.dart';
-import 'package:pitswal/settings/reader_settings.dart';
-import 'package:pitswal/widgets/poetry_text.dart';
+import 'package:shelf/app.dart';
+import 'package:shelf/settings/reader_settings.dart';
+import 'package:shelf/widgets/poetry_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'test_support.dart';
@@ -32,7 +32,7 @@ void main() {
       await SharedPreferences.getInstance(),
     );
     await tester.pumpWidget(
-      PitswalApp(repository: fixtureRepository(), readerSettings: settings),
+      ShelfApp(repository: fixtureRepository(), readerSettings: settings),
     );
     await tester.pumpAndSettle();
     Text collectionTitle() => tester.widget<Text>(

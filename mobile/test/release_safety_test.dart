@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pitswal/bootstrap/data_source_factory.dart';
-import 'package:pitswal/qa/qa_fixture_repository.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
+import 'package:shelf/bootstrap/data_source_factory.dart';
+import 'package:shelf/qa/qa_fixture_repository.dart';
+import 'package:shelf/repository/poetry_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

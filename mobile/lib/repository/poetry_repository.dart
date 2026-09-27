@@ -69,11 +69,11 @@ class PoetryRepository implements PoetryDataSource {
   final String _cacheNamespace;
 
   String get _catalogueKey => _cacheNamespace == 'public'
-      ? 'pitswal.catalogue.v1'
-      : 'pitswal.$_cacheNamespace.catalogue.v1';
+      ? 'shelf.catalogue.v1'
+      : 'shelf.$_cacheNamespace.catalogue.v1';
   String get _contentPrefix => _cacheNamespace == 'public'
-      ? 'pitswal.content.v1.'
-      : 'pitswal.$_cacheNamespace.content.v1.';
+      ? 'shelf.content.v1.'
+      : 'shelf.$_cacheNamespace.content.v1.';
 
   @override
   Future<CatalogueSnapshot?> loadCachedCatalogue() async {

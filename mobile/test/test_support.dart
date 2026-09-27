@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:pitswal/audio/audio_playback_controller.dart';
-import 'package:pitswal/models/poem.dart';
-import 'package:pitswal/repository/poetry_repository.dart';
-import 'package:pitswal/services/api_client.dart';
-import 'package:pitswal/services/cache_store.dart';
+import 'package:shelf/audio/audio_playback_controller.dart';
+import 'package:shelf/models/poem.dart';
+import 'package:shelf/repository/poetry_repository.dart';
+import 'package:shelf/services/api_client.dart';
+import 'package:shelf/services/cache_store.dart';
 
 const appConfigJson = {
-  'app_name': 'پېڅوَل',
+  'app_name': 'Shelf',
   'slogan': 'اجمل اند بشپړه شاعري',
   'content_version': 7,
   'min_app_version': '1.0.0',
@@ -26,7 +26,7 @@ const collectionJson = {
   'foreword_author': null,
   'foreword': null,
   'publication_info': '۱۳۸۵ لمريز — ۱۰۰۰ ټوکه',
-  'cover_url': 'https://poetry.ajmalaand.com/storage/covers/test.webp',
+  'cover_url': 'https://shelf.services/storage/covers/test.webp',
   'poem_count': 2,
   'sort_order': 3,
 };
@@ -128,7 +128,7 @@ PoetryRepository fixtureRepository({bool failNetwork = false}) {
   return PoetryRepository(
     api: ApiClient(
       client: client,
-      baseUri: Uri.parse('https://poetry.ajmalaand.com/api/'),
+      baseUri: Uri.parse('https://shelf.services/api/'),
     ),
     cache: MemoryCacheStore(),
   );

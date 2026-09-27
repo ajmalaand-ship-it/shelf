@@ -53,7 +53,7 @@ class CreateOwnerArchive extends Command
             $this->addFile($zip, $dump, 'database/database.sql', $checksums);
             $catalogue = json_encode([
                 'exported_at' => now()->toIso8601String(),
-                'system' => 'System C — پېڅوَل',
+                'system' => 'Shelf',
                 'collections' => Collection::query()->with(['poems' => fn ($query) => $query->orderBy('sort_order')])
                     ->orderBy('sort_order')->get()->toArray(),
             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)."\n";
@@ -74,7 +74,7 @@ class CreateOwnerArchive extends Command
                 }
             }
 
-            $readme = "System C — پېڅوَل owner off-server preservation package\n"
+            $readme = "Shelf owner off-server preservation package\n"
                 ."Contains a clean database export, portable catalogue JSON, private source/manifests, covers, and original audio currently on the server.\n"
                 ."Explicitly excludes .env files, application secrets, database passwords, private keys, and credentials.\n";
             $zip->addFromString('README.txt', $readme);

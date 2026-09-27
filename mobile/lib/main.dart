@@ -40,20 +40,20 @@ Future<void> main() async {
     entitlements: entitlements,
   );
   await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.hindara.pitswal.audio',
-    androidNotificationChannelName: 'د پېڅوَل غږ',
+    androidNotificationChannelId: 'services.shelf.app.audio',
+    androidNotificationChannelName: 'Shelf audio',
     androidNotificationOngoing: false,
   );
   final cacheRoot = await getApplicationCacheDirectory();
   final audioController = await JustAudioController.create(
     repository: repository,
     cache: AudioCacheStore(
-      Directory('${cacheRoot.path}/pitswal_audio_${sourceMode.name}'),
+      Directory('${cacheRoot.path}/shelf_audio_${sourceMode.name}'),
     ),
     entitlements: entitlements,
   );
   runApp(
-    PitswalApp(
+    ShelfApp(
       repository: repository,
       readerSettings: settings,
       audioController: audioController,
