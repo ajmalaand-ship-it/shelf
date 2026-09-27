@@ -55,6 +55,14 @@ return [
             'throw' => true,
         ],
 
+        'author_images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/authors'),
+            'visibility' => 'private',
+            'serve' => true,
+            'throw' => true,
+        ],
+
         'audio' => [
             'driver' => 'local',
             'root' => storage_path('app/private/audio'),

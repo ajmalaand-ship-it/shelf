@@ -12,6 +12,15 @@ class EditCollection extends EditRecord
 {
     protected static string $resource = CollectionResource::class;
 
+    protected ?bool $hasDatabaseTransactions = true;
+
+    protected function afterSave(): void
+    {
+        if ($this->record->is_active) {
+            $this->record->assertPublishable();
+        }
+    }
+
     protected function getHeaderActions(): array
     {
         return [

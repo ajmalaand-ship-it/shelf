@@ -14,6 +14,7 @@ use App\Filament\Resources\Poems\Pages\EditPoem;
 use App\Filament\Resources\Poems\Pages\ListPoems;
 use App\Filament\Resources\Poems\PoemResource;
 use App\Models\AppSetting;
+use App\Models\Author;
 use App\Models\Collection;
 use App\Models\Poem;
 use App\Models\User;
@@ -62,6 +63,7 @@ class AdminGateTest extends TestCase
                 'title' => 'ازمېښتي ټولګه', 'slug' => 'admin-test',
                 'cover_image' => [UploadedFile::fake()->create('cover.jpg', 10, 'image/jpeg')],
                 'sort_order' => 1, 'is_active' => true,
+                'language' => 'ps', 'credits' => [['author_id' => Author::create(['name' => 'Test author'])->id, 'role' => 'author']],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -315,7 +317,8 @@ class AdminGateTest extends TestCase
         ]);
 
         Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
-            ->fillForm(['sort_order' => 2, 'is_active' => true])
+            ->fillForm(['sort_order' => 2, 'is_active' => true, 'language' => 'ps',
+                'credits' => [['author_id' => Author::create(['name' => 'Test author'])->id, 'role' => 'author']]])
             ->call('save')
             ->assertHasNoFormErrors();
         $this->assertDatabaseHas('collections', ['id' => $collection->id, 'sort_order' => 2, 'is_active' => true]);
@@ -466,6 +469,9 @@ class AdminGateTest extends TestCase
             'collection_id' => $collection->id, 'body' => 'دويم', 'excerpt' => 'لنډ',
             'is_free_sample' => false, 'is_active' => false,
         ]);
+
+        $collection->update(['language' => 'ps']);
+        $collection->credits()->create(['author_id' => Author::create(['name' => 'Test author'])->id, 'role' => 'author']);
 
         Livewire::test(ListCollections::class)
             ->assertTableColumnStateSet('poems_count', 2, $collection)

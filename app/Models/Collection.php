@@ -6,6 +6,7 @@ use Database\Factories\CollectionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 
 class Collection extends Model
 {
@@ -13,7 +14,7 @@ class Collection extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'slug', 'subtitle', 'description', 'author', 'dedication', 'introduction',
+        'language', 'title', 'slug', 'subtitle', 'description', 'author', 'dedication', 'introduction',
         'foreword_author', 'foreword', 'publication_info', 'cover_image', 'sort_order', 'is_active', 'product_id',
     ];
 
@@ -33,6 +34,25 @@ class Collection extends Model
         static::deleted(function (): void {
             AppSetting::query()->where('key', 'content_version')->increment('value');
         });
+    }
+
+    public function credits(): HasMany
+    {
+        return $this->hasMany(BookCredit::class)->orderBy('position')->orderBy('id');
+    }
+
+    public function assertPublishable(): void
+    {
+        $errors = [];
+        if (! array_key_exists($this->language ?? '', config('books.languages'))) {
+            $errors['language'] = 'Choose a supported language before publishing.';
+        }
+        if (! $this->credits()->where('role', 'author')->exists()) {
+            $errors['credits'] = 'Add at least one author before publishing.';
+        }
+        if ($errors) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 
     public function poems(): HasMany

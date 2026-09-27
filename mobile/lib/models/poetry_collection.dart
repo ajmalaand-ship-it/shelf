@@ -1,8 +1,12 @@
+import 'book_credit.dart';
+
 class PoetryCollection {
   const PoetryCollection({
     required this.title,
     required this.slug,
     this.author,
+    this.authors = const [],
+    this.language,
     this.subtitle,
     this.description,
     this.dedication,
@@ -21,6 +25,8 @@ class PoetryCollection {
         title: _string(json, 'title', required: true)!,
         slug: _string(json, 'slug', required: true)!,
         author: _string(json, 'author'),
+        authors: _credits(json['authors']),
+        language: _string(json, 'language'),
         subtitle: _string(json, 'subtitle'),
         description: _string(json, 'description'),
         dedication: _string(json, 'dedication'),
@@ -39,6 +45,26 @@ class PoetryCollection {
   final String title;
   final String slug;
   final String? author;
+  final List<BookCredit> authors;
+  final String? language;
+
+  String? get creditedAuthors {
+    final names = authors
+        .where((credit) => credit.role == 'author')
+        .map((credit) => credit.name)
+        .join('، ');
+    // Old cached/server responses can still contain only the legacy field.
+    return names.isNotEmpty ? names : (authors.isEmpty ? author : null);
+  }
+
+  String? get creditedTranslators {
+    final names = authors
+        .where((credit) => credit.role == 'translator')
+        .map((credit) => credit.name)
+        .join('، ');
+    return names.isEmpty ? null : 'ژباړه: $names';
+  }
+
   final String? subtitle;
   final String? description;
   final String? dedication;
@@ -55,6 +81,8 @@ class PoetryCollection {
     'title': title,
     'slug': slug,
     'author': author,
+    'authors': authors.map((credit) => credit.toJson()).toList(growable: false),
+    'language': language,
     'subtitle': subtitle,
     'description': description,
     'dedication': dedication,
@@ -91,4 +119,17 @@ bool _boolean(Map<String, dynamic> json, String key) {
   final value = json[key];
   if (value is! bool) throw FormatException('$key must be a boolean');
   return value;
+}
+
+List<BookCredit> _credits(dynamic value) {
+  if (value == null) return const [];
+  if (value is! List) throw const FormatException('authors must be a list');
+  return value
+      .map((entry) {
+        if (entry is! Map<String, dynamic>) {
+          throw const FormatException('Invalid book credit');
+        }
+        return BookCredit.fromJson(entry);
+      })
+      .toList(growable: false);
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AppConfigController;
+use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CollectionController;
 use App\Http\Controllers\Api\OwnerPreview\AppConfigController as OwnerPreviewAppConfigController;
 use App\Http\Controllers\Api\OwnerPreview\CollectionController as OwnerPreviewCollectionController;
@@ -11,6 +12,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:60,1')->group(function (): void {
     Route::get('/app-config', AppConfigController::class);
+    Route::get('/authors', [AuthorController::class, 'index']);
+    Route::get('/authors/{author:slug}', [AuthorController::class, 'show']);
+    Route::get('/authors/{author:slug}/image', [AuthorController::class, 'image'])->name('authors.image');
     Route::get('/collections', [CollectionController::class, 'index']);
     Route::get('/collections/{collection:slug}', [CollectionController::class, 'show']);
     Route::get('/collections/{collection:slug}/poems', [CollectionController::class, 'poems']);

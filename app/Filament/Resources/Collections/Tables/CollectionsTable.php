@@ -19,7 +19,8 @@ class CollectionsTable
             ->columns([
                 TextColumn::make('sort_order')->label('Order')->sortable(),
                 TextColumn::make('title')->searchable()->sortable(),
-                TextColumn::make('author')->searchable(),
+                TextColumn::make('credits.author.name')->label('Credits')->searchable(),
+                TextColumn::make('language')->label('Language'),
                 IconColumn::make('is_active')->label('Published')->boolean(),
                 IconColumn::make('cover_image')->label('Cover')->boolean()
                     ->getStateUsing(fn (Collection $record): bool => filled($record->cover_image)),
@@ -49,7 +50,10 @@ class CollectionsTable
                     ->visible(fn (Collection $record): bool => ! $record->is_active)
                     ->requiresConfirmation()
                     ->modalDescription('Publish this collection? Individual poem publication states will not change.')
-                    ->action(fn (Collection $record) => $record->update(['is_active' => true])),
+                    ->action(function (Collection $record): void {
+                        $record->assertPublishable();
+                        $record->update(['is_active' => true]);
+                    }),
                 Action::make('unpublish')->label('Unpublish')->color('warning')
                     ->visible(fn (Collection $record): bool => $record->is_active)
                     ->requiresConfirmation()

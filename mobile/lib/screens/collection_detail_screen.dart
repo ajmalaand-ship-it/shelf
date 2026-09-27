@@ -86,9 +86,15 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                             fontFamily: widget.readerSettings.fontFamily,
                           ),
                     ),
-                    if (bundle.collection.author case final author?) ...[
+                    if (bundle.collection.creditedAuthors
+                        case final author?) ...[
                       const SizedBox(height: 12),
                       Text(author, textAlign: TextAlign.center),
+                    ],
+                    if (bundle.collection.creditedTranslators
+                        case final translators?) ...[
+                      const SizedBox(height: 8),
+                      Text(translators, textAlign: TextAlign.center),
                     ],
                     if (widget.ownerPreviewMode) ...[
                       const SizedBox(height: 10),

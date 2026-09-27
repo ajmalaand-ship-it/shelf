@@ -8,4 +8,13 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateCollection extends CreateRecord
 {
     protected static string $resource = CollectionResource::class;
+
+    protected ?bool $hasDatabaseTransactions = true;
+
+    protected function afterCreate(): void
+    {
+        if ($this->record->is_active) {
+            $this->record->assertPublishable();
+        }
+    }
 }

@@ -13,14 +13,14 @@ class CollectionController extends Controller
     public function index(): AnonymousResourceCollection
     {
         return OwnerPreviewCollectionResource::collection(Collection::query()
-            ->withCount('poems')
+            ->with('credits.author')->withCount('poems')
             ->orderBy('sort_order')
             ->get());
     }
 
     public function show(Collection $collection): OwnerPreviewCollectionResource
     {
-        $collection->loadCount('poems');
+        $collection->load('credits.author')->loadCount('poems');
 
         return new OwnerPreviewCollectionResource($collection);
     }

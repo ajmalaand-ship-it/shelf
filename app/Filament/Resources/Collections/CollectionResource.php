@@ -44,7 +44,7 @@ class CollectionResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withCount([
+        return parent::getEloquentQuery()->with('credits.author')->withCount([
             'poems',
             'poems as free_poems_count' => fn (Builder $query) => $query->where('is_free_sample', true),
             'poems as published_poems_count' => fn (Builder $query) => $query->where('is_active', true),

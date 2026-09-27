@@ -13,7 +13,14 @@ class CollectionResource extends JsonResource
         return [
             'title' => $this->title,
             'slug' => $this->slug,
-            'author' => $this->author,
+            'author' => $this->author ?? $this->credits->where('role', 'author')->map(fn ($credit) => $credit->author->name)->implode('، '),
+            'language' => $this->language,
+            'authors' => $this->credits->map(fn ($credit) => [
+                'id' => $credit->author->id,
+                'slug' => $credit->author->slug,
+                'name' => $credit->author->name,
+                'role' => $credit->role,
+            ])->values(),
             'subtitle' => $this->subtitle,
             'description' => $this->description,
             'dedication' => $this->dedication,

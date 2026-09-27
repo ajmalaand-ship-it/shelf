@@ -44,9 +44,14 @@ class CollectionCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleLarge
                             ?.copyWith(fontFamily: readerSettings.fontFamily),
                       ),
-                      if (collection.author case final author?) ...[
+                      if (collection.creditedAuthors case final author?) ...[
                         const SizedBox(height: 8),
                         Text(author),
+                      ],
+                      if (collection.creditedTranslators
+                          case final translators?) ...[
+                        const SizedBox(height: 8),
+                        Text(translators),
                       ],
                       if (collection.poemCount case final count?) ...[
                         const SizedBox(height: 8),

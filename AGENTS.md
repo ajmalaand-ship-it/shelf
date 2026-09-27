@@ -99,3 +99,11 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - 2026-09-27: Android app ID approved: `services.shelf.app`. Flutter package name: `shelf`.
 - 2026-09-27: App identity approved: Android app ID `services.shelf.app`; app name Shelf;
   slogan "کتاب مو ژوند بدلوي".
+- 2026-09-27: Author/language foundation approved: books have ordered author, translator,
+  and editor credits; languages are configurable, initially ps and fa. Keep legacy
+  collection author text and poem-level attribution unchanged.
+- 2026-09-27: "اجمل اند" and "Ajmal Aand" are the same author: display name اجمل اند,
+  Latin name Ajmal Aand. Do not merge other names by guessing; "نوم نه دی ښودل شوی"
+  is unknown and must not become an author record.
+- 2026-09-27: The six existing books are in Pashto (ps). Book 6 credits:
+  author پروین پژواک, translator اجمل اند. Publishing requires an author and language.
