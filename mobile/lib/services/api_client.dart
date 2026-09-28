@@ -31,17 +31,36 @@ class ApiClient {
   }
 
   Future<List<Map<String, dynamic>>> getDataList(String path) async {
-    final response = await getObject(path);
-    final data = response['data'];
-    if (data is! List) throw const FormatException('Expected a data list');
-    return data
-        .map((item) {
-          if (item is! Map<String, dynamic>) {
-            throw const FormatException('Expected an object in data list');
-          }
-          return item;
-        })
-        .toList(growable: false);
+    final items = <Map<String, dynamic>>[];
+    var pageUri = baseUri.resolve(path);
+    final visited = <Uri>{};
+    while (true) {
+      // Only follow pagination inside this API: never send credentials elsewhere.
+      if (pageUri.origin != baseUri.origin ||
+          !pageUri.path.startsWith(baseUri.path) ||
+          !visited.add(pageUri)) {
+        throw const FormatException('Invalid pagination link');
+      }
+      final response = await getObject(pageUri.toString());
+      final data = response['data'];
+      if (data is! List) throw const FormatException('Expected a data list');
+      for (final item in data) {
+        if (item is! Map<String, dynamic>) {
+          throw const FormatException('Expected an object in data list');
+        }
+        items.add(item);
+      }
+      final links = response['links'];
+      if (links != null && links is! Map<String, dynamic>) {
+        throw const FormatException('Invalid pagination links');
+      }
+      final next = links == null ? null : links['next'];
+      if (next == null) return items;
+      if (next is! String || next.isEmpty) {
+        throw const FormatException('Invalid next page');
+      }
+      pageUri = pageUri.resolve(next);
+    }
   }
 
   Future<Map<String, dynamic>> getDataObject(

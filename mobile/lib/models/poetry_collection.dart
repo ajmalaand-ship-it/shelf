@@ -4,6 +4,8 @@ class PoetryCollection {
   const PoetryCollection({
     required this.title,
     required this.slug,
+    this.id,
+    this.bookType = 'poetry',
     this.author,
     this.authors = const [],
     this.language,
@@ -23,6 +25,8 @@ class PoetryCollection {
   factory PoetryCollection.fromJson(Map<String, dynamic> json) =>
       PoetryCollection(
         title: _string(json, 'title', required: true)!,
+        id: _integer(json, 'id'),
+        bookType: _string(json, 'book_type') ?? 'poetry',
         slug: _string(json, 'slug', required: true)!,
         author: _string(json, 'author'),
         authors: _credits(json['authors']),
@@ -42,6 +46,8 @@ class PoetryCollection {
             : _boolean(json, 'is_active'),
       );
 
+  final int? id;
+  final String bookType;
   final String title;
   final String slug;
   final String? author;
@@ -78,6 +84,8 @@ class PoetryCollection {
   final bool isActive;
 
   Map<String, dynamic> toJson() => {
+    'id': id,
+    'book_type': bookType,
     'title': title,
     'slug': slug,
     'author': author,
