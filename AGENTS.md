@@ -114,3 +114,5 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   with no translator. This explicitly supersedes preservation of those four poems’
   attribution only. Leave book 8’s one unknown-original-author poem unchanged and
   list it in the report.
+
+- 2026-09-27: Word import is a separate task (5b) after task 5.

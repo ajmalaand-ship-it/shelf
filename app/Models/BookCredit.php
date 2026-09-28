@@ -26,8 +26,8 @@ class BookCredit extends Model
                 throw ValidationException::withMessages(['role' => 'Invalid book credit role.']);
             }
         });
-        static::saved(fn () => AppSetting::where('key', 'content_version')->increment('value'));
-        static::deleted(fn () => AppSetting::where('key', 'content_version')->increment('value'));
+        static::saved(fn (BookCredit $credit) => Collection::withTrashed()->find($credit->collection_id)?->recordChange());
+        static::deleted(fn (BookCredit $credit) => Collection::withTrashed()->find($credit->collection_id)?->recordChange());
     }
 
     public function author(): BelongsTo
