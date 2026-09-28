@@ -73,7 +73,12 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
    task does not already approve it.
 2. Label commands: READ-ONLY (only looks) or CHANGES (changes something).
 3. Do the work in small steps. Stop if anything fails.
-4. Check the result.
+4. Check the result. Automated tests stay. Always run tests through
+   `scripts/run_tests.sh` (PHP only by default). Flutter/Android tests run ONLY when
+   files in `mobile/` changed in the current task; then use `scripts/run_tests.sh --mobile`.
+   Never write to `/tmp`. All temporary files for tests, Flutter, Composer, and scripts
+   must go under `/home/shelf/tmp`. Set TMPDIR, TMP, and TEMP accordingly; put tool
+   caches there when needed. Clean up only the temporary files created by the run.
 5. Commit and push to origin main only when the task says so.
 6. Report in plain, short English with exactly these lines:
    Done: / Tested: / Problems: / Next: / Decision needed:
@@ -120,3 +125,8 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - 2026-09-28: Task 5: Each book manages its own content. No global content list in
   the admin. Manage poems/chapters, including bin and ordering, from the book only.
   This change is Filament admin only; no database or API changes.
+
+- 2026-09-28: Automated tests stay. Flutter/Android tests run only when files in
+  `mobile/` changed in the task. Always use `scripts/run_tests.sh`, with `--mobile`
+  only for those tasks. Never use `/tmp`; temporary files for tests, Flutter,
+  Composer, and scripts belong under `/home/shelf/tmp` and are cleaned up after use.

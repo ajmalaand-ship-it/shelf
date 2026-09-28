@@ -12,7 +12,7 @@ abstract class TestCase extends BaseTestCase
     public function createApplication()
     {
         if (self::$testStorage === null) {
-            self::$testStorage = dirname(__DIR__).'/storage/framework/testing/isolated-'.bin2hex(random_bytes(8));
+            self::$testStorage = (getenv('SHELF_TEST_TMP') ?: '/home/shelf/tmp').'/isolated-'.bin2hex(random_bytes(8));
             foreach (['app/private', 'app/public', 'app/source', 'framework/views', 'framework/cache', 'framework/sessions', 'framework/testing', 'logs'] as $directory) {
                 mkdir(self::$testStorage.'/'.$directory, 0700, true);
             }
