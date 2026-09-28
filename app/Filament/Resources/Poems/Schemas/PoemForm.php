@@ -26,12 +26,12 @@ class PoemForm
         return $schema
             ->components([
                 Section::make(fn (Get $get): string => self::contentLabel($get))
-                    ->description('Choose the book, preserve the original title truthfully, and enter the content exactly as authored.')
+                    ->description('Preserve the original title truthfully, and enter the content exactly as authored.')
                     ->columns(2)
                     ->schema([
                         Select::make('collection_id')->label('Book')
-                            ->relationship('collection', 'title', fn ($query) => $query->with('credits.author'))->getOptionLabelFromRecordUsing(fn ($record): string => $record->selector_label)->searchable()->preload()->required()->live()
-                            ->default(fn (): ?int => request()->integer('collection_id') ?: null),
+                            ->relationship('collection', 'title', fn ($query) => $query->with('credits.author'))->getOptionLabelFromRecordUsing(fn ($record): string => $record->selector_label)->disabled()->dehydrated(false)
+                            ->default(fn ($livewire): int => $livewire->contentBookId()),
                         TextInput::make('title')->label(fn (Get $get): string => self::contentLabel($get).' title')->maxLength(255)
                             ->helperText('Optional. Leave blank when the item has no original title; the first line is never saved as a title.'),
                         Textarea::make('body')->label(fn (Get $get): string => self::contentLabel($get).' text')->required()->rows(20)

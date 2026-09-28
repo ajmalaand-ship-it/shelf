@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Collections\Tables;
 
-use App\Filament\Resources\Poems\PoemResource;
+use App\Filament\Resources\Collections\CollectionResource;
 use App\Models\Author;
 use App\Models\Collection;
 use Filament\Actions\Action;
@@ -54,13 +54,7 @@ class CollectionsTable
             ])
             ->recordActions([
                 Action::make('managePoems')->label('Manage content')->icon('heroicon-o-document-text')
-                    ->url(fn (Collection $record): string => PoemResource::getUrl('index', [
-                        'filters' => ['collection' => ['value' => $record->getKey()]],
-                    ])),
-                Action::make('addPoem')->label(fn (Collection $record): string => $record->book_type === 'prose' ? 'Add chapter' : 'Add poem')->icon('heroicon-o-document-plus')
-                    ->url(fn (Collection $record): string => PoemResource::getUrl('create', [
-                        'collection_id' => $record->getKey(),
-                    ])),
+                    ->url(fn (Collection $record): string => CollectionResource::getUrl('edit', ['record' => $record])),
                 Action::make('publish')->label('Publish')->color('success')
                     ->visible(fn (Collection $record): bool => ! $record->is_active)
                     ->requiresConfirmation()

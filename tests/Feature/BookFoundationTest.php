@@ -7,9 +7,9 @@ use App\Filament\Resources\Categories\Pages\EditCategory;
 use App\Filament\Resources\Collections\Pages\CreateCollection;
 use App\Filament\Resources\Collections\Pages\EditCollection;
 use App\Filament\Resources\Collections\Pages\ListCollections;
+use App\Filament\Resources\Collections\RelationManagers\ContentRelationManager;
 use App\Filament\Resources\Poems\Pages\CreatePoem;
 use App\Filament\Resources\Poems\Pages\EditPoem;
-use App\Filament\Resources\Poems\Pages\ListPoems;
 use App\Models\AppSetting;
 use App\Models\Author;
 use App\Models\Category;
@@ -106,7 +106,7 @@ class BookFoundationTest extends TestCase
         $book->credits()->create(['author_id' => $author->id, 'role' => 'author']);
         $this->assertSame('A book — First author', $book->fresh()->selector_label);
         $existing = $this->content($book, ['sort_order' => 12]);
-        Livewire::test(CreatePoem::class)->fillForm([
+        Livewire::withQueryParams(['collection_id' => $book->id])->test(CreatePoem::class)->fillForm([
             'collection_id' => $book->id, 'title' => 'Chapter one', 'body' => 'Unmodified chapter text', 'excerpt' => 'Excerpt',
         ])->assertSee('Chapter text')->assertDontSee('Poetry layout')
             ->call('create')->assertHasNoFormErrors();
@@ -116,7 +116,7 @@ class BookFoundationTest extends TestCase
         $this->assertSame('Chapter', $chapter->content_label);
         $this->assertSame('Unmodified chapter text', $chapter->body);
         $poetry = $this->book(['book_type' => 'poetry']);
-        Livewire::test(CreatePoem::class)->fillForm(['collection_id' => $poetry->id])
+        Livewire::withQueryParams(['collection_id' => $poetry->id])->test(CreatePoem::class)
             ->assertSee('Poem text')->assertSee('Poetry layout');
         $existing->update(['collection_id' => $poetry->id]);
         $this->assertSame(1, $existing->fresh()->sort_order);
@@ -132,7 +132,7 @@ class BookFoundationTest extends TestCase
         $deleted->delete();
         $other = $this->content($this->book());
         $before = (int) AppSetting::where('key', 'content_version')->value('value');
-        Livewire::test(ListPoems::class)->filterTable('collection', $book->id)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $book, 'pageClass' => EditCollection::class])
             ->call('reorderTable', [$b->id, $a->id])->assertHasNoErrors();
         $this->assertSame([$b->id, $a->id], $book->poems()->pluck('id')->all());
         $this->assertSame(1, $other->fresh()->sort_order);
@@ -148,7 +148,7 @@ class BookFoundationTest extends TestCase
                 $this->assertSame([1, 2, 3], $book->poems()->pluck('sort_order')->all());
             }
         }
-        Livewire::test(ListPoems::class)->call('reorderTable', [$other->id])->assertHasErrors(['order']);
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $book, 'pageClass' => EditCollection::class])->call('reorderTable', [$other->id])->assertHasErrors(['order']);
     }
 
     public function test_database_rejects_duplicate_order_numbers(): void
@@ -169,7 +169,7 @@ class BookFoundationTest extends TestCase
         Livewire::test(EditPoem::class, ['record' => $item->id])->callAction('delete');
         $this->assertSoftDeleted($item);
         $this->getJson('/api/poems/'.$item->id)->assertNotFound();
-        Livewire::test(ListPoems::class)->filterTable('trashed', false)->assertCanSeeTableRecords([$item]);
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $book, 'pageClass' => EditCollection::class])->filterTable('trashed', false)->assertCanSeeTableRecords([$item]);
         Livewire::test(EditPoem::class, ['record' => $item->id])->callAction('restore');
         $this->assertSame($body, $item->fresh()->body);
         Livewire::test(EditCollection::class, ['record' => $book->id])->callAction('delete');
@@ -287,7 +287,7 @@ class BookFoundationTest extends TestCase
         Livewire::test(CreateCollection::class)->fillForm(['title' => 'Duplicate', 'slug' => $book->slug])
             ->call('create')->assertHasFormErrors(['slug']);
         $item = $this->content($book);
-        Livewire::test(CreatePoem::class)->fillForm([
+        Livewire::withQueryParams(['collection_id' => $book->id])->test(CreatePoem::class)->fillForm([
             'collection_id' => $book->id, 'body' => 'Synthetic', 'excerpt' => 'Synthetic', 'slug' => $item->slug,
         ])->call('create')->assertHasFormErrors(['slug']);
         Livewire::test(CreateCollection::class)->fillForm(['title' => 'Invalid', 'book_type' => 'invalid'])

@@ -13,6 +13,20 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditPoem extends EditRecord
 {
+    use ReturnsToBook;
+
+    public function contentBookId(): int
+    {
+        return (int) $this->record->collection_id;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        unset($data['collection_id'], $data['sort_order']);
+
+        return $data;
+    }
+
     protected static string $resource = PoemResource::class;
 
     public function getTitle(): string
@@ -27,9 +41,9 @@ class EditPoem extends EditRecord
                 ->url(fn (): string => CollectionResource::getUrl('edit', [
                     'record' => $this->record->collection_id,
                 ])),
-            DeleteAction::make(),
+            DeleteAction::make()->successRedirectUrl($this->bookUrl()),
             RestoreAction::make(),
-            ForceDeleteAction::make(),
+            ForceDeleteAction::make()->successRedirectUrl($this->bookUrl()),
         ];
     }
 

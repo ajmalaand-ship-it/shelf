@@ -9,9 +9,9 @@ use App\Filament\Resources\Collections\CollectionResource;
 use App\Filament\Resources\Collections\Pages\CreateCollection;
 use App\Filament\Resources\Collections\Pages\EditCollection;
 use App\Filament\Resources\Collections\Pages\ListCollections;
+use App\Filament\Resources\Collections\RelationManagers\ContentRelationManager;
 use App\Filament\Resources\Poems\Pages\CreatePoem;
 use App\Filament\Resources\Poems\Pages\EditPoem;
-use App\Filament\Resources\Poems\Pages\ListPoems;
 use App\Filament\Resources\Poems\PoemResource;
 use App\Models\AppSetting;
 use App\Models\Author;
@@ -171,7 +171,7 @@ class AdminGateTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'ټولګه', 'slug' => 'upload-test', 'is_active' => true]);
 
-        Livewire::test(CreatePoem::class)
+        Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
             ->assertFormFieldExists('body', fn ($field): bool => $field instanceof Textarea)
             ->assertFormFieldDoesNotExist('manual_spacing_enabled')
             ->assertFormFieldDoesNotExist('manual_spacing_controls')
@@ -193,7 +193,7 @@ class AdminGateTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'audio-owner-flow']);
 
-        Livewire::test(CreatePoem::class)
+        Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
             ->fillForm([
                 'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن',
                 'excerpt' => 'متن',
@@ -241,7 +241,7 @@ class AdminGateTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'artwork-owner-flow']);
 
-        Livewire::test(CreatePoem::class)
+        Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
             ->fillForm([
                 'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن', 'excerpt' => 'متن',
                 'artwork_path' => [UploadedFile::fake()->image('first.png', 200, 300)],
@@ -324,7 +324,7 @@ class AdminGateTest extends TestCase
         $this->assertDatabaseHas('collections', ['id' => $collection->id, 'sort_order' => 2, 'is_active' => true]);
 
         $body = "لومړۍ کرښه\nدويمه کرښه\n\nدويم بند";
-        Livewire::test(CreatePoem::class)
+        Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
             ->fillForm([
                 'collection_id' => $collection->id, 'title' => 'TEST ONLY شعر', 'body' => $body,
                 'excerpt' => 'TEST ONLY',
@@ -377,9 +377,8 @@ class AdminGateTest extends TestCase
             'sort_order' => 2, 'is_active' => true, 'is_free_sample' => true,
         ]);
 
-        Livewire::test(ListPoems::class)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $firstCollection, 'pageClass' => EditCollection::class])
             ->assertTableColumnExists('admin_display_title')
-            ->assertTableColumnExists('collection.title')
             ->assertTableColumnExists('work_type')
             ->assertTableColumnExists('is_active')
             ->assertTableColumnExists('is_free_sample')
@@ -388,23 +387,22 @@ class AdminGateTest extends TestCase
             ->assertCanSeeTableRecords([$untitled])
             ->assertCanNotSeeTableRecords([$published]);
 
-        Livewire::test(ListPoems::class)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $secondCollection, 'pageClass' => EditCollection::class])
             ->searchTable('ليکلی سرليک')
             ->assertCanSeeTableRecords([$published])
             ->assertCanNotSeeTableRecords([$untitled]);
 
-        Livewire::test(ListPoems::class)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $firstCollection, 'pageClass' => EditCollection::class])
             ->assertTableActionVisible('publish', $untitled)
             ->callTableAction('publish', $untitled);
         $this->assertTrue($untitled->fresh()->is_active);
 
-        Livewire::test(ListPoems::class)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $firstCollection, 'pageClass' => EditCollection::class])
             ->assertTableActionVisible('unpublish', $untitled->fresh())
             ->callTableAction('unpublish', $untitled->fresh());
         $this->assertFalse($untitled->fresh()->is_active);
 
-        Livewire::test(ListPoems::class)
-            ->filterTable('collection', $firstCollection)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $firstCollection, 'pageClass' => EditCollection::class])
             ->assertCanSeeTableRecords([$untitled])
             ->assertCanNotSeeTableRecords([$published])
             ->call('updateTableColumnState', 'is_free_sample', (string) $untitled->id, true);
@@ -413,12 +411,12 @@ class AdminGateTest extends TestCase
             'id' => $untitled->id, 'is_free_sample' => true, 'is_active' => false,
         ]);
 
-        Livewire::test(ListPoems::class)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $firstCollection, 'pageClass' => EditCollection::class])
             ->filterTable('work_type', 'ORIGINAL')
-            ->assertCanSeeTableRecords([$published])
+            ->assertCanNotSeeTableRecords([$published])
             ->assertCanSeeTableRecords([$untitled]);
 
-        Livewire::test(ListPoems::class)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $secondCollection, 'pageClass' => EditCollection::class])
             ->filterTable('is_active', true)
             ->filterTable('is_free_sample', true)
             ->filterTable('audio_path', true)
@@ -436,7 +434,7 @@ class AdminGateTest extends TestCase
             'sort_order' => $order, 'is_active' => false, 'is_free_sample' => false,
         ]));
 
-        Livewire::test(ListPoems::class)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])
             ->assertTableBulkActionExists('setFree')
             ->assertTableBulkActionExists('setLocked')
             ->assertTableBulkActionExists('publish')
@@ -445,12 +443,12 @@ class AdminGateTest extends TestCase
 
         $this->assertSame(2, Poem::where('is_free_sample', true)->where('is_active', false)->count());
 
-        Livewire::test(ListPoems::class)->callTableBulkAction('publish', $poems);
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('publish', $poems);
         $this->assertSame(2, Poem::where('is_free_sample', true)->where('is_active', true)->count());
         $this->assertFalse($collection->fresh()->is_active);
 
-        Livewire::test(ListPoems::class)->callTableBulkAction('unpublish', $poems);
-        Livewire::test(ListPoems::class)->callTableBulkAction('setLocked', $poems);
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('unpublish', $poems);
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('setLocked', $poems);
         $this->assertSame(2, Poem::where('is_free_sample', false)->where('is_active', false)->count());
     }
 
@@ -498,8 +496,8 @@ class AdminGateTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'simple-layout-owner']);
 
-        Livewire::test(CreatePoem::class)
-            ->assertFormFieldDoesNotExist('layout_mode')
+        Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
+            ->assertFormFieldExists('layout_mode')
             ->assertFormFieldExists('sort_order')
             ->fillForm([
                 'collection_id' => $collection->id,
@@ -519,31 +517,27 @@ class AdminGateTest extends TestCase
             ->assertFormFieldExists('sort_order');
     }
 
-    public function test_owner_navigation_names_books_and_content(): void
+    public function test_owner_navigation_keeps_books_and_hides_global_content(): void
     {
         $this->assertSame('Books', CollectionResource::getNavigationLabel());
-        $this->assertSame('Content', PoemResource::getNavigationLabel());
+        $this->assertFalse(PoemResource::shouldRegisterNavigation());
         $this->assertSame('Library', CollectionResource::getNavigationGroup());
         $this->assertSame('Library', PoemResource::getNavigationGroup());
     }
 
-    public function test_collection_actions_open_filtered_poems_and_prefilled_poem_creation(): void
+    public function test_collection_actions_open_book_content_and_book_bound_creation(): void
     {
         $this->actingAs(User::factory()->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'owner-navigation']);
-        $manageUrl = PoemResource::getUrl('index', [
-            'filters' => ['collection' => ['value' => $collection->getKey()]],
-        ]);
+        $manageUrl = CollectionResource::getUrl('edit', ['record' => $collection]);
         $createUrl = PoemResource::getUrl('create', ['collection_id' => $collection->getKey()]);
 
         Livewire::test(ListCollections::class)
-            ->assertTableActionHasUrl('managePoems', $manageUrl, $collection)
-            ->assertTableActionHasUrl('addPoem', $createUrl, $collection);
+            ->assertTableActionHasUrl('managePoems', $manageUrl, $collection);
 
-        Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
-            ->assertActionHasUrl('managePoems', $manageUrl)
-            ->assertActionHasUrl('addPoem', $createUrl);
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])
+            ->assertTableActionHasUrl('create', $createUrl);
 
         Livewire::withQueryParams(['collection_id' => $collection->getKey()])
             ->test(CreatePoem::class)
@@ -561,9 +555,7 @@ class AdminGateTest extends TestCase
             'excerpt' => 'لنډ',
         ]);
 
-        Livewire::withQueryParams([
-            'filters' => ['collection' => ['value' => $collection->getKey()]],
-        ])->test(ListPoems::class)
+        Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])
             ->assertCanSeeTableRecords([$included])
             ->assertCanNotSeeTableRecords([$excluded]);
     }
@@ -589,7 +581,7 @@ class AdminGateTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'translation-validation']);
 
-        Livewire::test(CreatePoem::class)
+        Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
             ->fillForm([
                 'collection_id' => $collection->id,
                 'title' => null,
@@ -603,7 +595,7 @@ class AdminGateTest extends TestCase
             ->call('create')
             ->assertHasFormErrors(['original_author', 'translator']);
 
-        Livewire::test(CreatePoem::class)
+        Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
             ->fillForm([
                 'collection_id' => $collection->id,
                 'title' => null,
@@ -643,7 +635,7 @@ class AdminGateTest extends TestCase
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'version-admin']);
         $version = (int) AppSetting::where('key', 'content_version')->value('value');
 
-        Livewire::test(CreatePoem::class)
+        Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
             ->fillForm([
                 'collection_id' => $collection->id,
                 'body' => 'متن',

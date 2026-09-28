@@ -116,3 +116,7 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   list it in the report.
 
 - 2026-09-27: Word import is a separate task (5b) after task 5.
+
+- 2026-09-28: Task 5: Each book manages its own content. No global content list in
+  the admin. Manage poems/chapters, including bin and ordering, from the book only.
+  This change is Filament admin only; no database or API changes.

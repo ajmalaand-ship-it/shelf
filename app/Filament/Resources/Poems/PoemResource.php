@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Poems;
 
 use App\Filament\Resources\Poems\Pages\CreatePoem;
 use App\Filament\Resources\Poems\Pages\EditPoem;
-use App\Filament\Resources\Poems\Pages\ListPoems;
 use App\Filament\Resources\Poems\Schemas\PoemForm;
 use App\Filament\Resources\Poems\Tables\PoemsTable;
 use App\Models\Poem;
@@ -22,6 +21,10 @@ class PoemResource extends Resource
     protected static ?string $model = Poem::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static bool $isGloballySearchable = false;
 
     protected static ?string $navigationLabel = 'Content';
 
@@ -58,7 +61,6 @@ class PoemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListPoems::route('/'),
             'create' => CreatePoem::route('/create'),
             'edit' => EditPoem::route('/{record}/edit'),
         ];

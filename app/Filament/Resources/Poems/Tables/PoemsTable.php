@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Poems\Tables;
 
+use App\Filament\Resources\Poems\PoemResource;
 use App\Models\Poem;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\RestoreAction;
 use Filament\Tables\Columns\IconColumn;
@@ -31,7 +33,6 @@ class PoemsTable
                         $query->where('title', 'like', "%{$search}%")
                             ->orWhere('body', 'like', "%{$search}%");
                     })),
-                TextColumn::make('collection.title')->label('Book')->searchable()->sortable(),
                 TextColumn::make('work_type')->label('Work type')->badge()
                     ->color(fn (string $state): string => $state === 'TRANSLATION' ? 'info' : 'gray'),
                 IconColumn::make('is_active')->label('Published')->boolean(),
@@ -43,12 +44,11 @@ class PoemsTable
                     ->getStateUsing(fn (Poem $record): bool => filled($record->artwork_path)),
             ])
             ->defaultSort('sort_order')
-            ->reorderable('sort_order', fn ($livewire): bool => $livewire->selectedBookId() !== null)
+            ->reorderable('sort_order')
             ->paginationPageOptions([10, 25, 50, 100])
             ->defaultPaginationPageOption(25)
             ->filters([
                 TrashedFilter::make()->label('Bin')->placeholder('Current content')->trueLabel('Include bin')->falseLabel('Bin only'),
-                SelectFilter::make('collection')->label('Book')->relationship('collection', 'title', fn ($query) => $query->with('credits.author'))->getOptionLabelFromRecordUsing(fn ($record): string => $record->selector_label)->searchable()->preload(),
                 SelectFilter::make('work_type')->label('Work type')->options([
                     'ORIGINAL' => 'Original work',
                     'TRANSLATION' => 'Translation',
@@ -74,7 +74,8 @@ class PoemsTable
                     ->visible(fn (Poem $record): bool => $record->is_active)
                     ->requiresConfirmation()
                     ->action(fn (Poem $record) => $record->update(['is_active' => false])),
-                EditAction::make(),
+                EditAction::make()->url(fn (Poem $record): string => PoemResource::getUrl('edit', ['record' => $record])),
+                DeleteAction::make()->label('Move to bin'),
                 RestoreAction::make(),
             ])
             ->toolbarActions([
