@@ -1,7 +1,7 @@
 <?php
 
 // Owner-run read-only check after backup and migrations. No secrets are printed.
-use App\Models\Collection;
+use App\Support\BookCreditCheck;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 
@@ -13,25 +13,15 @@ try {
     if (DB::connection()->getDatabaseName() !== 'shelf_app') {
         throw new RuntimeException('Unexpected database target.');
     }
-    $books = Collection::with('credits.author')->whereIn('id', [1, 2, 3, 4, 5, 6])->orderBy('id')->get();
-    $valid = $books->count() === 6;
-    foreach ($books as $book) {
-        $credits = $book->credits->map(fn ($credit) => [
-            'role' => $credit->role, 'position' => $credit->position,
-            'name' => $credit->author->name, 'slug' => $credit->author->slug,
-        ])->all();
-        echo json_encode([
-            'id' => $book->id, 'title' => $book->title,
-            'language' => $book->language, 'credits' => $credits,
-        ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).PHP_EOL;
-        $valid = $valid && $book->language === 'ps' && $book->credits->contains('role', 'author');
-        if ($book->id === 6) {
-            $valid = $valid && $book->credits->contains(fn ($credit) => $credit->role === 'author' && $credit->author->name === 'پروین پژواک')
-                && $book->credits->contains(fn ($credit) => $credit->role === 'translator' && $credit->author->name === 'اجمل اند');
-        }
+    $report = BookCreditCheck::report();
+    foreach ($report['books'] as $book) {
+        echo json_encode($book, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).PHP_EOL;
     }
-    echo $valid ? "PASS: six books, Pashto, credited authors, and book 6 attribution verified.\n"
-        : "REVIEW REQUIRED: book count, language, or credits differ from the owner decision.\n";
+    echo json_encode(['book_8_unknown_author_unchanged' => $report['book_8_unknown_author_unchanged']],
+        JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).PHP_EOL;
+    $valid = $report['valid'];
+    echo $valid ? "PASS: exactly six approved books, all Pashto, with exact owner-approved credits.\n"
+        : "REVIEW REQUIRED: book IDs, count, language, or exact credits differ from the owner decision.\n";
     exit($valid ? 0 : 1);
 } catch (Throwable $error) {
     fwrite(STDERR, "Check failed; database and exception details withheld. No data changed.\n");

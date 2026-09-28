@@ -107,3 +107,10 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   is unknown and must not become an author record.
 - 2026-09-27: The six existing books are in Pashto (ps). Book 6 credits:
   author پروین پژواک, translator اجمل اند. Publishing requires an author and language.
+- 2026-09-27: Task 4 correction: poetry books 3, 4, 5, 7, 8 have only اجمل اند
+  as author, with no book translator. Book 6 سيند په پرخه کې has author پروین پژواک
+  and translator اجمل اند. All six books are ps. Nothing else belongs to پروین پژواک:
+  correct the four poems in book 4 attributed to her to ORIGINAL works by اجمل اند,
+  with no translator. This explicitly supersedes preservation of those four poems’
+  attribution only. Leave book 8’s one unknown-original-author poem unchanged and
+  list it in the report.
