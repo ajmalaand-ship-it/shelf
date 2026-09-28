@@ -11,6 +11,9 @@ class CollectionResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
+            'book_type' => $this->book_type,
+            'categories' => $this->categories->map(fn ($category) => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug])->values(),
             'title' => $this->title,
             'slug' => $this->slug,
             'author' => $this->author ?? $this->credits->where('role', 'author')->map(fn ($credit) => $credit->author->name)->implode('، '),

@@ -60,6 +60,7 @@ class PoemController extends Controller
 
     public function streamOwnerPreview(Poem $poem)
     {
+        abort_unless($poem->collection, 404);
         abort_unless($poem->audio_path && Storage::disk('audio')->exists($poem->audio_path), 404);
 
         return Storage::disk('audio')->response($poem->audio_path, null, [
@@ -85,6 +86,7 @@ class PoemController extends Controller
 
     public function streamOwnerPreviewArtwork(Poem $poem)
     {
+        abort_unless($poem->collection, 404);
         abort_unless($poem->artwork_path && Storage::disk('artwork')->exists($poem->artwork_path), 404);
 
         return Storage::disk('artwork')->response($poem->artwork_path, null, [

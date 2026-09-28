@@ -21,11 +21,13 @@ class CollectionForm
     {
         return $schema
             ->components([
-                Section::make('Collection / Book')
+                Section::make('Book')
                     ->columns(2)
                     ->schema([
                         TextInput::make('title')->label('Book title')->required()->maxLength(255),
                         TextInput::make('subtitle')->label('Subtitle')->maxLength(255),
+                        Select::make('book_type')->label('Book type')->options(['poetry' => 'Poetry', 'prose' => 'Prose'])->required()->default('poetry')->rules([Rule::in(['poetry', 'prose'])]),
+                        Select::make('categories')->relationship('categories', 'name')->multiple()->searchable()->preload(),
                         Select::make('language')->options(fn () => config('books.languages'))
                             ->rules([Rule::in(array_keys(config('books.languages')))])
                             ->required(fn (Get $get): bool => (bool) $get('is_active')),
@@ -68,15 +70,15 @@ class CollectionForm
                     ->columns(2)
                     ->schema([
                         TextInput::make('sort_order')->label('Book order')->numeric()->minValue(0)->required()->default(0),
-                        Toggle::make('is_active')->label('Published')->helperText('Draft collections and their poems remain outside the public catalogue.')->default(false)->live(),
+                        Toggle::make('is_active')->label('Published')->helperText('Draft books and their content remain outside the public catalogue.')->default(false)->live(),
                     ]),
                 Section::make('Advanced')
                     ->description('Rarely changed technical and commercial identifiers.')
                     ->columns(2)
                     ->schema([
-                        TextInput::make('slug')->label('Web identifier (slug)')->required()->alphaDash()
+                        TextInput::make('slug')->label('Web identifier (slug)')->required(fn (string $operation): bool => $operation === 'edit')->alphaDash()
                             ->unique(ignoreRecord: true)->maxLength(255)
-                            ->helperText('Required by existing API links. Change only deliberately.'),
+                            ->helperText('Generated from the title when blank on a new book. Title edits never change it. Change an existing identifier only deliberately.'),
                         TextInput::make('product_id')->label('Store product mapping')->maxLength(255)
                             ->helperText('Leave unchanged unless configuring an approved store product.'),
                     ])

@@ -21,7 +21,7 @@ class CollectionController extends Controller
 
         return CollectionResource::collection(Collection::query()
             ->where('is_active', true)
-            ->with('credits.author')
+            ->with(['credits.author', 'categories'])
             ->when(isset($filters['language']), fn ($query) => $query->where('language', $filters['language']))
             ->when(isset($filters['author']), fn ($query) => $query->whereHas('credits.author', function ($authors) use ($filters): void {
                 $authors->where('is_active', true)->where(function ($identity) use ($filters): void {
@@ -32,14 +32,14 @@ class CollectionController extends Controller
                 });
             }))
             ->withCount(['poems' => fn ($query) => $query->where('is_active', true)])
-            ->orderBy('sort_order')
-            ->get());
+            ->orderBy('sort_order')->orderBy('id')
+            ->paginate(50)->withQueryString());
     }
 
     public function show(Collection $collection): CollectionResource
     {
         abort_unless($collection->is_active, 404);
-        $collection->load('credits.author');
+        $collection->load(['credits.author', 'categories']);
         $collection->loadCount(['poems' => fn ($query) => $query->where('is_active', true)]);
 
         return new CollectionResource($collection);
@@ -49,6 +49,6 @@ class CollectionController extends Controller
     {
         abort_unless($collection->is_active, 404);
 
-        return PoemSummaryResource::collection($collection->poems()->where('is_active', true)->get());
+        return PoemSummaryResource::collection($collection->poems()->orderBy('id')->where('is_active', true)->paginate(50)->withQueryString());
     }
 }

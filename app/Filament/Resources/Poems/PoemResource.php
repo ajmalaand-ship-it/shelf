@@ -13,6 +13,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
 class PoemResource extends Resource
@@ -21,13 +23,13 @@ class PoemResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
-    protected static ?string $navigationLabel = 'Poems / شعرونه';
+    protected static ?string $navigationLabel = 'Content';
 
-    protected static ?string $modelLabel = 'poem';
+    protected static ?string $modelLabel = 'content';
 
-    protected static ?string $pluralModelLabel = 'Poems / شعرونه';
+    protected static ?string $pluralModelLabel = 'Content';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Poetry Library / شعري کتابتون';
+    protected static string|UnitEnum|null $navigationGroup = 'Library';
 
     protected static ?int $navigationSort = 2;
 
@@ -39,6 +41,11 @@ class PoemResource extends Resource
     public static function table(Table $table): Table
     {
         return PoemsTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class])->with('collection');
     }
 
     public static function getRelations(): array

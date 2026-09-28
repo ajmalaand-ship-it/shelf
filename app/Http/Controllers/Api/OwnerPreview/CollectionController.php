@@ -13,20 +13,20 @@ class CollectionController extends Controller
     public function index(): AnonymousResourceCollection
     {
         return OwnerPreviewCollectionResource::collection(Collection::query()
-            ->with('credits.author')->withCount('poems')
-            ->orderBy('sort_order')
-            ->get());
+            ->with(['credits.author', 'categories'])->withCount('poems')
+            ->orderBy('sort_order')->orderBy('id')
+            ->paginate(50)->withQueryString());
     }
 
     public function show(Collection $collection): OwnerPreviewCollectionResource
     {
-        $collection->load('credits.author')->loadCount('poems');
+        $collection->load(['credits.author', 'categories'])->loadCount('poems');
 
         return new OwnerPreviewCollectionResource($collection);
     }
 
     public function poems(Collection $collection): AnonymousResourceCollection
     {
-        return OwnerPreviewPoemSummaryResource::collection($collection->poems()->get());
+        return OwnerPreviewPoemSummaryResource::collection($collection->poems()->orderBy('id')->paginate(50)->withQueryString());
     }
 }

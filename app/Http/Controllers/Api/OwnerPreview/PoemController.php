@@ -13,12 +13,14 @@ class PoemController extends Controller
 {
     public function show(Poem $poem): OwnerPreviewPoemResource
     {
+        abort_unless($poem->collection, 404);
+
         return new OwnerPreviewPoemResource($poem);
     }
 
     public function audio(Poem $poem): JsonResponse
     {
-        abort_unless($poem->audio_path && Storage::disk('audio')->exists($poem->audio_path), 404);
+        abort_unless($poem->collection && $poem->audio_path && Storage::disk('audio')->exists($poem->audio_path), 404);
 
         return response()->json([
             'locked' => false,

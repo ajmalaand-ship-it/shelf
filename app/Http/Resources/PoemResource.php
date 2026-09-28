@@ -18,6 +18,7 @@ class PoemResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'slug' => $this->slug,
             'collection_slug' => $this->collection->slug,
             'title' => $this->title,
             'work_type' => $this->work_type,
@@ -25,7 +26,7 @@ class PoemResource extends JsonResource
             'translator' => $this->translator,
             'source_date_place' => $this->source_date_place,
             'source_note' => $this->source_note,
-            'layout_mode' => $this->layout_mode,
+            'layout_mode' => $this->effective_layout_mode,
             'locked' => $locked,
             'requires_entitlement' => ! $this->is_free_sample,
             'excerpt' => $this->excerpt,

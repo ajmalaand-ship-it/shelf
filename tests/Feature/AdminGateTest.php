@@ -492,7 +492,7 @@ class AdminGateTest extends TestCase
         $this->assertSame(1, $collection->poems()->where('is_active', true)->count());
     }
 
-    public function test_poem_form_hides_legacy_layout_and_keeps_order_in_book(): void
+    public function test_poem_form_offers_poetry_layout_and_automatic_order_in_book(): void
     {
         $this->actingAs(User::factory()->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
@@ -515,16 +515,16 @@ class AdminGateTest extends TestCase
         $this->assertSame(1, $poem->sort_order);
 
         Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
-            ->assertFormFieldDoesNotExist('layout_mode')
+            ->assertFormFieldExists('layout_mode')
             ->assertFormFieldExists('sort_order');
     }
 
-    public function test_owner_navigation_prominently_names_books_and_poems(): void
+    public function test_owner_navigation_names_books_and_content(): void
     {
-        $this->assertSame('Collections / کتابونه', CollectionResource::getNavigationLabel());
-        $this->assertSame('Poems / شعرونه', PoemResource::getNavigationLabel());
-        $this->assertSame('Poetry Library / شعري کتابتون', CollectionResource::getNavigationGroup());
-        $this->assertSame('Poetry Library / شعري کتابتون', PoemResource::getNavigationGroup());
+        $this->assertSame('Books', CollectionResource::getNavigationLabel());
+        $this->assertSame('Content', PoemResource::getNavigationLabel());
+        $this->assertSame('Library', CollectionResource::getNavigationGroup());
+        $this->assertSame('Library', PoemResource::getNavigationGroup());
     }
 
     public function test_collection_actions_open_filtered_poems_and_prefilled_poem_creation(): void
@@ -657,7 +657,7 @@ class AdminGateTest extends TestCase
         $this->assertSame($version + 1, (int) AppSetting::where('key', 'content_version')->value('value'));
 
         Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
-            ->fillForm(['sort_order' => 2])
+            ->fillForm(['source_note' => 'Updated source note'])
             ->call('save')
             ->assertHasNoFormErrors();
         $this->assertSame($version + 2, (int) AppSetting::where('key', 'content_version')->value('value'));
@@ -676,10 +676,10 @@ class AdminGateTest extends TestCase
 
         Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
             ->callAction('delete');
-        $this->assertDatabaseMissing('poems', ['id' => $poem->id]);
+        $this->assertSoftDeleted('poems', ['id' => $poem->id]);
 
         Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
             ->callAction('delete');
-        $this->assertDatabaseMissing('collections', ['id' => $collection->id]);
+        $this->assertSoftDeleted('collections', ['id' => $collection->id]);
     }
 }

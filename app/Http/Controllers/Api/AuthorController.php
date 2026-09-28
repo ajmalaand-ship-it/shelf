@@ -14,7 +14,7 @@ class AuthorController extends Controller
     private function publishedBooks(): \Closure
     {
         return fn ($query) => $query->where('collections.is_active', true)
-            ->with('credits.author')
+            ->with(['credits.author', 'categories'])
             ->withCount(['poems' => fn ($poems) => $poems->where('is_active', true)])
             ->orderBy('sort_order')->orderBy('collections.id');
     }

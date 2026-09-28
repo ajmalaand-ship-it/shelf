@@ -79,11 +79,12 @@ class ReconcileTsapoDatePlaceTest extends TestCase
     {
         $collection = Collection::create(['title' => 'څپو کې انځورونه', 'slug' => 'tsapo-ambiguous']);
         $poem = $this->poem($collection, 1, null);
-        $this->poem($collection, 1, null);
-        $this->writeManifest([$this->sourceRecord($poem, 'source')]);
+        // Duplicate database positions are now forbidden; duplicate source
+        // sequences must still be rejected by the reconciliation guard.
+        $this->writeManifest([$this->sourceRecord($poem, 'source'), $this->sourceRecord($poem, 'source')]);
 
         $this->artisan('poetry:reconcile-tsapo-date-place', ['manifest' => $this->manifestPath, '--apply' => true])
-            ->expectsOutputToContain('AMBIGUOUS_MATCH=1')
+            ->expectsOutputToContain('AMBIGUOUS_MATCH=2')
             ->expectsOutputToContain('APPLY_REFUSED=YES')
             ->assertFailed();
         $this->assertNull($poem->fresh()->source_date_place);

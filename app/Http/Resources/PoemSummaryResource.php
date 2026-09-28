@@ -15,6 +15,7 @@ class PoemSummaryResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'slug' => $this->slug,
             'title' => $this->title,
             'work_type' => $this->work_type,
             'original_author' => $this->original_author,

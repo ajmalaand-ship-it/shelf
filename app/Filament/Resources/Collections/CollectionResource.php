@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
 class CollectionResource extends Resource
@@ -22,13 +23,13 @@ class CollectionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
 
-    protected static ?string $navigationLabel = 'Collections / کتابونه';
+    protected static ?string $navigationLabel = 'Books';
 
-    protected static ?string $modelLabel = 'collection / book';
+    protected static ?string $modelLabel = 'book';
 
-    protected static ?string $pluralModelLabel = 'Collections / کتابونه';
+    protected static ?string $pluralModelLabel = 'Books';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Poetry Library / شعري کتابتون';
+    protected static string|UnitEnum|null $navigationGroup = 'Library';
 
     protected static ?int $navigationSort = 1;
 
@@ -44,7 +45,7 @@ class CollectionResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('credits.author')->withCount([
+        return parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class])->with(['credits.author', 'categories'])->withCount([
             'poems',
             'poems as free_poems_count' => fn (Builder $query) => $query->where('is_free_sample', true),
             'poems as published_poems_count' => fn (Builder $query) => $query->where('is_active', true),
