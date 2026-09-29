@@ -20,10 +20,10 @@ per-book ownership decisions separately.
 
 ## Configuration and rollout
 
-`READER_ACCOUNTS_ENABLED=false` disables all account mutations and authenticated
-account routes. `READER_PUBLIC_REGISTRATION=false` allows new accounts only for the
-existing owner's email, in the separate reader table. Keep this restriction until
-the staging boundary is satisfied. Existing book access rules are unchanged.
+`READER_ACCOUNTS_ENABLED=false` disables account mutations and authenticated
+routes. Registration accepts any email, including the owner's email, in the
+separate reader table. Staging is required before anyone other than the owner
+uses the app. Account screens always use English and left-to-right layout.
 
 Back up with `scripts/shelf_daily_backup.py` before migrations or live setup.
 Apply the reversible migration using `php artisan migrate --force` and clear
@@ -64,3 +64,26 @@ Google cryptographic checks, direct access denials, bilingual widgets and accoun
 switching, alongside the existing reader, source-text and layout regression tests.
 Real-phone sign-in, email-link handling and secure-storage behavior still need
 owner verification. Do not begin public or closed Play testing before staging.
+
+For screenshots, set `SHELF_ACCOUNT_SCREENSHOTS` to a new directory under
+`/home/shelf/tmp` before running the same test command. The account capture test
+loads readable fonts and checks 320 × 568 and 430 × 932 layouts in both interface
+languages, including password checkmarks and the English/LTR deletion dialog.
+
+`scripts/check_reader_accounts.py` performs an approved live HTTPS lifecycle check
+using only an explicitly supplied owner Gmail plus-alias. Run after a verified
+backup, with `--base-url`, `--owner-email` and `--alias shelf-test-...`, in an
+interactive terminal with input echo disabled. Feed each emailed action link as
+JSON on stdin (`{"url": "..."}`); do not display or save its token. The runner
+checks single-use links, password reset/change, device revocation and confirmed
+deletion, and stops on an unexpected response. Its `--recover` option finishes
+an interrupted test using the existing verification email. At the login-window
+prompt, wait at least a minute after the previous logins before entering
+`continue`. Gmail searches must include Spam (`in:anywhere`).
+
+`bash scripts/build_owner_preview.sh` builds a private debug APK with the existing
+owner test signing certificate and a seven-day preview token. Build workspaces
+and dependency caches are isolated under `/home/shelf/tmp` and cleaned on exit.
+The APK remains in `storage/app/private/owner-apks/`; the helper prints its
+checksum, signing certificate hashes and token expiry, never the token itself.
+This is an owner test artifact, not a Play release build.
