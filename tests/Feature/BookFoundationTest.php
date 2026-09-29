@@ -164,7 +164,7 @@ class BookFoundationTest extends TestCase
     {
         $this->owner();
         $book = $this->book(['status' => 'published']);
-        $item = $this->content($book, ['is_active' => true, 'is_free_sample' => true]);
+        $item = $this->content($book, ['is_active' => true, 'sample_mode' => 'full']);
         $body = $item->body;
         Livewire::test(EditPoem::class, ['record' => $item->id])->callAction('delete');
         $this->assertSoftDeleted($item);
@@ -223,7 +223,7 @@ class BookFoundationTest extends TestCase
         $book = $this->book(['book_type' => 'prose', 'status' => 'published']);
         for ($i = 0; $i < 51; $i++) {
             $this->book(['status' => 'published']);
-            $this->content($book, ['title' => 'Chapter '.$i, 'is_active' => true, 'is_free_sample' => true]);
+            $this->content($book, ['title' => 'Chapter '.$i, 'is_active' => true, 'sample_mode' => 'full']);
         }
         $this->getJson('/api/collections')->assertOk()->assertJsonCount(50, 'data')->assertJsonPath('meta.total', 52);
         $this->getJson('/api/collections?page=2')->assertOk()->assertJsonCount(2, 'data');

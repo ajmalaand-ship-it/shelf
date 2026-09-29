@@ -171,7 +171,7 @@ class AuthorsAndLanguagesTest extends TestCase
         $this->assertFalse($draft->fresh()->isPublished());
         Storage::fake('covers');
         Storage::disk('covers')->put('cover.jpg', 'synthetic');
-        $draft->poems()->create(['body' => 'Synthetic', 'excerpt' => '', 'is_active' => true]);
+        $draft->poems()->create(['body' => 'Synthetic', 'excerpt' => '', 'is_active' => true, 'sample_mode' => 'full']);
         $draft->update(['language' => 'fa', 'cover_image' => 'cover.jpg']);
         $draft->credits()->create(['author_id' => $person->id, 'role' => 'author']);
         Livewire::test(ListCollections::class)->callTableAction('publish', $draft)->assertHasNoErrors();

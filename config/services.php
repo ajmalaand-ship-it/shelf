@@ -35,12 +35,4 @@ return [
         ],
     ],
 
-    'revenuecat' => [
-        'secret_api_key' => env('REVENUECAT_SECRET_API_KEY'),
-        'entitlement' => env('REVENUECAT_ENTITLEMENT', 'unlock_all'),
-        'timeout_seconds' => env('REVENUECAT_TIMEOUT_SECONDS', 4),
-        'positive_ttl_seconds' => env('REVENUECAT_POSITIVE_TTL_SECONDS', 86400),
-        'negative_ttl_seconds' => env('REVENUECAT_NEGATIVE_TTL_SECONDS', 300),
-    ],
-
 ];

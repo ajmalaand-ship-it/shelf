@@ -43,7 +43,7 @@ class OwnerPreviewApiTest extends TestCase
             'original_author' => 'پروین پژواک',
             'translator' => 'اجمل اند',
             'sort_order' => 3,
-            'is_free_sample' => false,
+            'sample_mode' => 'none',
             'is_active' => false,
         ]);
     }

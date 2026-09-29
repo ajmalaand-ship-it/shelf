@@ -50,7 +50,7 @@ class BookContentAdminTest extends TestCase
     {
         $book = Collection::create(['title' => 'Synthetic book']);
         $own = Poem::create(['body' => 'Synthetic source', 'excerpt' => 'Synthetic excerpt', 'collection_id' => $book->id, 'title' => 'Shared search']);
-        $foreign = Poem::create(['body' => 'Synthetic source', 'excerpt' => 'Synthetic excerpt', 'collection_id' => Collection::create(['title' => 'Other book'])->id, 'title' => 'Shared search', 'is_free_sample' => false]);
+        $foreign = Poem::create(['body' => 'Synthetic source', 'excerpt' => 'Synthetic excerpt', 'collection_id' => Collection::create(['title' => 'Other book'])->id, 'title' => 'Shared search', 'sample_mode' => 'none']);
         $this->manager($book)->searchTable('Shared search')->assertCanSeeTableRecords([$own])->assertCanNotSeeTableRecords([$foreign]);
         try {
             $this->manager($book)->callTableAction('delete', $foreign);
@@ -60,7 +60,7 @@ class BookContentAdminTest extends TestCase
         }
         $this->assertNotSoftDeleted($foreign);
         $this->manager($book)->callTableBulkAction('setFree', [$foreign]);
-        $this->assertFalse($foreign->fresh()->is_free_sample);
+        $this->assertFalse($foreign->fresh()->hasSample());
         $this->manager($book)->callTableAction('delete', $own);
         $this->assertSoftDeleted($own);
         $foreign->delete();

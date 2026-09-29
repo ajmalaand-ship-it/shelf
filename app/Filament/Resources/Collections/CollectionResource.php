@@ -48,7 +48,7 @@ class CollectionResource extends Resource
     {
         return parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class])->with(['credits.author', 'categories'])->withCount([
             'poems',
-            'poems as free_poems_count' => fn (Builder $query) => $query->where('is_free_sample', true),
+            'poems as free_poems_count' => fn (Builder $query) => $query->whereIn('sample_mode', ['full', 'partial']),
             'poems as published_poems_count' => fn (Builder $query) => $query->where('is_active', true),
             'poems as audio_poems_count' => fn (Builder $query) => $query->whereNotNull('audio_path'),
         ]);

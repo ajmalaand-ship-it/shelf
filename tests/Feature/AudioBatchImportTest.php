@@ -42,7 +42,7 @@ class AudioBatchImportTest extends TestCase
         $collection = Collection::create(['title' => 'څپو کې انځورونه', 'slug' => 'tsapo-ke-anzorona']);
         $poem = Poem::create([
             'collection_id' => $collection->id, 'body' => "لومړۍ کرښه\nدويمه کرښه",
-            'excerpt' => 'لومړۍ کرښه', 'sort_order' => 1, 'is_free_sample' => true,
+            'excerpt' => 'لومړۍ کرښه', 'sort_order' => 1, 'sample_mode' => 'full',
         ]);
 
         $this->artisan('poetry:audio-manifest', [
@@ -118,7 +118,7 @@ class AudioBatchImportTest extends TestCase
         $collection = Collection::create(['title' => 'څپو کې انځورونه', 'slug' => 'tsapo-ke-anzorona']);
         $poem = Poem::create([
             'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'ازمېښتي متن',
-            'excerpt' => 'ازمېښتي متن', 'sort_order' => 1, 'is_free_sample' => true,
+            'excerpt' => 'ازمېښتي متن', 'sort_order' => 1, 'sample_mode' => 'full',
         ]);
         File::put($this->manifest, json_encode([
             'collection' => ['id' => $collection->id, 'title' => $collection->title, 'slug' => $collection->slug],

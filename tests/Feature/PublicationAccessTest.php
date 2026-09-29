@@ -28,7 +28,7 @@ class PublicationAccessTest extends TestCase
         $book = Collection::create(['title' => 'Synthetic', 'language' => 'ps', 'status' => $status, 'cover_image' => 'synthetic.jpg']);
         $book->credits()->create(['author_id' => Author::create(['name' => 'Synthetic author'])->id, 'role' => 'author']);
         $book->poems()->create(['body' => 'ټ ډ ړ ږ ښ ڼ ې ۍ', 'excerpt' => '', 'is_active' => true,
-            'is_free_sample' => true, 'audio_path' => 'test.mp3', 'artwork_path' => 'test.png']);
+            'sample_mode' => 'full', 'audio_path' => 'test.mp3', 'artwork_path' => 'test.png']);
 
         return $book;
     }

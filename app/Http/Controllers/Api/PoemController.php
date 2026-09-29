@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PoemResource;
 use App\Models\Poem;
-use App\Services\RevenueCatEntitlementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,13 +19,12 @@ class PoemController extends Controller
         return new PoemResource($poem);
     }
 
-    public function audio(Request $request, Poem $poem, RevenueCatEntitlementService $entitlements): JsonResponse
+    public function audio(Request $request, Poem $poem): JsonResponse
     {
         abort_unless($poem->is_active && $poem->collection?->isPublished(), 404);
 
-        $paidAccess = ! $poem->is_free_sample && $entitlements->requestIsEntitled($request);
-        if (! $poem->is_free_sample && ! $paidAccess) {
-            return response()->json(['locked' => true, 'excerpt' => $poem->excerpt]);
+        if (! $poem->allowsPublicMedia()) {
+            return response()->json(['locked' => true, 'excerpt' => $poem->sampleExcerpt()]);
         }
 
         abort_unless($poem->audio_path && Storage::disk('audio')->exists($poem->audio_path), 404);
@@ -36,7 +34,7 @@ class PoemController extends Controller
             'url' => URL::temporarySignedRoute(
                 'poems.audio.stream',
                 now()->addMinutes(10),
-                ['poem' => $poem, 'access' => $paidAccess ? 'paid' : 'free'],
+                ['poem' => $poem],
             ),
             'duration_seconds' => $poem->audio_duration_seconds,
             'cache_key' => $poem->audioCacheKey(),
@@ -46,16 +44,15 @@ class PoemController extends Controller
 
     public function stream(Request $request, Poem $poem)
     {
-        $signedPaidAccess = $request->query('access') === 'paid';
         abort_unless(
             $poem->is_active
             && $poem->collection?->isPublished()
-            && ($poem->is_free_sample || $signedPaidAccess),
+            && $poem->allowsPublicMedia(),
             404,
         );
         abort_unless($poem->audio_path && Storage::disk('audio')->exists($poem->audio_path), 404);
 
-        return Storage::disk('audio')->response($poem->audio_path);
+        return Storage::disk('audio')->response($poem->audio_path, null, ['Cache-Control' => 'private, no-store']);
     }
 
     public function streamOwnerPreview(Poem $poem)
@@ -70,17 +67,16 @@ class PoemController extends Controller
 
     public function streamArtwork(Request $request, Poem $poem)
     {
-        $signedPaidAccess = $request->query('access') === 'paid';
         abort_unless(
             $poem->is_active
             && $poem->collection?->isPublished()
-            && ($poem->is_free_sample || $signedPaidAccess),
+            && $poem->allowsPublicMedia(),
             404,
         );
         abort_unless($poem->artwork_path && Storage::disk('artwork')->exists($poem->artwork_path), 404);
 
         return Storage::disk('artwork')->response($poem->artwork_path, null, [
-            'Cache-Control' => 'private, max-age=600',
+            'Cache-Control' => 'private, no-store',
         ]);
     }
 

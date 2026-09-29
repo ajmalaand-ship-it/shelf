@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\SampleText;
 use App\Support\UniqueSlug;
 use Database\Factories\PoemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class Poem extends Model
 {
@@ -26,15 +28,19 @@ class Poem extends Model
 
     public const LAYOUT_MODES = [self::LAYOUT_SOURCE, self::LAYOUT_COUPLET, self::LAYOUT_FOUR_LINES];
 
+    public const SAMPLE_MODES = ['none' => 'No sample', 'full' => 'Full item', 'partial' => 'First part only'];
+
+    protected $attributes = ['sample_mode' => 'none'];
+
     protected $fillable = [
         'slug', 'collection_id', 'title', 'body', 'excerpt', 'work_type', 'original_author', 'translator',
         'source_date_place', 'source_note', 'layout_mode', 'artwork_path', 'audio_path', 'audio_duration_seconds', 'sort_order',
-        'is_free_sample', 'is_active',
+        'sample_mode', 'sample_unit', 'sample_count', 'is_active',
     ];
 
     protected function casts(): array
     {
-        return ['is_free_sample' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'audio_duration_seconds' => 'integer'];
+        return ['is_free_sample' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'audio_duration_seconds' => 'integer', 'sample_count' => 'integer'];
     }
 
     public function save(array $options = [])
@@ -71,6 +77,20 @@ class Poem extends Model
             }
         });
         static::saving(function (Poem $poem): void {
+            if (! array_key_exists($poem->sample_mode, self::SAMPLE_MODES)) {
+                throw ValidationException::withMessages(['sample_mode' => 'Choose a valid sample mode.']);
+            }
+            if ($poem->sample_mode === 'partial') {
+                $count = filter_var($poem->getAttributes()['sample_count'] ?? null, FILTER_VALIDATE_INT);
+                if (! $count || $count < 1 || ! in_array($poem->sample_unit, ['lines', 'paragraphs'], true)
+                    || blank($poem->sampleText())) {
+                    throw ValidationException::withMessages(['sample_count' => 'Choose a positive count that leaves some text for the full book.']);
+                }
+            } else {
+                $poem->sample_unit = null;
+                $poem->sample_count = null;
+            }
+
             if ($poem->isDirty('layout_mode') && $poem->collection?->book_type === 'prose') {
                 $poem->layout_mode = self::LAYOUT_SOURCE;
             }
@@ -104,6 +124,40 @@ class Poem extends Model
         }
 
         return '';
+    }
+
+    public function sampleText(): ?string
+    {
+        return match ($this->sample_mode) {
+            'full' => $this->body,
+            'partial' => SampleText::prefix($this->body ?? '', $this->sample_unit ?? '', (int) $this->sample_count),
+            default => null,
+        };
+    }
+
+    public function hasSample(): bool
+    {
+        return filled($this->sampleText());
+    }
+
+    public function sampleExcerpt(): ?string
+    {
+        $text = $this->sampleText();
+
+        return $text === null ? null : mb_substr($text, 0, 240);
+    }
+
+    public function allowsPublicMedia(): bool
+    {
+        // A full recording or illustration may expose text outside a partial sample.
+        return $this->sample_mode === 'full' && $this->hasSample();
+    }
+
+    public function getSampleLabelAttribute(): string
+    {
+        return $this->sample_mode === 'partial'
+            ? 'First '.$this->sample_count.' '.$this->sample_unit
+            : (self::SAMPLE_MODES[$this->sample_mode] ?? 'No sample');
     }
 
     public function audioCacheKey(): ?string

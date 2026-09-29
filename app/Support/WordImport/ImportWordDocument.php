@@ -72,7 +72,7 @@ class ImportWordDocument
                     foreach ($document['items'] as $item) {
                         $record = $book->poems()->create([
                             'title' => $item['title'], 'body' => $item['body'],
-                            'excerpt' => '', 'is_active' => false, 'is_free_sample' => false,
+                            'excerpt' => '', 'is_active' => false, 'sample_mode' => 'none',
                             'layout_mode' => Poem::LAYOUT_SOURCE,
                         ]);
                         $ids[] = $record->id;

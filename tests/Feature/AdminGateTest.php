@@ -180,7 +180,7 @@ class AdminGateTest extends TestCase
             ->fillForm([
                 'collection_id' => $collection->id, 'title' => 'شعر', 'body' => 'متن',
                 'excerpt' => 'لنډ متن', 'audio_path' => [UploadedFile::fake()->create('attack.php', 2, 'application/x-php')],
-                'sort_order' => 1, 'is_free_sample' => true, 'is_active' => true,
+                'sort_order' => 1, 'sample_mode' => 'full', 'is_active' => true,
             ])
             ->call('create')
             ->assertHasFormErrors(['audio_path']);
@@ -198,7 +198,7 @@ class AdminGateTest extends TestCase
                 'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن',
                 'excerpt' => 'متن',
                 'audio_path' => [UploadedFile::fake()->create('first.m4a', 20, 'audio/mp4')],
-                'sort_order' => 1, 'is_free_sample' => true, 'is_active' => false,
+                'sort_order' => 1, 'sample_mode' => 'full', 'is_active' => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -245,7 +245,7 @@ class AdminGateTest extends TestCase
             ->fillForm([
                 'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن', 'excerpt' => 'متن',
                 'artwork_path' => [UploadedFile::fake()->image('first.png', 200, 300)],
-                'sort_order' => 1, 'is_free_sample' => false, 'is_active' => false,
+                'sort_order' => 1, 'sample_mode' => 'none', 'is_active' => false,
             ])->call('create')->assertHasNoFormErrors();
 
         $poem = Poem::where('title', 'TEST ONLY')->firstOrFail();
@@ -331,7 +331,7 @@ class AdminGateTest extends TestCase
                 'work_type' => 'TRANSLATION', 'original_author' => 'پروین پژواک', 'translator' => 'اجمل اند',
                 'audio_path' => [UploadedFile::fake()->create('voice.m4a', 20, 'audio/mp4')],
                 'audio_duration_seconds' => 12, 'sort_order' => 4,
-                'is_free_sample' => false, 'is_active' => false,
+                'sample_mode' => 'none', 'is_active' => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -344,11 +344,11 @@ class AdminGateTest extends TestCase
         Storage::disk('audio')->assertExists($poem->audio_path);
 
         Livewire::test(EditPoem::class, ['record' => $poem->getRouteKey()])
-            ->fillForm(['sort_order' => 1, 'is_free_sample' => true, 'is_active' => true])
+            ->fillForm(['sort_order' => 1, 'sample_mode' => 'full', 'is_active' => true])
             ->call('save')
             ->assertHasNoFormErrors();
         $this->assertDatabaseHas('poems', [
-            'id' => $poem->id, 'sort_order' => 1, 'is_free_sample' => true, 'is_active' => true,
+            'id' => $poem->id, 'sort_order' => 1, 'sample_mode' => 'full', 'is_active' => true,
         ]);
 
         $setting = AppSetting::where('key', 'content_version')->firstOrFail();
@@ -369,19 +369,19 @@ class AdminGateTest extends TestCase
             'collection_id' => $firstCollection->id,
             'body' => "د لټون لومړۍ کرښه\nدويمه کرښه",
             'excerpt' => 'لنډ متن', 'sort_order' => 1,
-            'is_active' => false, 'is_free_sample' => false,
+            'is_active' => false, 'sample_mode' => 'none',
         ]);
         $published = Poem::create([
             'collection_id' => $secondCollection->id, 'title' => 'ليکلی سرليک',
             'body' => 'متن', 'excerpt' => 'لنډ متن', 'audio_path' => 'test-only.m4a',
-            'sort_order' => 2, 'is_active' => true, 'is_free_sample' => true,
+            'sort_order' => 2, 'is_active' => true, 'sample_mode' => 'full',
         ]);
 
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $firstCollection, 'pageClass' => EditCollection::class])
             ->assertTableColumnExists('admin_display_title')
             ->assertTableColumnExists('work_type')
             ->assertTableColumnExists('is_active')
-            ->assertTableColumnExists('is_free_sample')
+            ->assertTableColumnExists('sample_label')
             ->assertTableColumnExists('audio_path')
             ->searchTable('د لټون لومړۍ کرښه')
             ->assertCanSeeTableRecords([$untitled])
@@ -405,10 +405,10 @@ class AdminGateTest extends TestCase
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $firstCollection, 'pageClass' => EditCollection::class])
             ->assertCanSeeTableRecords([$untitled])
             ->assertCanNotSeeTableRecords([$published])
-            ->call('updateTableColumnState', 'is_free_sample', (string) $untitled->id, true);
+            ->callTableBulkAction('setFree', [$untitled]);
 
         $this->assertDatabaseHas('poems', [
-            'id' => $untitled->id, 'is_free_sample' => true, 'is_active' => false,
+            'id' => $untitled->id, 'sample_mode' => 'full', 'is_active' => false,
         ]);
 
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $firstCollection, 'pageClass' => EditCollection::class])
@@ -418,7 +418,7 @@ class AdminGateTest extends TestCase
 
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $secondCollection, 'pageClass' => EditCollection::class])
             ->filterTable('is_active', true)
-            ->filterTable('is_free_sample', true)
+            ->filterTable('sample_mode', 'full')
             ->filterTable('audio_path', true)
             ->assertCanSeeTableRecords([$published])
             ->assertCanNotSeeTableRecords([$untitled]);
@@ -431,7 +431,7 @@ class AdminGateTest extends TestCase
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'bulk-actions', 'status' => 'draft']);
         $poems = collect([1, 2])->map(fn (int $order) => Poem::create([
             'collection_id' => $collection->id, 'body' => "شعر {$order}", 'excerpt' => 'لنډ',
-            'sort_order' => $order, 'is_active' => false, 'is_free_sample' => false,
+            'sort_order' => $order, 'is_active' => false, 'sample_mode' => 'none',
         ]));
 
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])
@@ -441,15 +441,15 @@ class AdminGateTest extends TestCase
             ->assertTableBulkActionExists('unpublish')
             ->callTableBulkAction('setFree', $poems);
 
-        $this->assertSame(2, Poem::where('is_free_sample', true)->where('is_active', false)->count());
+        $this->assertSame(2, Poem::where('sample_mode', 'full')->where('is_active', false)->count());
 
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('publish', $poems);
-        $this->assertSame(2, Poem::where('is_free_sample', true)->where('is_active', true)->count());
+        $this->assertSame(2, Poem::where('sample_mode', 'full')->where('is_active', true)->count());
         $this->assertFalse($collection->fresh()->isPublished());
 
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('unpublish', $poems);
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('setLocked', $poems);
-        $this->assertSame(2, Poem::where('is_free_sample', false)->where('is_active', false)->count());
+        $this->assertSame(2, Poem::where('sample_mode', 'none')->where('is_active', false)->count());
     }
 
     public function test_collection_list_shows_counts_and_uses_deliberate_publication_actions(): void
@@ -463,11 +463,11 @@ class AdminGateTest extends TestCase
         ]);
         Poem::create([
             'collection_id' => $collection->id, 'body' => 'لومړی', 'excerpt' => 'لنډ',
-            'is_free_sample' => true, 'is_active' => true, 'audio_path' => 'test.m4a',
+            'sample_mode' => 'full', 'is_active' => true, 'audio_path' => 'test.m4a',
         ]);
         Poem::create([
             'collection_id' => $collection->id, 'body' => 'دويم', 'excerpt' => 'لنډ',
-            'is_free_sample' => false, 'is_active' => false,
+            'sample_mode' => 'none', 'is_active' => false,
         ]);
 
         $collection->update(['language' => 'ps']);

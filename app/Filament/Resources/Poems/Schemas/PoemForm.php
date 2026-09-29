@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Poems\Schemas;
 
 use App\Models\Collection;
 use App\Models\Poem;
+use App\Support\SampleText;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -55,13 +56,23 @@ class PoemForm
                             ->extraInputAttributes(['dir' => 'rtl'])->columnSpanFull(),
                     ]),
                 Section::make('Access / Publication')
-                    ->description('Draft/published and free/locked are separate decisions.')
+                    ->description('Visibility and sample approval are separate decisions. Only approved sample text is public.')
                     ->columns(2)
                     ->schema([
                         Toggle::make('is_active')->label('Visible')->helperText('Hidden items are never available through the public API.')->default(false),
-                        Toggle::make('is_free_sample')->label('Free sample')->helperText('Off means the item is locked and requires entitlement when published.')->default(false),
-                        Textarea::make('excerpt')->label('Public excerpt')->required()->rows(5)
-                            ->helperText('Shown when a locked item is listed or opened without entitlement. Do not rewrite the source text.')
+                        Select::make('sample_mode')->label('Free sample')->options(Poem::SAMPLE_MODES)->default('none')->required()->live()->rules([Rule::in(array_keys(Poem::SAMPLE_MODES))]),
+                        Select::make('sample_unit')->label('Count by')->options(['lines' => 'Lines', 'paragraphs' => 'Paragraphs'])
+                            ->visible(fn (Get $get): bool => $get('sample_mode') === 'partial')->required(fn (Get $get): bool => $get('sample_mode') === 'partial')->live()
+                            ->helperText('Lines end at a line break. Paragraphs are blocks separated by a blank line. Full audio and artwork stay private for partial samples.'),
+                        TextInput::make('sample_count')->label('Number of free lines / paragraphs')->integer()->minValue(1)
+                            ->visible(fn (Get $get): bool => $get('sample_mode') === 'partial')->required(fn (Get $get): bool => $get('sample_mode') === 'partial')
+                            ->rules([fn (Get $get): \Closure => function (string $attribute, mixed $value, \Closure $fail) use ($get): void {
+                                if ($get('sample_mode') === 'partial' && blank(SampleText::prefix($get('body') ?? '', $get('sample_unit') ?? '', (int) $value))) {
+                                    $fail('Choose a count that leaves some text for the full book.');
+                                }
+                            }]),
+                        Textarea::make('excerpt')->label('Legacy excerpt (private)')->default('')->dehydrateStateUsing(fn (?string $state): string => $state ?? '')->rows(5)
+                            ->helperText('Retained for the owner only. Public excerpts come only from the approved sample; this field grants no access.')
                             ->extraInputAttributes(['dir' => 'rtl'])->columnSpanFull(),
                     ]),
                 Section::make('Audio / غږ')

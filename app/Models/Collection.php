@@ -126,9 +126,22 @@ class Collection extends Model
         if (! $this->poems()->where('is_active', true)->exists()) {
             $errors['status'] = 'Add at least one visible item before publishing.';
         }
+        if (! $this->poems()->where('is_active', true)->whereIn('sample_mode', ['full', 'partial'])->get()->contains(fn (Poem $item): bool => $item->hasSample())) {
+            $errors['status'] = 'Approve at least one visible free sample before publishing.';
+        }
         if ($errors) {
             throw ValidationException::withMessages($errors);
         }
+    }
+
+    public function sampleSummary(): string
+    {
+        $items = $this->poems()->whereIn('sample_mode', ['full', 'partial'])->get();
+        $visible = $items->where('is_active', true)->filter(fn (Poem $item): bool => $item->hasSample());
+
+        return 'Visible samples: '.$visible->where('sample_mode', 'full')->count().' full items, '
+            .$visible->where('sample_mode', 'partial')->count().' first parts. '
+            .$items->where('is_active', false)->count().' hidden sample items. A visible sample is required to publish.';
     }
 
     public function isPublished(): bool

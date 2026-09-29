@@ -100,7 +100,7 @@ class ImportPoetryManifest extends Command
                     'source_note' => $source['source_note'] ?? null,
                     'sort_order' => $source['sequence'],
                     'artwork_path' => $poemArtwork['target_path'] ?? null,
-                    'is_free_sample' => false,
+                    'sample_mode' => 'none',
                     'is_active' => false,
                     'audio_path' => null,
                     'audio_duration_seconds' => null,

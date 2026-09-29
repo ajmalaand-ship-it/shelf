@@ -21,7 +21,7 @@ class PoetryApiTest extends TestCase
         $body = "د زړه خبره\nد مينې سندره\n\nدويم بند";
         $poem = Poem::create([
             'collection_id' => $collection->id, 'title' => 'ازمېښتي شعر', 'body' => $body,
-            'excerpt' => 'د زړه خبره', 'sort_order' => 1, 'is_free_sample' => true, 'is_active' => true,
+            'excerpt' => 'د زړه خبره', 'sort_order' => 1, 'sample_mode' => 'full', 'is_active' => true,
         ]);
 
         $this->getJson("/api/poems/{$poem->id}")
@@ -37,14 +37,14 @@ class PoetryApiTest extends TestCase
         $collection = Collection::create(['title' => 'ټولګه', 'slug' => 'locked', 'status' => 'published']);
         $poem = Poem::create([
             'collection_id' => $collection->id, 'title' => 'پټ شعر', 'body' => 'بشپړ پټ متن',
-            'excerpt' => 'لنډه برخه', 'audio_path' => 'source.mp3', 'is_free_sample' => false, 'is_active' => true,
+            'excerpt' => 'لنډه برخه', 'audio_path' => 'source.mp3', 'sample_mode' => 'none', 'is_active' => true,
         ]);
 
         $this->getJson("/api/poems/{$poem->id}")
             ->assertOk()->assertJsonPath('data.locked', true)->assertJsonPath('data.body', null)
             ->assertJsonMissingPath('data.presentation_spacing');
         $this->getJson("/api/poems/{$poem->id}/audio")
-            ->assertOk()->assertExactJson(['locked' => true, 'excerpt' => 'لنډه برخه']);
+            ->assertOk()->assertExactJson(['locked' => true, 'excerpt' => null]);
     }
 
     public function test_only_active_collections_and_poems_are_public(): void
@@ -86,7 +86,7 @@ class PoetryApiTest extends TestCase
         $poem = Poem::create([
             'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'ازمېښتي متن',
             'excerpt' => 'ازمېښت', 'audio_path' => 'test-only.m4a', 'audio_duration_seconds' => 15,
-            'is_free_sample' => true, 'is_active' => true,
+            'sample_mode' => 'full', 'is_active' => true,
         ]);
 
         $this->getJson('/api/collections/media-test')
@@ -109,7 +109,7 @@ class PoetryApiTest extends TestCase
         $poem = Poem::create([
             'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن',
             'excerpt' => 'متن', 'audio_path' => 'first/test.m4a',
-            'is_free_sample' => true, 'is_active' => true,
+            'sample_mode' => 'full', 'is_active' => true,
         ]);
         $initialVersion = (int) AppSetting::where('key', 'content_version')->value('value');
 
@@ -140,15 +140,15 @@ class PoetryApiTest extends TestCase
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'artwork-access', 'status' => 'published']);
         $free = Poem::create([
             'collection_id' => $collection->id, 'body' => 'متن', 'excerpt' => 'متن',
-            'artwork_path' => 'poems/test.png', 'is_free_sample' => true, 'is_active' => true,
+            'artwork_path' => 'poems/test.png', 'sample_mode' => 'full', 'is_active' => true,
         ]);
         $locked = Poem::create([
             'collection_id' => $collection->id, 'body' => 'پټ', 'excerpt' => 'لنډ',
-            'artwork_path' => 'poems/test.png', 'is_free_sample' => false, 'is_active' => true,
+            'artwork_path' => 'poems/test.png', 'sample_mode' => 'none', 'is_active' => true,
         ]);
         $draft = Poem::create([
             'collection_id' => $collection->id, 'body' => 'مسوده', 'excerpt' => 'مسوده',
-            'artwork_path' => 'poems/test.png', 'is_free_sample' => true, 'is_active' => false,
+            'artwork_path' => 'poems/test.png', 'sample_mode' => 'full', 'is_active' => false,
         ]);
 
         $freeResponse = $this->getJson("/api/poems/{$free->id}")
@@ -171,7 +171,7 @@ class PoetryApiTest extends TestCase
         $poem = Poem::create([
             'collection_id' => $collection->id, 'title' => 'TEST ONLY', 'body' => 'متن',
             'excerpt' => 'متن', 'audio_path' => 'private/missing.m4a',
-            'is_free_sample' => true, 'is_active' => true,
+            'sample_mode' => 'full', 'is_active' => true,
         ]);
 
         $this->getJson("/api/poems/{$poem->id}/audio")
@@ -220,7 +220,7 @@ class PoetryApiTest extends TestCase
             'collection_id' => $collection->id, 'title' => 'ژمى', 'body' => 'ژباړل شوی متن',
             'excerpt' => 'ژباړل شوی متن', 'work_type' => 'TRANSLATION',
             'original_author' => 'پروین پژواک', 'translator' => 'اجمل اند',
-            'source_note' => 'دپروین پژواک ديو شعرژباړه', 'is_free_sample' => true, 'is_active' => true,
+            'source_note' => 'دپروین پژواک ديو شعرژباړه', 'sample_mode' => 'full', 'is_active' => true,
         ]);
 
         $this->getJson("/api/poems/{$poem->id}")
@@ -241,7 +241,7 @@ class PoetryApiTest extends TestCase
             'body' => $body,
             'excerpt' => 'لنډ',
             'layout_mode' => Poem::LAYOUT_COUPLET,
-            'is_free_sample' => true,
+            'sample_mode' => 'full',
             'is_active' => true,
         ]);
 
@@ -260,7 +260,7 @@ class PoetryApiTest extends TestCase
         $version = (int) AppSetting::where('key', 'content_version')->value('value');
 
         $poem->update(['layout_mode' => Poem::LAYOUT_FOUR_LINES]);
-        $poem->update(['sort_order' => 8, 'is_active' => true, 'is_free_sample' => true]);
+        $poem->update(['sort_order' => 8, 'is_active' => true, 'sample_mode' => 'full']);
         $collection->update(['title' => 'TEST ONLY UPDATED']);
 
         $this->assertSame($version + 3, (int) AppSetting::where('key', 'content_version')->value('value'));

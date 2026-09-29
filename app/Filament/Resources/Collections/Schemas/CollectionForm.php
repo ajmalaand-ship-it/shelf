@@ -67,6 +67,7 @@ class CollectionForm
                         Textarea::make('publication_info')->label('Publication information')->rows(7)->extraInputAttributes(['dir' => 'rtl']),
                     ])
                     ->collapsible(),
+                Section::make('Sample summary')->description(fn (?Collection $record): string => $record?->sampleSummary() ?? 'Save the book, then approve samples in its Content tab.')->schema([]),
                 Section::make('Order / Publication')
                     ->columns(2)
                     ->schema([

@@ -12,7 +12,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\RestoreAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -36,8 +35,7 @@ class PoemsTable
                 TextColumn::make('work_type')->label('Work type')->badge()
                     ->color(fn (string $state): string => $state === 'TRANSLATION' ? 'info' : 'gray'),
                 IconColumn::make('is_active')->label('Visible')->boolean(),
-                ToggleColumn::make('is_free_sample')->label('Free sample')
-                    ->tooltip(fn (bool $state): string => $state ? 'Free sample' : 'Locked'),
+                TextColumn::make('sample_label')->label('Free sample')->badge(),
                 IconColumn::make('audio_path')->label('Audio')->boolean()
                     ->getStateUsing(fn (Poem $record): bool => filled($record->audio_path)),
                 IconColumn::make('artwork_path')->label('Artwork')->boolean()
@@ -55,8 +53,7 @@ class PoemsTable
                 ]),
                 TernaryFilter::make('is_active')->label('Visibility')
                     ->trueLabel('Visible')->falseLabel('Hidden')->placeholder('All visibility states'),
-                TernaryFilter::make('is_free_sample')->label('Access')
-                    ->trueLabel('Free sample')->falseLabel('Locked')->placeholder('All access states'),
+                SelectFilter::make('sample_mode')->label('Free sample')->options(Poem::SAMPLE_MODES),
                 TernaryFilter::make('audio_path')->label('Audio')
                     ->trueLabel('Audio present')->falseLabel('Audio missing')->placeholder('All audio states')
                     ->nullable(),
@@ -80,15 +77,15 @@ class PoemsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    BulkAction::make('setFree')->label('Set Free')
+                    BulkAction::make('setFree')->label('Sample: full item')
                         ->requiresConfirmation()
                         ->modalDescription('Mark the selected content as free samples. Hidden content remain hidden.')
-                        ->action(fn (Collection $records) => $records->each->update(['is_free_sample' => true]))
+                        ->action(fn (Collection $records) => $records->each->update(['sample_mode' => 'full']))
                         ->deselectRecordsAfterCompletion(),
-                    BulkAction::make('setLocked')->label('Set Locked')
+                    BulkAction::make('setLocked')->label('Remove sample')
                         ->requiresConfirmation()
                         ->modalDescription('Mark the selected content as locked. Visibility will not change.')
-                        ->action(fn (Collection $records) => $records->each->update(['is_free_sample' => false]))
+                        ->action(fn (Collection $records) => $records->each->update(['sample_mode' => 'none']))
                         ->deselectRecordsAfterCompletion(),
                     BulkAction::make('publish')->label('Show')
                         ->requiresConfirmation()

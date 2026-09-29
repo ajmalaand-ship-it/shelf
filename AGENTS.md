@@ -201,3 +201,20 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   maintenance down, optimize:clear, migrate --force, shelf:move-covers --after-backup,
   maintenance up, shelf:check-publication. Stop at the first failure; if a failure
   occurs after down, run php artisan up before stopping.
+
+- 2026-09-28: Tasks 8 + 9 approved: samples work for every book type. The owner
+  chooses no sample, full item, or an exact first part counted by lines/paragraphs.
+  A reversible migration clears ALL legacy free flags; retain source text and
+  legacy excerpts privately, and restore old flags only on migration rollback.
+  A visible approved sample is required to publish. Admin shows sample controls,
+  column/filter and book summary. The app clearly labels samples and the full-book
+  remainder. Until Step 4 only approved sample text is readable publicly.
+- 2026-09-28: Retire global unlock access completely. No legacy product, offering,
+  entitlement, cached provider result or caller header can grant access. Public
+  audio/artwork require a full-item sample and a signed URL; partial samples must
+  not expose their full recording or artwork. Owner preview still sees everything.
+  Remove old purchase/restore UI and product IDs from the app; show Coming soon.
+  Future ownership must be verified for the exact book in Step 4.
+- 2026-09-28: Codex runs the Task 8 + 9 rollout with escalation: backup first in
+  the same run, down, optimize:clear, migrate, up, then sample/access checks and
+  direct HTTPS probes. Stop at the first failure, running up first if down began.

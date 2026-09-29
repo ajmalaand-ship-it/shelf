@@ -44,7 +44,7 @@ class ImportPoetryManifestTest extends TestCase
 
         $this->assertDatabaseCount('poems', 1);
         $this->assertDatabaseHas('poems', [
-            'title' => null, 'sort_order' => 1, 'is_active' => false, 'is_free_sample' => false,
+            'title' => null, 'sort_order' => 1, 'is_active' => false, 'sample_mode' => 'none',
         ]);
 
         File::delete($manifestPath);
@@ -85,7 +85,7 @@ class ImportPoetryManifestTest extends TestCase
         ]);
         $this->assertDatabaseHas('poems', [
             'title' => 'ژمى', 'work_type' => 'TRANSLATION', 'original_author' => 'پروین پژواک',
-            'translator' => 'اجمل اند', 'is_active' => false, 'is_free_sample' => false,
+            'translator' => 'اجمل اند', 'is_active' => false, 'sample_mode' => 'none',
         ]);
         $this->assertDatabaseCount('poems', 1);
 
