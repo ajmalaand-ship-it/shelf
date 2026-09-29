@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
-
 import '../models/app_config.dart';
 import '../models/poem.dart';
 import '../models/poetry_collection.dart';
@@ -208,16 +206,7 @@ class PoetryRepository implements PoetryDataSource {
   Future<AudioAccess> loadAudio(int poemId) async =>
       AudioAccess.fromJson(await _api.getObject('poems/$poemId/audio'));
 
-  String _accessScope() {
-    final entitlements = _entitlements;
-    if (entitlements == null ||
-        !entitlements.entitled ||
-        entitlements.userId == null) {
-      return 'public';
-    }
-    final digest = sha256.convert(utf8.encode(entitlements.userId!)).toString();
-    return 'paid.${digest.substring(0, 16)}';
-  }
+  String _accessScope() => 'sample-only';
 
   CollectionBundle _parseBundle(
     Map<String, dynamic> collectionJson,

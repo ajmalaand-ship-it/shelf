@@ -203,17 +203,6 @@ class QaFixtureRepository implements PoetryDataSource {
     if (contentVersion != _version) throw StateError('Invalid QA version');
     final poem = _poems[id];
     if (poem == null) throw StateError('Unknown QA poem');
-    if (id == 9104 && entitlements?.entitled == true) {
-      return _detail(
-        id: 9104,
-        slug: _covered.slug,
-        title: 'ژباړه — تړلې بېلګه',
-        workType: 'TRANSLATION',
-        originalAuthor: 'د QA اصلي شاعر',
-        translator: 'د QA ژباړن',
-        body: 'پرانيستل شوی مصنوعي QA متن\nدويمه ازموينيزه کرښه',
-      );
-    }
     return poem;
   }
 

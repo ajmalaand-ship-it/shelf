@@ -17,9 +17,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final preferences = await SharedPreferences.getInstance();
   final settings = await ReaderSettings.load(preferences);
-  const publicRevenueCatKey = String.fromEnvironment(
-    'REVENUECAT_PUBLIC_SDK_KEY',
-  );
   const ownerPreviewRequested = bool.fromEnvironment('OWNER_PREVIEW');
   const ownerPreviewToken = String.fromEnvironment('OWNER_PREVIEW_TOKEN');
   final sourceMode = selectPoetrySourceMode(
@@ -28,12 +25,7 @@ Future<void> main() async {
     ownerPreviewRequested: ownerPreviewRequested,
     ownerPreviewToken: ownerPreviewToken,
   );
-  final entitlements = EntitlementController(
-    createPurchaseProvider(
-      qaMode: sourceMode == PoetrySourceMode.qa,
-      publicSdkKey: publicRevenueCatKey,
-    ),
-  );
+  final entitlements = EntitlementController(const InactivePurchaseProvider());
   await entitlements.initialize();
   final repository = createPoetryDataSource(
     preferences: preferences,

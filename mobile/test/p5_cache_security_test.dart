@@ -10,32 +10,29 @@ import 'package:shelf/services/api_client.dart';
 import 'test_support.dart';
 
 void main() {
-  test(
-    'API sends anonymous ID only to configured Shelf API and can force refresh',
-    () async {
-      final provider = _MutableProvider()..entitled = true;
-      final controller = EntitlementController(provider);
-      await controller.initialize();
-      late http.Request captured;
-      final client = ApiClient(
-        entitlements: controller,
-        client: MockClient((request) async {
-          captured = request;
-          return http.Response.bytes(
-            utf8.encode(jsonEncode({'data': poemDetailJson()})),
-            200,
-          );
-        }),
-        baseUri: Uri.parse('https://shelf.services/api/'),
-      );
+  test('API never sends legacy purchase identity or refresh headers', () async {
+    final provider = _MutableProvider()..entitled = true;
+    final controller = EntitlementController(provider);
+    await controller.initialize();
+    late http.Request captured;
+    final client = ApiClient(
+      entitlements: controller,
+      client: MockClient((request) async {
+        captured = request;
+        return http.Response.bytes(
+          utf8.encode(jsonEncode({'data': poemDetailJson()})),
+          200,
+        );
+      }),
+      baseUri: Uri.parse('https://shelf.services/api/'),
+    );
 
-      await client.getDataObject('poems/301', refreshEntitlement: true);
+    await client.getDataObject('poems/301', refreshEntitlement: true);
 
-      expect(captured.url.host, 'shelf.services');
-      expect(captured.headers['X-RC-User-Id'], r'$RCAnonymousID:p5-test');
-      expect(captured.headers['X-RC-Refresh'], '1');
-    },
-  );
+    expect(captured.url.host, 'shelf.services');
+    expect(captured.headers['X-RC-User-Id'], isNull);
+    expect(captured.headers['X-RC-Refresh'], isNull);
+  });
 
   test('unentitled context never reads paid full-text cache', () async {
     final cache = MemoryCacheStore();
@@ -66,7 +63,7 @@ void main() {
     expect((await online.loadPoem(301, 7)).locked, isTrue);
     provider.entitled = true;
     await controller.restore();
-    expect((await online.loadPoem(301, 7)).body, 'PAID FULL TEXT');
+    expect((await online.loadPoem(301, 7)).body, isNull);
     provider.entitled = false;
     await controller.initialize();
 
@@ -82,10 +79,7 @@ void main() {
       offline.loadPoem(301, 7),
       throwsA(isA<http.ClientException>()),
     );
-    expect(
-      cache.values.keys.where((key) => key.contains('.paid.')),
-      isNotEmpty,
-    );
+    expect(cache.values.keys.where((key) => key.contains('.paid.')), isEmpty);
   });
 }
 
@@ -99,8 +93,10 @@ class _MutableProvider implements PurchaseProvider {
   Future<PurchaseSnapshot> customerInfo() async =>
       PurchaseSnapshot(entitled: entitled);
   @override
-  Future<PurchaseProduct?> product() async =>
-      const PurchaseProduct(identifier: revenueCatProductId, price: '€4.99');
+  Future<PurchaseProduct?> product() async => const PurchaseProduct(
+    identifier: 'synthetic-unused-product',
+    price: '€4.99',
+  );
   @override
   Future<PurchaseSnapshot> purchase() async =>
       PurchaseSnapshot(entitled: entitled);

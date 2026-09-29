@@ -172,7 +172,7 @@ void main() {
     'authoritative 404 never falls back to previously cached content',
     () async {
       final cache = MemoryCacheStore();
-      cache.values['shelf.content.v1.public.7.poem.301'] = jsonEncode(
+      cache.values['shelf.content.v1.sample-only.7.poem.301'] = jsonEncode(
         poemDetailJson(),
       );
       final repository = PoetryRepository(
@@ -188,7 +188,7 @@ void main() {
       );
       expect(
         cache.values,
-        isNot(contains('shelf.content.v1.public.7.poem.301')),
+        isNot(contains('shelf.content.v1.sample-only.7.poem.301')),
       );
     },
   );

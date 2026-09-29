@@ -39,7 +39,7 @@ void main() {
     expect(summary.translator, 'اجمل اند');
     expect(detail.locked, isTrue);
     expect(detail.body, isNull);
-    expect(detail.readableText, 'لنډه برخه\nدويمه کرښه');
+    expect(detail.readableText, isEmpty);
   });
 
   test('malformed responses fail safely', () {

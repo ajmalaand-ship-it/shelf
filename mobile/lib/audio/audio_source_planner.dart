@@ -30,12 +30,13 @@ class AudioSourcePlanner {
     if (!poem.hasPlayableAudio) {
       throw StateError('Poem has no accessible audio');
     }
-    if (poem.requiresEntitlement && entitlements?.entitled != true) {
-      throw const AudioLockedException();
+    final access = await repository.loadAudio(poem.id);
+    if (access.cacheKey != poem.audioCacheKey) {
+      throw const FormatException('Audio changed; refresh required');
     }
-    final entitlementScope = poem.requiresEntitlement
-        ? entitlements!.userId ?? 'unidentified'
-        : 'public';
+    final entitlementScope = repository is OwnerPreviewRepository
+        ? 'owner-preview'
+        : 'sample-only';
     final target = await cache.fileFor(
       poemId: poem.id,
       cacheKey: '$entitlementScope:${poem.audioCacheKey!}',
@@ -48,10 +49,6 @@ class AudioSourcePlanner {
     }
 
     await cache.clearPartial(target);
-    final access = await repository.loadAudio(poem.id);
-    if (access.cacheKey != poem.audioCacheKey) {
-      throw const FormatException('Audio changed; refresh required');
-    }
     return RemoteAudioPlan(target, access);
   }
 }

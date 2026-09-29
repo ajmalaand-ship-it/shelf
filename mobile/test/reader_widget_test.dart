@@ -436,7 +436,49 @@ void main() {
   });
 
   testWidgets(
-    'locked reader shows excerpt with purchase and restore controls',
+    'partial sample is labelled and only the approved part is readable',
+    (tester) async {
+      final repository = PoetryRepository(
+        api: ApiClient(
+          client: MockClient(
+            (_) async => http.Response.bytes(
+              utf8.encode(
+                jsonEncode({
+                  'data': {
+                    ...poemDetailJson(body: 'Approved first line'),
+                    'sample_mode': 'partial',
+                    'has_more': true,
+                    'is_free_sample': true,
+                    'requires_entitlement': true,
+                  },
+                }),
+              ),
+              200,
+            ),
+          ),
+        ),
+        cache: MemoryCacheStore(),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PoemReaderScreen(
+            poemId: 301,
+            contentVersion: 7,
+            repository: repository,
+            settings: await settings(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('sample-label')), findsOneWidget);
+      expect(find.byKey(const Key('book-coming-soon')), findsOneWidget);
+      expect(find.textContaining('Approved first line'), findsWidgets);
+      expect(find.byKey(const Key('restore-purchases')), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'locked reader shows coming soon without purchase or restore controls',
     (tester) async {
       final entitlements = EntitlementController(_ReaderPurchaseProvider());
       await entitlements.initialize();
@@ -465,11 +507,17 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('دا شعر تړلی دی'), findsOneWidget);
-      expect(find.textContaining('لنډه برخه'), findsOneWidget);
-      expect(find.text('TEST PRICE'), findsOneWidget);
-      expect(find.byKey(const Key('unlock-all')), findsOneWidget);
-      expect(find.byKey(const Key('restore-purchases')), findsOneWidget);
+      expect(find.byKey(const Key('book-coming-soon')), findsOneWidget);
+      expect(find.textContaining('لنډه برخه'), findsNothing);
+      expect(
+        tester
+            .widget<TextButton>(find.byKey(const Key('reader-share')))
+            .onPressed,
+        isNull,
+      );
+      expect(find.text('TEST PRICE'), findsNothing);
+      expect(find.byKey(const Key('unlock-all')), findsNothing);
+      expect(find.byKey(const Key('restore-purchases')), findsNothing);
       expect(find.textContaining('ټ ډ ړ ږ ښ ڼ ې ۍ'), findsNothing);
     },
   );
@@ -485,7 +533,7 @@ class _ReaderPurchaseProvider implements PurchaseProvider {
       const PurchaseSnapshot(entitled: false);
   @override
   Future<PurchaseProduct?> product() async => const PurchaseProduct(
-    identifier: revenueCatProductId,
+    identifier: 'synthetic-unused-product',
     price: 'TEST PRICE',
   );
   @override

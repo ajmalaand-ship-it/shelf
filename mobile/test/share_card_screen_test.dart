@@ -68,8 +68,13 @@ void main() {
     expect(renderer.preparedPaintedPage, isTrue);
   });
 
-  testWidgets('locked poem shares only its visible excerpt', (tester) async {
-    final poem = PoemDetail.fromJson(poemDetailJson(locked: true));
+  testWidgets('partial sample shares only its approved body', (tester) async {
+    final poem = PoemDetail.fromJson({
+      ...poemDetailJson(body: 'Approved sample only'),
+      'sample_mode': 'partial',
+      'has_more': true,
+      'is_free_sample': true,
+    });
     final output = _FakeOutput();
     final renderer = _FakeRenderer();
     await tester.pumpWidget(
@@ -83,8 +88,8 @@ void main() {
       ),
     );
 
-    expect(find.text('شته لنډه برخه'), findsOneWidget);
-    await tester.tap(find.text('شته لنډه برخه'));
+    expect(find.text('Sample — نمونه'), findsOneWidget);
+    await tester.tap(find.text('Sample — نمونه'));
     await tester.pump();
     await _scrollToShare(tester);
     final shareButton = tester.widget<FilledButton>(
@@ -98,7 +103,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(renderer.lastRequest?.text, poem.excerpt);
+    expect(renderer.lastRequest?.text, poem.body);
     expect(renderer.lastRequest?.text, isNot(contains('پټ بشپړ متن')));
     expect(output.sharedCount, 1);
   });

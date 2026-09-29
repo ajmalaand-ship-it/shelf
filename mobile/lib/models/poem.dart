@@ -12,6 +12,8 @@ class PoemSummary {
     required this.sortOrder,
     this.isActive = true,
     this.isFreeSample = true,
+    this.sampleMode = 'full',
+    this.hasMore = false,
   });
 
   factory PoemSummary.fromJson(Map<String, dynamic> json) => PoemSummary(
@@ -26,6 +28,10 @@ class PoemSummary {
     audioDurationSeconds: _int(json, 'audio_duration_seconds'),
     sortOrder: _int(json, 'sort_order') ?? 0,
     isActive: json['is_active'] == null ? true : _bool(json, 'is_active'),
+    sampleMode: _string(json, 'sample_mode') ?? 'none',
+    hasMore: json['has_more'] == null
+        ? _bool(json, 'locked')
+        : _bool(json, 'has_more'),
     isFreeSample: json['is_free_sample'] == null
         ? !(_bool(json, 'locked'))
         : _bool(json, 'is_free_sample'),
@@ -43,6 +49,8 @@ class PoemSummary {
   final int sortOrder;
   final bool isActive;
   final bool isFreeSample;
+  final String sampleMode;
+  final bool hasMore;
 
   bool get isTranslation => workType == 'TRANSLATION';
   bool get isUntitled => title == null || title!.trim().isEmpty;
@@ -62,6 +70,8 @@ class PoemSummary {
     'sort_order': sortOrder,
     'is_active': isActive,
     'is_free_sample': isFreeSample,
+    'sample_mode': sampleMode,
+    'has_more': hasMore,
   };
 }
 
@@ -102,6 +112,8 @@ class PoemDetail {
     this.shareAuthorLabel,
     this.isActive = true,
     this.isFreeSample = true,
+    this.sampleMode = 'full',
+    this.hasMore = false,
   });
 
   factory PoemDetail.fromJson(Map<String, dynamic> json) {
@@ -146,6 +158,10 @@ class PoemDetail {
       audioFormat: _string(audio, 'format'),
       audioLabel: _string(audio, 'label'),
       isActive: json['is_active'] == null ? true : _bool(json, 'is_active'),
+      sampleMode: _string(json, 'sample_mode') ?? 'none',
+      hasMore: json['has_more'] == null
+          ? _bool(json, 'locked')
+          : _bool(json, 'has_more'),
       isFreeSample: json['is_free_sample'] == null
           ? !(_bool(json, 'requires_entitlement'))
           : _bool(json, 'is_free_sample'),
@@ -179,12 +195,14 @@ class PoemDetail {
   final String? shareAuthorLabel;
   final bool isActive;
   final bool isFreeSample;
+  final String sampleMode;
+  final bool hasMore;
 
   bool get isTranslation => workType == 'TRANSLATION';
   bool get isUntitled => title == null || title!.trim().isEmpty;
   String get displayTitle =>
       isUntitled ? firstNonEmptyLine(body ?? excerpt) : title!.trim();
-  String get readableText => locked ? (excerpt ?? '') : (body ?? excerpt ?? '');
+  String get readableText => locked ? '' : (body ?? excerpt ?? '');
   bool get hasPlayableAudio =>
       audioAvailable && !locked && !audioLocked && audioCacheKey != null;
   String get cardAuthor => shareAuthorLabel ?? 'اجمل اند';

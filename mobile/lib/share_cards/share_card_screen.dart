@@ -99,7 +99,9 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
                 ButtonSegment(
                   value: ShareCardScope.accessiblePoem,
                   label: Text(
-                    widget.poem.locked ? 'شته لنډه برخه' : 'بشپړ شعر',
+                    widget.poem.hasMore || widget.poem.locked
+                        ? 'Sample — نمونه'
+                        : 'بشپړ متن',
                   ),
                 ),
               ],

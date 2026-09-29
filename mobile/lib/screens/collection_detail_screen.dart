@@ -218,6 +218,8 @@ class _PoemTile extends StatelessWidget {
       ),
       subtitle:
           [
+            if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)
+              'Sample — نمونه',
             if (poem.isTranslation)
               'اصلي شاعر: ${poem.originalAuthor ?? '—'}\nپښتو ژباړه: ${poem.translator ?? '—'}',
             if (ownerPreviewMode)
@@ -227,6 +229,8 @@ class _PoemTile extends StatelessWidget {
           ? null
           : Text(
               [
+                if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)
+                  'Sample — نمونه',
                 if (poem.isTranslation)
                   'اصلي شاعر: ${poem.originalAuthor ?? '—'}\nپښتو ژباړه: ${poem.translator ?? '—'}',
                 if (ownerPreviewMode)

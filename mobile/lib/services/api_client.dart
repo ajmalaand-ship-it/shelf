@@ -86,11 +86,6 @@ class ApiClient {
     if (authorizationToken case final token? when token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
     }
-    final userId = entitlements?.userId;
-    if (userId != null && userId.isNotEmpty) {
-      headers['X-RC-User-Id'] = userId;
-      if (refreshEntitlement) headers['X-RC-Refresh'] = '1';
-    }
     final response = await _client
         .get(baseUri.resolve(path), headers: headers)
         .timeout(const Duration(seconds: 12));

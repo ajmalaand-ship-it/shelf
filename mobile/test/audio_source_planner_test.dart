@@ -19,32 +19,32 @@ void main() {
     if (await directory.exists()) await directory.delete(recursive: true);
   });
 
-  test(
-    'uncached source fetches metadata while cached replay stays offline',
-    () async {
-      final repository = _AudioRepository();
-      final cache = AudioCacheStore(directory);
-      final planner = AudioSourcePlanner(repository, cache);
-      final poem = PoemDetail.fromJson(
-        poemDetailJson(
-          audioAvailable: true,
-          audioDurationSeconds: 8,
-          audioCacheKey: 'recording-v1',
-          audioFormat: 'm4a',
-        ),
-      );
+  test('cached audio still needs current server permission', () async {
+    final repository = _AudioRepository();
+    final cache = AudioCacheStore(directory);
+    final planner = AudioSourcePlanner(repository, cache);
+    final poem = PoemDetail.fromJson(
+      poemDetailJson(
+        audioAvailable: true,
+        audioDurationSeconds: 8,
+        audioCacheKey: 'recording-v1',
+        audioFormat: 'm4a',
+      ),
+    );
 
-      final miss = await planner.resolve(poem);
-      expect(miss, isA<RemoteAudioPlan>());
-      expect(repository.requests, 1);
-      await miss.file.writeAsBytes([1, 2, 3]);
-      repository.offline = true;
+    final miss = await planner.resolve(poem);
+    expect(miss, isA<RemoteAudioPlan>());
+    expect(repository.requests, 1);
+    await miss.file.writeAsBytes([1, 2, 3]);
+    repository.offline = true;
 
-      final hit = await planner.resolve(poem);
-      expect(hit, isA<CachedAudioPlan>());
-      expect(repository.requests, 1);
-    },
-  );
+    await expectLater(planner.resolve(poem), throwsA(isA<SocketException>()));
+    expect(repository.requests, 2);
+    repository.offline = false;
+    final hit = await planner.resolve(poem);
+    expect(hit, isA<CachedAudioPlan>());
+    expect(repository.requests, 3);
+  });
 
   test(
     'stale metadata identity is rejected instead of poisoning cache',

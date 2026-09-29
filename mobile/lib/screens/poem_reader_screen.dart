@@ -122,11 +122,6 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
                 colors: colors,
                 audioController:
                     widget.audioController ?? InactiveAudioController(),
-                entitlements: widget.entitlements,
-                onUnlocked: () => setState(() {
-                  _loadedPoem = null;
-                  _future = _load(refreshEntitlement: true);
-                }),
                 ownerPreviewMode: widget.ownerPreviewMode,
               );
             },
@@ -143,8 +138,6 @@ class _PoemBody extends StatelessWidget {
     required this.settings,
     required this.colors,
     required this.audioController,
-    required this.entitlements,
-    required this.onUnlocked,
     required this.ownerPreviewMode,
   });
 
@@ -152,8 +145,6 @@ class _PoemBody extends StatelessWidget {
   final ReaderSettings settings;
   final _ReaderColors colors;
   final AudioPlaybackController audioController;
-  final EntitlementController? entitlements;
-  final VoidCallback onUnlocked;
   final bool ownerPreviewMode;
 
   @override
@@ -236,12 +227,15 @@ class _PoemBody extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: 28),
-                  if (poem.locked)
-                    _LockedNotice(
-                      color: colors.foreground,
-                      entitlements: entitlements,
-                      onUnlocked: onUnlocked,
+                  if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)
+                    Text(
+                      'Sample — نمونه',
+                      key: const Key('sample-label'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: colors.muted),
                     ),
+                  if (!ownerPreviewMode && (poem.locked || poem.hasMore))
+                    _LockedNotice(color: colors.foreground),
                   PoetryText(
                     text: poem.readableText,
                     style: TextStyle(
@@ -424,94 +418,19 @@ class _AudioPlayerPanel extends StatelessWidget {
 }
 
 class _LockedNotice extends StatelessWidget {
-  const _LockedNotice({
-    required this.color,
-    required this.entitlements,
-    required this.onUnlocked,
-  });
+  const _LockedNotice({required this.color});
   final Color color;
-  final EntitlementController? entitlements;
-  final VoidCallback onUnlocked;
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 18),
-    child: Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.lock_outline_rounded, color: color),
-            const SizedBox(width: 8),
-            Text('دا شعر تړلی دی', style: TextStyle(color: color)),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'يو ځل پېر د اجمل اند ټول اوسني شعرونه او غږونه پرانيزي. راتلونکي د اجمل اند شعرونه هم ښايي بې له بل لګښته ورزيات شي؛ ځانګړې ټولګې يا د نورو شاعرانو آثار جلا کېدای شي.',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: color, height: 1.6),
-        ),
-        if (entitlements != null)
-          AnimatedBuilder(
-            animation: entitlements!,
-            builder: (context, _) => Column(
-              children: [
-                const SizedBox(height: 12),
-                if (entitlements!.product?.price case final price?)
-                  Text(price, key: const Key('unlock-price')),
-                const SizedBox(height: 8),
-                FilledButton.icon(
-                  key: const Key('unlock-all'),
-                  onPressed: entitlements!.busy || entitlements!.product == null
-                      ? null
-                      : () => _purchase(context),
-                  icon: const Icon(Icons.lock_open_rounded),
-                  label: const Text('ټول شعرونه پرانيزئ'),
-                ),
-                TextButton(
-                  key: const Key('restore-purchases'),
-                  onPressed: entitlements!.busy
-                      ? null
-                      : () => _restore(context),
-                  child: const Text('پېر بېرته راواخلئ'),
-                ),
-              ],
-            ),
-          ),
-      ],
+    child: Text(
+      'دا برخه د بشپړ کتاب برخه ده.\nComing soon — ډېر ژر',
+      key: const Key('book-coming-soon'),
+      textAlign: TextAlign.center,
+      style: TextStyle(color: color, height: 1.6),
     ),
   );
-
-  Future<void> _purchase(BuildContext context) async {
-    final result = await entitlements!.purchase();
-    if (!context.mounted) return;
-    if (result == PurchaseOutcome.entitled) {
-      onUnlocked();
-    }
-    _message(context, switch (result) {
-      PurchaseOutcome.entitled => 'پېر بريالی شو. شعرونه پرانيستل شول.',
-      PurchaseOutcome.cancelled => 'پېر لغوه شو.',
-      PurchaseOutcome.notEntitled => 'پېر بشپړ شو، خو لاسرسی تاييد نه شو.',
-      PurchaseOutcome.error => 'پېر بشپړ نه شو. بيا هڅه وکړئ.',
-    });
-  }
-
-  Future<void> _restore(BuildContext context) async {
-    final result = await entitlements!.restore();
-    if (!context.mounted) return;
-    if (result == PurchaseOutcome.entitled) onUnlocked();
-    _message(context, switch (result) {
-      PurchaseOutcome.entitled => 'پېر بېرته وموندل شو او شعرونه پرانيستل شول.',
-      PurchaseOutcome.notEntitled => 'پخوانی پېر ونه موندل شو.',
-      PurchaseOutcome.cancelled => 'بېرته راوستل لغوه شول.',
-      PurchaseOutcome.error => 'پېر بېرته راونه وړل شو. بيا هڅه وکړئ.',
-    });
-  }
-
-  void _message(BuildContext context, String text) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
-  }
 }
 
 class _ReaderError extends StatelessWidget {
