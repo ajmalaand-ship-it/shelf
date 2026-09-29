@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
 import '../models/poem.dart';
+import '../l10n/app_strings.dart';
+import '../widgets/bookstore_widgets.dart';
+import 'bookstore_navigation.dart';
 import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
@@ -57,7 +60,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
             onPressed: () =>
                 showReadingPreferences(context, widget.readerSettings),
             icon: const Icon(Icons.text_fields_rounded),
-            label: const Text('لیکبڼه'),
+            label: const Text(AppStrings.font),
           ),
         ],
       ),
@@ -71,12 +74,48 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
             return _CollectionError(onRetry: _retry);
           }
           final bundle = snapshot.requireData;
+          final book = bundle.collection;
+          final navigation = BookstoreNavigation(
+            repository: widget.repository,
+            settings: widget.readerSettings,
+            contentVersion: widget.contentVersion,
+            audioController: widget.audioController,
+            entitlements: widget.entitlements,
+            ownerPreview: widget.ownerPreviewMode,
+          );
+          final samples = bundle.poems.where(
+            (p) => p.isFreeSample && !p.locked,
+          );
+          void openItem(PoemSummary poem) => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => PoemReaderScreen(
+                poemId: poem.id,
+                contentVersion: widget.contentVersion,
+                repository: widget.repository,
+                settings: widget.readerSettings,
+                collectionTitle: book.title,
+                audioController:
+                    widget.audioController ?? InactiveAudioController(),
+                entitlements: widget.entitlements,
+                ownerPreviewMode: widget.ownerPreviewMode,
+              ),
+            ),
+          );
+
           return CustomScrollView(
             slivers: [
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
                 sliver: SliverList.list(
                   children: [
+                    Center(
+                      child: BookCover(
+                        url: book.coverUrl,
+                        width: 180,
+                        height: 245,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     Text(
                       bundle.collection.title,
                       key: const Key('collection-detail-title'),
@@ -86,11 +125,24 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                             fontFamily: widget.readerSettings.fontFamily,
                           ),
                     ),
-                    if (bundle.collection.creditedAuthors
-                        case final author?) ...[
-                      const SizedBox(height: 12),
+                    if (book.subtitle?.isNotEmpty == true)
+                      Text(book.subtitle!, textAlign: TextAlign.center),
+                    if (book.authors.any((a) => a.role == 'author'))
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        children: [
+                          for (final author in book.authors.where(
+                            (a) => a.role == 'author',
+                          ))
+                            TextButton(
+                              onPressed: () =>
+                                  navigation.openAuthor(context, author.slug),
+                              child: Text(author.name),
+                            ),
+                        ],
+                      )
+                    else if (book.creditedAuthors case final author?)
                       Text(author, textAlign: TextAlign.center),
-                    ],
                     if (bundle.collection.creditedTranslators
                         case final translators?) ...[
                       const SizedBox(height: 8),
@@ -103,33 +155,73 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                           key: const Key(
                             'owner-preview-collection-detail-status',
                           ),
-                          label: Text(
-                            bundle.collection.isActive ? 'خپره' : 'مسوده',
-                          ),
+                          label: Text(AppStrings.status(book.displayStatus)),
                         ),
                       ),
                     ],
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 8,
+                      children: [
+                        if (book.language case final language?)
+                          Chip(label: Text(AppStrings.languageName(language))),
+                        Chip(label: Text(AppStrings.typeName(book.bookType))),
+                        for (final category in book.categories)
+                          Chip(label: Text(category.name)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      key: const Key('read-sample'),
+                      onPressed: samples.isEmpty
+                          ? null
+                          : () => openItem(samples.first),
+                      icon: const Icon(Icons.menu_book_outlined),
+                      label: const Text(AppStrings.readSample),
+                    ),
+                    const SizedBox(height: 8),
+                    const OutlinedButton(
+                      key: Key('buy-coming-soon'),
+                      onPressed: null,
+                      child: Text(AppStrings.buySoon),
+                    ),
+                    if (book.description?.isNotEmpty == true)
+                      _FrontMatter(
+                        title: AppStrings.description,
+                        body: book.description!,
+                      ),
                     if (bundle.collection.publicationInfo case final info?)
-                      _FrontMatter(title: 'د چاپ معلومات', body: info),
+                      _FrontMatter(
+                        title: AppStrings.publicationInfo,
+                        body: info,
+                      ),
                     if (bundle.collection.dedication case final dedication?)
-                      _FrontMatter(title: 'ډالۍ', body: dedication),
+                      _FrontMatter(
+                        title: AppStrings.dedication,
+                        body: dedication,
+                      ),
                     if (bundle.collection.introduction case final introduction?)
-                      _FrontMatter(title: 'سريزه', body: introduction),
+                      _FrontMatter(
+                        title: AppStrings.introduction,
+                        body: introduction,
+                      ),
                     if (bundle.collection.foreword case final foreword?)
                       _FrontMatter(
-                        title: bundle.collection.forewordAuthor ?? 'مخکنۍ خبرې',
+                        title:
+                            bundle.collection.forewordAuthor ??
+                            AppStrings.foreword,
                         body: foreword,
                       ),
                     const SizedBox(height: 28),
                     Text(
-                      'شعرونه',
+                      AppStrings.contents,
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 10),
                     if (bundle.poems.isEmpty)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 30),
-                        child: Text('خپاره شوي شعرونه نشته.'),
+                        child: Text(AppStrings.noContent),
                       )
                     else
                       ...bundle.poems.map(
@@ -137,22 +229,11 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                           poem: poem,
                           fontFamily: widget.readerSettings.fontFamily,
                           ownerPreviewMode: widget.ownerPreviewMode,
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => PoemReaderScreen(
-                                poemId: poem.id,
-                                contentVersion: widget.contentVersion,
-                                repository: widget.repository,
-                                settings: widget.readerSettings,
-                                collectionTitle: bundle.collection.title,
-                                audioController:
-                                    widget.audioController ??
-                                    InactiveAudioController(),
-                                entitlements: widget.entitlements,
-                                ownerPreviewMode: widget.ownerPreviewMode,
-                              ),
-                            ),
-                          ),
+                          onTap:
+                              widget.ownerPreviewMode ||
+                                  (poem.isFreeSample && !poem.locked)
+                              ? () => openItem(poem)
+                              : null,
                         ),
                       ),
                   ],
@@ -197,45 +278,41 @@ class _PoemTile extends StatelessWidget {
     required this.fontFamily,
   });
   final PoemSummary poem;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool ownerPreviewMode;
   final String fontFamily;
 
   @override
   Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: poem.isUntitled
-        ? 'بې نومه شعر: ${poem.displayTitle}'
-        : poem.displayTitle,
+    button: onTap != null,
+    label: poem.isUntitled ? AppStrings.untitled : poem.displayTitle,
     child: ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
       onTap: onTap,
       leading: CircleAvatar(child: Text('${poem.sortOrder}')),
       title: Text(
-        poem.displayTitle,
+        poem.displayTitle.isEmpty ? AppStrings.untitled : poem.displayTitle,
         key: Key('poem-list-title-${poem.id}'),
         style: TextStyle(fontFamily: fontFamily),
       ),
       subtitle:
           [
             if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)
-              'Sample — نمونه',
+              AppStrings.sample,
             if (poem.isTranslation)
-              'اصلي شاعر: ${poem.originalAuthor ?? '—'}\nپښتو ژباړه: ${poem.translator ?? '—'}',
+              '${AppStrings.originalAuthor(poem.originalAuthor ?? '—')}\n${AppStrings.translation(poem.translator ?? '—')}',
             if (ownerPreviewMode)
-              '${poem.isActive ? 'خپور' : 'مسوده'} • ${poem.isFreeSample ? 'وړيا' : 'تړلی'}'
-                  '${poem.isTranslation ? ' • ژباړه' : ''}',
+              '${poem.isActive ? AppStrings.published : AppStrings.draft} • ${poem.isFreeSample ? AppStrings.free : AppStrings.locked}',
           ].isEmpty
           ? null
           : Text(
               [
                 if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)
-                  'Sample — نمونه',
+                  AppStrings.sample,
                 if (poem.isTranslation)
-                  'اصلي شاعر: ${poem.originalAuthor ?? '—'}\nپښتو ژباړه: ${poem.translator ?? '—'}',
+                  '${AppStrings.originalAuthor(poem.originalAuthor ?? '—')}\n${AppStrings.translation(poem.translator ?? '—')}',
                 if (ownerPreviewMode)
-                  '${poem.isActive ? 'خپور' : 'مسوده'} • ${poem.isFreeSample ? 'وړيا' : 'تړلی'}'
-                      '${poem.isTranslation ? ' • ژباړه' : ''}',
+                  '${poem.isActive ? AppStrings.published : AppStrings.draft} • ${poem.isFreeSample ? AppStrings.free : AppStrings.locked}',
               ].join('\n'),
               key: ownerPreviewMode
                   ? const Key('owner-preview-poem-status')
@@ -246,8 +323,8 @@ class _PoemTile extends StatelessWidget {
             ? Icons.lock_outline_rounded
             : Icons.menu_book_rounded,
         semanticLabel: (ownerPreviewMode ? !poem.isFreeSample : poem.locked)
-            ? 'تړلی'
-            : 'وړيا',
+            ? AppStrings.locked
+            : AppStrings.free,
       ),
     ),
   );
@@ -262,9 +339,9 @@ class _CollectionError extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text('ټولګه ترلاسه نه شوه.'),
+        const Text(AppStrings.error),
         const SizedBox(height: 12),
-        FilledButton(onPressed: onRetry, child: const Text('بيا هڅه وکړئ')),
+        FilledButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
       ],
     ),
   );

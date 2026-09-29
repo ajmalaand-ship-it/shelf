@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import '../models/app_config.dart';
+import '../models/book_author.dart';
+import '../models/book_category.dart';
 import '../models/poem.dart';
 import '../models/poetry_collection.dart';
 import '../purchases/entitlement_controller.dart';
@@ -46,7 +48,19 @@ abstract interface class PoetryDataSource {
   Future<AudioAccess> loadAudio(int poemId);
 }
 
-class PoetryRepository implements PoetryDataSource {
+abstract interface class BookstoreDataSource {
+  Future<List<BookAuthor>> loadAuthors();
+  Future<List<BookCategory>> loadCategories();
+  Future<BookAuthor> loadAuthor(String slug);
+  Future<List<PoetryCollection>> searchBooks({
+    String query = '',
+    String? language,
+    String? category,
+    String? bookType,
+  });
+}
+
+class PoetryRepository implements PoetryDataSource, BookstoreDataSource {
   PoetryRepository({
     required ApiClient api,
     required CacheStore cache,
@@ -200,6 +214,55 @@ class PoetryRepository implements PoetryDataSource {
       if (cached == null) rethrow;
       return PoemDetail.fromJson(_asMap(jsonDecode(cached)));
     }
+  }
+
+  @override
+  Future<List<BookAuthor>> loadAuthors() async =>
+      (await _api.getDataList('authors'))
+          .map((json) => BookAuthor.fromJson(json))
+          .toList();
+
+  @override
+  Future<List<BookCategory>> loadCategories() async =>
+      (await _api.getDataList('categories'))
+          .map(BookCategory.fromJson)
+          .toList();
+
+  @override
+  Future<BookAuthor> loadAuthor(String slug) async {
+    final responses = await Future.wait([
+      _api.getDataObject('authors/${Uri.encodeComponent(slug)}'),
+      _api.getDataList(
+        Uri(path: 'collections', queryParameters: {'author': slug}).toString(),
+      ),
+    ]);
+    return BookAuthor.fromJson(
+      responses[0] as Map<String, dynamic>,
+      books: (responses[1] as List<Map<String, dynamic>>)
+          .map(PoetryCollection.fromJson)
+          .toList(),
+    );
+  }
+
+  @override
+  Future<List<PoetryCollection>> searchBooks({
+    String query = '',
+    String? language,
+    String? category,
+    String? bookType,
+  }) async {
+    final path = Uri(
+      path: 'collections',
+      queryParameters: {
+        if (query.trim().isNotEmpty) 'q': query.trim(),
+        if (language != null) 'language': language,
+        if (category != null) 'category': category,
+        if (bookType != null) 'book_type': bookType,
+      },
+    ).toString();
+    return (await _api.getDataList(path))
+        .map(PoetryCollection.fromJson)
+        .toList();
   }
 
   @override

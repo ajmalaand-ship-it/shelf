@@ -108,6 +108,7 @@ PoetryRepository fixtureRepository({bool failNetwork = false}) {
     final path = request.url.path;
     final Object payload = switch (path) {
       '/api/app-config' => appConfigJson,
+      '/api/authors' || '/api/categories' => {'data': []},
       '/api/collections' => {
         'data': [collectionJson],
       },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'audio/audio_playback_controller.dart';
+import 'l10n/app_strings.dart';
 import 'repository/poetry_repository.dart';
 import 'purchases/entitlement_controller.dart';
 import 'screens/home_screen.dart';
@@ -28,7 +29,7 @@ class ShelfApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
-    title: 'Shelf',
+    title: AppStrings.appName,
     theme: AppTheme.light,
     builder: (context, child) => Directionality(
       textDirection: TextDirection.rtl,
@@ -48,9 +49,7 @@ class ShelfApp extends StatelessWidget {
                       child: SizedBox(
                         width: double.infinity,
                         child: Text(
-                          'OWNER PREVIEW — UNPUBLISHED CONTENT\n'
-                          'SIND-ARTWORK • BUILD 10\n'
-                          'د مالک کتنه — ناچاپه منځپانګه',
+                          AppStrings.ownerPreview,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,

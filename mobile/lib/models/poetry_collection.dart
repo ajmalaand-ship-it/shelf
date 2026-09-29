@@ -1,10 +1,15 @@
 import 'book_credit.dart';
+import 'book_category.dart';
+import '../l10n/app_strings.dart';
 
 class PoetryCollection {
   const PoetryCollection({
     required this.title,
     required this.slug,
     this.id,
+    this.status,
+    this.createdAt,
+    this.categories = const [],
     this.bookType = 'poetry',
     this.author,
     this.authors = const [],
@@ -26,6 +31,11 @@ class PoetryCollection {
       PoetryCollection(
         title: _string(json, 'title', required: true)!,
         id: _integer(json, 'id'),
+        status: _string(json, 'status'),
+        createdAt: DateTime.tryParse(_string(json, 'created_at') ?? ''),
+        categories: (json['categories'] as List? ?? [])
+            .map((item) => BookCategory.fromJson(item as Map<String, dynamic>))
+            .toList(),
         bookType: _string(json, 'book_type') ?? 'poetry',
         slug: _string(json, 'slug', required: true)!,
         author: _string(json, 'author'),
@@ -46,6 +56,10 @@ class PoetryCollection {
             : _boolean(json, 'is_active'),
       );
 
+  final String? status;
+  final DateTime? createdAt;
+  final List<BookCategory> categories;
+  String get displayStatus => status ?? (isActive ? 'published' : 'draft');
   final int? id;
   final String bookType;
   final String title;
@@ -68,7 +82,7 @@ class PoetryCollection {
         .where((credit) => credit.role == 'translator')
         .map((credit) => credit.name)
         .join('، ');
-    return names.isEmpty ? null : 'ژباړه: $names';
+    return names.isEmpty ? null : AppStrings.translation(names);
   }
 
   final String? subtitle;
@@ -85,6 +99,9 @@ class PoetryCollection {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'status': status,
+    'created_at': createdAt?.toIso8601String(),
+    'categories': categories.map((category) => category.toJson()).toList(),
     'book_type': bookType,
     'title': title,
     'slug': slug,

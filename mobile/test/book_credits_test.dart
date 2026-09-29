@@ -128,7 +128,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('پروین پژواک، Second author'), findsOneWidget);
+      expect(find.widgetWithText(TextButton, 'پروین پژواک'), findsOneWidget);
+      expect(find.widgetWithText(TextButton, 'Second author'), findsOneWidget);
       expect(find.text('ژباړه: اجمل اند'), findsOneWidget);
       expect(find.text('Legacy name'), findsNothing);
     },

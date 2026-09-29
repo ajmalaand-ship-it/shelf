@@ -36,12 +36,8 @@ void main() {
 
     expect(find.text('Shelf'), findsWidgets);
     expect(find.text('اجمل اند بشپړه شاعري'), findsOneWidget);
-    expect(find.text('ټولګې'), findsOneWidget);
-    expect(find.text('ټولې ټولګې'), findsNothing);
-    final homeForwardIcon = tester.widget<Icon>(
-      find.byIcon(Icons.arrow_forward_rounded),
-    );
-    expect(homeForwardIcon.icon!.matchTextDirection, isTrue);
+    expect(find.text('ټول کتابونه'), findsOneWidget);
+    expect(find.byType(NavigationDestination), findsExactly(4));
     final hasRtlRoot = tester
         .widgetList<Directionality>(find.byType(Directionality))
         .any((widget) => widget.textDirection == TextDirection.rtl);
@@ -178,11 +174,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      await tester.scrollUntilVisible(find.text('ژمى'), 250);
       expect(find.text('د لومړۍ کرښې پېژندنه'), findsOneWidget);
       expect(find.text('بې سرليکه'), findsNothing);
       expect(find.text('ژمى'), findsOneWidget);
-      expect(find.textContaining('اصلي شاعر: پروین پژواک'), findsOneWidget);
-      expect(find.textContaining('پښتو ژباړه: اجمل اند'), findsOneWidget);
+      expect(find.textContaining('اصلي لیکوال: پروین پژواک'), findsOneWidget);
+      expect(find.textContaining('ژباړه: اجمل اند'), findsOneWidget);
 
       final readerSettings = tester
           .widget<CollectionDetailScreen>(find.byType(CollectionDetailScreen))

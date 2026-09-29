@@ -66,19 +66,15 @@ void main() {
 
     expect(find.byKey(const Key('debug-qa-notice')), findsOneWidget);
     expect(find.text('Shelf'), findsOneWidget);
-    expect(find.text('ټولګې'), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_forward_rounded), findsOneWidget);
-
-    await tester.tap(find.text('ټولګې'));
-    await tester.pumpAndSettle();
-    expect(find.text('د لوست ازموينه — پوښ لري'), findsOneWidget);
-    final cardForwardIcon = tester.widget<Icon>(
-      find.byIcon(Icons.arrow_forward_ios_rounded).first,
+    expect(find.text('ټول کتابونه'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('د لوست ازموينه — پوښ لري'),
+      200,
+      scrollable: find.byType(Scrollable).first,
     );
-    expect(cardForwardIcon.icon!.matchTextDirection, isTrue);
-
     await tester.tap(find.text('د لوست ازموينه — پوښ لري'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('مصنوعي غږ ازموينه'), 250);
     expect(find.text('مصنوعي غږ ازموينه'), findsOneWidget);
 
     await tester.tap(find.text('مصنوعي غږ ازموينه'));
@@ -93,6 +89,6 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
-    expect(find.text('شعرونه'), findsOneWidget);
+    expect(find.text('لړلیک'), findsOneWidget);
   });
 }

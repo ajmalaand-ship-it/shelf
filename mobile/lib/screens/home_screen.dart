@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
-import '../models/app_config.dart';
+import '../l10n/app_strings.dart';
+import '../models/book_author.dart';
+import '../models/book_category.dart';
+import '../models/poetry_collection.dart';
 import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
 import '../settings/reading_preferences_sheet.dart';
-import '../widgets/collection_card.dart';
-import 'collection_detail_screen.dart';
-import 'collections_screen.dart';
+import '../widgets/bookstore_widgets.dart';
+import 'bookstore_navigation.dart';
+import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -20,22 +23,22 @@ class HomeScreen extends StatefulWidget {
     this.entitlements,
     super.key,
   });
-
   final PoetryDataSource repository;
   final ReaderSettings readerSettings;
   final bool qaMode;
   final AudioPlaybackController audioController;
   final bool ownerPreviewMode;
   final EntitlementController? entitlements;
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   CatalogueSnapshot? _snapshot;
-  Object? _error;
-
+  List<BookAuthor> _authors = [];
+  List<BookCategory> _categories = [];
+  bool _failed = false;
+  int _tab = 0;
   @override
   void initState() {
     super.initState();
@@ -43,257 +46,273 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _load() async {
-    if (mounted) setState(() => _error = null);
-    final cached = await widget.repository.loadCachedCatalogue();
-    if (mounted) setState(() => _snapshot = cached);
+    setState(() {
+      _failed = false;
+    });
     try {
-      final refreshed = await widget.repository.refreshCatalogue(cached);
-      if (mounted) setState(() => _snapshot = refreshed);
-    } catch (error) {
-      if (mounted) setState(() => _error = error);
+      // Always request a fresh catalogue, including refreshed signed cover URLs.
+      final snapshot = await widget.repository.refreshCatalogue(null);
+      final source = widget.repository;
+      List<BookAuthor> authors;
+      List<BookCategory> categories;
+      if (source is BookstoreDataSource) {
+        final extra = await Future.wait([
+          (source as BookstoreDataSource).loadAuthors(),
+          (source as BookstoreDataSource).loadCategories(),
+        ]);
+        authors = extra[0] as List<BookAuthor>;
+        categories = extra[1] as List<BookCategory>;
+      } else {
+        final credits = {
+          for (final b in snapshot.collections)
+            for (final c in b.authors)
+              if (c.role == 'author') c.slug: c,
+        };
+        authors = credits.values
+            .map((c) => BookAuthor(id: c.id, slug: c.slug, name: c.name))
+            .toList();
+        categories = {
+          for (final b in snapshot.collections)
+            for (final c in b.categories) c.slug: c,
+        }.values.toList();
+      }
+      if (mounted)
+        setState(() {
+          _snapshot = snapshot;
+          _authors = authors;
+          _categories = categories;
+        });
+    } catch (_) {
+      // Public discovery never falls back to possibly withdrawn cached books.
+      if (mounted)
+        setState(() {
+          _snapshot = null;
+          _failed = true;
+        });
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final snapshot = _snapshot;
-    return Scaffold(
-      body: SafeArea(
-        child: snapshot == null
-            ? _error == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : _ErrorState(onRetry: _load)
-            : RefreshIndicator(
-                onRefresh: _load,
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-                      sliver: SliverList.list(
-                        children: [
-                          _BrandHeader(config: snapshot.config),
-                          const SizedBox(height: 18),
-                          Center(
-                            child: OutlinedButton.icon(
-                              key: const Key('home-font-chooser'),
-                              onPressed: () => showReadingPreferences(
-                                context,
-                                widget.readerSettings,
-                              ),
-                              icon: const Icon(Icons.text_fields_rounded),
-                              label: const Text('لیکبڼه'),
-                            ),
-                          ),
-                          if (widget.qaMode) ...[
-                            const SizedBox(height: 16),
-                            const _QaNotice(),
-                          ],
-                          if (snapshot.refreshError != null) ...[
-                            const SizedBox(height: 16),
-                            const _OfflineNotice(),
-                          ],
-                          const SizedBox(height: 32),
-                          Semantics(
-                            button: true,
-                            header: true,
-                            label: 'ټولګې',
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(8),
-                              onTap: () => _openCollections(snapshot),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 6,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        'ټولګې',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineMedium,
-                                      ),
-                                    ),
-                                    const Icon(Icons.arrow_forward_rounded),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          if (snapshot.collections.isEmpty)
-                            const _EmptyCatalogue()
-                          else
-                            ...snapshot.collections.map(
-                              (collection) => Padding(
-                                padding: const EdgeInsets.only(bottom: 14),
-                                child: CollectionCard(
-                                  collection: collection,
-                                  readerSettings: widget.readerSettings,
-                                  ownerPreviewMode: widget.ownerPreviewMode,
-                                  onTap: () => _openCollection(
-                                    snapshot,
-                                    collection.slug,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ),
-    );
-  }
-
-  void _openCollections(CatalogueSnapshot snapshot) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => CollectionsScreen(
-          snapshot: snapshot,
-          repository: widget.repository,
-          readerSettings: widget.readerSettings,
-          audioController: widget.audioController,
-          entitlements: widget.entitlements,
-          ownerPreviewMode: widget.ownerPreviewMode,
-        ),
-      ),
-    );
-  }
-
-  void _openCollection(CatalogueSnapshot snapshot, String slug) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => CollectionDetailScreen(
-          slug: slug,
-          contentVersion: snapshot.config.contentVersion,
-          repository: widget.repository,
-          readerSettings: widget.readerSettings,
-          audioController: widget.audioController,
-          entitlements: widget.entitlements,
-          ownerPreviewMode: widget.ownerPreviewMode,
-        ),
-      ),
-    );
-  }
-}
-
-class _QaNotice extends StatelessWidget {
-  const _QaNotice();
+  BookstoreNavigation get _navigation => BookstoreNavigation(
+    repository: widget.repository,
+    settings: widget.readerSettings,
+    contentVersion: _snapshot?.config.contentVersion ?? 0,
+    audioController: widget.audioController,
+    entitlements: widget.entitlements,
+    ownerPreview: widget.ownerPreviewMode,
+  );
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: 'د ازموینې بڼه، يوازې ډيبګ',
-    child: Container(
-      key: const Key('debug-qa-notice'),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.science_outlined, size: 18),
-          SizedBox(width: 8),
-          Expanded(child: Text('د لوست ازموينه — ډيبګ')),
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: widget.readerSettings,
+    builder: (context, _) => Scaffold(
+      appBar: AppBar(
+        title: Text(
+          [
+            AppStrings.store,
+            AppStrings.search,
+            AppStrings.library,
+            AppStrings.settings,
+          ][_tab],
+        ),
+        actions: [
+          TextButton.icon(
+            key: const Key('home-font-chooser'),
+            onPressed: () =>
+                showReadingPreferences(context, widget.readerSettings),
+            icon: const Icon(Icons.text_fields_rounded),
+            label: const Text(AppStrings.font),
+          ),
         ],
       ),
-    ),
-  );
-}
-
-class _BrandHeader extends StatelessWidget {
-  const _BrandHeader({required this.config});
-  final AppConfig config;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    header: true,
-    child: Column(
-      children: [
-        Text(
-          config.appName.isEmpty ? AppConfig.fallback.appName : config.appName,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-            fontSize: 42,
-            color: Theme.of(context).colorScheme.primary,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tab,
+        onDestinationSelected: (index) => setState(() => _tab = index),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.storefront_outlined),
+            label: AppStrings.store,
           ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          config.slogan.isEmpty ? AppConfig.fallback.slogan : config.slogan,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-      ],
-    ),
-  );
-}
-
-class _EmptyCatalogue extends StatelessWidget {
-  const _EmptyCatalogue();
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 42),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(16),
-    ),
-    child: const Column(
-      children: [
-        Icon(Icons.auto_stories_outlined, size: 42),
-        SizedBox(height: 16),
-        Text('تر اوسه خپره شوې ټولګه نشته.', textAlign: TextAlign.center),
-      ],
-    ),
-  );
-}
-
-class _OfflineNotice extends StatelessWidget {
-  const _OfflineNotice();
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    liveRegion: true,
-    child: Material(
-      color: Theme.of(context).colorScheme.secondaryContainer,
-      borderRadius: BorderRadius.circular(10),
-      child: const Padding(
-        padding: EdgeInsets.all(12),
-        child: Row(
+          NavigationDestination(
+            icon: Icon(Icons.search),
+            label: AppStrings.search,
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.local_library_outlined),
+            label: AppStrings.library,
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            label: AppStrings.settings,
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: IndexedStack(
+          index: _tab,
           children: [
-            Icon(Icons.cloud_off_outlined),
-            SizedBox(width: 10),
-            Expanded(child: Text('ساتل شوې منځپانګه ښودل کېږي.')),
+            _store(),
+            SearchScreen(
+              books: _snapshot?.collections ?? [],
+              categories: _categories,
+              navigation: _navigation,
+            ),
+            const LibraryScreen(),
+            SettingsScreen(settings: widget.readerSettings),
           ],
         ),
       ),
     ),
   );
+
+  Widget _store() {
+    final snapshot = _snapshot;
+    if (snapshot == null)
+      return _failed
+          ? BookstoreError(onRetry: _load)
+          : const Center(child: CircularProgressIndicator());
+    final books = snapshot.collections;
+    final populated = _categories
+        .where(
+          (c) => books.any((b) => b.categories.any((bc) => bc.slug == c.slug)),
+        )
+        .toList();
+    final newest = List<PoetryCollection>.of(books)
+      ..sort((a, b) {
+        final date = (b.createdAt ?? DateTime(1970)).compareTo(
+          a.createdAt ?? DateTime(1970),
+        );
+        return date != 0 ? date : (b.id ?? 0).compareTo(a.id ?? 0);
+      });
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        children: [
+          Text(
+            AppStrings.appName,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            snapshot.config.slogan,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          if (widget.qaMode)
+            const Padding(
+              key: Key('debug-qa-notice'),
+              padding: EdgeInsets.all(12),
+              child: Text(AppStrings.qaNotice),
+            ),
+          if (snapshot.refreshError != null) const Text(AppStrings.offline),
+          if (books.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: Text(AppStrings.noBooks),
+            )
+          else if (populated.isEmpty) ...[
+            const SectionTitle(AppStrings.allBooks),
+            BookGrid(
+              books: books,
+              ownerPreview: widget.ownerPreviewMode,
+              fontFamily: widget.readerSettings.fontFamily,
+              onTap: (b) => _navigation.openBook(context, b.slug),
+            ),
+          ] else ...[
+            BookRow(
+              title: AppStrings.newBooks,
+              books: newest,
+              ownerPreview: widget.ownerPreviewMode,
+              fontFamily: widget.readerSettings.fontFamily,
+              onTap: (b) => _navigation.openBook(context, b.slug),
+            ),
+            for (final category in populated)
+              BookRow(
+                title: category.name,
+                books: books
+                    .where(
+                      (b) => b.categories.any((c) => c.slug == category.slug),
+                    )
+                    .toList(),
+                ownerPreview: widget.ownerPreviewMode,
+                fontFamily: widget.readerSettings.fontFamily,
+                onTap: (b) => _navigation.openBook(context, b.slug),
+              ),
+          ],
+          if (_authors.isNotEmpty) ...[
+            const SectionTitle(AppStrings.authors),
+            SizedBox(
+              height:
+                  132 * MediaQuery.textScalerOf(context).scale(1).clamp(1, 2),
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _authors.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final author = _authors[index];
+                  return SizedBox(
+                    width: 120,
+                    child: InkWell(
+                      onTap: () => _navigation.openAuthor(context, author.slug),
+                      child: Column(
+                        children: [
+                          AuthorPortrait(author: author),
+                          const SizedBox(height: 8),
+                          Text(
+                            author.name,
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }
 
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.onRetry});
-  final VoidCallback onRetry;
-
+class LibraryScreen extends StatelessWidget {
+  const LibraryScreen({super.key});
   @override
-  Widget build(BuildContext context) => Center(
+  Widget build(BuildContext context) => const Center(
     child: Padding(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(28),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.wifi_off_rounded, size: 42),
-          const SizedBox(height: 16),
-          const Text('منځپانګه ترلاسه نه شوه.', textAlign: TextAlign.center),
-          const SizedBox(height: 12),
-          FilledButton(onPressed: onRetry, child: const Text('بيا هڅه وکړئ')),
+          Icon(Icons.local_library_outlined, size: 56),
+          SizedBox(height: 20),
+          Text(AppStrings.librarySoon, textAlign: TextAlign.center),
+          SizedBox(height: 12),
+          Text(AppStrings.libraryMessage, textAlign: TextAlign.center),
         ],
       ),
     ),
+  );
+}
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({required this.settings, super.key});
+  final ReaderSettings settings;
+  @override
+  Widget build(BuildContext context) => ListView(
+    padding: const EdgeInsets.all(20),
+    children: [
+      ListTile(
+        leading: const Icon(Icons.menu_book_outlined),
+        title: const Text(AppStrings.readingPreferences),
+        trailing: const Icon(Icons.chevron_left),
+        onTap: () => showReadingPreferences(context, settings),
+      ),
+    ],
   );
 }
