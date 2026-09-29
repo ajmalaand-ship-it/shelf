@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CollectionResource;
 use App\Http\Resources\PoemSummaryResource;
 use App\Models\Collection;
+use App\Support\CatalogueFilters;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
@@ -19,7 +20,7 @@ class CollectionController extends Controller
             'language' => ['sometimes', 'string', Rule::in(array_keys(config('books.languages')))],
         ]);
 
-        return CollectionResource::collection(Collection::query()
+        return CollectionResource::collection(CatalogueFilters::apply(Collection::query(), $request)
             ->where('status', 'published')
             ->with(['credits.author', 'categories'])
             ->when(isset($filters['language']), fn ($query) => $query->where('language', $filters['language']))
