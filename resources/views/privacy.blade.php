@@ -114,43 +114,24 @@
     <article>
         <header>
             <p class="brand">Shelf</p>
-            <p class="slogan" dir="rtl" lang="ps">اجمل اند بشپړه شاعري</p>
+            <p class="slogan" dir="rtl" lang="ps">کتاب مو ژوند بدلوي</p>
             <h1>Privacy Policy</h1>
-            <p class="updated">Last updated: August 29, 2026</p>
+            <p class="updated">Last updated: September 29, 2026</p>
         </header>
 
-        <p>This Privacy Policy explains how Hindara, the publisher and developer of Shelf, handles information when you use the app, its website, or its supporting poetry API.</p>
-
-        <h2>Information we process</h2>
-        <p>The current version does not provide end-user accounts, profiles, comments, likes, or a social feed. We therefore do not ask users to submit profile information or social content.</p>
-        <p>Our servers and hosting infrastructure may process routine technical information when the app or website requests content. This may include an IP address, date and time, user-agent or device/browser information, the requested endpoint, response status, and diagnostic or security events. We use this information to deliver the service, diagnose problems, prevent abuse, and maintain security.</p>
-
-        <h2>Poetry and audio content</h2>
-        <p>Poetry, collection information, covers, and audio are publisher-managed content. The app retrieves that content through the Shelf API. Audio offered in the app is Ajmal Aand’s original recording where a recording is available. The current service does not invite users to upload recordings or other content, and it does not use AI-generated voice.</p>
-
-        <h2>Purchases and payments</h2>
-        <p>Shelf does not collect payment-card details. Purchases are offered through Google Play Billing, which processes payment and store-account information under Google’s privacy terms. RevenueCat provides purchase and entitlement management. The app uses a random anonymous RevenueCat App User ID, and RevenueCat and Google Play process purchase history, transaction, product, device/app, and diagnostic information needed to complete purchases, confirm access, prevent fraud, and restore purchases. Shelf does not provide an app account.</p>
-
-        <h2>Advertising, analytics, and sale of data</h2>
-        <p>Shelf does not currently display advertising and does not currently use an advertising or analytics SDK. Hindara does not sell or rent personal data.</p>
-
-        <h2>Service providers</h2>
-        <p>Our hosting infrastructure processes technical requests and logs so the service can operate securely. Google Play processes information relating to app distribution, downloads, and purchases under Google’s own privacy policy. RevenueCat processes the anonymous purchase identifier and purchase/entitlement information as our purchase-management provider. We do not disclose data to third parties for advertising.</p>
-
-        <h2>Security</h2>
-        <p>We use reasonable technical and organizational safeguards, including encrypted HTTPS connections, access controls, and restricted administration. No method of transmission or storage is completely secure, so absolute security cannot be guaranteed.</p>
-
-        <h2>Retention and deletion</h2>
-        <p>Technical logs are kept only as long as reasonably needed for service operation, security, troubleshooting, backup integrity, and applicable legal obligations, then deleted or rotated according to operational procedures. Because the app has no end-user accounts or user-posted content, there is normally no user profile or social content to delete. For a privacy or deletion question, contact us using the details below. Purchase information controlled by Google Play or RevenueCat is subject to those providers’ retention and deletion processes.</p>
-
-        <h2>Children and audience</h2>
-        <p>Shelf presents poetry and literary content for a general audience. The current version does not knowingly solicit personal information from children through accounts, forms, comments, or social features. The app’s final target-audience and store settings will be reviewed against the released app and its content before Google Play submission.</p>
-
-        <h2>Changes to this policy</h2>
-        <p>We may update this policy when the app or applicable requirements change. The update date above will be revised. We will review and update the policy before release if app functionality or data practices materially change, including through new SDKs, permissions, analytics, crash reporting, purchases, or other data collection.</p>
-
-        <h2>Contact</h2>
-        <p>For privacy questions or requests, contact Hindara through Ajmal Aand at <a href="mailto:ajmalaand@gmail.com">ajmalaand@gmail.com</a> or use the <a href="https://ajmalaand.com/contact/" rel="noopener noreferrer">public contact page</a>.</p>
+        <p>Shelf is a bookstore and reader. You can browse books and read approved samples without an account.</p>
+        <h2>Reader account information</h2>
+        <p>We keep your email address, optional display name, sign-in method, email-verification time and account timestamps. For authentication we store a password hash when you use a password, a hashed Google sign-in identifier when linked, and hashed, expiring sign-in and email-action tokens. We never store plaintext passwords or Google ID tokens. Google profile photos, contacts, date of birth, address and phone number are not collected.</p>
+        <p>Email/password and, when configured, Google sign-in are available. Google processes its own sign-in interaction under its privacy policy. Shelf checks Google identity tokens on the server. The app stores its Shelf sign-in token in protected device storage. Signing out revokes the account's active Shelf sign-in tokens.</p>
+        <h2>Email and service operation</h2>
+        <p>We send verification, password-reset, sign-in confirmation and deletion-confirmation emails through our hosting provider from noreply@shelf.services. Hosting infrastructure may process request metadata, such as IP addresses, times and diagnostic logs, to deliver and protect the service. These are not reader profile fields. We do not use advertising or analytics SDKs, sell personal data, or collect your reading history in this version.</p>
+        <h2>Books and purchases</h2>
+        <p>Books, author credits, covers and available audio are managed by the owner. Creating an account does not unlock books. Purchases are not enabled in this version; there are no sales, payment-card or refund records. Google Play purchases and per-book ownership will be implemented separately, with this policy updated before use.</p>
+        <h2>Deletion and retention</h2>
+        <p>You can request deletion in the app's Account screen or on <a href="{{ route('account.delete') }}">our account-deletion page</a>. Confirm the link sent to your email to permanently remove your reader profile, authentication credentials, action tokens and sign-in tokens. Owner administration is separate. No money records need to be retained in this version.</p>
+        <p>Restricted backups rotate through the 14 most recent daily backups. A deleted account may remain in those protected backups until they expire; it is not available in the live service. If a backup must be restored, deletion requests must be reapplied before reader access resumes. Your device's account token is removed on sign-out or when the app next learns that the account was deleted.</p>
+        <h2>Security and contact</h2>
+        <p>We use HTTPS, password hashing, limited authentication attempts, expiring email links and restricted administration. Contact <a href="mailto:ajmalaand@gmail.com">ajmalaand@gmail.com</a> for privacy or deletion help, including if you no longer control your account email.</p>
     </article>
 </main>
 </body>

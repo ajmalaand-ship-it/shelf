@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Reader;
 use App\Models\User;
 
 return [
@@ -38,6 +39,7 @@ return [
     */
 
     'guards' => [
+        'reader' => ['driver' => 'sanctum', 'provider' => 'readers'],
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
@@ -62,6 +64,7 @@ return [
     */
 
     'providers' => [
+        'readers' => ['driver' => 'eloquent', 'model' => Reader::class],
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),

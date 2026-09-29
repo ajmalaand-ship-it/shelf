@@ -227,3 +227,13 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   Book text, titles, author names, descriptions, contents, reader and share cards
   remain RTL and right-aligned in both modes, with unchanged source strings.
   Switching language must not mirror or reflow book content. Test this explicitly.
+
+- 2026-09-29: Step 4 Task 1 reader accounts approved. D7: Google sign-in and
+  email/password. D8: Google Play payments (App Store later with iOS). D13:
+  bought books readable offline with periodic server checks; refunded copies
+  removed. Purchases/offline ownership are Task 2, not account access rights.
+  Readers remain separate from owner admin. Register, verify, reset/change
+  password, revoke mobile tokens and delete accounts with email confirmation.
+  Configure noreply@shelf.services; privacy/deletion pages and bilingual account
+  screens required. Owner runs are automated with backup first. Public reader
+  registration waits for staging; initial live testing uses the owner's email.

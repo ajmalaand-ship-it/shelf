@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Account\AuthController;
 use App\Http\Controllers\Api\AppConfigController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\CategoryController;
@@ -8,6 +9,9 @@ use App\Http\Controllers\Api\OwnerPreview\AppConfigController as OwnerPreviewApp
 use App\Http\Controllers\Api\OwnerPreview\CollectionController as OwnerPreviewCollectionController;
 use App\Http\Controllers\Api\OwnerPreview\PoemController as OwnerPreviewPoemController;
 use App\Http\Controllers\Api\PoemController;
+use App\Http\Middleware\AccountsEnabled;
+use App\Http\Middleware\PrivateAccountResponse;
+use App\Http\Middleware\ReaderAccountAccess;
 use App\Http\Middleware\RequireOwnerPreviewToken;
 use Illuminate\Support\Facades\Route;
 
@@ -38,3 +42,20 @@ Route::prefix('owner-preview')
         Route::get('/poems/{poem}/audio', [OwnerPreviewPoemController::class, 'audio'])
             ->name('owner-preview.poems.audio');
     });
+
+Route::prefix('auth')->middleware([PrivateAccountResponse::class])->group(function (): void {
+    Route::get('config', [AuthController::class, 'config'])->middleware('throttle:60,1');
+    Route::middleware([AccountsEnabled::class, 'throttle:reader-auth'])->group(function (): void {
+        foreach (['register', 'login', 'google', 'forgot' => 'forgot-password'] as $method => $path) {
+            $method = is_int($method) ? $path : $method;
+            Route::post($path, [AuthController::class, $method]);
+        }
+        Route::middleware(['auth:reader', ReaderAccountAccess::class])->group(function (): void {
+            Route::get('me', [AuthController::class, 'me']);
+            Route::post('logout', [AuthController::class, 'logout']);
+            Route::post('verify/resend', [AuthController::class, 'resend']);
+            Route::post('password', [AuthController::class, 'changePassword']);
+            Route::post('delete-request', [AuthController::class, 'deleteRequest']);
+        });
+    });
+});
