@@ -39,10 +39,10 @@ try {
     $password = $exists ? $values['MAIL_PASSWORD'] : bin2hex(random_bytes(32)).'aA!9';
     $updates = ['MAIL_MAILER' => 'smtp', 'MAIL_SCHEME' => 'smtps', 'MAIL_HOST' => 'mail.'.$domain,
         'MAIL_PORT' => '465', 'MAIL_USERNAME' => $address, 'MAIL_PASSWORD' => $password,
-        'MAIL_FROM_ADDRESS' => $address, 'MAIL_FROM_NAME' => 'Shelf', 'MAIL_URL' => '',
+        'MAIL_FROM_ADDRESS' => $address, 'MAIL_FROM_NAME' => 'Shelf', 'MAIL_URL' => 'null',
         'READER_ACCOUNTS_ENABLED' => 'false', 'READER_PUBLIC_REGISTRATION' => 'false'];
     foreach ($updates as $key => $value) {
-        $line = $key.'="'.addcslashes($value, '\\"$').'"';
+        $line = $value === 'null' ? $key.'=null' : $key.'="'.addcslashes($value, '\\"$').'"';
         $text = preg_match('/^'.preg_quote($key, '/').'=/m', $text)
             ? preg_replace_callback('/^'.preg_quote($key, '/').'=.*$/m', fn () => $line, $text)
             : rtrim($text)."\n".$line."\n";
