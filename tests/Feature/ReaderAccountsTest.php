@@ -81,13 +81,13 @@ class ReaderAccountsTest extends TestCase
         $this->assertTrue(Hash::check(self::PASSWORD, $reader->fresh()->password));
     }
 
-    public function test_strong_passwords_and_owner_only_live_gate(): void
+    public function test_strong_passwords_and_registration_open_to_any_email(): void
     {
         foreach (['short', 'alllowercase123!', 'NoNumbersHere!', 'NoSymbol123456', str_repeat('Aa1!', 19)] as $index => $password) {
             $this->postJson('/api/auth/register', ['email' => "r$index@example.test", 'password' => $password, 'password_confirmation' => $password])->assertUnprocessable();
         }
         config(['reader_auth.public_registration' => false]);
-        $this->postJson('/api/auth/register', ['email' => 'outside@example.test', 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertForbidden();
+        $this->postJson('/api/auth/register', ['email' => 'outside@example.test', 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertAccepted();
         User::factory()->create(['email' => 'owner@example.test', 'is_owner' => true]);
         $this->postJson('/api/auth/register', ['email' => 'owner@example.test', 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertAccepted();
     }

@@ -59,7 +59,11 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 11. Nothing is "done" without evidence. Reading and layout need real Android phone testing.
 12. Real people's data: if real reader accounts or purchases appear, do not change,
     move or delete them without a plan approved by Ajmal.
-13. Report failures honestly. If something goes wrong, stop and report before fixing.
+13. Report failures honestly. Failing tests or build errors in the agent's own
+    work-in-progress are normal development: fix them and continue within the
+    approved task without asking. Stop and report before fixing only if something
+    fails on the live server or database, data could be lost or changed unexpectedly,
+    a backup or rollback fails, or the fix would go beyond the approved task.
 
 ## 5. The server
 - Shelf runs in its own cPanel account "shelf": code in /home/shelf/apps/shelf,
@@ -91,15 +95,23 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 1. Plan: say what you will do, why, the risk, and how to undo it. Wait for OK if the
    task does not already approve it.
 2. Label commands: READ-ONLY (only looks) or CHANGES (changes something).
-3. Do the work in small steps. Stop if anything fails.
+3. Do the work in small steps. Fix tests and build errors in your own work-in-progress
+   and continue within the approved task. Stop and report before fixing live server
+   or database failures, unexpected data loss or changes, backup or rollback failures,
+   or fixes beyond the approved task, as required by section 4.13.
 4. Check the result. Automated tests stay. Always run tests through
    `scripts/run_tests.sh` (PHP only by default). Flutter/Android tests run ONLY when
    files in `mobile/` changed in the current task; then use `scripts/run_tests.sh --mobile`.
    Never write to `/tmp`. All temporary files for tests, Flutter, Composer, and scripts
    must go under `/home/shelf/tmp`. Set TMPDIR, TMP, and TEMP accordingly; put tool
    caches there when needed. Clean up only the temporary files created by the run.
-5. Commit and push to origin main only when the task says so.
-6. Report in plain, short English with exactly these lines:
+5. Permanent UX rule: every screen must be friendly and clear for non-technical
+   readers: obvious primary action, large touch targets, clear hierarchy, short
+   plain text, helpful empty/error/loading states, no mixed-direction punctuation
+   or clipped text, consistent with the existing Shelf look. Check every new or
+   changed screen for this before reporting.
+6. Commit and push to origin main only when the task says so.
+7. Report in plain, short English with exactly these lines:
    Done: / Tested: / Problems: / Next: / Decision needed:
 
 ## 7. Technical facts (from inspection, 25 September 2026)
@@ -237,3 +249,18 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   Configure noreply@shelf.services; privacy/deletion pages and bilingual account
   screens required. Owner runs are automated with backup first. Public reader
   registration waits for staging; initial live testing uses the owner's email.
+
+- 2026-09-29: Step 4 Task 1 fixes approved: registration accepts any email; retain
+  rate limits and verification. This supersedes owner-email-only registration;
+  staging remains required before readers other than the owner use the app.
+  Reader identities remain separate from owner/admin, including identical emails.
+  Store shows account state; signed-out Library has a large sign-in/create-account
+  action; Buy first requests sign-in. Store language control becomes a compact
+  current-language dropdown, synchronized with first launch and Settings.
+  All account screens are always English and LTR, superseding bilingual account
+  screens. Password requirements show live checkmarks. Codex runs live rollout
+  with backup first, tests the complete account lifecycle using only owner Gmail
+  plus-aliases, reads their email links, and deletes all test accounts through
+  confirmed deletion. Check screenshots of account screens and Store/dropdown in
+  both languages and small/large phones; run scripts/run_tests.sh --mobile,
+  commit, push, and build the owner-preview APK with checksum and expiry report.

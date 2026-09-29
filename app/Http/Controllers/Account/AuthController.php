@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Models\Reader;
-use App\Models\User;
 use App\Services\Accounts\AccountActions;
 use App\Services\Accounts\GoogleIdentity;
 use Illuminate\Http\Request;
@@ -24,7 +23,7 @@ class AuthController extends Controller
 
         return response()->json(['enabled' => $enabled, 'google_enabled' => $google,
             'google_web_client_id' => $google ? config('reader_auth.google_web_client_id') : null,
-            'owner_testing_only' => ! config('reader_auth.public_registration')]);
+            'owner_testing_only' => false]);
     }
 
     private function email(Request $request): string
@@ -46,16 +45,10 @@ class AuthController extends Controller
             }];
     }
 
-    private function permitRegistration(string $email): void
-    {
-        abort_unless(config('reader_auth.public_registration') || User::where('is_owner', true)->whereRaw('LOWER(email) = ?', [$email])->exists(), 403, 'Registration is currently limited to owner testing.');
-    }
-
     public function register(Request $request)
     {
         $email = $this->email($request);
         $data = $request->validate(['name' => ['nullable', 'string', 'max:100'], 'password' => self::passwordRules()]);
-        $this->permitRegistration($email);
         $reader = Reader::firstOrCreate(['email' => $email], ['name' => $data['name'] ?? null]);
         if ($reader->wasRecentlyCreated) {
             $reader->forceFill(['password' => $data['password']])->save();
@@ -155,7 +148,6 @@ class AuthController extends Controller
         $subject = hash('sha256', $claims['sub']);
         $reader = Reader::where('email', $email)->first();
         if (! $reader) {
-            $this->permitRegistration($email);
             $reader = Reader::create(['email' => $email]);
             $reader->forceFill(['sign_in_method' => 'google'])->save();
         }
