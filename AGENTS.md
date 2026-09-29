@@ -72,8 +72,18 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   payment, whichever comes first, and before any public or closed Google Play testing.
   This supersedes the earlier "until live with users" wording. Automated tests use
   an in-memory or temporary database only.
-- Codex's sandbox cannot reach the database. Any command that needs the real database
-  is given to the owner to run, with exact commands.
+- Codex runs approved live-server commands itself (backup, migrations, file moves
+  and checks), requesting sandbox escalation. The owner's approval of that
+  escalation prompt is the owner's OK under R1. This supersedes earlier wording
+  requiring the owner personally to run commands, including section 4's R3 wording
+  and historical decisions below; reversible migrations remain mandatory.
+- Backup first in the same run. Stop at the first failure and report it. Never edit
+  the database by hand. For the Task 6 + 7 rollout, if anything fails after entering
+  maintenance mode, run `php artisan up` before stopping.
+- Claude (planner) makes technical decisions following the Master Record. Ask the
+  owner only owner questions: books, rights, prices/money, what readers see,
+  publishing and launch.
+
 - Daily backup: scripts/shelf_daily_backup.py at 03:00 (shelf crontab), stored in
   /home/shelf/backups/shelf, 14 kept.
 
@@ -178,3 +188,16 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   list the three unreferenced cover files. Do not run live migrations or moves as
   an agent. Public app browsing checks the server rather than falling back to
   potentially withdrawn cached content; owner-preview caching remains separate.
+
+- 2026-09-28: Codex runs live-server commands itself (backup, migrate, file moves,
+  checks), requesting sandbox escalation; owner approval of the escalation prompt
+  is the owner's OK (R1). Backup first in the same run, stop at the first failure,
+  and report. Never edit the database by hand. This supersedes prior owner-run-only
+  restrictions; it does not waive reversible migrations or backup requirements.
+- 2026-09-28: Claude (planner) makes technical decisions following the Master
+  Record; the owner is asked only owner questions (books, rights, prices/money,
+  what readers see, publishing, launch).
+- 2026-09-28: Codex is approved to run the Task 6 + 7 rollout in order: backup,
+  maintenance down, optimize:clear, migrate --force, shelf:move-covers --after-backup,
+  maintenance up, shelf:check-publication. Stop at the first failure; if a failure
+  occurs after down, run php artisan up before stopping.
