@@ -167,7 +167,7 @@ class _PoemBody extends StatelessWidget {
                     Text(
                       poem.title!,
                       key: const Key('poem-title'),
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.right,
                       style: TextStyle(
                         color: colors.foreground,
                         fontFamily: settings.fontFamily,
@@ -202,7 +202,7 @@ class _PoemBody extends StatelessWidget {
                     Text(
                       'اصلي شاعر: ${poem.originalAuthor ?? '—'}\n'
                       'پښتو ژباړه: ${poem.translator ?? '—'}',
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.right,
                       style: TextStyle(color: colors.muted, height: 1.6),
                     ),
                   ],
@@ -250,7 +250,7 @@ class _PoemBody extends StatelessWidget {
                     Text(
                       datePlace,
                       key: const Key('poem-date-place'),
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.right,
                       style: TextStyle(
                         color: colors.muted,
                         fontSize: settings.fontSize > 16

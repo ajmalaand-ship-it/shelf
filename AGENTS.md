@@ -218,3 +218,12 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - 2026-09-28: Codex runs the Task 8 + 9 rollout with escalation: backup first in
   the same run, down, optimize:clear, migrate, up, then sample/access checks and
   direct HTTPS probes. Stop at the first failure, running up first if down began.
+
+- 2026-09-29: Step 3 task 2 addition: Pashto/English interface choice on first
+  launch, a visible one-tap "EN | پښتو" button in the Store header, and the same
+  control in Settings. All share one persisted preference. Book/source language
+  and the existing reader layout stay unchanged. Include widget tests.
+- 2026-09-29: Language addition clarified: English changes interface words only.
+  Book text, titles, author names, descriptions, contents, reader and share cards
+  remain RTL and right-aligned in both modes, with unchanged source strings.
+  Switching language must not mirror or reflow book content. Test this explicitly.

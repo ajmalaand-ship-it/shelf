@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'reader_settings.dart';
+import '../l10n/app_strings.dart';
 
 Future<void> showReadingPreferences(
   BuildContext context,
@@ -19,7 +20,10 @@ Future<void> showReadingPreferences(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('د ليک کچه', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                AppStrings.of(context).fontSize,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               Row(
                 children: [
                   const Icon(Icons.text_decrease_rounded),
@@ -42,7 +46,7 @@ Future<void> showReadingPreferences(
               ),
               const SizedBox(height: 8),
               Text(
-                'د شعر ليکدود',
+                AppStrings.of(context).readingFont,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 4),
@@ -52,43 +56,47 @@ Future<void> showReadingPreferences(
                 onChanged: (value) {
                   if (value != null) settings.setFont(value);
                 },
-                child: const Column(
+                child: Column(
                   children: [
                     RadioListTile<ReaderFont>(
                       key: Key('font-choice-vazirmatn'),
                       value: ReaderFont.vazirmatn,
-                      title: Text('وزيرمتن — Vazirmatn'),
-                      subtitle: Text('اصلي او د پيل ليکدود'),
+                      title: Text(AppStrings.of(context).vazirmatnName),
+                      subtitle: Text(
+                        AppStrings.of(context).defaultFontDescription,
+                      ),
                     ),
                     RadioListTile<ReaderFont>(
                       key: Key('font-choice-scheherazade'),
                       value: ReaderFont.naskh,
-                      title: Text('شهرزاد نو — Scheherazade New'),
-                      subtitle: Text('دوديز نسخ'),
+                      title: Text(AppStrings.of(context).scheherazadeName),
+                      subtitle: Text(AppStrings.of(context).naskhDescription),
                     ),
                     RadioListTile<ReaderFont>(
                       key: Key('font-choice-noto-nastaliq'),
                       value: ReaderFont.literary,
-                      title: Text('نوټو نستعليق — Noto Nastaliq Urdu'),
-                      subtitle: Text('ادبي نستعليق'),
+                      title: Text(AppStrings.of(context).nastaliqName),
+                      subtitle: Text(
+                        AppStrings.of(context).nastaliqDescription,
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 14),
               SegmentedButton<ReaderPalette>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: ReaderPalette.light,
-                    label: Text('روښانه'),
+                    label: Text(AppStrings.of(context).lightPalette),
                   ),
                   ButtonSegment(
                     value: ReaderPalette.sepia,
-                    label: Text('سپيا'),
+                    label: Text(AppStrings.of(context).sepiaPalette),
                   ),
                   ButtonSegment(
                     value: ReaderPalette.dark,
-                    label: Text('تياره'),
+                    label: Text(AppStrings.of(context).darkPalette),
                   ),
                 ],
                 selected: {settings.palette},

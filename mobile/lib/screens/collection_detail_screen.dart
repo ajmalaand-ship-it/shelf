@@ -60,7 +60,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
             onPressed: () =>
                 showReadingPreferences(context, widget.readerSettings),
             icon: const Icon(Icons.text_fields_rounded),
-            label: const Text(AppStrings.font),
+            label: Text(AppStrings.of(context).font),
           ),
         ],
       ),
@@ -88,16 +88,19 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
           );
           void openItem(PoemSummary poem) => Navigator.of(context).push(
             MaterialPageRoute<void>(
-              builder: (_) => PoemReaderScreen(
-                poemId: poem.id,
-                contentVersion: widget.contentVersion,
-                repository: widget.repository,
-                settings: widget.readerSettings,
-                collectionTitle: book.title,
-                audioController:
-                    widget.audioController ?? InactiveAudioController(),
-                entitlements: widget.entitlements,
-                ownerPreviewMode: widget.ownerPreviewMode,
+              builder: (_) => Directionality(
+                textDirection: TextDirection.rtl,
+                child: PoemReaderScreen(
+                  poemId: poem.id,
+                  contentVersion: widget.contentVersion,
+                  repository: widget.repository,
+                  settings: widget.readerSettings,
+                  collectionTitle: book.title,
+                  audioController:
+                      widget.audioController ?? InactiveAudioController(),
+                  entitlements: widget.entitlements,
+                  ownerPreviewMode: widget.ownerPreviewMode,
+                ),
               ),
             ),
           );
@@ -119,17 +122,23 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                     Text(
                       bundle.collection.title,
                       key: const Key('collection-detail-title'),
-                      textAlign: TextAlign.center,
+                      textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.right,
                       style: Theme.of(context).textTheme.headlineLarge
                           ?.copyWith(
                             fontFamily: widget.readerSettings.fontFamily,
                           ),
                     ),
                     if (book.subtitle?.isNotEmpty == true)
-                      Text(book.subtitle!, textAlign: TextAlign.center),
+                      Text(
+                        book.subtitle!,
+                        textDirection: TextDirection.rtl,
+                        textAlign: TextAlign.right,
+                      ),
                     if (book.authors.any((a) => a.role == 'author'))
                       Wrap(
-                        alignment: WrapAlignment.center,
+                        alignment: WrapAlignment.start,
+                        textDirection: TextDirection.rtl,
                         children: [
                           for (final author in book.authors.where(
                             (a) => a.role == 'author',
@@ -137,16 +146,32 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                             TextButton(
                               onPressed: () =>
                                   navigation.openAuthor(context, author.slug),
-                              child: Text(author.name),
+                              child: Text(
+                                author.name,
+                                textDirection: TextDirection.rtl,
+                                textAlign: TextAlign.right,
+                              ),
                             ),
                         ],
                       )
                     else if (book.creditedAuthors case final author?)
-                      Text(author, textAlign: TextAlign.center),
-                    if (bundle.collection.creditedTranslators
-                        case final translators?) ...[
+                      Text(
+                        author,
+                        textDirection: TextDirection.rtl,
+                        textAlign: TextAlign.right,
+                      ),
+                    if (bundle.collection.creditedTranslators != null) ...[
                       const SizedBox(height: 8),
-                      Text(translators, textAlign: TextAlign.center),
+                      Text(
+                        AppStrings.of(context).translation(
+                          book.authors
+                              .where((a) => a.role == 'translator')
+                              .map((a) => a.name)
+                              .join('، '),
+                        ),
+                        textDirection: TextDirection.rtl,
+                        textAlign: TextAlign.right,
+                      ),
                     ],
                     if (widget.ownerPreviewMode) ...[
                       const SizedBox(height: 10),
@@ -155,17 +180,28 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                           key: const Key(
                             'owner-preview-collection-detail-status',
                           ),
-                          label: Text(AppStrings.status(book.displayStatus)),
+                          label: Text(
+                            AppStrings.of(context).status(book.displayStatus),
+                          ),
                         ),
                       ),
                     ],
                     Wrap(
-                      alignment: WrapAlignment.center,
+                      alignment: WrapAlignment.start,
+                      textDirection: TextDirection.rtl,
                       spacing: 8,
                       children: [
                         if (book.language case final language?)
-                          Chip(label: Text(AppStrings.languageName(language))),
-                        Chip(label: Text(AppStrings.typeName(book.bookType))),
+                          Chip(
+                            label: Text(
+                              AppStrings.of(context).languageName(language),
+                            ),
+                          ),
+                        Chip(
+                          label: Text(
+                            AppStrings.of(context).typeName(book.bookType),
+                          ),
+                        ),
                         for (final category in book.categories)
                           Chip(label: Text(category.name)),
                       ],
@@ -177,51 +213,51 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                           ? null
                           : () => openItem(samples.first),
                       icon: const Icon(Icons.menu_book_outlined),
-                      label: const Text(AppStrings.readSample),
+                      label: Text(AppStrings.of(context).readSample),
                     ),
                     const SizedBox(height: 8),
-                    const OutlinedButton(
+                    OutlinedButton(
                       key: Key('buy-coming-soon'),
                       onPressed: null,
-                      child: Text(AppStrings.buySoon),
+                      child: Text(AppStrings.of(context).buySoon),
                     ),
                     if (book.description?.isNotEmpty == true)
                       _FrontMatter(
-                        title: AppStrings.description,
+                        title: AppStrings.of(context).description,
                         body: book.description!,
                       ),
                     if (bundle.collection.publicationInfo case final info?)
                       _FrontMatter(
-                        title: AppStrings.publicationInfo,
+                        title: AppStrings.of(context).publicationInfo,
                         body: info,
                       ),
                     if (bundle.collection.dedication case final dedication?)
                       _FrontMatter(
-                        title: AppStrings.dedication,
+                        title: AppStrings.of(context).dedication,
                         body: dedication,
                       ),
                     if (bundle.collection.introduction case final introduction?)
                       _FrontMatter(
-                        title: AppStrings.introduction,
+                        title: AppStrings.of(context).introduction,
                         body: introduction,
                       ),
                     if (bundle.collection.foreword case final foreword?)
                       _FrontMatter(
                         title:
                             bundle.collection.forewordAuthor ??
-                            AppStrings.foreword,
+                            AppStrings.of(context).foreword,
                         body: foreword,
                       ),
                     const SizedBox(height: 28),
                     Text(
-                      AppStrings.contents,
+                      AppStrings.of(context).contents,
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 10),
                     if (bundle.poems.isEmpty)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: 30),
-                        child: Text(AppStrings.noContent),
+                        child: Text(AppStrings.of(context).noContent),
                       )
                     else
                       ...bundle.poems.map(
@@ -255,6 +291,7 @@ class _FrontMatter extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ExpansionTile(
     tilePadding: EdgeInsets.zero,
+    expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
     title: Text(title),
     children: [
       Padding(
@@ -262,7 +299,7 @@ class _FrontMatter extends StatelessWidget {
         child: SelectableText(
           body,
           textDirection: TextDirection.rtl,
-          textAlign: TextAlign.start,
+          textAlign: TextAlign.right,
           style: const TextStyle(height: 1.8),
         ),
       ),
@@ -285,34 +322,40 @@ class _PoemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     button: onTap != null,
-    label: poem.isUntitled ? AppStrings.untitled : poem.displayTitle,
+    label: poem.isUntitled
+        ? AppStrings.of(context).untitled
+        : poem.displayTitle,
     child: ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
       onTap: onTap,
       leading: CircleAvatar(child: Text('${poem.sortOrder}')),
       title: Text(
-        poem.displayTitle.isEmpty ? AppStrings.untitled : poem.displayTitle,
+        poem.displayTitle.isEmpty
+            ? AppStrings.of(context).untitled
+            : poem.displayTitle,
         key: Key('poem-list-title-${poem.id}'),
+        textDirection: TextDirection.rtl,
+        textAlign: TextAlign.right,
         style: TextStyle(fontFamily: fontFamily),
       ),
       subtitle:
           [
             if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)
-              AppStrings.sample,
+              AppStrings.of(context).sample,
             if (poem.isTranslation)
-              '${AppStrings.originalAuthor(poem.originalAuthor ?? '—')}\n${AppStrings.translation(poem.translator ?? '—')}',
+              '${AppStrings.of(context).originalAuthor(poem.originalAuthor ?? '—')}\n${AppStrings.of(context).translation(poem.translator ?? '—')}',
             if (ownerPreviewMode)
-              '${poem.isActive ? AppStrings.published : AppStrings.draft} • ${poem.isFreeSample ? AppStrings.free : AppStrings.locked}',
+              '${poem.isActive ? AppStrings.of(context).published : AppStrings.of(context).draft} • ${poem.isFreeSample ? AppStrings.of(context).free : AppStrings.of(context).locked}',
           ].isEmpty
           ? null
           : Text(
               [
                 if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)
-                  AppStrings.sample,
+                  AppStrings.of(context).sample,
                 if (poem.isTranslation)
-                  '${AppStrings.originalAuthor(poem.originalAuthor ?? '—')}\n${AppStrings.translation(poem.translator ?? '—')}',
+                  '${AppStrings.of(context).originalAuthor(poem.originalAuthor ?? '—')}\n${AppStrings.of(context).translation(poem.translator ?? '—')}',
                 if (ownerPreviewMode)
-                  '${poem.isActive ? AppStrings.published : AppStrings.draft} • ${poem.isFreeSample ? AppStrings.free : AppStrings.locked}',
+                  '${poem.isActive ? AppStrings.of(context).published : AppStrings.of(context).draft} • ${poem.isFreeSample ? AppStrings.of(context).free : AppStrings.of(context).locked}',
               ].join('\n'),
               key: ownerPreviewMode
                   ? const Key('owner-preview-poem-status')
@@ -323,8 +366,8 @@ class _PoemTile extends StatelessWidget {
             ? Icons.lock_outline_rounded
             : Icons.menu_book_rounded,
         semanticLabel: (ownerPreviewMode ? !poem.isFreeSample : poem.locked)
-            ? AppStrings.locked
-            : AppStrings.free,
+            ? AppStrings.of(context).locked
+            : AppStrings.of(context).free,
       ),
     ),
   );
@@ -339,9 +382,12 @@ class _CollectionError extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(AppStrings.error),
+        Text(AppStrings.of(context).error),
         const SizedBox(height: 12),
-        FilledButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
+        FilledButton(
+          onPressed: onRetry,
+          child: Text(AppStrings.of(context).retry),
+        ),
       ],
     ),
   );

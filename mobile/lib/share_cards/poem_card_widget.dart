@@ -79,7 +79,7 @@ class PoemCardWidget extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         request.poem.title!,
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.right,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -95,7 +95,8 @@ class PoemCardWidget extends StatelessWidget {
                     ],
                     const SizedBox(height: 8),
                     Expanded(
-                      child: Center(
+                      child: Align(
+                        alignment: Alignment.centerRight,
                         child: Text(
                           page.text,
                           key: const Key('card-poem-text'),
@@ -114,7 +115,7 @@ class PoemCardWidget extends StatelessWidget {
                       Text(
                         'اصلي شاعر: ${request.poem.originalAuthor ?? '—'}  •  '
                         'پښتو ژباړه: ${request.poem.translator ?? '—'}',
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.right,
                         style: TextStyle(
                           color: palette.muted,
                           fontFamily: 'Vazirmatn',
@@ -125,7 +126,7 @@ class PoemCardWidget extends StatelessWidget {
                     else
                       Text(
                         request.poem.cardAuthor,
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.right,
                         style: TextStyle(
                           color: palette.muted,
                           fontFamily: request.fontFamily,

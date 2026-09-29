@@ -10,6 +10,8 @@ import '../repository/poetry_repository.dart';
 import '../settings/reader_settings.dart';
 import '../settings/reading_preferences_sheet.dart';
 import '../widgets/bookstore_widgets.dart';
+import '../widgets/language_controls.dart';
+import '../settings/interface_language.dart';
 import 'bookstore_navigation.dart';
 import 'search_screen.dart';
 
@@ -108,41 +110,43 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           [
-            AppStrings.store,
-            AppStrings.search,
-            AppStrings.library,
-            AppStrings.settings,
+            AppStrings.of(context).store,
+            AppStrings.of(context).search,
+            AppStrings.of(context).library,
+            AppStrings.of(context).settings,
           ][_tab],
         ),
         actions: [
+          if (_tab == 0)
+            const LanguageButton(key: Key('store-language-toggle')),
           TextButton.icon(
             key: const Key('home-font-chooser'),
             onPressed: () =>
                 showReadingPreferences(context, widget.readerSettings),
             icon: const Icon(Icons.text_fields_rounded),
-            label: const Text(AppStrings.font),
+            label: Text(AppStrings.of(context).font),
           ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (index) => setState(() => _tab = index),
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.storefront_outlined),
-            label: AppStrings.store,
+            label: AppStrings.of(context).store,
           ),
           NavigationDestination(
             icon: Icon(Icons.search),
-            label: AppStrings.search,
+            label: AppStrings.of(context).search,
           ),
           NavigationDestination(
             icon: Icon(Icons.local_library_outlined),
-            label: AppStrings.library,
+            label: AppStrings.of(context).library,
           ),
           NavigationDestination(
             icon: Icon(Icons.settings_outlined),
-            label: AppStrings.settings,
+            label: AppStrings.of(context).settings,
           ),
         ],
       ),
@@ -190,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            AppStrings.appName,
+            AppStrings.of(context).appName,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
@@ -201,19 +205,20 @@ class _HomeScreenState extends State<HomeScreen> {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           if (widget.qaMode)
-            const Padding(
+            Padding(
               key: Key('debug-qa-notice'),
               padding: EdgeInsets.all(12),
-              child: Text(AppStrings.qaNotice),
+              child: Text(AppStrings.of(context).qaNotice),
             ),
-          if (snapshot.refreshError != null) const Text(AppStrings.offline),
+          if (snapshot.refreshError != null)
+            Text(AppStrings.of(context).offline),
           if (books.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 40),
-              child: Text(AppStrings.noBooks),
+              child: Text(AppStrings.of(context).noBooks),
             )
           else if (populated.isEmpty) ...[
-            const SectionTitle(AppStrings.allBooks),
+            SectionTitle(AppStrings.of(context).allBooks),
             BookGrid(
               books: books,
               ownerPreview: widget.ownerPreviewMode,
@@ -222,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ] else ...[
             BookRow(
-              title: AppStrings.newBooks,
+              title: AppStrings.of(context).newBooks,
               books: newest,
               ownerPreview: widget.ownerPreviewMode,
               fontFamily: widget.readerSettings.fontFamily,
@@ -242,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
           ],
           if (_authors.isNotEmpty) ...[
-            const SectionTitle(AppStrings.authors),
+            SectionTitle(AppStrings.of(context).authors),
             SizedBox(
               height:
                   132 * MediaQuery.textScalerOf(context).scale(1).clamp(1, 2),
@@ -257,13 +262,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: InkWell(
                       onTap: () => _navigation.openAuthor(context, author.slug),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          AuthorPortrait(author: author),
+                          Center(child: AuthorPortrait(author: author)),
                           const SizedBox(height: 8),
                           Text(
                             author.name,
                             maxLines: 2,
-                            textAlign: TextAlign.center,
+                            textDirection: TextDirection.rtl,
+                            textAlign: TextAlign.right,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -283,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
   @override
-  Widget build(BuildContext context) => const Center(
+  Widget build(BuildContext context) => Center(
     child: Padding(
       padding: EdgeInsets.all(28),
       child: Column(
@@ -291,9 +298,12 @@ class LibraryScreen extends StatelessWidget {
         children: [
           Icon(Icons.local_library_outlined, size: 56),
           SizedBox(height: 20),
-          Text(AppStrings.librarySoon, textAlign: TextAlign.center),
+          Text(AppStrings.of(context).librarySoon, textAlign: TextAlign.center),
           SizedBox(height: 12),
-          Text(AppStrings.libraryMessage, textAlign: TextAlign.center),
+          Text(
+            AppStrings.of(context).libraryMessage,
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     ),
@@ -308,8 +318,17 @@ class SettingsScreen extends StatelessWidget {
     padding: const EdgeInsets.all(20),
     children: [
       ListTile(
+        title: Text(AppStrings.of(context).interfaceLanguage),
+        subtitle: Text(
+          InterfaceLanguageScope.of(context)?.isEnglish == true
+              ? AppStrings.english
+              : AppStrings.pashto,
+        ),
+        trailing: const LanguageButton(key: Key('settings-language-toggle')),
+      ),
+      ListTile(
         leading: const Icon(Icons.menu_book_outlined),
-        title: const Text(AppStrings.readingPreferences),
+        title: Text(AppStrings.of(context).readingPreferences),
         trailing: const Icon(Icons.chevron_left),
         onTap: () => showReadingPreferences(context, settings),
       ),

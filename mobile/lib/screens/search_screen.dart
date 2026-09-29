@@ -123,8 +123,8 @@ class _SearchScreenState extends State<SearchScreen> {
           key: const Key('book-search'),
           controller: _text,
           onChanged: (_) => _schedule(),
-          decoration: const InputDecoration(
-            labelText: AppStrings.searchHint,
+          decoration: InputDecoration(
+            labelText: AppStrings.of(context).searchHint,
             prefixIcon: Icon(Icons.search),
           ),
         ),
@@ -135,9 +135,12 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             _filter(
               'language-filter',
-              AppStrings.language,
+              AppStrings.of(context).language,
               _language,
-              {for (final l in languages) l: AppStrings.languageName(l)},
+              {
+                for (final l in languages)
+                  l: AppStrings.of(context).languageName(l),
+              },
               (v) {
                 _language = v;
                 _schedule();
@@ -145,7 +148,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             _filter(
               'category-filter',
-              AppStrings.category,
+              AppStrings.of(context).category,
               _category,
               {for (final c in widget.categories) c.slug: c.name},
               (v) {
@@ -155,9 +158,12 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             _filter(
               'type-filter',
-              AppStrings.bookType,
+              AppStrings.of(context).bookType,
               _type,
-              {'poetry': AppStrings.poetry, 'prose': AppStrings.prose},
+              {
+                'poetry': AppStrings.of(context).poetry,
+                'prose': AppStrings.of(context).prose,
+              },
               (v) {
                 _type = v;
                 _schedule();
@@ -174,7 +180,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 _language = _category = _type = null;
                 _schedule();
               },
-              child: const Text(AppStrings.clearFilters),
+              child: Text(AppStrings.of(context).clearFilters),
             ),
           ),
         const SizedBox(height: 24),
@@ -183,9 +189,9 @@ class _SearchScreenState extends State<SearchScreen> {
         else if (_failed)
           BookstoreError(onRetry: _search)
         else if (!_hasQuery)
-          const Text(AppStrings.searchEmpty)
+          Text(AppStrings.of(context).searchEmpty)
         else if (_results.isEmpty)
-          const Text(AppStrings.noResults)
+          Text(AppStrings.of(context).noResults)
         else
           BookGrid(
             books: _results,
@@ -211,9 +217,9 @@ class _SearchScreenState extends State<SearchScreen> {
       isExpanded: true,
       decoration: InputDecoration(labelText: label),
       items: [
-        const DropdownMenuItem<String>(
+        DropdownMenuItem<String>(
           value: null,
-          child: Text(AppStrings.all),
+          child: Text(AppStrings.of(context).all),
         ),
         ...options.entries.map(
           (e) => DropdownMenuItem(

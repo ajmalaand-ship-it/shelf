@@ -93,16 +93,24 @@ class BookTile extends StatelessWidget {
             Text(
               book.title,
               key: Key('collection-title-${book.slug}'),
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.titleMedium
                   ?.copyWith(fontFamily: fontFamily),
             ),
             if (book.creditedAuthors case final author?)
-              Text(author, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text(
+                author,
+                textDirection: TextDirection.rtl,
+                textAlign: TextAlign.right,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             if (ownerPreview)
               Text(
-                AppStrings.status(book.displayStatus),
+                AppStrings.of(context).status(book.displayStatus),
                 key: const Key('owner-preview-collection-status'),
                 style: Theme.of(context).textTheme.labelSmall,
               ),
@@ -193,7 +201,7 @@ class BookRow extends StatelessWidget {
 }
 
 class SectionTitle extends StatelessWidget {
-  const SectionTitle(this.title, {super.key});
+  SectionTitle(this.title, {super.key});
   final String title;
   @override
   Widget build(BuildContext context) => Padding(
@@ -214,9 +222,12 @@ class BookstoreError extends StatelessWidget {
         children: [
           const Icon(Icons.wifi_off_outlined, size: 40),
           const SizedBox(height: 16),
-          const Text(AppStrings.error),
+          Text(AppStrings.of(context).error),
           const SizedBox(height: 12),
-          FilledButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
+          FilledButton(
+            onPressed: onRetry,
+            child: Text(AppStrings.of(context).retry),
+          ),
         ],
       ),
     ),

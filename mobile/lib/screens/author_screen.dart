@@ -44,7 +44,7 @@ class _AuthorScreenState extends State<AuthorScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text(AppStrings.authors)),
+    appBar: AppBar(title: Text(AppStrings.of(context).authors)),
     body: FutureBuilder<BookAuthor>(
       future: _future,
       builder: (context, snapshot) {
@@ -62,18 +62,21 @@ class _AuthorScreenState extends State<AuthorScreen> {
             const SizedBox(height: 16),
             Text(
               author.name,
-              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const SectionTitle(AppStrings.biography),
+            SectionTitle(AppStrings.of(context).biography),
             Text(
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
               author.biography?.isNotEmpty == true
                   ? author.biography!
-                  : AppStrings.noBiography,
+                  : AppStrings.of(context).noBiography,
             ),
-            const SectionTitle(AppStrings.allBooks),
+            SectionTitle(AppStrings.of(context).allBooks),
             if (author.books.isEmpty)
-              const Text(AppStrings.noBooks)
+              Text(AppStrings.of(context).noBooks)
             else
               BookGrid(
                 books: author.books,

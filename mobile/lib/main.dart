@@ -12,6 +12,7 @@ import 'audio/just_audio_controller.dart';
 import 'bootstrap/data_source_factory.dart';
 import 'purchases/entitlement_controller.dart';
 import 'settings/reader_settings.dart';
+import 'settings/interface_language.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,7 @@ Future<void> main() async {
     ShelfApp(
       repository: repository,
       readerSettings: settings,
+      languageSettings: InterfaceLanguageSettings.load(preferences),
       audioController: audioController,
       entitlements: entitlements,
       qaMode: sourceMode == PoetrySourceMode.qa,
