@@ -6,7 +6,7 @@ require dirname(__DIR__).'/vendor/autoload.php';
 
 use Symfony\Component\Process\Process;
 
-function accountMailUapi(string $method, array $arguments): array
+function accountMailUapi(string $method, array $arguments): mixed
 {
     $process = new Process(['/usr/local/cpanel/bin/uapi', '--output=json', 'Email', $method, ...$arguments]);
     $process->setTimeout(60);
