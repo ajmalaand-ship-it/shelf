@@ -37,7 +37,7 @@ class ImportPoetryManifestTest extends TestCase
                 'body' => "لومړۍ کرښه\nدويمه کرښه", 'source_page_start' => 4, 'source_page_end' => 4,
             ]],
         ], JSON_UNESCAPED_UNICODE));
-        Collection::create(['title' => 'څپو کې انځورونه', 'slug' => 'source-test', 'is_active' => false]);
+        Collection::create(['title' => 'څپو کې انځورونه', 'slug' => 'source-test', 'status' => 'draft']);
 
         $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath, '--apply' => true])->assertSuccessful();
         $this->artisan('poetry:import-manifest', ['manifest' => $manifestPath, '--apply' => true])->assertSuccessful();

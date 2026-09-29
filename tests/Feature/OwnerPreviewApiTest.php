@@ -32,7 +32,7 @@ class OwnerPreviewApiTest extends TestCase
             'slug' => 'draft-real-review',
             'author' => 'اجمل اند',
             'sort_order' => 2,
-            'is_active' => false,
+            'status' => 'draft',
         ]);
         $this->draftLockedPoem = Poem::create([
             'collection_id' => $this->draftCollection->id,

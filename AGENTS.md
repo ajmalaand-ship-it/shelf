@@ -159,3 +159,22 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   failure leaves neither partial items nor orphan files. A one-time preview token/lock
   prevents duplicate submissions. Append only; never replace or delete existing content.
   This supersedes Task 5b's retention of files created by failed imports.
+
+- 2026-09-28: Tasks 6 + 7 approved (Master Record 6.1, 6.8, 6.10): book states
+  are Draft, Ready for review, Published and Withdrawn. A reversible owner-run
+  migration makes all six existing books Draft, retaining old flags for rollback.
+  Only Published books and Visible items are public, including their media.
+  Publishing requires an author credit, language, cover and visible item; sample
+  and per-book store-product checks follow in task 8 / Step 4. Record status actor
+  and time. Withdrawal deletes nothing; Step 4 will preserve verified prior buyers'
+  access while stopping discovery and new sales. Until then that access fails closed.
+- 2026-09-28: Only users explicitly marked owner may enter admin. The reversible
+  migration marks the existing single user owner; all future users default to
+  non-owner. Keep login rate limiting and offer optional authenticator-app MFA
+  with recovery codes in the owner profile; do not enable it for the owner.
+- 2026-09-28: Unpublished covers must not be public. Serve covers through status-
+  checked routes; private admin/owner-preview access remains. The owner backs up,
+  migrates and moves only referenced covers into private storage. Preserve and
+  list the three unreferenced cover files. Do not run live migrations or moves as
+  an agent. Public app browsing checks the server rather than falling back to
+  potentially withdrawn cached content; owner-preview caching remains separate.

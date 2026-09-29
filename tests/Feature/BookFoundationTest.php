@@ -31,7 +31,7 @@ class BookFoundationTest extends TestCase
 
     private function owner(): User
     {
-        $user = User::factory()->create();
+        $user = User::factory()->state(['is_owner' => true])->create();
         $this->actingAs($user);
         Filament::setCurrentPanel(Filament::getPanel('admin'));
 
@@ -163,7 +163,7 @@ class BookFoundationTest extends TestCase
     public function test_book_and_content_bin_restore_and_permanent_delete_guard(): void
     {
         $this->owner();
-        $book = $this->book(['is_active' => true]);
+        $book = $this->book(['status' => 'published']);
         $item = $this->content($book, ['is_active' => true, 'is_free_sample' => true]);
         $body = $item->body;
         Livewire::test(EditPoem::class, ['record' => $item->id])->callAction('delete');
@@ -193,7 +193,7 @@ class BookFoundationTest extends TestCase
     public function test_book_filters_and_changes_track_actor_without_changing_identity_or_text(): void
     {
         $creator = $this->owner();
-        $book = $this->book(['book_type' => 'prose', 'language' => 'fa', 'is_active' => true]);
+        $book = $this->book(['book_type' => 'prose', 'language' => 'fa', 'status' => 'ready']);
         $other = $this->book();
         $author = Author::create(['name' => 'Named author']);
         $book->credits()->create(['author_id' => $author->id, 'role' => 'author']);
@@ -220,9 +220,9 @@ class BookFoundationTest extends TestCase
 
     public function test_public_api_paginates_books_and_content_and_exposes_stable_id_and_type(): void
     {
-        $book = $this->book(['book_type' => 'prose', 'is_active' => true]);
+        $book = $this->book(['book_type' => 'prose', 'status' => 'published']);
         for ($i = 0; $i < 51; $i++) {
-            $this->book(['is_active' => true]);
+            $this->book(['status' => 'published']);
             $this->content($book, ['title' => 'Chapter '.$i, 'is_active' => true, 'is_free_sample' => true]);
         }
         $this->getJson('/api/collections')->assertOk()->assertJsonCount(50, 'data')->assertJsonPath('meta.total', 52);
@@ -279,7 +279,7 @@ class BookFoundationTest extends TestCase
     public function test_category_api_metadata_and_duplicate_slug_validation(): void
     {
         $this->owner();
-        $book = $this->book(['is_active' => true]);
+        $book = $this->book(['status' => 'published']);
         $category = Category::create(['name' => 'History']);
         $book->categories()->attach($category);
         $this->getJson('/api/collections/'.$book->slug)

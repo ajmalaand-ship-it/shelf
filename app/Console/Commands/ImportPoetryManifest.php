@@ -189,7 +189,7 @@ class ImportPoetryManifest extends Command
             'publication_info' => $collection['publication_info'] ?? null,
             'cover_image' => $collection['cover_image'] ?? null,
             'sort_order' => $collection['catalogue_order'] ?? 0,
-            'is_active' => false,
+            'status' => 'draft',
         ];
     }
 
@@ -210,7 +210,7 @@ class ImportPoetryManifest extends Command
         $expected = collect($mapping)
             ->filter(fn (string $modelKey, string $sourceKey): bool => array_key_exists($sourceKey, $source))
             ->mapWithKeys(fn (string $modelKey, string $sourceKey): array => [$modelKey => $source[$sourceKey]])
-            ->put('is_active', false);
+            ->put('status', 'draft');
 
         return $expected->every(fn (mixed $value, string $key): bool => $collection->{$key} === $value);
     }

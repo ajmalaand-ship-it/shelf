@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # Covers are authorized by Laravel; never serve legacy static copies.
+    # Unreferenced files remain untouched for the owner to review.
+    RewriteRule ^storage/covers(?:/|$) - [R=404,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

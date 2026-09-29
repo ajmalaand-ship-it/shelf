@@ -9,7 +9,8 @@ class OwnerPreviewCollectionResource extends CollectionResource
     public function toArray(Request $request): array
     {
         return parent::toArray($request) + [
-            'is_active' => (bool) $this->is_active,
+            'is_active' => $this->resource->isPublished(),
+            'status' => $this->status,
         ];
     }
 }

@@ -15,14 +15,14 @@ class PoemController extends Controller
 {
     public function show(Poem $poem): PoemResource
     {
-        abort_unless($poem->is_active && $poem->collection?->is_active, 404);
+        abort_unless($poem->is_active && $poem->collection?->isPublished(), 404);
 
         return new PoemResource($poem);
     }
 
     public function audio(Request $request, Poem $poem, RevenueCatEntitlementService $entitlements): JsonResponse
     {
-        abort_unless($poem->is_active && $poem->collection?->is_active, 404);
+        abort_unless($poem->is_active && $poem->collection?->isPublished(), 404);
 
         $paidAccess = ! $poem->is_free_sample && $entitlements->requestIsEntitled($request);
         if (! $poem->is_free_sample && ! $paidAccess) {
@@ -49,7 +49,7 @@ class PoemController extends Controller
         $signedPaidAccess = $request->query('access') === 'paid';
         abort_unless(
             $poem->is_active
-            && $poem->collection?->is_active
+            && $poem->collection?->isPublished()
             && ($poem->is_free_sample || $signedPaidAccess),
             404,
         );
@@ -73,7 +73,7 @@ class PoemController extends Controller
         $signedPaidAccess = $request->query('access') === 'paid';
         abort_unless(
             $poem->is_active
-            && $poem->collection?->is_active
+            && $poem->collection?->isPublished()
             && ($poem->is_free_sample || $signedPaidAccess),
             404,
         );

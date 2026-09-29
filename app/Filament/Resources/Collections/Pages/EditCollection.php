@@ -7,6 +7,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Validation\ValidationException;
 
 class EditCollection extends EditRecord
 {
@@ -16,8 +17,12 @@ class EditCollection extends EditRecord
 
     protected function afterSave(): void
     {
-        if ($this->record->is_active) {
-            $this->record->assertPublishable();
+        if ($this->record->isPublished()) {
+            try {
+                $this->record->assertPublishable();
+            } catch (ValidationException $exception) {
+                throw ValidationException::withMessages(collect($exception->errors())->mapWithKeys(fn ($messages, $field) => ['data.'.$field => $messages])->all());
+            }
         }
     }
 

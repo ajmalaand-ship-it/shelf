@@ -41,7 +41,7 @@ class AdminGateTest extends TestCase
 
     public function test_owner_can_see_and_open_app_setting_edit_action(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $setting = AppSetting::where('key', 'content_version')->firstOrFail();
 
@@ -55,14 +55,14 @@ class AdminGateTest extends TestCase
     public function test_owner_can_create_collection_with_validated_cover(): void
     {
         Storage::fake('covers');
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
 
         Livewire::test(CreateCollection::class)
             ->fillForm([
                 'title' => 'ازمېښتي ټولګه', 'slug' => 'admin-test',
                 'cover_image' => [UploadedFile::fake()->create('cover.jpg', 10, 'image/jpeg')],
-                'sort_order' => 1, 'is_active' => true,
+                'sort_order' => 1, 'status' => 'draft',
                 'language' => 'ps', 'credits' => [['author_id' => Author::create(['name' => 'Test author'])->id, 'role' => 'author']],
             ])
             ->call('create')
@@ -74,7 +74,7 @@ class AdminGateTest extends TestCase
     public function test_collection_cover_accepts_supported_images_up_to_five_megabytes(): void
     {
         Storage::fake('covers');
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
 
         $images = [
@@ -119,13 +119,13 @@ class AdminGateTest extends TestCase
     {
         Storage::fake('covers');
         Storage::disk('covers')->put('existing/cover.jpg', 'preserved-cover');
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create([
             'title' => 'TEST EXISTING COVER',
             'slug' => 'existing-cover',
             'cover_image' => 'existing/cover.jpg',
-            'is_active' => false,
+            'status' => 'draft',
         ]);
 
         Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
@@ -167,9 +167,9 @@ class AdminGateTest extends TestCase
     public function test_poem_form_rejects_non_audio_upload(): void
     {
         Storage::fake('audio');
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
-        $collection = Collection::create(['title' => 'ټولګه', 'slug' => 'upload-test', 'is_active' => true]);
+        $collection = Collection::create(['title' => 'ټولګه', 'slug' => 'upload-test', 'status' => 'published']);
 
         Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
             ->assertFormFieldExists('body', fn ($field): bool => $field instanceof Textarea)
@@ -189,7 +189,7 @@ class AdminGateTest extends TestCase
     public function test_owner_can_replace_and_remove_audio_without_losing_private_files(): void
     {
         Storage::fake('audio');
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'audio-owner-flow']);
 
@@ -237,7 +237,7 @@ class AdminGateTest extends TestCase
     public function test_owner_can_attach_replace_and_remove_artwork_without_deleting_preserved_files(): void
     {
         Storage::fake('artwork');
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'artwork-owner-flow']);
 
@@ -270,7 +270,7 @@ class AdminGateTest extends TestCase
     public function test_collection_form_rejects_non_image_cover(): void
     {
         Storage::fake('covers');
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
 
         Livewire::test(CreateCollection::class)
@@ -285,9 +285,9 @@ class AdminGateTest extends TestCase
 
     public function test_owner_can_edit_collection_front_matter_in_pashto(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
-        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'front-matter', 'is_active' => false]);
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'front-matter', 'status' => 'draft']);
 
         Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
             ->fillForm([
@@ -304,24 +304,24 @@ class AdminGateTest extends TestCase
         $collection->refresh();
         $this->assertSame("لومړۍ کرښه\n\nدويم بند", $collection->introduction);
         $this->assertSame('غفور لېوال', $collection->foreword_author);
-        $this->assertFalse($collection->is_active);
+        $this->assertFalse($collection->isPublished());
     }
 
     public function test_owner_can_edit_order_state_pashto_audio_and_settings(): void
     {
         Storage::fake('audio');
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create([
-            'title' => 'TEST ONLY', 'slug' => 'test-only', 'sort_order' => 9, 'is_active' => false,
+            'title' => 'TEST ONLY', 'slug' => 'test-only', 'sort_order' => 9, 'status' => 'draft',
         ]);
 
         Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
-            ->fillForm(['sort_order' => 2, 'is_active' => true, 'language' => 'ps',
+            ->fillForm(['sort_order' => 2, 'status' => 'ready', 'language' => 'ps',
                 'credits' => [['author_id' => Author::create(['name' => 'Test author'])->id, 'role' => 'author']]])
             ->call('save')
             ->assertHasNoFormErrors();
-        $this->assertDatabaseHas('collections', ['id' => $collection->id, 'sort_order' => 2, 'is_active' => true]);
+        $this->assertDatabaseHas('collections', ['id' => $collection->id, 'sort_order' => 2, 'status' => 'ready']);
 
         $body = "لومړۍ کرښه\nدويمه کرښه\n\nدويم بند";
         Livewire::withQueryParams(['collection_id' => $collection->id])->test(CreatePoem::class)
@@ -361,10 +361,10 @@ class AdminGateTest extends TestCase
 
     public function test_poem_list_supports_owner_search_filters_and_inline_free_control(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
-        $firstCollection = Collection::create(['title' => 'لومړۍ ټولګه', 'slug' => 'first', 'is_active' => false]);
-        $secondCollection = Collection::create(['title' => 'دويمه ټولګه', 'slug' => 'second', 'is_active' => true]);
+        $firstCollection = Collection::create(['title' => 'لومړۍ ټولګه', 'slug' => 'first', 'status' => 'draft']);
+        $secondCollection = Collection::create(['title' => 'دويمه ټولګه', 'slug' => 'second', 'status' => 'published']);
         $untitled = Poem::create([
             'collection_id' => $firstCollection->id,
             'body' => "د لټون لومړۍ کرښه\nدويمه کرښه",
@@ -426,9 +426,9 @@ class AdminGateTest extends TestCase
 
     public function test_poem_bulk_editorial_actions_do_not_mix_free_and_publication_states(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
-        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'bulk-actions', 'is_active' => false]);
+        $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'bulk-actions', 'status' => 'draft']);
         $poems = collect([1, 2])->map(fn (int $order) => Poem::create([
             'collection_id' => $collection->id, 'body' => "شعر {$order}", 'excerpt' => 'لنډ',
             'sort_order' => $order, 'is_active' => false, 'is_free_sample' => false,
@@ -445,7 +445,7 @@ class AdminGateTest extends TestCase
 
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('publish', $poems);
         $this->assertSame(2, Poem::where('is_free_sample', true)->where('is_active', true)->count());
-        $this->assertFalse($collection->fresh()->is_active);
+        $this->assertFalse($collection->fresh()->isPublished());
 
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('unpublish', $poems);
         Livewire::test(ContentRelationManager::class, ['ownerRecord' => $collection, 'pageClass' => EditCollection::class])->callTableBulkAction('setLocked', $poems);
@@ -454,10 +454,12 @@ class AdminGateTest extends TestCase
 
     public function test_collection_list_shows_counts_and_uses_deliberate_publication_actions(): void
     {
-        $this->actingAs(User::factory()->create());
+        Storage::fake('covers');
+        Storage::disk('covers')->put('test.webp', 'test cover');
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create([
-            'title' => 'TEST ONLY', 'slug' => 'collection-controls', 'cover_image' => 'test.webp', 'is_active' => false,
+            'title' => 'TEST ONLY', 'slug' => 'collection-controls', 'cover_image' => 'test.webp', 'status' => 'draft',
         ]);
         Poem::create([
             'collection_id' => $collection->id, 'body' => 'لومړی', 'excerpt' => 'لنډ',
@@ -479,20 +481,20 @@ class AdminGateTest extends TestCase
             ->assertTableActionVisible('publish', $collection)
             ->callTableAction('publish', $collection);
 
-        $this->assertTrue($collection->fresh()->is_active);
+        $this->assertTrue($collection->fresh()->isPublished());
         $this->assertSame(1, $collection->poems()->where('is_active', true)->count());
 
         Livewire::test(ListCollections::class)
             ->assertTableActionVisible('unpublish', $collection->fresh())
             ->callTableAction('unpublish', $collection->fresh());
 
-        $this->assertFalse($collection->fresh()->is_active);
+        $this->assertFalse($collection->fresh()->isPublished());
         $this->assertSame(1, $collection->poems()->where('is_active', true)->count());
     }
 
     public function test_poem_form_offers_poetry_layout_and_automatic_order_in_book(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'simple-layout-owner']);
 
@@ -527,7 +529,7 @@ class AdminGateTest extends TestCase
 
     public function test_collection_actions_open_book_content_and_book_bound_creation(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'owner-navigation']);
         $manageUrl = CollectionResource::getUrl('edit', ['record' => $collection]);
@@ -562,7 +564,7 @@ class AdminGateTest extends TestCase
 
     public function test_poem_edit_links_back_to_its_collection(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'poem-back-link']);
         $poem = Poem::create([
@@ -577,7 +579,7 @@ class AdminGateTest extends TestCase
 
     public function test_translation_requires_truthful_attribution_but_original_does_not(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'translation-validation']);
 
@@ -630,7 +632,7 @@ class AdminGateTest extends TestCase
 
     public function test_filament_crud_continues_to_increment_content_version(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'version-admin']);
         $version = (int) AppSetting::where('key', 'content_version')->value('value');
@@ -657,7 +659,7 @@ class AdminGateTest extends TestCase
 
     public function test_owner_can_deliberately_delete_poems_and_empty_collections(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create(['title' => 'TEST ONLY', 'slug' => 'delete-owner-flow']);
         $poem = Poem::create([

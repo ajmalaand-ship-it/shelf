@@ -32,7 +32,7 @@ class RevenueCatEntitlementTest extends TestCase
         Cache::setDefaultDriver('array');
         Cache::clear();
         $this->collection = Collection::create([
-            'title' => 'TEST ONLY', 'slug' => 'p5-test', 'is_active' => true,
+            'title' => 'TEST ONLY', 'slug' => 'p5-test', 'status' => 'published',
         ]);
         $this->free = Poem::create([
             'collection_id' => $this->collection->id, 'title' => 'Free',

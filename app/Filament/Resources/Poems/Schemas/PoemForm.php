@@ -58,7 +58,7 @@ class PoemForm
                     ->description('Draft/published and free/locked are separate decisions.')
                     ->columns(2)
                     ->schema([
-                        Toggle::make('is_active')->label('Published')->helperText('Draft content remain unavailable through the public API.')->default(false),
+                        Toggle::make('is_active')->label('Visible')->helperText('Hidden items are never available through the public API.')->default(false),
                         Toggle::make('is_free_sample')->label('Free sample')->helperText('Off means the item is locked and requires entitlement when published.')->default(false),
                         Textarea::make('excerpt')->label('Public excerpt')->required()->rows(5)
                             ->helperText('Shown when a locked item is listed or opened without entitlement. Do not rewrite the source text.')

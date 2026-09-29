@@ -62,7 +62,8 @@ class CreateOwnerArchive extends Command
 
             foreach ([
                 storage_path('app/source') => 'sources',
-                storage_path('app/public/covers') => 'covers',
+                storage_path('app/public/covers') => 'legacy-public-covers',
+                storage_path('app/private/covers') => 'covers',
                 storage_path('app/private/audio') => 'audio',
                 storage_path('app/private/artwork') => 'artwork',
             ] as $directory => $prefix) {

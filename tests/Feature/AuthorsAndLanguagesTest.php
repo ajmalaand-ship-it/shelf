@@ -28,13 +28,13 @@ class AuthorsAndLanguagesTest extends TestCase
 
     private function owner(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
     }
 
     private function book(string $slug, bool $published = true, string $language = 'ps'): Collection
     {
-        return Collection::create(['title' => $slug, 'slug' => $slug, 'author' => 'Legacy text', 'is_active' => $published, 'language' => $language]);
+        return Collection::create(['title' => $slug, 'slug' => $slug, 'author' => 'Legacy text', 'status' => $published ? 'published' : 'draft', 'language' => $language]);
     }
 
     public function test_author_slug_is_generated_once_and_images_cannot_escape_private_storage(): void
@@ -135,7 +135,7 @@ class AuthorsAndLanguagesTest extends TestCase
         $author = Author::create(['name' => 'Author']);
         $translator = Author::create(['name' => 'Translator']);
         Livewire::test(CreateCollection::class)->fillForm([
-            'title' => 'Book', 'slug' => 'book', 'language' => 'ps', 'sort_order' => 0, 'is_active' => true,
+            'title' => 'Book', 'slug' => 'book', 'language' => 'ps', 'sort_order' => 0, 'status' => 'draft',
             'credits' => [
                 ['author_id' => $author->id, 'role' => 'author'],
                 ['author_id' => $translator->id, 'role' => 'translator'],
@@ -159,20 +159,23 @@ class AuthorsAndLanguagesTest extends TestCase
         $this->owner();
         $person = Author::create(['name' => 'Person']);
         Livewire::test(CreateCollection::class)->fillForm([
-            'title' => 'Invalid', 'slug' => 'invalid', 'sort_order' => 0, 'is_active' => true,
+            'title' => 'Invalid', 'slug' => 'invalid', 'sort_order' => 0, 'status' => 'published',
             'credits' => [['author_id' => $person->id, 'role' => 'translator']],
         ])->call('create')->assertHasFormErrors(['language', 'credits']);
         $this->assertDatabaseMissing('collections', ['slug' => 'invalid']);
         Livewire::test(CreateCollection::class)->fillForm([
-            'title' => 'Draft', 'slug' => 'draft', 'sort_order' => 0, 'is_active' => false,
+            'title' => 'Draft', 'slug' => 'draft', 'sort_order' => 0, 'status' => 'draft',
         ])->call('create')->assertHasNoFormErrors();
         $draft = Collection::where('slug', 'draft')->firstOrFail();
         Livewire::test(ListCollections::class)->callTableAction('publish', $draft)->assertHasErrors(['language', 'credits']);
-        $this->assertFalse($draft->fresh()->is_active);
-        $draft->update(['language' => 'fa']);
+        $this->assertFalse($draft->fresh()->isPublished());
+        Storage::fake('covers');
+        Storage::disk('covers')->put('cover.jpg', 'synthetic');
+        $draft->poems()->create(['body' => 'Synthetic', 'excerpt' => '', 'is_active' => true]);
+        $draft->update(['language' => 'fa', 'cover_image' => 'cover.jpg']);
         $draft->credits()->create(['author_id' => $person->id, 'role' => 'author']);
         Livewire::test(ListCollections::class)->callTableAction('publish', $draft)->assertHasNoErrors();
-        $this->assertTrue($draft->fresh()->is_active);
+        $this->assertTrue($draft->fresh()->isPublished());
         Livewire::test(EditCollection::class, ['record' => $draft->id])->fillForm(['credits' => []])
             ->call('save')->assertHasFormErrors(['credits']);
         $this->assertCount(1, $draft->fresh()->credits);
@@ -182,7 +185,7 @@ class AuthorsAndLanguagesTest extends TestCase
     {
         $this->owner();
         $author = Author::create(['name' => 'Person']);
-        $base = ['title' => 'Test', 'slug' => 'test', 'sort_order' => 0, 'is_active' => false];
+        $base = ['title' => 'Test', 'slug' => 'test', 'sort_order' => 0, 'status' => 'draft'];
         Livewire::test(CreateCollection::class)->fillForm($base + ['language' => 'xx'])
             ->call('create')->assertHasFormErrors(['language']);
         Livewire::test(CreateCollection::class)->fillForm($base + ['credits' => [

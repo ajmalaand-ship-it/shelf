@@ -24,7 +24,7 @@ class BookContentAdminTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
     }
 

@@ -35,7 +35,7 @@ class PoemsTable
                     })),
                 TextColumn::make('work_type')->label('Work type')->badge()
                     ->color(fn (string $state): string => $state === 'TRANSLATION' ? 'info' : 'gray'),
-                IconColumn::make('is_active')->label('Published')->boolean(),
+                IconColumn::make('is_active')->label('Visible')->boolean(),
                 ToggleColumn::make('is_free_sample')->label('Free sample')
                     ->tooltip(fn (bool $state): string => $state ? 'Free sample' : 'Locked'),
                 IconColumn::make('audio_path')->label('Audio')->boolean()
@@ -53,8 +53,8 @@ class PoemsTable
                     'ORIGINAL' => 'Original work',
                     'TRANSLATION' => 'Translation',
                 ]),
-                TernaryFilter::make('is_active')->label('Publication')
-                    ->trueLabel('Published')->falseLabel('Draft')->placeholder('All publication states'),
+                TernaryFilter::make('is_active')->label('Visibility')
+                    ->trueLabel('Visible')->falseLabel('Hidden')->placeholder('All visibility states'),
                 TernaryFilter::make('is_free_sample')->label('Access')
                     ->trueLabel('Free sample')->falseLabel('Locked')->placeholder('All access states'),
                 TernaryFilter::make('audio_path')->label('Audio')
@@ -65,12 +65,12 @@ class PoemsTable
                     ->nullable(),
             ])
             ->recordActions([
-                Action::make('publish')->label('Publish')->color('success')
+                Action::make('publish')->label('Show')->color('success')
                     ->visible(fn (Poem $record): bool => ! $record->is_active)
                     ->requiresConfirmation()
-                    ->modalDescription('Publish this item? It becomes publicly eligible only when its book is also published.')
+                    ->modalDescription('Show this item? It becomes publicly eligible only when its book is also published.')
                     ->action(fn (Poem $record) => $record->update(['is_active' => true])),
-                Action::make('unpublish')->label('Unpublish')->color('warning')
+                Action::make('unpublish')->label('Hide')->color('warning')
                     ->visible(fn (Poem $record): bool => $record->is_active)
                     ->requiresConfirmation()
                     ->action(fn (Poem $record) => $record->update(['is_active' => false])),
@@ -82,20 +82,20 @@ class PoemsTable
                 BulkActionGroup::make([
                     BulkAction::make('setFree')->label('Set Free')
                         ->requiresConfirmation()
-                        ->modalDescription('Mark the selected content as free samples. Draft content remain unpublished.')
+                        ->modalDescription('Mark the selected content as free samples. Hidden content remain hidden.')
                         ->action(fn (Collection $records) => $records->each->update(['is_free_sample' => true]))
                         ->deselectRecordsAfterCompletion(),
                     BulkAction::make('setLocked')->label('Set Locked')
                         ->requiresConfirmation()
-                        ->modalDescription('Mark the selected content as locked. Publication state will not change.')
+                        ->modalDescription('Mark the selected content as locked. Visibility will not change.')
                         ->action(fn (Collection $records) => $records->each->update(['is_free_sample' => false]))
                         ->deselectRecordsAfterCompletion(),
-                    BulkAction::make('publish')->label('Publish')
+                    BulkAction::make('publish')->label('Show')
                         ->requiresConfirmation()
-                        ->modalDescription('Publish the selected content? They become publicly eligible only when their book is also published.')
+                        ->modalDescription('Show the selected content? They become publicly eligible only when their book is also published.')
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => true]))
                         ->deselectRecordsAfterCompletion(),
-                    BulkAction::make('unpublish')->label('Unpublish')
+                    BulkAction::make('unpublish')->label('Hide')
                         ->requiresConfirmation()
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => false]))
                         ->deselectRecordsAfterCompletion(),

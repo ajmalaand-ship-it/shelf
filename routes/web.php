@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\PoemController;
+use App\Http\Controllers\CoverController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,3 +25,6 @@ Route::get('/media/artwork/{poem}', [PoemController::class, 'streamArtwork'])
 Route::get('/media/owner-preview/artwork/{poem}', [PoemController::class, 'streamOwnerPreviewArtwork'])
     ->middleware('signed')
     ->name('owner-preview.poems.artwork.stream');
+
+Route::get('/media/covers/{collection}', [CoverController::class, 'show'])->name('books.cover');
+Route::get('/media/owner-preview/covers/{collection}', [CoverController::class, 'preview'])->middleware('signed')->name('owner-preview.books.cover');

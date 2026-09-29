@@ -11,7 +11,6 @@ use Filament\Actions\RestoreAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
@@ -28,7 +27,8 @@ class CollectionsTable
                 TextColumn::make('book_type')->label('Type'),
                 TextColumn::make('categories.name')->label('Categories'),
                 TextColumn::make('updated_at')->label('Last changed')->dateTime()->sortable(),
-                IconColumn::make('is_active')->label('Published')->boolean(),
+                TextColumn::make('status')->label('Status')->badge()->formatStateUsing(fn (string $state): string => Collection::STATUSES[$state])->sortable(),
+                TextColumn::make('status_changed_at')->label('Status changed')->dateTime(),
                 IconColumn::make('cover_image')->label('Cover')->boolean()
                     ->getStateUsing(fn (Collection $record): bool => filled($record->cover_image)),
                 TextColumn::make('poems_count')->label('Content'),
@@ -49,24 +49,26 @@ class CollectionsTable
                 SelectFilter::make('language')->options(config('books.languages')),
                 SelectFilter::make('categories')->label('Category')->relationship('categories', 'name')->searchable(),
                 SelectFilter::make('book_type')->label('Book type')->options(['poetry' => 'Poetry', 'prose' => 'Prose']),
-                TernaryFilter::make('is_active')->label('Publication')
-                    ->trueLabel('Published')->falseLabel('Draft')->placeholder('All publication states'),
+                SelectFilter::make('status')->label('Status')->options(Collection::STATUSES),
             ])
             ->recordActions([
                 Action::make('managePoems')->label('Manage content')->icon('heroicon-o-document-text')
                     ->url(fn (Collection $record): string => CollectionResource::getUrl('edit', ['record' => $record])),
                 Action::make('publish')->label('Publish')->color('success')
-                    ->visible(fn (Collection $record): bool => ! $record->is_active)
+                    ->visible(fn (Collection $record): bool => ! $record->isPublished())
                     ->requiresConfirmation()
                     ->modalDescription('Publish this book? Individual content publication states will not change.')
                     ->action(function (Collection $record): void {
                         $record->assertPublishable();
-                        $record->update(['is_active' => true]);
+                        $record->changeStatus('published');
                     }),
                 Action::make('unpublish')->label('Unpublish')->color('warning')
-                    ->visible(fn (Collection $record): bool => $record->is_active)
+                    ->visible(fn (Collection $record): bool => $record->isPublished())
                     ->requiresConfirmation()
-                    ->action(fn (Collection $record) => $record->update(['is_active' => false])),
+                    ->action(fn (Collection $record) => $record->changeStatus('draft')),
+                Action::make('withdraw')->label('Withdraw')->color('danger')->requiresConfirmation()
+                    ->visible(fn (Collection $record): bool => $record->status !== 'withdrawn')
+                    ->action(fn (Collection $record) => $record->changeStatus('withdrawn')),
                 EditAction::make(),
                 RestoreAction::make(),
             ]);

@@ -64,9 +64,9 @@ return [
 
         'covers' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/covers'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/covers',
-            'visibility' => 'public',
+            'root' => storage_path('app/private/covers'),
+            'visibility' => 'private',
+            'serve' => false,
             'throw' => true,
         ],
 
