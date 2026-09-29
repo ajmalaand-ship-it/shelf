@@ -1,4 +1,8 @@
 import 'dart:io';
+import 'dart:async';
+
+import 'accounts/account_controller.dart';
+import 'accounts/account_service.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -45,9 +49,17 @@ Future<void> main() async {
     ),
     entitlements: entitlements,
   );
+  final accounts = AccountController(
+    service: HttpAccountService(),
+    store: SecureAccountTokenStore(),
+    google: PlatformGoogleAccountProvider(),
+  );
+  // A network failure must never prevent anonymous browsing.
+  unawaited(accounts.initialize().catchError((Object _) {}));
   runApp(
     ShelfApp(
       repository: repository,
+      accountController: accounts,
       readerSettings: settings,
       languageSettings: InterfaceLanguageSettings.load(preferences),
       audioController: audioController,

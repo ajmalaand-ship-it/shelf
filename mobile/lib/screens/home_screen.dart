@@ -1,3 +1,6 @@
+import '../accounts/account_controller.dart';
+import '../accounts/account_screen.dart';
+
 import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
@@ -298,11 +301,21 @@ class LibraryScreen extends StatelessWidget {
         children: [
           Icon(Icons.local_library_outlined, size: 56),
           SizedBox(height: 20),
-          Text(AppStrings.of(context).librarySoon, textAlign: TextAlign.center),
+          Text(
+            AccountScope.of(context)?.user == null
+                ? AppStrings.of(context).signIn
+                : AppStrings.of(context).booksWillAppear,
+            textAlign: TextAlign.center,
+          ),
           SizedBox(height: 12),
           Text(
-            AppStrings.of(context).libraryMessage,
+            AppStrings.of(context).libraryAccountMessage,
             textAlign: TextAlign.center,
+          ),
+          FilledButton(
+            key: const Key('library-account'),
+            onPressed: () => openAccount(context),
+            child: Text(AppStrings.of(context).account),
           ),
         ],
       ),
@@ -317,6 +330,16 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) => ListView(
     padding: const EdgeInsets.all(20),
     children: [
+      ListTile(
+        key: const Key('settings-account'),
+        leading: const Icon(Icons.person_outline),
+        title: Text(AppStrings.of(context).account),
+        subtitle: Text(
+          AccountScope.of(context)?.user?.email ??
+              AppStrings.of(context).signIn,
+        ),
+        onTap: () => openAccount(context),
+      ),
       ListTile(
         title: Text(AppStrings.of(context).interfaceLanguage),
         subtitle: Text(

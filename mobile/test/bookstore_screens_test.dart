@@ -157,7 +157,7 @@ void main() {
       expect(find.text(AppStrings.allBooks), findsOneWidget);
       await tester.tap(find.byIcon(Icons.local_library_outlined));
       await tester.pumpAndSettle();
-      expect(find.text(AppStrings.librarySoon), findsOneWidget);
+      expect(find.text('ننوتل'), findsOneWidget);
       await tester.tap(find.byIcon(Icons.settings_outlined));
       await tester.pumpAndSettle();
       await tester.tap(find.text(AppStrings.readingPreferences));

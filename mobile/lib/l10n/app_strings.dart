@@ -170,6 +170,84 @@ class BookstoreStrings {
   String get languageSaveError => isEnglish
       ? 'Could not save the language. Please try again.'
       : 'ژبه خوندي نه شوه. بیا هڅه وکړئ.';
+  String get account => isEnglish ? 'Account' : 'حساب';
+  String get signIn => isEnglish ? 'Sign in' : 'ننوتل';
+  String get createAccount => isEnglish ? 'Create account' : 'حساب جوړول';
+  String get signOut => isEnglish ? 'Sign out' : 'وتل';
+  String get forgotPassword =>
+      isEnglish ? 'Forgot password?' : 'پټنوم مو هېر شوی؟';
+  String get resetPassword =>
+      isEnglish ? 'Send reset email' : 'د پټنوم د بدلولو برېښنالیک ولېږئ';
+  String get changePassword => isEnglish ? 'Change password' : 'پټنوم بدلول';
+  String get deleteAccount => isEnglish ? 'Delete account' : 'حساب ړنګول';
+  String get confirmDelete =>
+      isEnglish ? 'Send deletion email' : 'د ړنګولو برېښنالیک ولېږئ';
+  String get cancel => isEnglish ? 'Cancel' : 'لغوه';
+  String get email => isEnglish ? 'Email' : 'برېښنالیک';
+  String get password => isEnglish ? 'Password' : 'پټنوم';
+  String get currentPassword => isEnglish ? 'Current password' : 'اوسنی پټنوم';
+  String get newPassword => isEnglish ? 'New password' : 'نوی پټنوم';
+  String get confirmPassword =>
+      isEnglish ? 'Confirm password' : 'پټنوم بیا ولیکئ';
+  String get optionalName =>
+      isEnglish ? 'Display name (optional)' : 'ښکاره نوم (اختیاري)';
+  String get googleSignIn =>
+      isEnglish ? 'Sign in with Google' : 'د ګوګل له لارې ننوتل';
+  String get emailVerified =>
+      isEnglish ? 'Email verified' : 'برېښنالیک تایید شوی';
+  String get verifyEmail =>
+      isEnglish ? 'Please verify your email.' : 'خپل برېښنالیک تایید کړئ.';
+  String get resendVerification =>
+      isEnglish ? 'Resend verification email' : 'د تایید برېښنالیک بیا ولېږئ';
+  String get refreshAccount => isEnglish ? 'Refresh account' : 'حساب تازه کړئ';
+  String get booksWillAppear => isEnglish
+      ? 'Your books will appear here'
+      : 'ستاسو کتابونه به دلته ښکاره شي';
+  String get libraryAccountMessage => isEnglish
+      ? 'Browsing and samples are free. Book purchases are coming soon.'
+      : 'د کتابونو کتل او نمونې وړیا دي. د کتابونو پېرودل به ژر راشي.';
+  String get accountsUnavailable => isEnglish
+      ? 'Accounts are temporarily unavailable. You can still browse and read samples.'
+      : 'حسابونه اوس نه شته. کتابونه او نمونې لا هم لوستلی شئ.';
+  String get ownerAccountTesting => isEnglish
+      ? 'Owner testing: only the owner’s email can create an account for now.'
+      : 'د مالک ازموینه: اوس یوازې د مالک په برېښنالیک حساب جوړېږي.';
+  String get accountConnectionError => isEnglish
+      ? 'Could not complete this request. Check your connection and try again.'
+      : 'غوښتنه بشپړه نه شوه. خپله اړیکه وګورئ او بیا هڅه وکړئ.';
+  String get emailSent => isEnglish
+      ? 'Check your email, including spam. If the address is eligible, a confirmation link has been sent.'
+      : 'خپل برېښنالیک او سپم وګورئ. که پته وړ وي، د تایید لینک ورته لېږل شوی.';
+  String get deleteEmailSent => isEnglish
+      ? 'Check your email to confirm deletion. Your account remains until you confirm.'
+      : 'د ړنګولو د تایید لپاره خپل برېښنالیک وګورئ. تر تایید پورې حساب پاتې کېږي.';
+  String get deleteAccountExplanation => isEnglish
+      ? 'We will email a confirmation link. Confirming it permanently deletes your account and personal information and signs out all devices.'
+      : 'موږ د تایید لینک په برېښنالیک لېږو. په تایید سره ستاسو حساب او شخصي معلومات د تل لپاره ړنګېږي او ټول وسایل وځي.';
+  String get passwordChanged => isEnglish
+      ? 'Password changed. Please sign in again.'
+      : 'پټنوم بدل شو. بیا ننوځئ.';
+  String get passwordRule => isEnglish
+      ? 'Use at least 12 characters with uppercase and lowercase letters, a number and a symbol (maximum 72 bytes).'
+      : 'لږ تر لږه ۱۲ توري، لوی او کوچني لاتین توري، شمېره او نښه وکاروئ (تر ۷۲ بایټونو).';
+  String accountError(int status) => switch (status) {
+    202 => emailSent,
+    401 => isEnglish ? 'Please sign in again.' : 'بیا ننوځئ.',
+    403 => ownerAccountTesting,
+    409 =>
+      isEnglish
+          ? 'This Google identity cannot be linked. Use your existing sign-in method.'
+          : 'دا ګوګل حساب نه شي تړل کېدای. په پخوانۍ لاره ننوځئ.',
+    422 =>
+      isEnglish
+          ? 'Check your email and password. New passwords must match and meet the password rules.'
+          : 'برېښنالیک او پټنوم وګورئ. نوي پټنومونه باید یو شان او له اصولو سره سم وي.',
+    429 =>
+      isEnglish
+          ? 'Too many attempts. Please wait a minute.'
+          : 'ډېرې هڅې شوې. یوه دقیقه صبر وکړئ.',
+    _ => accountConnectionError,
+  };
   String status(String value) => switch (value) {
     'ready' => ready,
     'published' => published,

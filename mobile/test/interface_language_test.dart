@@ -146,7 +146,7 @@ void main() {
       );
       await tester.tap(find.byIcon(Icons.local_library_outlined));
       await tester.pumpAndSettle();
-      expect(find.text('Your library — coming soon'), findsOneWidget);
+      expect(find.text('Sign in'), findsOneWidget);
       await tester.tap(find.byIcon(Icons.storefront_outlined));
       await tester.pumpAndSettle();
       expect(find.text(collectionJson['title']! as String), findsOneWidget);
