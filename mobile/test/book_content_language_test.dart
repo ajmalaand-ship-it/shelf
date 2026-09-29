@@ -116,6 +116,8 @@ void main() {
       expectSource(tester, tile, title);
       await tester.tap(find.byKey(const Key('store-language-toggle')));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
       expectSource(tester, tile, title);
       expect(tester.getRect(tile), bounds);
       await tester.tap(tile);

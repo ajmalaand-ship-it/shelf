@@ -40,8 +40,9 @@ class AccountConfiguration {
 }
 
 class AccountFailure implements Exception {
-  const AccountFailure(this.status);
+  const AccountFailure(this.status, [this.validationMessage]);
   final int status;
+  final String? validationMessage;
 }
 
 abstract interface class AccountService {
@@ -92,8 +93,29 @@ class HttpAccountService implements AccountService {
     final response = await http.Response.fromStream(
       await _client.send(req).timeout(const Duration(seconds: 15)),
     ).timeout(const Duration(seconds: 15));
-    if (response.statusCode < 200 || response.statusCode >= 300)
-      throw AccountFailure(response.statusCode);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      String? validationMessage;
+      if (response.statusCode == 422) {
+        try {
+          final payload = jsonDecode(utf8.decode(response.bodyBytes));
+          final errors = payload['errors'];
+          if (errors is Map) {
+            final messages = <String>[];
+            for (final field in [
+              'email',
+              'name',
+              'password',
+              'current_password',
+            ]) {
+              final values = errors[field];
+              if (values is List) messages.addAll(values.whereType<String>());
+            }
+            if (messages.isNotEmpty) validationMessage = messages.join('\n');
+          }
+        } catch (_) {}
+      }
+      throw AccountFailure(response.statusCode, validationMessage);
+    }
     if (response.statusCode == 204) return {};
     return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
   }

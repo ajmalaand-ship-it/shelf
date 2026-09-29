@@ -1,3 +1,6 @@
+import '../accounts/account_controller.dart';
+import '../accounts/account_screen.dart';
+
 import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
@@ -218,7 +221,17 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                     const SizedBox(height: 8),
                     OutlinedButton(
                       key: Key('buy-coming-soon'),
-                      onPressed: null,
+                      onPressed: () {
+                        if (AccountScope.of(context)?.user == null) {
+                          openAccount(context);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(AppStrings.of(context).buySoon),
+                            ),
+                          );
+                        }
+                      },
                       child: Text(AppStrings.of(context).buySoon),
                     ),
                     if (book.description?.isNotEmpty == true)

@@ -192,17 +192,24 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('settings-account')));
       await tester.pumpAndSettle();
-      return s;
+      return const BookstoreStrings(true);
     }
 
     testWidgets(
-      '${language.name}: register, forgot, login, verify and delete screen stays RTL',
+      '${language.name}: register, forgot, login, verify and delete screen stays English and LTR',
       (tester) async {
         final s = await launch(tester);
         expect(find.byKey(const Key('google-sign-in')), findsNothing);
         expect(
-          Directionality.of(tester.element(find.byType(AccountScreen))),
-          TextDirection.rtl,
+          Directionality.of(
+            tester.element(
+              find.descendant(
+                of: find.byType(AccountScreen),
+                matching: find.byType(Scaffold),
+              ),
+            ),
+          ),
+          TextDirection.ltr,
         );
         await tester.tap(find.text(s.createAccount));
         await tester.pumpAndSettle();
@@ -274,7 +281,18 @@ void main() {
           find.byKey(const Key('confirm-password')),
           'Synthetic!Pass123',
         );
-        await tester.ensureVisible(find.text(s.changePassword));
+        await tester.scrollUntilVisible(
+          find.text(s.changePassword),
+          200,
+          scrollable: find.descendant(
+            of: find.byType(AccountScreen),
+            matching: find.byWidgetPredicate(
+              (widget) =>
+                  widget is Scrollable &&
+                  widget.axisDirection == AxisDirection.down,
+            ),
+          ),
+        );
         await tester.tap(find.text(s.changePassword));
         await tester.pumpAndSettle();
         expect(c.user, isNull);
@@ -282,12 +300,20 @@ void main() {
         await c.signIn('one', 'password');
         await tester.pageBack();
         await tester.pumpAndSettle();
-        await tester.tap(find.text(s.library));
+        await tester.tap(find.byIcon(Icons.local_library_outlined));
         await tester.pumpAndSettle();
-        expect(find.text(s.booksWillAppear), findsOneWidget);
+        expect(
+          find.text(
+            BookstoreStrings(language == InterfaceLanguage.en).booksWillAppear,
+          ),
+          findsOneWidget,
+        );
         await c.signOut();
         await tester.pumpAndSettle();
-        expect(find.text(s.signIn), findsOneWidget);
+        expect(
+          find.text(BookstoreStrings(language == InterfaceLanguage.en).signIn),
+          findsOneWidget,
+        );
         expect(find.text(s.booksWillAppear), findsNothing);
         expect(find.text('reader1@example.test'), findsNothing);
         await tester.tap(find.byKey(const Key('library-account')));

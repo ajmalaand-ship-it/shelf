@@ -87,13 +87,12 @@ void main() {
       final header = find.byKey(const Key('store-language-toggle'));
       expect(header.hitTestable(), findsOneWidget);
       expect(
-        find.descendant(
-          of: header,
-          matching: find.text(AppStrings.languageToggle, findRichText: true),
-        ),
+        find.descendant(of: header, matching: find.text('پښتو')),
         findsOneWidget,
       );
       await tester.tap(header);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
       expect(language.language, InterfaceLanguage.en);
       expect(find.text('Store'), findsWidgets);
@@ -114,8 +113,16 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('settings-language-toggle')));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('پښتو'));
+      await tester.pumpAndSettle();
       expect(language.language, InterfaceLanguage.ps);
-      expect(find.text(AppStrings.pashto), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('settings-language-toggle')),
+          matching: find.text(AppStrings.pashto),
+        ),
+        findsOneWidget,
+      );
       await tester.tap(find.byIcon(Icons.storefront_outlined));
       await tester.pumpAndSettle();
       expect(find.text(AppStrings.allBooks), findsOneWidget);

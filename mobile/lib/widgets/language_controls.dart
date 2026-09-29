@@ -23,41 +23,28 @@ class LanguageButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = InterfaceLanguageScope.of(context);
-    return TextButton(
-      onPressed: settings == null || settings.saving
-          ? null
-          : () => chooseInterfaceLanguage(
-              context,
-              settings,
-              settings.isEnglish ? InterfaceLanguage.ps : InterfaceLanguage.en,
-            ),
-      child: Tooltip(
-        message: AppStrings.of(context).switchLanguage,
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Text.rich(
-            TextSpan(
+    return PopupMenuButton<InterfaceLanguage>(
+      enabled: settings != null && !settings.saving,
+      tooltip: AppStrings.of(context).interfaceLanguage,
+      onSelected: (language) =>
+          chooseInterfaceLanguage(context, settings!, language),
+      itemBuilder: (_) => const [
+        PopupMenuItem(value: InterfaceLanguage.en, child: Text('English')),
+        PopupMenuItem(value: InterfaceLanguage.ps, child: Text('پښتو')),
+      ],
+      child: SizedBox(
+        height: 48,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                TextSpan(
-                  text: AppStrings.englishShort,
-                  style: TextStyle(
-                    fontWeight: settings?.isEnglish == true
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-                const TextSpan(text: ' | '),
-                TextSpan(
-                  text: AppStrings.pashto,
-                  style: TextStyle(
-                    fontWeight: settings?.isEnglish != true
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
+                Text(settings?.isEnglish == true ? 'EN' : 'پښتو'),
+                const Icon(Icons.arrow_drop_down, size: 20),
               ],
             ),
-            semanticsLabel: AppStrings.languageToggle,
           ),
         ),
       ),

@@ -102,7 +102,10 @@ Map<String, dynamic> poemDetailJson({
   },
 };
 
-PoetryRepository fixtureRepository({bool failNetwork = false}) {
+PoetryRepository fixtureRepository({
+  bool failNetwork = false,
+  bool includeCover = true,
+}) {
   final client = MockClient((request) async {
     if (failNetwork) throw http.ClientException('offline');
     final path = request.url.path;
@@ -110,7 +113,9 @@ PoetryRepository fixtureRepository({bool failNetwork = false}) {
       '/api/app-config' => appConfigJson,
       '/api/authors' || '/api/categories' => {'data': []},
       '/api/collections' => {
-        'data': [collectionJson],
+        'data': [
+          {...collectionJson, if (!includeCover) 'cover_url': null},
+        ],
       },
       '/api/collections/hendaray-aw-chine' => {'data': collectionJson},
       '/api/collections/hendaray-aw-chine/poems' => {

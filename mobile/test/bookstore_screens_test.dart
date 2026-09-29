@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shelf/app.dart';
+import 'package:shelf/accounts/account_screen.dart';
 import 'package:shelf/l10n/app_strings.dart';
 import 'package:shelf/repository/poetry_repository.dart';
 import 'package:shelf/services/api_client.dart';
@@ -223,8 +224,21 @@ void main() {
         tester
             .widget<OutlinedButton>(find.byKey(const Key('buy-coming-soon')))
             .onPressed,
-        isNull,
+        isNotNull,
       );
+      await tester.ensureVisible(find.byKey(const Key('buy-coming-soon')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('buy-coming-soon')));
+      await tester.pumpAndSettle();
+      expect(find.byType(AccountScreen), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.widgetWithText(TextButton, 'Writer'),
+        -200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(TextButton, 'Writer'));
       await tester.pumpAndSettle();
       expect(find.text(AppStrings.noBiography), findsOneWidget);

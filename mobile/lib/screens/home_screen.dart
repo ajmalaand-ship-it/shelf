@@ -120,6 +120,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ][_tab],
         ),
         actions: [
+          IconButton(
+            key: const Key('store-account'),
+            tooltip: AccountScope.of(context)?.user == null
+                ? 'Sign in / Create account'
+                : 'Signed in',
+            onPressed: () => openAccount(context),
+            icon: Icon(
+              AccountScope.of(context)?.user == null
+                  ? Icons.person_outline
+                  : Icons.account_circle,
+            ),
+          ),
           if (_tab == 0)
             const LanguageButton(key: Key('store-language-toggle')),
           TextButton.icon(
@@ -315,7 +327,14 @@ class LibraryScreen extends StatelessWidget {
           FilledButton(
             key: const Key('library-account'),
             onPressed: () => openAccount(context),
-            child: Text(AppStrings.of(context).account),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(double.infinity, 52),
+            ),
+            child: Text(
+              AccountScope.of(context)?.user == null
+                  ? 'Sign in / Create account'
+                  : AppStrings.of(context).account,
+            ),
           ),
         ],
       ),
