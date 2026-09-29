@@ -10,29 +10,32 @@ import 'package:shelf/services/api_client.dart';
 import 'test_support.dart';
 
 void main() {
-  test('API sends anonymous ID only to configured Shelf API and can force refresh', () async {
-    final provider = _MutableProvider()..entitled = true;
-    final controller = EntitlementController(provider);
-    await controller.initialize();
-    late http.Request captured;
-    final client = ApiClient(
-      entitlements: controller,
-      client: MockClient((request) async {
-        captured = request;
-        return http.Response.bytes(
-          utf8.encode(jsonEncode({'data': poemDetailJson()})),
-          200,
-        );
-      }),
-      baseUri: Uri.parse('https://shelf.services/api/'),
-    );
+  test(
+    'API sends anonymous ID only to configured Shelf API and can force refresh',
+    () async {
+      final provider = _MutableProvider()..entitled = true;
+      final controller = EntitlementController(provider);
+      await controller.initialize();
+      late http.Request captured;
+      final client = ApiClient(
+        entitlements: controller,
+        client: MockClient((request) async {
+          captured = request;
+          return http.Response.bytes(
+            utf8.encode(jsonEncode({'data': poemDetailJson()})),
+            200,
+          );
+        }),
+        baseUri: Uri.parse('https://shelf.services/api/'),
+      );
 
-    await client.getDataObject('poems/301', refreshEntitlement: true);
+      await client.getDataObject('poems/301', refreshEntitlement: true);
 
-    expect(captured.url.host, 'shelf.services');
-    expect(captured.headers['X-RC-User-Id'], r'$RCAnonymousID:p5-test');
-    expect(captured.headers['X-RC-Refresh'], '1');
-  });
+      expect(captured.url.host, 'shelf.services');
+      expect(captured.headers['X-RC-User-Id'], r'$RCAnonymousID:p5-test');
+      expect(captured.headers['X-RC-Refresh'], '1');
+    },
+  );
 
   test('unentitled context never reads paid full-text cache', () async {
     final cache = MemoryCacheStore();
@@ -75,10 +78,10 @@ void main() {
         client: MockClient((_) async => throw http.ClientException('offline')),
       ),
     );
-    final poem = await offline.loadPoem(301, 7);
-
-    expect(poem.locked, isTrue);
-    expect(poem.body, isNull);
+    await expectLater(
+      offline.loadPoem(301, 7),
+      throwsA(isA<http.ClientException>()),
+    );
     expect(
       cache.values.keys.where((key) => key.contains('.paid.')),
       isNotEmpty,

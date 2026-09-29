@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _load() async {
     if (mounted) setState(() => _error = null);
     final cached = await widget.repository.loadCachedCatalogue();
-    if (cached != null && mounted) setState(() => _snapshot = cached);
+    if (mounted) setState(() => _snapshot = cached);
     try {
       final refreshed = await widget.repository.refreshCatalogue(cached);
       if (mounted) setState(() => _snapshot = refreshed);

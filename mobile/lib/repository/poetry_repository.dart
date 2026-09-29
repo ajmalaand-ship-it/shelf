@@ -68,6 +68,10 @@ class PoetryRepository implements PoetryDataSource {
   final EntitlementController? _entitlements;
   final String _cacheNamespace;
 
+  // Step 4 adds verified purchaser offline access. Public discovery must
+  // confirm current publication state; owner preview remains separately cached.
+  bool get _canUseOfflineCache => _cacheNamespace == 'owner-preview';
+
   String get _catalogueKey => _cacheNamespace == 'public'
       ? 'shelf.catalogue.v1'
       : 'shelf.$_cacheNamespace.catalogue.v1';
@@ -77,6 +81,11 @@ class PoetryRepository implements PoetryDataSource {
 
   @override
   Future<CatalogueSnapshot?> loadCachedCatalogue() async {
+    if (!_canUseOfflineCache) {
+      await _cache.remove(_catalogueKey);
+      await _clearVersionedContent();
+      return null;
+    }
     final raw = await _cache.read(_catalogueKey);
     if (raw == null) return null;
     try {
@@ -98,7 +107,8 @@ class PoetryRepository implements PoetryDataSource {
   Future<CatalogueSnapshot> refreshCatalogue(CatalogueSnapshot? cached) async {
     try {
       final config = AppConfig.fromJson(await _api.getObject('app-config'));
-      if (cached != null &&
+      if (_canUseOfflineCache &&
+          cached != null &&
           cached.config.contentVersion == config.contentVersion) {
         return CatalogueSnapshot(
           config: config,
@@ -128,7 +138,7 @@ class PoetryRepository implements PoetryDataSource {
         fromCache: false,
       );
     } catch (error) {
-      if (cached != null) return cached.withError(error);
+      if (_canUseOfflineCache && cached != null) return cached.withError(error);
       rethrow;
     }
   }
@@ -157,6 +167,7 @@ class PoetryRepository implements PoetryDataSource {
       await _cache.remove(key);
       rethrow;
     } catch (networkError) {
+      if (!_canUseOfflineCache) rethrow;
       final cached = await _cache.read(key);
       if (cached == null) rethrow;
       final json = _asMap(jsonDecode(cached));
@@ -186,6 +197,7 @@ class PoetryRepository implements PoetryDataSource {
       await _cache.remove(key);
       rethrow;
     } catch (networkError) {
+      if (!_canUseOfflineCache) rethrow;
       final cached = await _cache.read(key);
       if (cached == null) rethrow;
       return PoemDetail.fromJson(_asMap(jsonDecode(cached)));

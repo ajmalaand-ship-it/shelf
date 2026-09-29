@@ -53,7 +53,11 @@ void main() {
     );
     final catalogue = await repository.refreshCatalogue(null);
     expect(catalogue.collections, hasLength(2));
-    expect((await repository.loadCachedCatalogue())!.collections, hasLength(2));
+    expect(
+      jsonDecode(cache.values['shelf.catalogue.v1']!)['collections'],
+      hasLength(2),
+    );
+    expect(await repository.loadCachedCatalogue(), isNull);
     final bundle = await repository.loadCollection('hendaray-aw-chine', 7);
     expect(bundle.poems.map((item) => item.id), [301, 302]);
     expect(calls.where((url) => url.contains('page=2')), hasLength(2));
