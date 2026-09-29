@@ -2,8 +2,8 @@
 
 return [
     'temporary_file_upload' => [
-        'disk' => null,
-        'rules' => ['required', 'file', 'max:5120'],
+        'disk' => 'temporary',
+        'rules' => ['required', 'file', 'max:20480'],
         'directory' => 'livewire-tmp',
         'middleware' => 'throttle:60,1',
         'preview_mimes' => [

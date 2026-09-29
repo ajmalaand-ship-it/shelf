@@ -103,14 +103,14 @@ class AdminGateTest extends TestCase
         }
     }
 
-    public function test_livewire_temporary_upload_rejects_files_over_five_megabytes(): void
+    public function test_livewire_temporary_upload_rejects_files_over_twenty_megabytes(): void
     {
         Storage::fake(FileUploadConfiguration::disk());
 
         $this->expectException(ValidationException::class);
 
         (new FileUploadController)->validateAndStore(
-            [$this->syntheticImage('oversize.jpg', 5121)],
+            [$this->syntheticImage('oversize.jpg', 20481)],
             FileUploadConfiguration::disk(),
         );
     }
@@ -139,20 +139,20 @@ class AdminGateTest extends TestCase
         Storage::disk('covers')->assertExists('existing/cover.jpg');
     }
 
-    public function test_livewire_temporary_upload_limit_matches_collection_cover_limit(): void
+    public function test_livewire_temporary_upload_limit_allows_word_documents(): void
     {
         $this->assertSame(
-            ['required', 'file', 'max:5120'],
+            ['required', 'file', 'max:20480'],
             config('livewire.temporary_file_upload.rules'),
         );
-        $this->assertNull(config('livewire.temporary_file_upload.disk'));
+        $this->assertSame('temporary', config('livewire.temporary_file_upload.disk'));
         $this->assertSame('tmp-for-tests', FileUploadConfiguration::disk());
         $this->assertSame('livewire-tmp', FileUploadConfiguration::path());
         $this->assertTrue(config('livewire.temporary_file_upload.cleanup'));
 
         $webPhpConfiguration = parse_ini_file(public_path('.user.ini'));
-        $this->assertSame('5M', $webPhpConfiguration['upload_max_filesize']);
-        $this->assertSame('8M', $webPhpConfiguration['post_max_size']);
+        $this->assertSame('20M', $webPhpConfiguration['upload_max_filesize']);
+        $this->assertSame('24M', $webPhpConfiguration['post_max_size']);
     }
 
     private function syntheticImage(string $name, int $kilobytes): File

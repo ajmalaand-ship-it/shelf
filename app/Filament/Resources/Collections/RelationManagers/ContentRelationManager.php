@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ContentRelationManager extends RelationManager
 {
+    use HasWordImport;
+
     protected static string $relationship = 'poems';
 
     protected static ?string $title = 'Content';
@@ -26,6 +28,7 @@ class ContentRelationManager extends RelationManager
             ->pluralModelLabel($label === 'Chapter' ? 'Chapters' : 'Poems')
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([SoftDeletingScope::class])->with('collection'))
             ->headerActions([
+                $this->wordImportAction(),
                 CreateAction::make()->label('Add '.$label)
                     ->url(fn (): string => PoemResource::getUrl('create', ['collection_id' => $this->getOwnerRecord()->getKey()])),
             ]);

@@ -130,3 +130,14 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   `mobile/` changed in the task. Always use `scripts/run_tests.sh`, with `--mobile`
   only for those tasks. Never use `/tmp`; temporary files for tests, Flutter,
   Composer, and scripts belong under `/home/shelf/tmp` and are cleaned up after use.
+
+- 2026-09-28: Task 5b approved: Word (.docx, max 20 MB) import belongs only inside
+  a book's Content tab, for poetry and prose. Heading 1 starts a titled item; an
+  exact *** line starts an untitled item; preceding text is an untitled first item.
+  Preserve source words, Unicode and breaks exactly; never guess, normalize or repair.
+  Preview titles, first two lines, word counts and excluded-feature/empty-item warnings
+  before Import. Append only; cancellation changes nothing. Archive each original
+  privately under storage/app/source/imports/<book-id>/ with checksum and importer,
+  time, filename and count. This authorizes adding new originals there, never changing
+  or deleting existing source files. Reversible migrations are run by the owner only.
+  Change the API home service name to Shelf API.

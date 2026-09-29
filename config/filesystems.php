@@ -30,6 +30,21 @@ return [
 
     'disks' => [
 
+        'temporary' => [
+            'driver' => 'local',
+            'root' => env('SHELF_TEST_TMP', '/home/shelf/tmp').'/uploads',
+            'visibility' => 'private',
+            'throw' => true,
+        ],
+
+        'sources' => [
+            'driver' => 'local',
+            'root' => storage_path('app/source'),
+            'visibility' => 'private',
+            'serve' => false,
+            'throw' => true,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),

@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\PoemController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return response()->json(['service' => 'Pashto Poetry API', 'status' => 'ok']);
+    return response()->json(['service' => 'Shelf API', 'status' => 'ok']);
 });
 
 Route::view('/privacy', 'privacy')->name('privacy');
