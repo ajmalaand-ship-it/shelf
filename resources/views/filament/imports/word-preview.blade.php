@@ -5,7 +5,7 @@
         <p>No public excerpt or free sample is selected automatically. Review each draft before publishing.</p>
         @if ($preview['warnings'])
             <div role="alert">
-                <strong>Warnings</strong>
+                <strong>Warnings — content marked NOT imported will be left out</strong>
                 <ul class="list-disc ps-6">
                     @foreach ($preview['warnings'] as $warning)
                         <li>{{ $warning }}</li>

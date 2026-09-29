@@ -248,12 +248,109 @@ class WordImportTest extends TestCase
         $this->assertSame(0, WordImport::count());
         $this->assertSame($version, AppSetting::where('key', 'content_version')->value('value'));
         $source = 'imports/'.$book->id.'/'.$preview['id'].'.docx';
-        $this->assertSame(file_get_contents($preview['path']), Storage::disk('sources')->get($source));
+        Storage::disk('sources')->assertMissing($source);
+        $this->assertSame([], Storage::disk('sources')->allFiles());
         $audit = app(ImportWordDocument::class)->import($book->id, auth()->user(), $preview);
         $this->assertSame(2, $audit->item_count);
         $this->assertSame(3, $book->poems()->count());
         $this->assertSame([$source], Storage::disk('sources')->allFiles());
         $this->get('/storage/source/'.$source)->assertForbidden();
+    }
+
+    public function test_pashto_omissions_are_listed_and_require_owner_acknowledgement(): void
+    {
+        $book = $this->book();
+        $text = '  دا د پښتو اصلي متن دی  ';
+        $body = $this->paragraph($text).
+            '<w:tbl><w:tr><w:tc>'.$this->paragraph('د جدول متن').'</w:tc></w:tr></w:tbl>'.
+            '<w:p><w:r><w:footnoteReference w:id="1"/><w:endnoteReference w:id="1"/><w:commentReference w:id="1"/>'.
+            '<w:drawing><w:txbxContent>'.$this->paragraph('د متن بکس').'</w:txbxContent></w:drawing></w:r></w:p>'.
+            '<w:ins>'.$this->paragraph('بدلون').'</w:ins>';
+        $path = $this->docx($body, [
+            'word/media/image.png' => 'synthetic image',
+            'word/footnotes.xml' => '<notes>پښتو لمنلیک</notes>',
+            'word/endnotes.xml' => '<notes>پایلیک</notes>',
+            'word/comments.xml' => '<comments>تبصره</comments>',
+        ]);
+        $preview = $this->preview($path);
+        $this->assertSame($text, $preview['items'][0]['body']);
+        foreach (['Images', 'Tables', 'Footnotes', 'Endnotes', 'Comments', 'Tracked changes', 'Text boxes'] as $feature) {
+            $this->assertContains($feature.' found and NOT imported.', $preview['omissions']);
+        }
+        // Re-reading the file enforces consent even if a caller omits preview warnings.
+        $forged = $preview;
+        $forged['omissions'] = [];
+        try {
+            app(ImportWordDocument::class)->import($book->id, auth()->user(), $forged);
+            $this->fail('Unacknowledged omitted content accepted');
+        } catch (ValidationException $error) {
+            $this->assertArrayHasKey('acknowledge_omissions', $error->errors());
+        }
+        $this->assertSame(0, WordImport::count());
+        $this->assertSame([], Storage::disk('sources')->allFiles());
+        $component = $this->manager($book)->callTableAction('importWord', data: [
+            'document' => UploadedFile::fake()->createWithContent('پښتو.docx', file_get_contents($path)),
+        ])->assertHasNoErrors()->assertActionMounted('confirmWordImport');
+        $this->assertTrue($component->instance()->getMountedAction()->getModalSubmitAction()->isDisabled());
+        $modal = $component->instance()->getMountedAction()->getModalContent()->render();
+        foreach ($preview['omissions'] as $omission) {
+            $this->assertStringContainsString($omission, $modal);
+        }
+        $component->callMountedAction()->assertHasActionErrors(['acknowledge_omissions']);
+        $this->assertSame(0, $book->poems()->count());
+        $this->assertSame([], Storage::disk('sources')->allFiles());
+        $component->fillForm(['acknowledge_omissions' => true]);
+        $this->assertFalse($component->instance()->getMountedAction()->getModalSubmitAction()->isDisabled());
+        $component->callMountedAction()->assertHasNoErrors();
+        $this->assertSame($text, $book->poems()->sole()->body);
+        $this->assertSame(1, WordImport::count());
+    }
+
+    public function test_partial_file_copy_failure_leaves_no_orphan_or_rows(): void
+    {
+        $book = $this->book();
+        $preview = $this->preview($this->docx($this->paragraph('Original source')));
+        $importer = new class extends ImportWordDocument
+        {
+            protected function copySource($input, $output): void
+            {
+                fwrite($output, 'partial file');
+                throw new \RuntimeException('Synthetic disk failure');
+            }
+        };
+        try {
+            $importer->import($book->id, auth()->user(), $preview);
+            $this->fail('Expected disk failure');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('Synthetic disk failure', $error->getMessage());
+        }
+        $this->assertSame(0, $book->poems()->count());
+        $this->assertSame(0, WordImport::count());
+        $this->assertSame([], Storage::disk('sources')->allFiles());
+        $this->assertSame($preview['sha256'], hash_file('sha256', $preview['path']));
+    }
+
+    public function test_audit_write_failure_preserves_existing_items_and_originals_only(): void
+    {
+        $book = $this->book();
+        $existing = $book->poems()->create(['body' => 'Existing content', 'excerpt' => '']);
+        Storage::disk('sources')->put('imports/'.$book->id.'/committed.docx', 'Existing original');
+        $preview = $this->preview($this->docx($this->paragraph('New source')));
+        $dispatcher = WordImport::getEventDispatcher();
+        WordImport::setEventDispatcher(clone $dispatcher);
+        WordImport::creating(fn () => throw new \RuntimeException('Synthetic audit failure'));
+        try {
+            app(ImportWordDocument::class)->import($book->id, auth()->user(), $preview);
+            $this->fail('Expected audit failure');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('Synthetic audit failure', $error->getMessage());
+        } finally {
+            WordImport::setEventDispatcher($dispatcher);
+        }
+        $this->assertSame([$existing->id], $book->poems()->pluck('id')->all());
+        $this->assertSame(0, WordImport::count());
+        $this->assertSame(['imports/'.$book->id.'/committed.docx'], Storage::disk('sources')->allFiles());
+        $this->assertSame('Existing original', Storage::disk('sources')->get('imports/'.$book->id.'/committed.docx'));
     }
 
     public function test_preview_cannot_be_forged_and_invalid_xml_is_a_visible_upload_error(): void

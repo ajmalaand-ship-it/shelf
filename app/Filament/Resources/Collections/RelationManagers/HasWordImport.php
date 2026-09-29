@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Collections\RelationManagers;
 use App\Support\WordImport\DocxReader;
 use App\Support\WordImport\ImportWordDocument;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
@@ -49,7 +50,7 @@ trait HasWordImport
                 $this->wordPreview = [
                     'id' => (string) Str::uuid(), 'path' => $file->getRealPath(),
                     'upload' => $file->getFilename(), 'filename' => $file->getClientOriginalName(), 'sha256' => $result['sha256'],
-                    'warnings' => $result['warnings'],
+                    'warnings' => $result['warnings'], 'omissions' => $result['omissions'],
                     'items' => array_map(fn (array $item): array => array_diff_key($item, ['body' => true]), $result['items']),
                 ];
                 $this->replaceMountedAction('confirmWordImport');
@@ -62,21 +63,32 @@ trait HasWordImport
             ->authorize(fn (): bool => $this->wordPreview !== null && $this->canCreate() && ! $this->getOwnerRecord()->trashed())
             ->modalHeading('Preview Word import')->modalSubmitActionLabel('Import')
             ->modalWidth('5xl')
+            ->schema([
+                Checkbox::make('acknowledge_omissions')
+                    ->label('I understand this content will not be imported')
+                    ->visible(fn (): bool => ! empty($this->wordPreview['omissions']))
+                    ->accepted(fn (): bool => ! empty($this->wordPreview['omissions']))
+                    ->default(false)->live(),
+            ])
             ->modalContent(fn () => view('filament.imports.word-preview', [
                 'preview' => $this->wordPreview,
                 'label' => $this->getOwnerRecord()->book_type === 'prose' ? 'Chapter' : 'Poem',
             ]))
-            ->modalSubmitAction(fn (Action $action) => $action->disabled(empty($this->wordPreview['items'])))
-            ->action(function (Action $action): void {
+            ->modalSubmitAction(fn (Action $action) => $action->disabled(
+                fn (): bool => empty($this->wordPreview['items'])
+                    || (! empty($this->wordPreview['omissions'])
+                        && ! ($this->getMountedActionSchema()?->getRawState()['acknowledge_omissions'] ?? false)),
+            ))
+            ->action(function (Action $action, array $data): void {
                 try {
-                    $import = app(ImportWordDocument::class)->import($this->getOwnerRecord()->getKey(), auth()->user(), $this->wordPreview);
+                    $import = app(ImportWordDocument::class)->import($this->getOwnerRecord()->getKey(), auth()->user(), $this->wordPreview, (bool) ($data['acknowledge_omissions'] ?? false));
                 } catch (ValidationException $error) {
                     Notification::make()->danger()->title('Nothing imported')->body($error->getMessage())->send();
                     $action->halt();
                 } catch (Throwable $error) {
                     report($error);
                     Notification::make()->danger()->title('Import failed')
-                        ->body('No items were added. An archived original, if created, has been retained. You can retry this preview.')->send();
+                        ->body('Import did not complete. Please check the error log before retrying this preview.')->send();
                     $action->halt();
                 }
                 $this->resetTable();

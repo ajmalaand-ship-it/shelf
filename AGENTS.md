@@ -17,7 +17,7 @@ README.md and any remaining docs describe the old app technically; they are not 
 
 ## 2. Who decides
 - The owner, Ajmal Aand, decides everything. The governing document is the
-  **Shelf Master Record** (Version 2.0, approved 25 September 2026), kept by Ajmal.
+  **Shelf Master Record** (Version 2.2, approved 28 September 2026), kept by Ajmal.
   This file is its summary for coding agents.
 - Do only the task Ajmal gives you. Do not start other work, even if it looks useful.
 - If a task conflicts with this file, or something is not covered, STOP and ask.
@@ -31,17 +31,23 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 
 ## 4. Rules that are never broken
 1. No change without Ajmal's clear OK for that specific task.
-2. Backup before any database change: database dump plus a note of the path, in
-   /home/ajmalaand/backups/poetry/. Database structure changes only through Laravel
-   migrations committed to git. Never edit the live database by hand.
+2. R3: Database STRUCTURE changes and BULK or SCRIPTED changes to existing data
+   require reversible Laravel migrations committed to git, backup first, run by the
+   owner. Backups and their path notes belong in /home/shelf/backups/shelf/.
+   Normal owner admin work (adding/editing books, authors, credits, categories,
+   content, and importing through the admin) needs no migration; the nightly backup,
+   bin and change record protect it. Never edit the live database by hand.
 3. All code changes in git, small commits, clear messages. Never force-push, never rewrite
    history, never delete or move the tag pitswal-baseline-2026-09-25.
 4. Never print, copy or commit secrets (.env values, keys, tokens, passwords).
    Never reuse old Pitswal tokens, RevenueCat keys or store settings for Shelf.
 5. Pashto and Farsi source text is never repaired, guessed or rebuilt with OCR or AI.
-   Uncertain text is marked and held. Never modify files in storage/app/source/.
+   Uncertain text is marked and held. Never alter or delete committed source originals
+   in storage/app/source/. Word import failure cleanup removes only new files created
+   by that failed attempt, as required by Master Record 6.12.
 6. The server decides access. Paid text, audio and artwork go only to readers who own
-   that specific book. A locked screen in the app is not protection.
+   that specific book. A locked screen in the app is not protection. Access protection
+   is a foundation priority; prove its state with direct requests, never assume it.
 7. Money records (sales, refunds, author shares) are never overwritten; corrections are
    new entries.
 8. No book, cover, font, image or audio is published without known rights and correct
@@ -61,8 +67,11 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   database shelf_app. Domain: shelf.services.
 - The old poetry app in the "ajmalaand" account (poetry.ajmalaand.com) is NOT Shelf.
   Never read from, write to or change it. It stays untouched and will be retired.
-- The app is not public yet and has no real readers. No staging or test copy until
-  Shelf is live with users. Automated tests use an in-memory or temporary database only.
+- Staging boundary (v2.2): no staging until the boundary inside Step 5. Staging must
+  be in place before the first real reader other than the owner or the first real
+  payment, whichever comes first, and before any public or closed Google Play testing.
+  This supersedes the earlier "until live with users" wording. Automated tests use
+  an in-memory or temporary database only.
 - Codex's sandbox cannot reach the database. Any command that needs the real database
   is given to the owner to run, with exact commands.
 - Daily backup: scripts/shelf_daily_backup.py at 03:00 (shelf crontab), stored in
@@ -141,3 +150,12 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   time, filename and count. This authorizes adding new originals there, never changing
   or deleting existing source files. Reversible migrations are run by the owner only.
   Change the API home service name to Shelf API.
+
+- 2026-09-28: Master Record v2.2 approved (R3 clarified, staging boundary, Word import safeguards, v2.0 requirements restored).
+- 2026-09-28: Master Record 6.12 Word import safeguards: preview clearly lists all
+  omitted images, tables, footnotes, endnotes, comments, tracked changes and text boxes.
+  If anything is omitted, require "I understand this content will not be imported"
+  before enabling Import. Import is all-or-nothing across database and file handling:
+  failure leaves neither partial items nor orphan files. A one-time preview token/lock
+  prevents duplicate submissions. Append only; never replace or delete existing content.
+  This supersedes Task 5b's retention of files created by failed imports.

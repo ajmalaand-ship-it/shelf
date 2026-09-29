@@ -13,7 +13,9 @@ then click **Import**. Cancel changes no book records and removes the staged upl
   blank lines. Only empty boundary lines are removed; spaces, tabs, RTL marks,
   combining characters and all other source characters are preserved.
 - Images, tables, notes, comments and tracked-change content are not imported and
-  produce warnings. Tracked inserted/deleted/moved text is excluded, not accepted
+  produce warnings, including a separate text-box warning. If any content is left
+  out, the owner must tick "I understand this content will not be imported" before
+  Import is enabled. This is also checked on the server. Tracked inserted/deleted/moved text is excluded, not accepted
   or reconstructed. Empty items are visibly warned about and retained as drafts.
 - Unsupported/malformed documents are rejected; no XML or source text is repaired.
   Archive expansion is limited to 64 MB and 10,000 ZIP entries for safe parsing.
@@ -23,8 +25,10 @@ then click **Import**. Cancel changes no book records and removes the staged upl
 - Originals are immutable private files in `storage/app/source/imports/<book-id>/`.
   `word_imports` records SHA-256, original name, importer, time, count and item IDs.
   Retrying the same confirmed preview does not duplicate items. All database writes
-  are transactional. If a database write fails after archiving, the original is
-  retained for retry; it is never deleted or overwritten.
+  are transactional. If a write fails, new items and the audit row roll back, and
+  files created by that attempt are removed. A failed partial file copy is cleaned
+  up too. Existing content and committed source originals are never changed.
+  The upload stays available for retry until the preview is closed.
 
 ## Owner commands: backup, migrate, check
 

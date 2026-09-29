@@ -55,7 +55,9 @@ class DocxReader
             foreach ([
                 'Images' => '//w:drawing | //w:pict',
                 'Tables' => '//w:tbl',
-                'Footnotes / endnotes' => '//w:footnoteReference | //w:endnoteReference',
+                'Footnotes' => '//w:footnoteReference',
+                'Endnotes' => '//w:endnoteReference',
+                'Text boxes' => '//w:txbxContent | //*[local-name()="textbox"]',
                 'Comments' => '//w:commentRangeStart | //w:commentReference',
                 'Tracked changes' => '//w:ins | //w:del | //w:moveFrom | //w:moveTo | //w:rPrChange | //w:pPrChange | //w:sectPrChange',
                 'Embedded objects / alternate content' => '//w:object | //w:altChunk | //*[local-name()="AlternateContent"]',
@@ -67,7 +69,8 @@ class DocxReader
             foreach ($names as $name) {
                 $label = match (true) {
                     str_starts_with($name, 'word/media/') => 'Images',
-                    in_array($name, ['word/footnotes.xml', 'word/endnotes.xml']) => 'Footnotes / endnotes',
+                    $name === 'word/footnotes.xml' => 'Footnotes',
+                    $name === 'word/endnotes.xml' => 'Endnotes',
                     $name === 'word/comments.xml' => 'Comments',
                     (bool) preg_match('~^word/(header|footer)\d*\.xml$~', $name) => 'Headers / footers',
                     default => null,
@@ -76,6 +79,7 @@ class DocxReader
                     $warnings[$label] = $label.' found and NOT imported.';
                 }
             }
+            $omissions = array_values($warnings);
             $headingStyles = ['Heading1'];
             if (($stylesXml = $zip->getFromName('word/styles.xml')) !== false) {
                 $stylesPath = new DOMXPath($this->xml($stylesXml));
@@ -145,7 +149,7 @@ class DocxReader
                 $warnings[] = 'No items were found. There is nothing to import.';
             }
 
-            return ['items' => $items, 'warnings' => array_values($warnings), 'sha256' => hash_file('sha256', $path)];
+            return ['items' => $items, 'omissions' => $omissions, 'warnings' => array_values($warnings), 'sha256' => hash_file('sha256', $path)];
         } finally {
             $zip->close();
         }
@@ -188,7 +192,7 @@ class DocxReader
     private function excluded(DOMElement $node): bool
     {
         return $node->localName === 'AlternateContent' || (in_array($node->namespaceURI, self::WORD_NAMESPACES, true)
-            && in_array($node->localName, ['tbl', 'drawing', 'pict', 'object', 'altChunk', 'ins', 'del', 'moveFrom', 'moveTo', 'pPr', 'rPr', 'sdtPr', 'sectPr'], true));
+            && in_array($node->localName, ['txbxContent', 'tbl', 'drawing', 'pict', 'object', 'altChunk', 'ins', 'del', 'moveFrom', 'moveTo', 'pPr', 'rPr', 'sdtPr', 'sectPr'], true));
     }
 
     private function text(DOMNode $node): string
