@@ -34,7 +34,7 @@ class AuthorsAndLanguagesTest extends TestCase
 
     private function book(string $slug, bool $published = true, string $language = 'ps'): Collection
     {
-        return Collection::create(['title' => $slug, 'slug' => $slug, 'author' => 'Legacy text', 'status' => $published ? 'published' : 'draft', 'language' => $language]);
+        return Collection::create(['title' => $slug, 'price_usd' => '2.99', 'slug' => $slug, 'author' => 'Legacy text', 'status' => $published ? 'published' : 'draft', 'language' => $language]);
     }
 
     public function test_author_slug_is_generated_once_and_images_cannot_escape_private_storage(): void
@@ -172,7 +172,7 @@ class AuthorsAndLanguagesTest extends TestCase
         Storage::fake('covers');
         Storage::disk('covers')->put('cover.jpg', 'synthetic');
         $draft->poems()->create(['body' => 'Synthetic', 'excerpt' => '', 'is_active' => true, 'sample_mode' => 'full']);
-        $draft->update(['language' => 'fa', 'cover_image' => 'cover.jpg']);
+        $draft->update(['language' => 'fa', 'price_usd' => '2.99', 'cover_image' => 'cover.jpg']);
         $draft->credits()->create(['author_id' => $person->id, 'role' => 'author']);
         Livewire::test(ListCollections::class)->callTableAction('publish', $draft)->assertHasNoErrors();
         $this->assertTrue($draft->fresh()->isPublished());

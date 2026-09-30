@@ -26,6 +26,9 @@ class CollectionForm
                     ->schema([
                         TextInput::make('title')->label('Book title')->required()->maxLength(255),
                         TextInput::make('subtitle')->label('Subtitle')->maxLength(255),
+                        TextInput::make('price_usd')->label('Book price (USD)')->numeric()->minValue(0.01)->maxValue(99999999.99)
+                            ->step(0.01)->required(fn (Get $get): bool => $get('status') === 'published')
+                            ->helperText('One USD price per book. Google Play displays the local currency. Test sales only.'),
                         Select::make('book_type')->label('Book type')->options(['poetry' => 'Poetry', 'prose' => 'Prose'])->required()->default('poetry')->rules([Rule::in(['poetry', 'prose'])]),
                         Select::make('categories')->relationship('categories', 'name')->multiple()->searchable()->preload(),
                         Select::make('language')->options(fn () => config('books.languages'))
@@ -81,8 +84,8 @@ class CollectionForm
                         TextInput::make('slug')->label('Web identifier (slug)')->required(fn (string $operation): bool => $operation === 'edit')->alphaDash()
                             ->unique(ignoreRecord: true)->maxLength(255)
                             ->helperText('Generated from the title when blank on a new book. Title edits never change it. Change an existing identifier only deliberately.'),
-                        TextInput::make('product_id')->label('Store product mapping')->maxLength(255)
-                            ->helperText('Leave unchanged unless configuring an approved store product.'),
+                        TextInput::make('product_id')->label('Google Play product ID')->disabled()->dehydrated(false)
+                            ->helperText('Automatically generated when saved. Permanent; use exactly this value in Play and RevenueCat.'),
                     ])
                     ->collapsible()
                     ->collapsed(),

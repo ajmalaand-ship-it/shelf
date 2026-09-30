@@ -15,6 +15,21 @@ use App\Http\Middleware\ReaderAccountAccess;
 use App\Http\Middleware\RequireOwnerPreviewToken;
 use Illuminate\Support\Facades\Route;
 
+Route::post('purchases/webhook', App\Http\Controllers\PurchaseWebhookController::class)->middleware('throttle:120,1');
+Route::get('purchases/config', [App\Http\Controllers\LibraryController::class, 'config'])->middleware([PrivateAccountResponse::class, 'throttle:60,1']);
+Route::prefix('library')->middleware([PrivateAccountResponse::class, AccountsEnabled::class, 'auth:reader', ReaderAccountAccess::class, 'throttle:120,1'])->group(function (): void {
+    Route::get('/', [App\Http\Controllers\LibraryController::class, 'index']);
+    Route::post('confirm', [App\Http\Controllers\LibraryController::class, 'index']);
+    Route::post('restore', [App\Http\Controllers\LibraryController::class, 'index']);
+    Route::post('books/{collection}/consent', [App\Http\Controllers\LibraryController::class, 'consent']);
+    Route::get('books/{collection:slug}', [App\Http\Controllers\LibraryController::class, 'book']);
+    Route::get('books/{collection:slug}/content', [App\Http\Controllers\LibraryController::class, 'content']);
+    Route::get('books/{collection}/cover', [App\Http\Controllers\LibraryController::class, 'cover']);
+    Route::get('poems/{poem}', [App\Http\Controllers\LibraryController::class, 'poem']);
+    Route::get('poems/{poem}/audio', [App\Http\Controllers\LibraryController::class, 'audio']);
+    Route::get('poems/{poem}/media/{kind}', [App\Http\Controllers\LibraryController::class, 'media'])->name('library.media');
+});
+
 Route::middleware('throttle:60,1')->group(function (): void {
     Route::get('/app-config', AppConfigController::class);
     Route::get('/categories', [CategoryController::class, 'index']);

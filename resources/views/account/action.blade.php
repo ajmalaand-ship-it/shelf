@@ -5,7 +5,7 @@
 
 @else
 <h2>{{ ['verify'=>'Verify email','reset'=>'Reset password','delete'=>'Delete reader account','google'=>'Confirm Google sign-in'][$purpose] }}</h2>
-@if($purpose === 'delete')<p>This permanently removes your reader account, personal profile and sign-in sessions. Your owner/admin account is separate and will not be deleted. There are no purchase records in this version.</p>@endif
+@if($purpose === 'delete')<p>This permanently removes your reader account, personal profile and sign-in sessions. Your owner/admin account is separate and will not be deleted. Access to your books is removed; transaction and accounting history is kept without your name or email. A new account does not automatically receive those purchases. Contact support before deleting if you need help.</p>@endif
 <form method="post" action="{{ url('/account/'.$purpose) }}" autocomplete="off">@csrf
 <input id="action-token" type="hidden" name="token" value="">
 @if($purpose === 'reset')

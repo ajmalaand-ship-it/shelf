@@ -25,7 +25,7 @@ class PublicationAccessTest extends TestCase
     private function book(string $status = 'draft'): Collection
     {
         Storage::disk('covers')->put('synthetic.jpg', 'synthetic cover');
-        $book = Collection::create(['title' => 'Synthetic', 'language' => 'ps', 'status' => $status, 'cover_image' => 'synthetic.jpg']);
+        $book = Collection::create(['title' => 'Synthetic', 'price_usd' => '2.99', 'language' => 'ps', 'status' => $status, 'cover_image' => 'synthetic.jpg']);
         $book->credits()->create(['author_id' => Author::create(['name' => 'Synthetic author'])->id, 'role' => 'author']);
         $book->poems()->create(['body' => 'ټ ډ ړ ږ ښ ڼ ې ۍ', 'excerpt' => '', 'is_active' => true,
             'sample_mode' => 'full', 'audio_path' => 'test.mp3', 'artwork_path' => 'test.png']);
@@ -59,7 +59,7 @@ class PublicationAccessTest extends TestCase
             foreach (['poems.audio.stream', 'poems.artwork.stream'] as $route) {
                 $this->get(URL::temporarySignedRoute($route, now()->addMinutes(10), ['poem' => $item, 'access' => 'paid']))->assertNotFound();
             }
-            $this->assertFalse($book->allowsPriorPurchaserAccess());
+            $this->assertSame($state === 'withdrawn', $book->allowsPriorPurchaserAccess());
         }
     }
 

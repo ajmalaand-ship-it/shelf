@@ -15,13 +15,15 @@ class Reader extends Authenticatable
 
     protected function casts(): array
     {
-        return ['password' => 'hashed', 'email_verified_at' => 'datetime'];
+        return ['password' => 'hashed', 'email_verified_at' => 'datetime', 'buying_blocked' => 'boolean'];
     }
 
     public function getIsOwnerAttribute(): bool
     {
         return false;
     }
+
+    public function purchases() { return $this->hasMany(Purchase::class); }
 
     public function profile(): array
     {

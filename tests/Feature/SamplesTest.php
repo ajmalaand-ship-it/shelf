@@ -82,7 +82,7 @@ class SamplesTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         Storage::fake('covers');
         Storage::disk('covers')->put('cover.jpg', 'Synthetic');
-        $book = Collection::create(['title' => 'Synthetic', 'language' => 'ps', 'cover_image' => 'cover.jpg']);
+        $book = Collection::create(['title' => 'Synthetic', 'price_usd' => '2.99', 'language' => 'ps', 'cover_image' => 'cover.jpg']);
         $book->credits()->create(['role' => 'author', 'author_id' => Author::create(['name' => 'Synthetic'])->id]);
         $item = $book->poems()->create(['body' => "First line\nSecond line\nThird line", 'excerpt' => 'Private legacy excerpt', 'is_active' => true]);
         Livewire::test(ListCollections::class)->callTableAction('publish', $book)->assertHasErrors(['status']);

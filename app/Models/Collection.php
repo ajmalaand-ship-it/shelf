@@ -31,17 +31,23 @@ class Collection extends Model
 
     protected $fillable = [
         'book_type', 'language', 'title', 'slug', 'subtitle', 'description', 'author', 'dedication', 'introduction',
-        'foreword_author', 'foreword', 'publication_info', 'cover_image', 'sort_order', 'status', 'product_id',
+        'foreword_author', 'foreword', 'publication_info', 'cover_image', 'sort_order', 'status', 'product_id', 'price_usd',
     ];
 
     protected function casts(): array
     {
-        return ['sort_order' => 'integer', 'status_changed_at' => 'datetime'];
+        return ['sort_order' => 'integer', 'status_changed_at' => 'datetime', 'price_usd' => 'decimal:2'];
     }
 
     protected static function booted(): void
     {
         static::saving(function (Collection $book): void {
+            if ($book->exists && $book->isDirty('product_id') && $book->getOriginal('product_id') === 'shelf_book_'.$book->id) {
+                throw ValidationException::withMessages(['product_id' => 'The store product identifier is permanent.']);
+            }
+            if ($book->price_usd !== null && (! is_numeric($book->price_usd) || $book->price_usd <= 0)) {
+                throw ValidationException::withMessages(['price_usd' => 'Enter a price above zero in USD.']);
+            }
             if (! $book->exists && blank($book->slug)) {
                 $book->slug = UniqueSlug::for($book, $book->title, 'book');
             }
@@ -70,6 +76,9 @@ class Collection extends Model
         });
         static::restored(fn (Collection $book) => $book->recordChange());
         static::saved(function (Collection $collection): void {
+            if ($collection->wasRecentlyCreated) {
+                $collection->forceFill(['product_id' => 'shelf_book_'.$collection->id])->saveQuietly();
+            }
             if ($collection->recordStatusChange) {
                 DB::table('book_status_changes')->insert([
                     'collection_id' => $collection->id,
@@ -114,6 +123,12 @@ class Collection extends Model
     public function assertPublishable(): void
     {
         $errors = [];
+        if (! $this->price_usd || $this->price_usd <= 0) {
+            $errors['price_usd'] = 'Set the USD book price before publishing.';
+        }
+        if ($this->product_id !== 'shelf_book_'.$this->id) {
+            $errors['product_id'] = 'A stable Shelf store product is required before publishing.';
+        }
         if (! array_key_exists($this->language ?? '', config('books.languages'))) {
             $errors['language'] = 'Choose a supported language before publishing.';
         }
@@ -153,7 +168,7 @@ class Collection extends Model
     // Never use discovery visibility as purchase ownership, and never delete on withdrawal.
     public function allowsPriorPurchaserAccess(): bool
     {
-        return false; // Fail closed until book-specific purchases are implemented.
+        return $this->status === 'withdrawn' && ! $this->trashed();
     }
 
     public function changeStatus(string $status): void

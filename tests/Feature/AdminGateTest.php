@@ -459,7 +459,7 @@ class AdminGateTest extends TestCase
         $this->actingAs(User::factory()->state(['is_owner' => true])->create());
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $collection = Collection::create([
-            'title' => 'TEST ONLY', 'slug' => 'collection-controls', 'cover_image' => 'test.webp', 'status' => 'draft',
+            'title' => 'TEST ONLY', 'price_usd' => '2.99', 'slug' => 'collection-controls', 'cover_image' => 'test.webp', 'status' => 'draft',
         ]);
         Poem::create([
             'collection_id' => $collection->id, 'body' => 'لومړی', 'excerpt' => 'لنډ',

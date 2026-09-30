@@ -54,9 +54,9 @@ class AccountActions
             $reader = Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail();
             $reader->tokens()->delete();
             DB::table('reader_account_actions')->where('reader_id', $reader->id)->delete();
+            // Money records are retained unchanged. These nullable identifiers have no
+            // FK to the deleted identity; no names/emails are stored in accounting.
             $reader->delete();
-            // There are no money records in Task 1. Future purchase retention
-            // must be explicitly implemented with Step 4 Task 2, not guessed here.
         });
     }
 }
