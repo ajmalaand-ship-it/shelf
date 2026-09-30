@@ -17,7 +17,7 @@ the admin. Author percentages remain owner decisions.
 Do not create products or edit prices in Play Console. Shelf does this automatically.
 
 - Android application/package: `services.shelf.app`.
-- Current release: `1.0.2`, version code `11`.
+- Current internal-test release: `1.0.3`, version code `12`.
 - Use Play App Signing. The newly generated Shelf **upload** key signs the AAB;
   Google Play's separate **app signing** certificate signs installed Play builds.
 - Upload key alias: `shelf-upload`; private files are outside git under
@@ -61,6 +61,8 @@ Never use the former Pitswal project, keys, products or offerings.
    | `SHELF_PURCHASES_ENABLED` | `true`, only after all new Shelf values are configured |
    | `SHELF_REVENUECAT_ANDROID_KEY` | New Android public SDK key beginning `goog_` |
    | `SHELF_REVENUECAT_SECRET_KEY` | New server secret with subscriber-read REST access |
+   | `SHELF_REVENUECAT_SECRET_KEY_PATH` | Preferred alternative: private `0600` file containing a **V1** secret key for the existing `/v1/subscribers` verifier |
+   | `SHELF_REVENUECAT_V2_SECRET_KEY_PATH` | Separate private V2 key for catalogue/webhook configuration; never used as the V1 verifier |
    | `SHELF_REVENUECAT_WEBHOOK_AUTH` | Exact newly chosen webhook Authorization header |
    | `SHELF_REVENUECAT_APP_ID` | New RevenueCat Google Play app ID from its dashboard |
 
@@ -153,3 +155,95 @@ Sources: [RevenueCat restore behavior](https://www.revenuecat.com/docs/projects/
 Price-sync API references: [product upsert](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization.onetimeproducts/patch),
 [automatic local prices](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization/convertRegionPrices),
 [activate/deactivate](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization.onetimeproducts.purchaseOptions/batchUpdateStates).
+
+## Connection evidence — 30 September 2026
+
+The owner supplied the new Shelf service account, public Android SDK key and V2
+configuration credential, then supplied a separate V1 secret verifier key. All
+three private credentials are under `/home/shelf/secrets/` (directory `0700`,
+files `0600`). The server reads the V1 verifier from its private file; the V2
+configuration key is never substituted into the V1 subscriber endpoint.
+
+RevenueCat Shelf project `projbbce26da`, Google Play app `appf83cd58c5c`:
+products `shelf_book_3` through `shelf_book_8` each have a separate same-named
+entitlement attached only to their own non-consumable product. No offering is
+needed: the app looks up each store product directly. The sandbox-only webhook
+`whintgr75a4892970` targets `https://shelf.services/api/purchases/webhook`, scoped
+to this app, with NON_RENEWING_PURCHASE, CANCELLATION and EXPIRATION. Its random
+Authorization value is stored in `.env` and privately in
+`/home/shelf/secrets/revenuecat-webhook-auth.txt`; no dashboard entry is needed.
+The creation response reordered events; the verification now compares sets.
+V1 subscriber authentication passed. The app fetches its public SDK key through
+`/api/purchases/config`; it does not need a compiled key or offering.
+
+Verified backup before connection/sync metadata updates:
+`/home/shelf/backups/shelf/20260930-211054/`, including rollout/rollback notes.
+No catalogue prices, source text, reader accounts or financial history were edited.
+The live kernel simulation passed purchase confirmation, duplicate events and
+transactions, other-reader denial, withdrawn buyer access, restore, refund,
+revocation and admin denial. All synthetic rows rolled back and preexisting
+counts/content version were verified unchanged. HTTPS passed enabled sandbox
+configuration, six public books, locked non-sample body, protected Library and
+owner preview, unsigned-webhook denial and private-file denial.
+
+Google sync stopped at book 3: the existing client returned its 400/409 safe
+product/price error. A subsequent **read-only** diagnostic found no existing
+product (404) and price conversion denied (403). This is consistent with the
+new-account permission/propagation delay, but the initial 400/409 is not proven
+to have the same cause. There were no further Google writes or retries. Books
+4–8 remain Pending. `SHELF_PLAY_SYNC_ENABLED=false` prevents scheduled remote
+retries; sandbox purchases are configured but actual buying waits for Play products.
+This shell also cannot read the crontab because of PAM policy; the existing
+schedule was not changed or independently verified in this task.
+
+After the credential warning/delay clears, rerun the backup-first operator script
+as Shelf from this repository:
+
+```bash
+python3 scripts/connect_purchase_test.py
+```
+
+It stops at the first unsuccessful book and keeps scheduled sync disabled on
+failure. Only when all sellable books sync does it enable scheduled admin price
+sync. If the original product/price error persists after Google permits requests,
+stop and diagnose that separate blocker before retrying. Do not create products
+or change prices manually in Play Console.
+
+Validation: `scripts/run_tests.sh --mobile`: 173 PHP tests / 2,095 assertions and
+134 Flutter tests passed. Tests cover denied-sync early stop, private-key fail
+closed, purchase/refund/isolation/offline checks and purchase layouts on small
+and large phones. Physical-phone purchase/restore/refund testing is still pending.
+
+Built and signature-verified `1.0.3` (version code `12`) artifacts:
+
+| Artifact | Private server path | SHA-256 |
+| --- | --- | --- |
+| Internal-test AAB | `/home/shelf/apps/shelf/storage/app/private/owner-aabs/shelf-internal-test-20260930-210956.aab` | `722fd0cc7280d07eb2524e05cd8fa341d52dea14d29f7863b86181d1bfb5fa57` |
+| Owner-preview APK | `/home/shelf/apps/shelf/storage/app/private/owner-apks/shelf-owner-preview-20260930-211145.apk` | `5b6374840e6d37913b410559dd0605afb4300892be8e02059f7ff5ffb8274c6c` |
+
+Owner-preview access expires **7 October 2026 at 21:09:17 UTC**. The AAB contains
+no owner-preview token. Both are private server files and are not committed.
+
+On the owner's PC in PowerShell, download both with one command:
+
+```powershell
+scp "shelf@157.250.199.106:/home/shelf/apps/shelf/storage/app/private/owner-aabs/shelf-internal-test-20260930-210956.aab" "shelf@157.250.199.106:/home/shelf/apps/shelf/storage/app/private/owner-apks/shelf-owner-preview-20260930-211145.apk" .
+```
+
+In Play Console → Shelf → Testing → Internal testing → Create new release,
+upload the AAB and roll it out only to the owner. Install through the internal
+tester opt-in link with the license-test account. Real store integration must
+be tested with that Play-installed build, not the sideloaded owner-preview APK.
+After Google sync succeeds, sign in to the owner reader account, accept the
+sample-first agreement and buy **only when Google explicitly shows a test
+payment method**. Verify My Library, cancellation, refund, account isolation,
+offline expiry and restore on another phone. No real money or public release.
+
+For rollback, set both `SHELF_PURCHASES_ENABLED=false` and
+`SHELF_PLAY_SYNC_ENABLED=false`, then run `php artisan optimize:clear`.
+Retain provider catalogue/webhook settings and all financial history; never
+delete records to undo configuration.
+
+API setup references: [RevenueCat product creation](https://www.revenuecat.com/docs/api-v2/product),
+[entitlement attachment](https://www.revenuecat.com/docs/api-v2/entitlement),
+[sandbox webhook creation](https://www.revenuecat.com/docs/api-v2/integration).

@@ -125,6 +125,16 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-09-30: Step 4 purchase connection approved, owner-only sandbox/test mode.
+  New Shelf service account and separate RevenueCat V2 configuration/V1 verifier
+  keys secured outside git. Six per-book products/entitlements and app-scoped
+  sandbox webhook configured; sandbox server config and independent V1 check on.
+  Google sync stopped at book 3 (initial 400/409 product/price error; read-only
+  diagnostic conversion denied 403). Scheduled sync remains disabled, no retry
+  loop; remaining five Pending. Backup `/home/shelf/backups/shelf/20260930-211054/`.
+  Tests and rolled-back live simulation passed. AAB 1.0.3 (12) and fresh seven-day
+  owner APK built; owner uploads AAB. See docs/PURCHASES_TEST_SETUP.md for evidence,
+  download command and deferred Play retry. No real-money or public release.
 - 2026-09-30: Superseding the earlier same-day visibility clarification, the
   owner confirms the hidden item flags in books 3–8 came from the old app's
   private-draft period, not editorial choices. Make all non-deleted items in
