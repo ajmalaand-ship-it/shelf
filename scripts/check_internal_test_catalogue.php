@@ -32,7 +32,16 @@ function probe(string $path, int $status = 200, ?string $token = null, array $he
         $request = $request->withToken($token);
     }
     $response = $request->get(rtrim(config('app.url'), '/').$path);
-    check($response->status() === $status, 'HTTPS '.strtok($path, '?').' status '.$status);
+    if ($response->status() === 429) {
+        // Public and owner-preview throttles may share an IP bucket. Respect it;
+        // never clear a limiter or change access rules to complete verification.
+        $retryAfter = filter_var($response->header('Retry-After'), FILTER_VALIDATE_INT);
+        check($retryAfter !== false && $retryAfter >= 1 && $retryAfter <= 60, 'Server supplied a bounded rate-limit retry interval');
+        echo 'Waiting '.$retryAfter.' seconds for the existing rate limit.'.PHP_EOL;
+        sleep($retryAfter);
+        $response = $request->get(rtrim(config('app.url'), '/').$path);
+    }
+    check($response->status() === $status, 'HTTPS '.strtok($path, '?').' expected '.$status.' actual '.$response->status());
 
     return $response->json() ?? [];
 }

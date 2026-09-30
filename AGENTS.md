@@ -133,6 +133,11 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   and publication through existing publish logic; verify all six publicly
   listed, non-sample text locked and purchases still disabled. No source text,
   access rules or old poetry project changes; no app rebuild.
+  Applied successfully: all 342 non-deleted items visible, first two items per
+  book full samples, all six Published with owner/time/status history. Verified
+  backup: /home/shelf/backups/shelf/20260930-070203/. Live catalogue, locked
+  non-sample text/media, exact source, disabled purchases and protected owner
+  preview passed. Existing rate limiting was respected, not cleared or changed.
 - 2026-09-30: Publish all six books (IDs 3–8) for Google Play internal testing;
   the owner accepts visibility through the public catalogue. For a book without
   a sample, temporarily sample its first two visible items in full; the owner

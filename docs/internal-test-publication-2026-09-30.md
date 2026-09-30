@@ -43,4 +43,25 @@ exact source preservation, samples/locked remainder, unrelated drafts, owner
 preview, all-or-nothing failure, successful reversal and rollback refusal after
 later owner edits. Flutter tests are skipped because no mobile files changed.
 
-Live rollout results will be appended after verification.
+Verified pre-migration backup: `/home/shelf/backups/shelf/20260930-070203/`.
+SQL completion, ZIP integrity and SHA-256 checks passed. The backup directory
+contains `internal-test-publication-notes.txt` with the source commit and
+rollback command. Migration applied successfully; maintenance ended.
+
+Live HTTPS checks confirm all six books in the public catalogue, all 342
+items listed across pagination, all six covers served, 12 samples returning
+exact source, and a non-sample item in every book returning `locked: true`,
+no body/excerpt/artwork URL and locked audio. Source checksums and order match
+the pre-change snapshot; actor/time/status history are present for all books.
+The public purchase configuration remains disabled; Play sync is also disabled.
+
+The first verification stopped at owner preview because accumulated probes
+reached the existing shared IP throttle (HTTP 429, not an access-rule change).
+No further live mutation or rollback was attempted. The read-only helper now
+honours the server's bounded `Retry-After` interval instead of changing or
+clearing the limiter. The read-only rerun passed: missing preview token returns
+401, protected owner preview lists the books and reads exact non-sample text,
+and a forged legacy unlock request cannot reveal text. No credentials or
+signed URLs were displayed. Automated tests prove unrelated drafts stay
+private; there are no remaining live Draft books to probe after this rollout.
+Real Android refresh/display acceptance remains the owner's phone check.
