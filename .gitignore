@@ -24,6 +24,7 @@ secrets/
 /storage/framework/sessions/**
 /storage/framework/testing/**
 /storage/framework/views/**
+/storage/framework/play-price-sync.lock
 /storage/logs/**
 *.log
 error_log
