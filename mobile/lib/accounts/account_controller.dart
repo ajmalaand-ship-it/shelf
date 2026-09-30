@@ -7,22 +7,33 @@ class AccountController extends ChangeNotifier {
     required this.service,
     required this.store,
     required this.google,
+    this.identityStore,
   });
   final AccountService service;
   final AccountTokenStore store;
   final GoogleAccountProvider google;
+  final AccountIdentityStore? identityStore;
   AccountConfiguration configuration = const AccountConfiguration();
   ReaderAccount? user;
   String? _token;
+  String? get readerToken => _token;
   bool busy = false, initialized = false;
   int _generation = 0;
 
   Future<void> initialize() async {
     if (busy) return;
     final generation = ++_generation;
-    final config = await service.configuration();
-    if (generation != _generation) return;
     final savedToken = await store.read();
+    final offlineIdentity = savedToken == null
+        ? null
+        : await identityStore?.read(savedToken);
+    AccountConfiguration config;
+    try {
+      config = await service.configuration();
+    } catch (_) {
+      if (offlineIdentity == null) rethrow;
+      config = const AccountConfiguration(enabled: true);
+    }
     if (generation != _generation) return;
     configuration = config;
     _token = savedToken;
@@ -36,12 +47,20 @@ class AccountController extends ChangeNotifier {
         );
         if (generation == _generation)
           user = ReaderAccount.fromJson(data['user'] as Map<String, dynamic>);
+        if (generation == _generation && user != null)
+          await identityStore?.write(savedToken, user!);
       } on AccountFailure catch (error) {
         if (generation != _generation) return;
         if (error.status == 401 || error.status == 403)
           await _clear();
+        else if (offlineIdentity != null)
+          user = offlineIdentity;
         else
           rethrow;
+      } catch (_) {
+        if (generation != _generation) return;
+        if (offlineIdentity == null) rethrow;
+        user = offlineIdentity;
       }
     }
     if (generation == _generation) {
@@ -54,6 +73,7 @@ class AccountController extends ChangeNotifier {
     user = null;
     _token = null;
     await store.clear();
+    await identityStore?.clear();
     notifyListeners();
   }
 
@@ -95,6 +115,7 @@ class AccountController extends ChangeNotifier {
         );
         try {
           await store.write(token);
+          await identityStore?.write(token, profile);
         } catch (_) {
           await service.request('logout', token: token);
           rethrow;

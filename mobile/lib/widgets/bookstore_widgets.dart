@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +25,12 @@ class BookCover extends StatelessWidget {
         height: height,
         child: url == null || url!.isEmpty || url!.startsWith('qa-cover:')
             ? placeholder
+            : url!.startsWith('file:')
+            ? Image.file(
+                File.fromUri(Uri.parse(url!)),
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => placeholder,
+              )
             : CachedNetworkImage(
                 imageUrl: url!,
                 fit: BoxFit.contain,

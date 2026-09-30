@@ -222,7 +222,7 @@ class BookstoreStrings {
       ? 'Check your email to confirm deletion. Your account remains until you confirm.'
       : 'د ړنګولو د تایید لپاره خپل برېښنالیک وګورئ. تر تایید پورې حساب پاتې کېږي.';
   String get deleteAccountExplanation => isEnglish
-      ? 'We will email a confirmation link. Confirming it permanently deletes your account and personal information and signs out all devices.'
+      ? 'We will email a confirmation link. Confirming it deletes your account and personal information, removes access to your books and signs out all devices. Payment history is kept without your name or email. A new account does not inherit your books. Contact us before deleting if you need help with purchases.'
       : 'موږ د تایید لینک په برېښنالیک لېږو. په تایید سره ستاسو حساب او شخصي معلومات د تل لپاره ړنګېږي او ټول وسایل وځي.';
   String get passwordChanged => isEnglish
       ? 'Password changed. Please sign in again.'

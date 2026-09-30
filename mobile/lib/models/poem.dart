@@ -116,7 +116,10 @@ class PoemDetail {
     this.hasMore = false,
   });
 
-  factory PoemDetail.fromJson(Map<String, dynamic> json) {
+  factory PoemDetail.fromJson(
+    Map<String, dynamic> json, {
+    bool allowLocalMedia = false,
+  }) {
     final audio = json['audio'];
     if (audio is! Map<String, dynamic>) {
       throw const FormatException('audio must be an object');
@@ -139,7 +142,9 @@ class PoemDetail {
           ? false
           : _bool(artworkData, 'available'),
       artworkLocked: artworkData == null ? false : _bool(artworkData, 'locked'),
-      artworkUrl: artworkData == null ? null : _uri(artworkData, 'url'),
+      artworkUrl: artworkData == null
+          ? null
+          : _uri(artworkData, 'url', allowLocal: allowLocalMedia),
       artworkCacheKey: artworkData == null
           ? null
           : _string(artworkData, 'cache_key'),
@@ -274,11 +279,14 @@ bool _bool(Map<String, dynamic> json, String key) {
   return value;
 }
 
-Uri? _uri(Map<String, dynamic> json, String key) {
+Uri? _uri(Map<String, dynamic> json, String key, {bool allowLocal = false}) {
   final value = _string(json, key);
   if (value == null) return null;
   final uri = Uri.tryParse(value);
-  if (uri == null || (!uri.isScheme('https') && !uri.isScheme('http'))) {
+  if (uri == null ||
+      (!uri.isScheme('https') &&
+          !uri.isScheme('http') &&
+          !(allowLocal && uri.isScheme('file')))) {
     throw FormatException('$key must be an HTTP(S) URL');
   }
   return uri;

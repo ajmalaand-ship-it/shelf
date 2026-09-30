@@ -7,6 +7,7 @@ class PoetryCollection {
     required this.title,
     required this.slug,
     this.id,
+    this.productId,
     this.status,
     this.createdAt,
     this.categories = const [],
@@ -31,6 +32,7 @@ class PoetryCollection {
       PoetryCollection(
         title: _string(json, 'title', required: true)!,
         id: _integer(json, 'id'),
+        productId: _string(json, 'product_id'),
         status: _string(json, 'status'),
         createdAt: DateTime.tryParse(_string(json, 'created_at') ?? ''),
         categories: (json['categories'] as List? ?? [])
@@ -61,6 +63,7 @@ class PoetryCollection {
   final List<BookCategory> categories;
   String get displayStatus => status ?? (isActive ? 'published' : 'draft');
   final int? id;
+  final String? productId;
   final String bookType;
   final String title;
   final String slug;
@@ -99,6 +102,7 @@ class PoetryCollection {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'product_id': productId,
     'status': status,
     'created_at': createdAt?.toIso8601String(),
     'categories': categories.map((category) => category.toJson()).toList(),

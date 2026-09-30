@@ -31,6 +31,11 @@ class AudioSourcePlanner {
       throw StateError('Poem has no accessible audio');
     }
     final access = await repository.loadAudio(poem.id);
+    if (access.url.scheme == 'file') {
+      final file = File.fromUri(access.url);
+      if (!await file.exists()) throw StateError('Download is unavailable');
+      return CachedAudioPlan(file);
+    }
     if (access.cacheKey != poem.audioCacheKey) {
       throw const FormatException('Audio changed; refresh required');
     }

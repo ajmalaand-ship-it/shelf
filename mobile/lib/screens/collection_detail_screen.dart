@@ -1,5 +1,8 @@
 import '../accounts/account_controller.dart';
 import '../accounts/account_screen.dart';
+import '../purchases/library_controller.dart';
+import '../purchases/library_screen.dart';
+import '../purchases/purchase_screen.dart';
 
 import 'package:flutter/material.dart';
 
@@ -23,6 +26,7 @@ class CollectionDetailScreen extends StatefulWidget {
     this.audioController,
     this.entitlements,
     this.ownerPreviewMode = false,
+    this.ownedMode = false,
     super.key,
   });
 
@@ -33,6 +37,7 @@ class CollectionDetailScreen extends StatefulWidget {
   final AudioPlaybackController? audioController;
   final EntitlementController? entitlements;
   final bool ownerPreviewMode;
+  final bool ownedMode;
 
   @override
   State<CollectionDetailScreen> createState() => _CollectionDetailScreenState();
@@ -212,28 +217,74 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                     const SizedBox(height: 16),
                     FilledButton.icon(
                       key: const Key('read-sample'),
-                      onPressed: samples.isEmpty
+                      onPressed:
+                          (widget.ownedMode
+                              ? bundle.poems.isEmpty
+                              : samples.isEmpty)
                           ? null
-                          : () => openItem(samples.first),
+                          : () => openItem(
+                              widget.ownedMode
+                                  ? bundle.poems.first
+                                  : samples.first,
+                            ),
                       icon: const Icon(Icons.menu_book_outlined),
-                      label: Text(AppStrings.of(context).readSample),
+                      label: Text(
+                        widget.ownedMode
+                            ? (AppStrings.of(context).isEnglish
+                                  ? 'Read book'
+                                  : 'کتاب ولولئ')
+                            : AppStrings.of(context).readSample,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    OutlinedButton(
-                      key: Key('buy-coming-soon'),
-                      onPressed: () {
-                        if (AccountScope.of(context)?.user == null) {
-                          openAccount(context);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(AppStrings.of(context).buySoon),
-                            ),
-                          );
-                        }
-                      },
-                      child: Text(AppStrings.of(context).buySoon),
-                    ),
+                    if (!widget.ownedMode) BookPriceLabel(book: book),
+                    if (!widget.ownedMode)
+                      OutlinedButton(
+                        key: Key('buy-coming-soon'),
+                        onPressed: () {
+                          final library = LibraryScope.of(context);
+                          if (library != null) {
+                            if (library.owns(book.id)) {
+                              openOwnedBook(
+                                context,
+                                library,
+                                book,
+                                widget.readerSettings,
+                              );
+                            } else {
+                              Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => PurchaseScreen(
+                                    book: book,
+                                    settings: widget.readerSettings,
+                                  ),
+                                ),
+                              );
+                            }
+                            return;
+                          }
+                          if (AccountScope.of(context)?.user == null) {
+                            openAccount(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(AppStrings.of(context).buySoon),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          LibraryScope.of(context) == null
+                              ? AppStrings.of(context).buySoon
+                              : LibraryScope.of(context)!.owns(book.id)
+                              ? (AppStrings.of(context).isEnglish
+                                    ? 'Open owned book'
+                                    : 'پېرودل شوی کتاب پرانیزئ')
+                              : (AppStrings.of(context).isEnglish
+                                    ? 'Buy book'
+                                    : 'کتاب وپېرئ'),
+                        ),
+                      ),
                     if (book.description?.isNotEmpty == true)
                       _FrontMatter(
                         title: AppStrings.of(context).description,
@@ -279,7 +330,8 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                           fontFamily: widget.readerSettings.fontFamily,
                           ownerPreviewMode: widget.ownerPreviewMode,
                           onTap:
-                              widget.ownerPreviewMode ||
+                              widget.ownedMode ||
+                                  widget.ownerPreviewMode ||
                                   (poem.isFreeSample && !poem.locked)
                               ? () => openItem(poem)
                               : null,

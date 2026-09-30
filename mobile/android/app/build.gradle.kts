@@ -1,13 +1,34 @@
+import java.util.Properties
+import java.io.File
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val shelfSigningPath = System.getenv("SHELF_SIGNING_PROPERTIES")
+val shelfSigning = Properties()
+if (shelfSigningPath != null) {
+    File(shelfSigningPath).inputStream().use { shelfSigning.load(it) }
+}
+
 android {
     namespace = "services.shelf.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+
+    if (shelfSigningPath != null) {
+        signingConfigs {
+            create("shelfUpload") {
+                storeFile = File(shelfSigning.getProperty("storeFile"))
+                storePassword = shelfSigning.getProperty("storePassword")
+                keyAlias = shelfSigning.getProperty("keyAlias")
+                keyPassword = shelfSigning.getProperty("keyPassword")
+            }
+        }
+        buildTypes.getByName("release").signingConfig = signingConfigs.getByName("shelfUpload")
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

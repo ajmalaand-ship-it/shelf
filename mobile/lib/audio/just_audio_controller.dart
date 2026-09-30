@@ -20,15 +20,14 @@ class JustAudioController extends AudioPlaybackController {
     this._entitlements,
   );
 
-  final PoetryDataSource _repository;
+  PoetryDataSource _repository;
+  PoetryDataSource? _defaultRepository;
+  int _audioGeneration = 0;
   final AudioCacheStore _cache;
   final AudioPlayer _player;
   final EntitlementController? _entitlements;
-  late final AudioSourcePlanner _planner = AudioSourcePlanner(
-    _repository,
-    _cache,
-    entitlements: _entitlements,
-  );
+  AudioSourcePlanner get _planner =>
+      AudioSourcePlanner(_repository, _cache, entitlements: _entitlements);
   final List<StreamSubscription<dynamic>> _subscriptions = [];
   StreamSubscription<double>? _downloadSubscription;
 
@@ -141,8 +140,27 @@ class JustAudioController extends AudioPlaybackController {
     await _player.seek(target < Duration.zero ? Duration.zero : target);
   }
 
+  Future<void> useRepository(PoetryDataSource repository) async {
+    if (identical(repository, _repository)) return;
+    _defaultRepository ??= _repository;
+    ++_audioGeneration;
+    _repository = repository;
+    await _player.stop();
+    _activePoemId = null;
+    _activeCacheFile = null;
+    _state = AudioControlState.idle;
+    notifyListeners();
+  }
+
+  Future<void> restoreRepository(PoetryDataSource expected) async {
+    if (identical(_repository, expected) && _defaultRepository != null) {
+      await useRepository(_defaultRepository!);
+    }
+  }
+
   Future<void> _loadAndPlay(PoemDetail poem) async {
     if (!poem.hasPlayableAudio) return;
+    final generation = ++_audioGeneration;
     await _downloadSubscription?.cancel();
     _downloadSubscription = null;
     _activePoemId = poem.id;
@@ -158,6 +176,7 @@ class JustAudioController extends AudioPlaybackController {
 
     try {
       final plan = await _planner.resolve(poem);
+      if (generation != _audioGeneration) return;
       final target = plan.file;
       _activeCacheFile = target;
 
@@ -194,10 +213,11 @@ class JustAudioController extends AudioPlaybackController {
         });
         await _player.setAudioSource(source);
       }
-      unawaited(_player.play());
+      if (generation == _audioGeneration) unawaited(_player.play());
     } on AudioLockedException {
-      _setError('دا غږ تړلی دی.');
+      if (generation == _audioGeneration) _setError('دا غږ تړلی دی.');
     } catch (_) {
+      if (generation != _audioGeneration) return;
       final activeCacheFile = _activeCacheFile;
       if (activeCacheFile != null) {
         await _cache.clearPartial(activeCacheFile);

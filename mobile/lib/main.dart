@@ -3,6 +3,10 @@ import 'dart:async';
 
 import 'accounts/account_controller.dart';
 import 'accounts/account_service.dart';
+import 'purchases/library_controller.dart';
+import 'purchases/library_service.dart';
+import 'purchases/download_store.dart';
+import 'purchases/book_purchase_provider.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -53,6 +57,17 @@ Future<void> main() async {
     service: HttpAccountService(),
     store: SecureAccountTokenStore(),
     google: PlatformGoogleAccountProvider(),
+    identityStore: SecureAccountIdentityStore(),
+  );
+  final privateRoot = await getApplicationSupportDirectory();
+  final library = LibraryController(
+    accounts: accounts,
+    service: HttpLibraryService(),
+    provider: RevenueCatBookProvider(),
+    audioController: audioController,
+    downloads: PrivateBookDownloadStore(
+      Directory('${privateRoot.path}/shelf_owned'),
+    ),
   );
   // A network failure must never prevent anonymous browsing.
   unawaited(accounts.initialize().catchError((Object _) {}));
@@ -60,6 +75,7 @@ Future<void> main() async {
     ShelfApp(
       repository: repository,
       accountController: accounts,
+      libraryController: library,
       readerSettings: settings,
       languageSettings: InterfaceLanguageSettings.load(preferences),
       audioController: audioController,

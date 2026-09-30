@@ -1,5 +1,7 @@
 import '../accounts/account_controller.dart';
 import '../accounts/account_screen.dart';
+import '../purchases/library_controller.dart';
+import '../purchases/library_screen.dart';
 
 import 'package:flutter/material.dart';
 
@@ -175,7 +177,9 @@ class _HomeScreenState extends State<HomeScreen> {
               categories: _categories,
               navigation: _navigation,
             ),
-            const LibraryScreen(),
+            LibraryScope.of(context) == null
+                ? const LibraryScreen()
+                : PurchasedLibraryScreen(settings: widget.readerSettings),
             SettingsScreen(settings: widget.readerSettings),
           ],
         ),

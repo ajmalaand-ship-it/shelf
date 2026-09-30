@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../audio/audio_playback_controller.dart';
@@ -186,8 +188,11 @@ class _PoemBody extends StatelessWidget {
                     const SizedBox(height: 22),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 420),
-                      child: Image.network(
-                        poem.artworkUrl.toString(),
+                      child: Image(
+                        image: poem.artworkUrl?.scheme == 'file'
+                            ? FileImage(File.fromUri(poem.artworkUrl!))
+                                  as ImageProvider
+                            : NetworkImage(poem.artworkUrl.toString()),
                         key: const Key('poem-artwork'),
                         fit: BoxFit.contain,
                         alignment: Alignment.center,

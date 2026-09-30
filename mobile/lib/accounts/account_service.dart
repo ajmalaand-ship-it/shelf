@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -141,6 +143,47 @@ class SecureAccountTokenStore implements AccountTokenStore {
 abstract interface class GoogleAccountProvider {
   Future<String> idToken(String webClientId);
   Future<void> signOut();
+}
+
+abstract interface class AccountIdentityStore {
+  Future<ReaderAccount?> read(String token);
+  Future<void> write(String token, ReaderAccount account);
+  Future<void> clear();
+}
+
+class SecureAccountIdentityStore implements AccountIdentityStore {
+  final _storage = const FlutterSecureStorage();
+  static const _key = 'shelf.reader.offline-identity';
+  @override
+  Future<ReaderAccount?> read(String token) async {
+    final raw = await _storage.read(key: _key);
+    if (raw == null) return null;
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      if (json['token_hash'] != sha256.convert(utf8.encode(token)).toString())
+        return null;
+      return ReaderAccount.fromJson(json['account'] as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> write(String token, ReaderAccount account) => _storage.write(
+    key: _key,
+    value: jsonEncode({
+      'token_hash': sha256.convert(utf8.encode(token)).toString(),
+      'account': {
+        'id': account.id,
+        'email': account.email,
+        'name': account.name,
+        'email_verified': account.verified,
+        'sign_in_method': account.method,
+      },
+    }),
+  );
+  @override
+  Future<void> clear() => _storage.delete(key: _key);
 }
 
 class PlatformGoogleAccountProvider implements GoogleAccountProvider {
