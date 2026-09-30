@@ -29,6 +29,14 @@ class CollectionsTable
                 TextColumn::make('updated_at')->label('Last changed')->dateTime()->sortable(),
                 TextColumn::make('status')->label('Status')->badge()->formatStateUsing(fn (string $state): string => Collection::STATUSES[$state])->sortable(),
                 TextColumn::make('status_changed_at')->label('Status changed')->dateTime(),
+                TextColumn::make('price_usd')->label('Price')->money('USD'),
+                TextColumn::make('playSync.status')->label('Google Play')->badge()->placeholder('Pending')
+                    ->formatStateUsing(fn (?string $state): string => ucfirst($state ?? 'pending'))
+                    ->color(fn (?string $state): string => match ($state) {
+                        'synced' => 'success', 'error' => 'danger', default => 'warning'
+                    })
+                    ->description(fn (Collection $record): string => $record->playSync?->message ?? 'Save the book to prepare sync.')
+                    ->wrap(),
                 IconColumn::make('cover_image')->label('Cover')->boolean()
                     ->getStateUsing(fn (Collection $record): bool => filled($record->cover_image)),
                 TextColumn::make('poems_count')->label('Content'),

@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Services\Play\PlayPriceSync;
 use App\Support\UniqueSlug;
 use Database\Factories\CollectionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
@@ -29,6 +32,12 @@ class Collection extends Model
 
     private ?string $previousStatus = null;
 
+    private bool $recordPriceChange = false;
+
+    private ?string $previousPrice = null;
+
+    private bool $requestPlaySync = false;
+
     protected $fillable = [
         'book_type', 'language', 'title', 'slug', 'subtitle', 'description', 'author', 'dedication', 'introduction',
         'foreword_author', 'foreword', 'publication_info', 'cover_image', 'sort_order', 'status', 'product_id', 'price_usd',
@@ -42,6 +51,9 @@ class Collection extends Model
     protected static function booted(): void
     {
         static::saving(function (Collection $book): void {
+            $book->recordPriceChange = $book->isDirty('price_usd');
+            $book->previousPrice = $book->exists ? $book->getOriginal('price_usd') : null;
+            $book->requestPlaySync = ! $book->exists || $book->isDirty(['price_usd', 'title', 'status', 'deleted_at']);
             if ($book->exists && $book->isDirty('product_id') && $book->getOriginal('product_id') === 'shelf_book_'.$book->id) {
                 throw ValidationException::withMessages(['product_id' => 'The store product identifier is permanent.']);
             }
@@ -76,6 +88,9 @@ class Collection extends Model
         });
         static::restored(fn (Collection $book) => $book->recordChange());
         static::saved(function (Collection $collection): void {
+            $priceChanged = $collection->recordPriceChange;
+            $oldPrice = $collection->previousPrice;
+            $syncRequested = $collection->requestPlaySync;
             if ($collection->wasRecentlyCreated) {
                 $collection->forceFill(['product_id' => 'shelf_book_'.$collection->id])->saveQuietly();
             }
@@ -90,10 +105,24 @@ class Collection extends Model
             if ($collection->wasRecentlyCreated || $collection->wasChanged()) {
                 AppSetting::query()->where('key', 'content_version')->increment('value');
             }
+            if (Schema::hasTable('play_product_syncs')) {
+                if ($priceChanged) {
+                    BookPriceChange::create(['collection_id' => $collection->id, 'old_price_usd' => $oldPrice,
+                        'new_price_usd' => $collection->price_usd, 'changed_by' => auth()->id(),
+                        'actor' => auth()->id() ? 'Owner admin' : 'System/test creation',
+                        'reason' => 'Admin price change', 'created_at' => now()]);
+                }
+                if ($syncRequested) {
+                    app(PlayPriceSync::class)->request($collection);
+                }
+            }
         });
 
-        static::deleted(function (): void {
+        static::deleted(function (Collection $collection): void {
             AppSetting::query()->where('key', 'content_version')->increment('value');
+            if (! $collection->isForceDeleting() && Schema::hasTable('play_product_syncs')) {
+                app(PlayPriceSync::class)->request($collection);
+            }
         });
     }
 
@@ -106,6 +135,11 @@ class Collection extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->using(BookCategory::class)->orderBy('sort_order')->orderBy('categories.id');
+    }
+
+    public function playSync(): HasOne
+    {
+        return $this->hasOne(PlayProductSync::class);
     }
 
     public function getSelectorLabelAttribute(): string

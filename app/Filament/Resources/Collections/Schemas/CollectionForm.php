@@ -28,7 +28,7 @@ class CollectionForm
                         TextInput::make('subtitle')->label('Subtitle')->maxLength(255),
                         TextInput::make('price_usd')->label('Book price (USD)')->numeric()->minValue(0.01)->maxValue(99999999.99)
                             ->step(0.01)->required(fn (Get $get): bool => $get('status') === 'published')
-                            ->helperText('One USD price per book. Google Play displays the local currency. Test sales only.'),
+                            ->helperText('Change prices here only. Saving sends this USD price to Google Play, which sets local prices. Test sales only.'),
                         Select::make('book_type')->label('Book type')->options(['poetry' => 'Poetry', 'prose' => 'Prose'])->required()->default('poetry')->rules([Rule::in(['poetry', 'prose'])]),
                         Select::make('categories')->relationship('categories', 'name')->multiple()->searchable()->preload(),
                         Select::make('language')->options(fn () => config('books.languages'))
@@ -71,6 +71,10 @@ class CollectionForm
                     ])
                     ->collapsible(),
                 Section::make('Sample summary')->description(fn (?Collection $record): string => $record?->sampleSummary() ?? 'Save the book, then approve samples in its Content tab.')->schema([]),
+                Section::make('Google Play sync')
+                    ->description(fn (?Collection $record): string => $record
+                        ? ucfirst($record->playSync?->status ?? 'pending').': '.($record->playSync?->message ?? 'Save this book to prepare Google Play sync.')
+                        : 'Save the book to prepare Google Play sync.')->schema([]),
                 Section::make('Order / Publication')
                     ->columns(2)
                     ->schema([
@@ -85,7 +89,7 @@ class CollectionForm
                             ->unique(ignoreRecord: true)->maxLength(255)
                             ->helperText('Generated from the title when blank on a new book. Title edits never change it. Change an existing identifier only deliberately.'),
                         TextInput::make('product_id')->label('Google Play product ID')->disabled()->dehydrated(false)
-                            ->helperText('Automatically generated when saved. Permanent; use exactly this value in Play and RevenueCat.'),
+                            ->helperText('Automatically generated and synced to Google Play. Permanent; RevenueCat uses the same identifier.'),
                     ])
                     ->collapsible()
                     ->collapsed(),
