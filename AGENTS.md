@@ -1,6 +1,7 @@
 # AGENTS.md — Shelf
 
 Read this file fully before doing anything in this repository.
+Before every task, read docs/MASTER_RECORD.md; it is the governing document.
 
 ## 1. What this project is
 This repository is **Shelf**: a free-download Android app that is a Pashto and Farsi digital
@@ -17,7 +18,7 @@ README.md and any remaining docs describe the old app technically; they are not 
 
 ## 2. Who decides
 - The owner, Ajmal Aand, decides everything. The governing document is the
-  **Shelf Master Record** (Version 2.2, approved 28 September 2026), kept by Ajmal.
+  **Shelf Master Record** (Version 2.3 with the 29 September 2026 owner addendum), in docs/MASTER_RECORD.md.
   This file is its summary for coding agents.
 - Do only the task Ajmal gives you. Do not start other work, even if it looks useful.
 - If a task conflicts with this file, or something is not covered, STOP and ask.
@@ -124,6 +125,17 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-09-29: Step 4 Task 2 approved, TEST MODE ONLY, no real money. D9: one
+  USD price per book; Google Play displays local currency. D11: verified buyers
+  keep withdrawn books forever; new purchases stop. D12: all sales final except
+  owner-approved duplicate/broken-book cases; Google refunds revoke access.
+  Buying requires "Read the free sample first. All sales are final. I agree."
+  Owner sees refunds per reader and may block buying. D13: account-isolated
+  offline downloads expire 30 days after the last successful server check;
+  refunded/revoked books and copies are removed at the next check. D10 values
+  remain owner decisions before real sales. New Shelf upload key and verified
+  private backup, release AAB and seven-day owner APK approved; simulated live
+  webhook tests use disposable test readers. No old Pitswal settings or keys.
 - 2026-09-29: Google sign-in enabled for project Shelf (`shelf-510123`), External
   consent with owner as test user. Android client uses `services.shelf.app` and
   current test signing SHA-1. In Step 5, ADD the Play Store signing key SHA-1
