@@ -13,7 +13,7 @@ class GoogleIdentity
 
     public static function enabled(): bool
     {
-        return filled(config('reader_auth.google_web_client_id')) && filled(config('reader_auth.google_android_client_id'));
+        return filled(config('reader_auth.google_web_client_id'));
     }
 
     public function verify(string $idToken): array

@@ -206,6 +206,15 @@ class ReaderAccountsTest extends TestCase
         $this->mock(GoogleIdentity::class)->shouldReceive('verify')->andReturn($claims);
     }
 
+    public function test_web_audience_alone_enables_google_and_fake_tokens_are_rejected(): void
+    {
+        config(['reader_auth.google_web_client_id' => 'web.test', 'reader_auth.google_android_client_id' => null]);
+        $this->getJson('/api/auth/config')->assertOk()->assertJsonPath('google_enabled', true)->assertJsonPath('google_web_client_id', 'web.test');
+        $this->postJson('/api/auth/google', ['id_token' => 'fake'])->assertUnprocessable();
+        $this->assertDatabaseCount('readers', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
     public function test_google_links_only_verified_identity_and_defeats_unverified_account_pre_hijack(): void
     {
         $reader = $this->reader('reader@gmail.com', false);

@@ -192,7 +192,7 @@ class BookstoreStrings {
   String get optionalName =>
       isEnglish ? 'Display name (optional)' : 'ښکاره نوم (اختیاري)';
   String get googleSignIn =>
-      isEnglish ? 'Sign in with Google' : 'د ګوګل له لارې ننوتل';
+      isEnglish ? 'Continue with Google' : 'د ګوګل له لارې ننوتل';
   String get emailVerified =>
       isEnglish ? 'Email verified' : 'برېښنالیک تایید شوی';
   String get verifyEmail =>

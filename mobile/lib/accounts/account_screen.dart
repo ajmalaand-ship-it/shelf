@@ -299,10 +299,21 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 if (c.configuration.googleEnabled &&
                     _form == _AccountForm.login)
-                  OutlinedButton(
+                  OutlinedButton.icon(
                     key: const Key('google-sign-in'),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xff1f1f1f),
+                      minimumSize: const Size.fromHeight(48),
+                      side: const BorderSide(color: Color(0xff747775)),
+                    ),
+                    icon: Image.asset(
+                      'assets/google-g.png',
+                      width: 18,
+                      height: 18,
+                    ),
                     onPressed: blocked ? null : () => _perform(c.googleSignIn),
-                    child: Text(s.googleSignIn),
+                    label: Text(s.googleSignIn),
                   ),
                 TextButton(
                   onPressed: blocked ? null : () => _show(_AccountForm.login),

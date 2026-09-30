@@ -124,6 +124,11 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-09-29: Google sign-in enabled for project Shelf (`shelf-510123`), External
+  consent with owner as test user. Android client uses `services.shelf.app` and
+  current test signing SHA-1. In Step 5, ADD the Play Store signing key SHA-1
+  to this Android client before release. Web client ID is the server audience
+  and the app's serverClientId; Google sign-in appears only when configured.
 - 2026-09-25: No staging/test copy until the app is live with users.
 - 2026-09-25: Shelf is built on the existing poetry app work; the Pitswal name is retired.
 - 2026-09-25: Permanent domain: shelf.services.

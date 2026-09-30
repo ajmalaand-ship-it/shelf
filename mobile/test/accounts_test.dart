@@ -35,8 +35,13 @@ class MemoryTokens implements AccountTokenStore {
 
 class FakeGoogle implements GoogleAccountProvider {
   int exits = 0;
+  String? audience;
   @override
-  Future<String> idToken(String id) async => 'synthetic-google';
+  Future<String> idToken(String id) async {
+    audience = id;
+    return 'synthetic-google';
+  }
+
   @override
   Future<void> signOut() async {
     exits++;
@@ -264,8 +269,13 @@ void main() {
       '${language.name}: Google enabled, library identity and password form',
       (tester) async {
         final s = await launch(tester, googleEnabled: true);
+        expect(find.text('Continue with Google'), findsOneWidget);
+        final button = find.byKey(const Key('google-sign-in'));
+        expect(Directionality.of(tester.element(button)), TextDirection.ltr);
+        expect(tester.getSize(button).height, greaterThanOrEqualTo(48));
         await tester.tap(find.byKey(const Key('google-sign-in')));
         await tester.pumpAndSettle();
+        expect(google.audience, 'synthetic-web');
         expect(api.calls, contains('google'));
         await tester.tap(find.text(s.changePassword));
         await tester.pumpAndSettle();
