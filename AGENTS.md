@@ -125,6 +125,16 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-09-29: Step 4 Task 2b: book prices are set and edited ONLY in the
+  admin, one USD price per book. Admin saves automatically create missing
+  Google Play one-time products, update converted local prices and activate
+  Published books or deactivate other states. The owner never edits prices
+  or creates products in Play Console. One new service account with Play
+  access is shared by Shelf sync and RevenueCat. Sync stays disabled until
+  its private server-only credentials are provided. Approved test price:
+  USD 2.99 on books 3, 4, 5, 6, 7, 8 through a backed-up reversible migration,
+  with actor/time recorded. Queued retry, admin status, tests and live rollout
+  are approved; no real payments.
 - 2026-09-29: Step 4 Task 2 approved, TEST MODE ONLY, no real money. D9: one
   USD price per book; Google Play displays local currency. D11: verified buyers
   keep withdrawn books forever; new purchases stop. D12: all sales final except
