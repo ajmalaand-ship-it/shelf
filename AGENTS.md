@@ -125,6 +125,27 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-09-30: Superseding the earlier same-day visibility clarification, the
+  owner confirms the hidden item flags in books 3–8 came from the old app's
+  private-draft period, not editorial choices. Make all non-deleted items in
+  these six books visible with a backed-up reversible migration, recording
+  owner and time. Continue the approved temporary first-two-full-item samples
+  and publication through existing publish logic; verify all six publicly
+  listed, non-sample text locked and purchases still disabled. No source text,
+  access rules or old poetry project changes; no app rebuild.
+- 2026-09-30: Publish all six books (IDs 3–8) for Google Play internal testing;
+  the owner accepts visibility through the public catalogue. For a book without
+  a sample, temporarily sample its first two visible items in full; the owner
+  can change samples later in the admin. Check author credit, language, cover,
+  visible content, sample, USD 2.99 price and canonical product ID; fix only
+  missing approved test values and report other blockers. Backup first, use a
+  reversible migration and existing publish logic with status history. Keep
+  non-sample text locked and purchases disabled pending Play/RevenueCat setup.
+  Verify the six-book public catalogue, non-sample body denial and unchanged
+  draft/owner-preview protection. This approves publication, not a rebuild.
+  Same-day clarification: keep item visibility unchanged; the owner will choose
+  visible items in the admin. Publication is pending that choice: preflight
+  found no visible items in books 3, 4, 6, 7 or 8 and only item 152 in book 5.
 - 2026-09-29: Step 4 Task 2b: book prices are set and edited ONLY in the
   admin, one USD price per book. Admin saves automatically create missing
   Google Play one-time products, update converted local prices and activate
