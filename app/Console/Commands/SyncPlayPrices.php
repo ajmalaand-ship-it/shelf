@@ -10,7 +10,7 @@ use Illuminate\Console\Command;
 
 class SyncPlayPrices extends Command
 {
-    protected $signature = 'shelf:sync-play-prices {book? : Book ID; omit for all books} {--pending : Dispatch only due pending/error work} {--status : Read status only}';
+    protected $signature = 'shelf:sync-play-prices {book? : Book ID; omit for all books} {--pending : Dispatch only due pending/error work} {--status : Read status only} {--once : Run synchronously and stop at the first error}';
 
     protected $description = 'Queue Google Play products from admin prices; never accepts or changes a price.';
 
@@ -36,6 +36,20 @@ class SyncPlayPrices extends Command
             return self::SUCCESS;
         }
         foreach ($books->get() as $book) {
+            if ($this->option('once')) {
+                // Operational sync metadata only; never edits catalogue prices or source.
+                $sync->request($book);
+                $sync->run($book->id);
+                $state = PlayProductSync::where('collection_id', $book->id)->first();
+                $this->line('Book '.$book->id.': '.ucfirst($state?->status ?? 'pending').' / '.$state?->message);
+                if ($state?->status !== 'synced') {
+                    $this->error('Stopped at the first unsuccessful book. No further Google requests made.');
+
+                    return self::FAILURE;
+                }
+
+                continue;
+            }
             if ($this->option('pending')) {
                 $sync->enqueue($book->id);
             } else {

@@ -9,9 +9,25 @@ use Illuminate\Support\Facades\Http;
 
 class RevenueCatClient
 {
+    private static function credential(): ?string
+    {
+        $path = config('purchases.secret_key_path');
+        if (! $path) {
+            return config('purchases.secret_key');
+        }
+        $real = is_string($path) ? realpath($path) : false;
+        if (! $real || $real !== $path || ! is_file($real) || ! is_readable($real)
+            || ! str_starts_with($real, '/home/shelf/') || str_starts_with($real, base_path().'/')
+            || str_starts_with($real, '/home/shelf/public_html/') || (fileperms($real) & 0077) !== 0) {
+            return null;
+        }
+
+        return trim(file_get_contents($real)) ?: null;
+    }
+
     public static function configured(): bool
     {
-        return config('purchases.enabled') && filled(config('purchases.secret_key'))
+        return config('purchases.enabled') && filled(self::credential())
             && filled(config('purchases.webhook_authorization')) && filled(config('purchases.app_id'))
             && str_starts_with((string) config('purchases.public_sdk_key'), 'goog_');
     }
@@ -20,7 +36,7 @@ class RevenueCatClient
     {
         abort_unless(self::configured(), 503, 'Purchases are not configured yet.');
         try {
-            $response = Http::withToken(config('purchases.secret_key'))->acceptJson()->connectTimeout(5)->timeout(12)
+            $response = Http::withToken(self::credential())->acceptJson()->withoutRedirecting()->connectTimeout(5)->timeout(12)
                 ->get('https://api.revenuecat.com/v1/subscribers/'.rawurlencode((string) $reader->id));
             $subscriber = $response->successful() ? $response->json('subscriber') : null;
             if (! is_array($subscriber) || ($subscriber['original_app_user_id'] ?? null) !== (string) $reader->id

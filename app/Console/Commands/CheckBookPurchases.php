@@ -33,6 +33,7 @@ class CheckBookPurchases extends Command
             // Overrides only this CLI process. Never enable a fake verifier on the website.
             $authorization = 'Bearer '.bin2hex(random_bytes(32));
             config(['reader_auth.enabled' => true, 'purchases.enabled' => true, 'purchases.secret_key' => bin2hex(random_bytes(32)),
+                'purchases.secret_key_path' => null,
                 'purchases.public_sdk_key' => 'goog_synthetic', 'purchases.webhook_authorization' => $authorization, 'purchases.app_id' => 'shelf-synthetic']);
             $tag = bin2hex(random_bytes(8));
             $reader = Reader::create(['email' => 'shelf-purchase-'.$tag.'@example.test']);

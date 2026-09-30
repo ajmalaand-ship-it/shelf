@@ -106,6 +106,21 @@ class PlayPriceSyncTest extends TestCase
         Bus::assertNothingDispatched();
     }
 
+    public function test_one_shot_command_stops_after_first_denial_without_touching_later_books(): void
+    {
+        $first = $this->book('published');
+        $second = $this->book('published');
+        config(['play_sync.enabled' => true]);
+        $this->errorStatus = 403;
+        $this->artisan('shelf:sync-play-prices', ['--once' => true])
+            ->expectsOutputToContain('Stopped at the first')->assertFailed();
+        $this->assertSame('error', $first->playSync()->first()->status);
+        $this->assertSame(0, $second->playSync()->first()->attempts);
+        $storeCalls = collect($this->calls)->filter(fn ($call) => str_contains($call['url'], 'androidpublisher.googleapis.com'));
+        $this->assertCount(1, $storeCalls);
+        $this->assertStringContainsString($first->product_id, $storeCalls->first()['url']);
+    }
+
     public function test_create_local_prices_activate_and_duplicate_job_idempotent(): void
     {
         $book = $this->book('published');

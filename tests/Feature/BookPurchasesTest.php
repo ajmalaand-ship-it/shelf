@@ -21,6 +21,7 @@ class BookPurchasesTest extends TestCase
     {
         parent::setUp();
         config(['reader_auth.enabled' => true, 'purchases.enabled' => true, 'purchases.secret_key' => 'synthetic-secret',
+            'purchases.secret_key_path' => null,
             'purchases.webhook_authorization' => 'synthetic-auth', 'purchases.app_id' => 'shelf-test-app', 'purchases.public_sdk_key' => 'goog_synthetic']);
         Http::preventStrayRequests();
         $this->reader = Reader::create(['email' => 'synthetic@example.test']);
@@ -42,6 +43,17 @@ class BookPurchasesTest extends TestCase
 
     private function mockProvider(): void { Http::swap(new \Illuminate\Http\Client\Factory); Http::preventStrayRequests(); Http::fake(['api.revenuecat.com/*' => Http::response(['subscriber' => $this->subscriber])]); }
     private function webhook(array $changes = []) { return $this->postJson('/api/purchases/webhook', ['event' => array_replace($this->event, $changes)], ['Authorization' => 'synthetic-auth']); }
+
+    public function test_private_credential_path_fails_closed_without_using_inline_fallback(): void
+    {
+        config(['purchases.secret_key_path' => base_path('.env')]);
+        $this->getJson('/api/purchases/config')->assertOk()->assertJson(['enabled' => false, 'public_sdk_key' => null]);
+        $this->webhook()->assertStatus(503);
+        Http::assertNothingSent();
+        $this->assertDatabaseCount('purchases', 0);
+        config(['purchases.secret_key_path' => '/home/shelf/secrets/missing-synthetic-verifier.txt']);
+        $this->getJson('/api/purchases/config')->assertJson(['enabled' => false]);
+    }
     private function bearer(?Reader $reader = null): array
     {
         app('auth')->forgetGuards();
