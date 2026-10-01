@@ -118,6 +118,11 @@ def prepare_release(commit):
 
 
 def switch_staging(destination):
+    # Static files are served by Apache; PHP and private runtime stay account-only.
+    (destination/'public').chmod(0o755)
+    for path in (destination/'public').rglob('*'):
+        if path.is_symlink(): raise RuntimeError('Unexpected staging public symlink.')
+        path.chmod(0o755 if path.is_dir() else 0o644)
     temporary = STAGING.with_name('shelf-staging-next')
     if temporary.exists() or temporary.is_symlink():
         raise RuntimeError('Unexpected pending staging switch.')
@@ -272,6 +277,7 @@ def checked(app, commit, initial=False):
     if result.returncode: raise RuntimeError('Staging automated checks failed; private log: '+str(log))
     state=current_state(); state.update(staging_commit=commit,checks={'commit':commit,'passed':True,
         'checked_at':datetime.now(timezone.utc).isoformat(),'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    if initial: state['initial_isolation_verified']=True
     save_state(state)
     print('PASS: deployed commit automated PHP/Flutter checks. Staging approval evidence recorded.',flush=True)
 
@@ -290,10 +296,27 @@ def setup(commit):
     (app/'public/robots.txt').write_text('User-agent: *\nDisallow: /\n')
     switch_staging(app)
     uapi('SubDomain','addsubdomain',domain='staging',rootdomain='shelf.services',dir='apps/shelf-staging/public')
+    # cPanel restricts document roots to public_html. Keep its dedicated entry
+    # but serve the independent staging release through a public-only symlink.
+    configure_document_root()
     uapi('SSL','start_autossl_check')
     save_state({'staging_commit':commit,'production_commit':run(['git','rev-parse','HEAD'],PRODUCTION).strip(),
                 'checks':None,'setup_at':datetime.now(timezone.utc).isoformat()})
     print('Staging created. Run checks after DNS/AutoSSL completes; no production code or database changed.',flush=True)
+
+
+def configure_document_root():
+    entry=PRODUCTION/'public/apps/shelf-staging/public'
+    if entry.is_symlink():
+        if entry.readlink()!=STAGING/'public': raise RuntimeError('Unexpected staging document-root target.')
+        return
+    if not entry.is_dir(): raise RuntimeError('Expected cPanel staging document root is missing.')
+    retained=RUNTIME/'original-cpanel-document-root'
+    if retained.exists(): raise RuntimeError('Original cPanel document root already retained; inspect before proceeding.')
+    entry.rename(retained)
+    entry.symlink_to(STAGING/'public',target_is_directory=True)
+    entry.parent.chmod(0o755);entry.parent.parent.chmod(0o755)
+    print('PASS: dedicated cPanel public entry points to independent staging public files.',flush=True)
 
 
 def deploy(commit):
@@ -339,9 +362,9 @@ def promote(commit):
         artisan(PRODUCTION,'migrate','--force')
         artisan(PRODUCTION,'filament:assets')
         artisan(PRODUCTION,'shelf:check-purchases')
-        artisan(PRODUCTION,'shelf:check-owner-shares')
     finally:
         artisan(PRODUCTION,'up')
+    artisan(PRODUCTION,'shelf:check-owner-shares')
     https_checks()
     state.update(production_commit=commit,last_backup=str(saved),previous_production_commit=previous)
     save_state(state)
@@ -365,7 +388,8 @@ def main():
         elif args.action=='deploy': deploy(commit)
         elif args.action=='refresh':
             refresh_data(STAGING);print('Refresh complete; run check before promotion.',flush=True)
-        elif args.action=='check': checked(STAGING,(STAGING/'REVISION').read_text().strip(),initial=True)
+        elif args.action=='check': checked(STAGING,(STAGING/'REVISION').read_text().strip(),
+                                          initial=current_state().get('initial_isolation_verified') is not True)
         elif args.action=='promote': promote(commit)
 
 

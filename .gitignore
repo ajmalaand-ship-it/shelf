@@ -44,6 +44,7 @@ error_log
 /public/covers/**
 /public/audio/**
 /public/storage
+/public/apps/
 /public/css/filament/
 /public/fonts/filament/
 /public/js/filament/
