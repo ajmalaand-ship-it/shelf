@@ -158,6 +158,74 @@ Price-sync API references: [product upsert](https://developers.google.com/androi
 
 ## Connection evidence — 30 September 2026
 
+### Retry after valid credentials and internal release — 1 October 2026 UTC
+
+The owner reported RevenueCat **Valid credentials** at approximately 21:55 ET
+on 30 September and internal-track publication of AAB `1.0.3 (12)`.
+The exact archived AAB above contains `com.android.vending.BILLING` and the
+correct package. Google requires a published build containing its Billing
+Library to enable billing features; another upload for this permission is not
+indicated. Phone installation and internal/license tester membership still need
+the owner's confirmation.
+
+Investigation reproduced the earlier **400**, independently of the later 403:
+the client sent a JSON `[]` body with GET, and Google returned HTTP 400 HTML.
+It also read `/onetimeproducts/…`; even a body-free GET returned HTTP 404 HTML.
+The documented read URL is `/oneTimeProducts/…`, with an empty request body;
+PATCH intentionally uses `/onetimeproducts/…`. Both client defects are corrected.
+Regression tests now reject GET bodies and incorrect read casing. The old
+message grouped 400 and 409; there is no evidence that a distinct 409 occurred.
+The original failure happened at the initial read, before conversion or upsert.
+
+Correctly cased, body-free GETs returned structured product-not-found 404s for
+all six IDs; the modern catalogue list returned 204 with no products. **No
+partly created products were found. None of the six products is active.** The
+legacy product-list endpoint returned 403, “Please migrate to the new publishing
+API”; Shelf already uses the modern one-time-product API, not that legacy API.
+
+The correctly documented `/pricing:convertRegionPrices` still returned 403,
+“The caller does not have permission”. Valid RevenueCat purchase credentials
+do not prove product/price-management permission. Check Play Console → Users
+and permissions → the shared service account → Shelf app access and **Manage
+store presence**, as well as the other permissions listed above. Missing
+permission versus propagation is not proven from the response. Do not manually
+create products or change prices, and do not start a retry loop.
+
+The requested `python3 -B scripts/connect_purchase_test.py` retry made and
+verified backup `/home/shelf/backups/shelf/20261001-030723/` before application
+sync-status changes. It passed the rolled-back live purchase simulation, then
+stopped at book 3 with the access-denied message. No later book was attempted;
+scheduled sync remains disabled. Prices, source text, existing readers and money
+history were unchanged. Once permission is confirmed, rerun that backup-first
+operator script; it uses the latest admin prices and must succeed on all six
+before phone buying is ready.
+
+Read-only RevenueCat V2 verification confirmed `shelf_book_3` through
+`shelf_book_8` in app `appf83cd58c5c`, each a one-time product with a same-named
+entitlement attached exclusively to that product. Identifiers match the intended
+Play IDs; an actual Play-product match cannot yet be confirmed because those
+products do not exist. Recheck Play ACTIVE states and USD prices, then RevenueCat
+matching, after successful sync.
+
+Validation: `scripts/run_tests.sh` passed **173 PHP tests / 2,095 assertions**.
+No mobile files changed, so Flutter tests were skipped. Live simulation passed
+purchase, duplicate, isolation, withdrawal, restore, refund, revoke and admin
+denial checks, with synthetic rows rolled back. Test mode remains enabled;
+no real payments were attempted. Before a phone purchase: successful product
+sync, owner internal/license tester setup, Play-installed `1.0.3 (12)`, reader
+sign-in (email/password works without the Play OAuth signing-certificate step),
+and an explicitly displayed Google test payment method are required. Google
+sign-in additionally needs the Play app-signing SHA-1 registered as described above.
+
+References: [Google product reads](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization.onetimeproducts/get),
+[product upsert](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization.onetimeproducts/patch),
+[price conversion](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization/convertRegionPrices),
+[billing setup](https://developer.android.com/google/play/billing/getting-ready),
+[RevenueCat service-account permissions](https://www.revenuecat.com/docs/service-credentials/creating-play-service-credentials).
+
+The following evidence describes the earlier connection attempt and is retained
+as history; the retry findings above supersede its initial diagnosis.
+
 The owner supplied the new Shelf service account, public Android SDK key and V2
 configuration credential, then supplied a separate V1 secret verifier key. All
 three private credentials are under `/home/shelf/secrets/` (directory `0700`,

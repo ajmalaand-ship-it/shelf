@@ -61,6 +61,9 @@ class PlayPriceSyncTest extends TestCase
             preg_match('~/(?:onetimeproducts|oneTimeProducts)/(shelf_book_[0-9]+)~', $request->url(), $match);
             $id = $match[1];
             if ($request->method() === 'GET') {
+                if ($request->body() !== '' || ! str_contains($request->url(), '/oneTimeProducts/')) {
+                    return Http::response([], 400);
+                }
                 return isset($this->products[$id]) ? Http::response($this->products[$id]) : Http::response([], 404);
             }
             if ($request->method() === 'PATCH') {

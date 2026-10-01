@@ -77,8 +77,12 @@ class GooglePlayClient
     private function request(string $method, string $path, array $body = [], array $query = [], bool $missingAllowed = false): Response
     {
         $base = 'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/'.rawurlencode(config('play_sync.package'));
+        $options = ['query' => $query];
+        if ($method !== 'GET') {
+            $options['json'] = $body;
+        }
         $response = Http::withToken($this->token())->acceptJson()->withoutRedirecting()->connectTimeout(3)->timeout(8)
-            ->send($method, $base.$path, ['json' => $body, 'query' => $query]);
+            ->send($method, $base.$path, $options);
         $this->check($response, $missingAllowed);
 
         return $response;
@@ -90,7 +94,8 @@ class GooglePlayClient
             throw new PlaySyncException('This book needs its permanent Shelf product ID.');
         }
         $path = '/onetimeproducts/'.rawurlencode($book->product_id);
-        $existing = $this->request('GET', $path, missingAllowed: true);
+        // Google uses different path casing for reads and product upserts.
+        $existing = $this->request('GET', '/oneTimeProducts/'.rawurlencode($book->product_id), missingAllowed: true);
         $old = $existing->successful() ? $existing->json() : null;
         $options = $old['purchaseOptions'] ?? [];
         if ($old && (count($options) !== 1 || ($options[0]['purchaseOptionId'] ?? '') !== 'buy'
