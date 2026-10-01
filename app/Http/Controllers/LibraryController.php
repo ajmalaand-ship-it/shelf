@@ -21,7 +21,8 @@ class LibraryController extends Controller
     {
         return response()->json(['enabled' => RevenueCatClient::configured(), 'test_mode' => true,
             'public_sdk_key' => RevenueCatClient::configured() ? config('purchases.public_sdk_key') : null,
-            'consent' => PurchaseService::CONSENT, 'offline_days' => 30]);
+            'consent' => PurchaseService::CONSENT, 'offline_days' => 30,
+            'identity_prefix' => \App\Support\Staging::active() ? 'staging_' : '']);
     }
 
     public function index(Request $r, PurchaseService $service)
@@ -56,7 +57,7 @@ class LibraryController extends Controller
             DB::table('purchase_consents')->insert(['reader_id' => $reader->id, 'collection_id' => $book->id,
                 'wording' => PurchaseService::CONSENT, 'created_at' => now()]);
         });
-        return response()->json(['accepted' => true, 'app_user_id' => (string) $r->user()->id]);
+        return response()->json(['accepted' => true, 'app_user_id' => \App\Support\Staging::identity($r->user()->id)]);
     }
 
     public function book(Request $r, Collection $collection)

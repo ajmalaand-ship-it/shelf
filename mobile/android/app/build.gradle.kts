@@ -49,6 +49,21 @@ android {
         versionName = flutter.versionName
     }
 
+    flavorDimensions += "environment"
+    productFlavors {
+        create("production") {
+            dimension = "environment"
+            manifestPlaceholders["shelfLabel"] = "Shelf"
+            manifestPlaceholders["shelfIcon"] = "@mipmap/ic_launcher"
+        }
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            manifestPlaceholders["shelfLabel"] = "Shelf Test"
+            manifestPlaceholders["shelfIcon"] = "@drawable/shelf_test_icon"
+        }
+    }
+
 }
 
 kotlin {

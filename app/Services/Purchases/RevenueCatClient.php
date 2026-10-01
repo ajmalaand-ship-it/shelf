@@ -27,6 +27,12 @@ class RevenueCatClient
 
     public static function configured(): bool
     {
+        if (\App\Support\Staging::active() && (! config('purchases.staging_project_confirmed')
+            || config('purchases.app_id') === 'appf83cd58c5c'
+            || (! str_starts_with((string) config('purchases.secret_key_path'), '/home/shelf/secrets/staging/')
+                && ! (app()->runningUnitTests() && str_starts_with((string) config('purchases.secret_key_path'), env('SHELF_TEST_TMP').'/'))))) {
+            return false;
+        }
         return config('purchases.enabled') && filled(self::credential())
             && filled(config('purchases.webhook_authorization')) && filled(config('purchases.app_id'))
             && str_starts_with((string) config('purchases.public_sdk_key'), 'goog_');
@@ -37,9 +43,9 @@ class RevenueCatClient
         abort_unless(self::configured(), 503, 'Purchases are not configured yet.');
         try {
             $response = Http::withToken(self::credential())->acceptJson()->withoutRedirecting()->connectTimeout(5)->timeout(12)
-                ->get('https://api.revenuecat.com/v1/subscribers/'.rawurlencode((string) $reader->id));
+                ->get('https://api.revenuecat.com/v1/subscribers/'.rawurlencode(\App\Support\Staging::identity($reader->id)));
             $subscriber = $response->successful() ? $response->json('subscriber') : null;
-            if (! is_array($subscriber) || ($subscriber['original_app_user_id'] ?? null) !== (string) $reader->id
+            if (! is_array($subscriber) || ($subscriber['original_app_user_id'] ?? null) !== \App\Support\Staging::identity($reader->id)
                 || ! is_array($subscriber['entitlements'] ?? null) || ! is_array($subscriber['non_subscriptions'] ?? null)) {
                 abort(503, 'Store confirmation is unavailable. Please try again.');
             }

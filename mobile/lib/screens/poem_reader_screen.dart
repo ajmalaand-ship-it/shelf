@@ -1,4 +1,5 @@
 import 'dart:io';
+import '../services/api_config.dart';
 
 import 'package:flutter/material.dart';
 
@@ -192,7 +193,7 @@ class _PoemBody extends StatelessWidget {
                         image: poem.artworkUrl?.scheme == 'file'
                             ? FileImage(File.fromUri(poem.artworkUrl!))
                                   as ImageProvider
-                            : NetworkImage(poem.artworkUrl.toString()),
+                            : NetworkImage(poem.artworkUrl.toString(), headers: shelfTestHeaders(poem.artworkUrl!)),
                         key: const Key('poem-artwork'),
                         fit: BoxFit.contain,
                         alignment: Alignment.center,

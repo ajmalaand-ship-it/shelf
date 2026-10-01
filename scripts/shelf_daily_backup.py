@@ -109,6 +109,11 @@ def dump_database(folder, settings):
 
 def write_media(app, archive):
     storage = app / 'storage'
+    if (app / '.shelf-staging').is_file():
+        # Staging releases share only their own runtime, never production files.
+        if storage.resolve() != Path('/home/shelf/staging-runtime/storage'):
+            raise RuntimeError('Unexpected staging storage target.')
+        storage = storage.resolve()
     with zipfile.ZipFile(archive, 'x', compression=zipfile.ZIP_DEFLATED,
                          allowZip64=True) as output:
         for name in MEDIA_PATHS:

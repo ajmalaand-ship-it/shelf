@@ -18,6 +18,8 @@ from setup_revenuecat_test import APP, php_json, update_env
 
 
 def main():
+    if (APP / '.shelf-staging').is_file():
+        raise RuntimeError('Production purchase connection is forbidden on staging.')
     os.umask(0o077)
     os.environ.update(TMPDIR='/home/shelf/tmp', TMP='/home/shelf/tmp', TEMP='/home/shelf/tmp')
     settings = php_json(r'''require $argv[1].'/vendor/autoload.php';

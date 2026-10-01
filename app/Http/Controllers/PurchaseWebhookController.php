@@ -9,6 +9,7 @@ class PurchaseWebhookController extends Controller
 {
     public function __invoke(Request $request, PurchaseService $service)
     {
+        abort_if(\App\Support\Staging::active(), 403, 'Test copy uses REST confirmation; webhooks are disabled.');
         abort_unless(RevenueCatClient::configured(), 503);
         abort_unless(hash_equals((string) config('purchases.webhook_authorization'), (string) $request->header('Authorization')), 401);
         $data = $request->validate([

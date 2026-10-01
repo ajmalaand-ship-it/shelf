@@ -4,6 +4,23 @@ const shelfApiBaseUrl = String.fromEnvironment(
   defaultValue: 'https://shelf.services/api/',
 );
 
+const shelfTestMode = bool.fromEnvironment('SHELF_TEST_MODE');
+const _testAccessKey = String.fromEnvironment('SHELF_STAGING_ACCESS_KEY');
+
+Map<String, String> shelfTestHeaders(Uri target) {
+  if (!shelfTestMode || _testAccessKey.isEmpty) return const {};
+  final base = apiBaseUri();
+  if (target.origin != base.origin ||
+      !(target.path.startsWith(base.path) || target.path.startsWith('/media/'))) return const {};
+  return {'X-Shelf-Test-Key': _testAccessKey};
+}
+
+String shelfPurchaseIdentity(int reader, String prefix) {
+  final expected = shelfTestMode ? 'staging_' : '';
+  if (prefix != expected) throw const FormatException('Wrong purchase environment');
+  return '$prefix$reader';
+}
+
 Uri apiBaseUri([String value = shelfApiBaseUrl]) {
   final uri = Uri.parse(value);
   if ((uri.scheme != 'https' && uri.scheme != 'http') ||

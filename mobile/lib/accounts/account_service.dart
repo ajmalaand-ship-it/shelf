@@ -87,6 +87,7 @@ class HttpAccountService implements AccountService {
     final req = http.Request(method, _base.resolve('auth/$path'))
       ..followRedirects = false;
     req.headers.addAll({
+      ...shelfTestHeaders(req.url),
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',

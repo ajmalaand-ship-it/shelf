@@ -93,6 +93,9 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
   /home/shelf/backups/shelf, 14 kept.
 
 ## 6. How to work on every task
+From 1 October 2026, every change is developed and tested in an isolated checkout,
+deployed to staging first, and promoted to production only at the same verified
+commit. Never develop in the running production checkout. Use docs/STAGING.md.
 1. Plan: say what you will do, why, the risk, and how to undo it. Wait for OK if the
    task does not already approve it.
 2. Label commands: READ-ONLY (only looks) or CHANGES (changes something).
@@ -125,6 +128,17 @@ Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DN
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-01: D10 decided. The owner sets author-share percentages per book in
+  the admin. All six current books: 100% of the net amount received to اجمل اند,
+  effective 1 October 2026. For سيند په پرخه کې, author پروین پژواک permits the
+  owner to keep all income; the owner retains written permission. Its 100% share
+  goes to اجمل اند as translator/publisher. New agreement versions record owner
+  and time; past agreements and financial snapshots are unchanged.
+- 2026-10-01: Private staging at staging.shelf.services approved, with its own
+  files, database/user, secrets, logged email, disabled Play sync and queue,
+  prefixed RevenueCat identities, REST-only sandbox confirmation and private
+  Shelf Test Android app services.shelf.app.staging. Production webhook and daily
+  backup stay unchanged. Every future change must pass staging before promotion.
 - 2026-09-30: Step 4 purchase connection approved, owner-only sandbox/test mode.
   New Shelf service account and separate RevenueCat V2 configuration/V1 verifier
   keys secured outside git. Six per-book products/entitlements and app-scoped

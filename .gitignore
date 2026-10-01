@@ -16,6 +16,7 @@ secrets/
 
 # PHP, Composer, and Laravel
 /vendor/
+/vendor
 /database/*.sqlite
 /.phpunit.cache/
 /.phpunit.result.cache

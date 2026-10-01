@@ -15,6 +15,7 @@ class AppConfigController extends Controller
             ->pluck('value', 'key');
 
         return response()->json([
+            ...(\App\Support\Staging::active() ? ['environment' => 'staging'] : []),
             'app_name' => $settings['public_app_name'] ?? '',
             'slogan' => $settings['public_slogan'] ?? '',
             'content_version' => (int) ($settings['content_version'] ?? 1),

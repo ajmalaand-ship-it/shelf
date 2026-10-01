@@ -15,11 +15,11 @@ test -r "$SHELF_SIGNING_PROPERTIES"
 mkdir -p "$run_dir/mobile"
 tar -C "$repo_root/mobile" --exclude='./build' --exclude='./.dart_tool' --exclude='./android/.gradle' --exclude='./.flutter-plugins-dependencies' -cf - . | tar -C "$run_dir/mobile" -xf -
 cd "$run_dir/mobile"
-/home/shelf/flutter/bin/flutter build appbundle --release
+/home/shelf/flutter/bin/flutter build appbundle --release --flavor production
 destination="$repo_root/storage/app/private/owner-aabs"
 mkdir -p "$destination"
 aab="$destination/shelf-internal-test-$(date -u +%Y%m%d-%H%M%S).aab"
-install -m 0600 build/app/outputs/bundle/release/app-release.aab "$aab"
+install -m 0600 build/app/outputs/bundle/productionRelease/app-production-release.aab "$aab"
 "$JAVA_HOME/bin/jarsigner" -verify "$aab"
 sha256sum "$aab"
 echo "Private test AAB: $aab"

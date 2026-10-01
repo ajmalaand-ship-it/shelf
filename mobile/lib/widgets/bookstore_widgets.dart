@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import '../models/book_author.dart';
 import '../models/poetry_collection.dart';
+import '../services/api_config.dart';
 
 class BookCover extends StatelessWidget {
   const BookCover({this.url, this.width = 112, this.height = 156, super.key});
@@ -33,6 +34,7 @@ class BookCover extends StatelessWidget {
               )
             : CachedNetworkImage(
                 imageUrl: url!,
+                httpHeaders: shelfTestHeaders(Uri.parse(url!)),
                 fit: BoxFit.contain,
                 placeholder: (_, _) => placeholder,
                 errorWidget: (_, _, _) => placeholder,
@@ -60,6 +62,7 @@ class AuthorPortrait extends StatelessWidget {
     return ClipOval(
       child: CachedNetworkImage(
         imageUrl: author.imageUrl!,
+        httpHeaders: shelfTestHeaders(Uri.parse(author.imageUrl!)),
         width: radius * 2,
         height: radius * 2,
         fit: BoxFit.cover,

@@ -16,11 +16,14 @@ class GooglePlayClient
 
     public static function configured(): bool
     {
-        return (bool) config('play_sync.enabled') && filled(config('play_sync.credentials_path'));
+        return ! \App\Support\Staging::active() && (bool) config('play_sync.enabled') && filled(config('play_sync.credentials_path'));
     }
 
     private function token(): string
     {
+        if (\App\Support\Staging::active()) {
+            throw new PlaySyncException('Google Play price sync is permanently disabled on the test copy.');
+        }
         if ($this->token) {
             return $this->token;
         }

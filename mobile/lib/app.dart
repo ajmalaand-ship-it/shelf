@@ -11,6 +11,7 @@ import 'purchases/entitlement_controller.dart';
 import 'screens/home_screen.dart';
 import 'settings/reader_settings.dart';
 import 'theme/app_theme.dart';
+import 'services/api_config.dart';
 
 class ShelfApp extends StatelessWidget {
   const ShelfApp({
@@ -51,7 +52,7 @@ class ShelfApp extends StatelessWidget {
             theme: AppTheme.light,
             builder: (context, child) => Directionality(
               textDirection: TextDirection.rtl,
-              child: ownerPreviewMode
+              child: (ownerPreviewMode || shelfTestMode)
                   ? Column(
                       children: [
                         Material(
@@ -67,7 +68,7 @@ class ShelfApp extends StatelessWidget {
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Text(
-                                  AppStrings.of(context).ownerPreview,
+                                  shelfTestMode ? 'TEST COPY — Shelf Test' : AppStrings.of(context).ownerPreview,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.white,

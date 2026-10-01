@@ -9,5 +9,6 @@ return [
     'webhook_authorization' => env('SHELF_REVENUECAT_WEBHOOK_AUTH'),
     'app_id' => env('SHELF_REVENUECAT_APP_ID'),
     'environment' => 'SANDBOX',
+    'staging_project_confirmed' => env('SHELF_STAGING_REVENUECAT_PROJECT_CONFIRMED', false),
     'test_reader_ids' => [], // Isolated CLI/tests may inject synthetic reader IDs in-process only.
 ];

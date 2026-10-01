@@ -38,6 +38,8 @@ def update_env(values):
 
 
 def main():
+    if (APP / '.shelf-staging').is_file():
+        raise RuntimeError('Production RevenueCat setup is forbidden on staging.')
     os.umask(0o077)
     settings = php_json(r'''require $argv[1].'/vendor/autoload.php';
 echo json_encode(Dotenv\Dotenv::parse(file_get_contents($argv[1].'/.env')));''')

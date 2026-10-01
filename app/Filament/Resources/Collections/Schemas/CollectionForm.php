@@ -71,6 +71,16 @@ class CollectionForm
                     ])
                     ->collapsible(),
                 Section::make('Sample summary')->description(fn (?Collection $record): string => $record?->sampleSummary() ?? 'Save the book, then approve samples in its Content tab.')->schema([]),
+                Section::make('Current author share')
+                    ->description(function (?Collection $record): string {
+                        $agreement = $record ? \App\Models\AuthorShareAgreement::where('collection_id', $record->id)
+                            ->where('starts_at', '<=', now())->orderByDesc('starts_at')->orderByDesc('id')->first() : null;
+                        if (! $agreement) { return 'No agreement yet. Add a version in Author-share agreements.'; }
+                        $shares = collect($agreement->contributors)->map(fn ($c) =>
+                            (\App\Models\Author::find($c['author_id'])?->name ?? 'Contributor').' '.$c['percentage'].'%')->implode(', ');
+                        return $shares.' | '.($agreement->basis === 'net' ? 'Net amount received' : 'Gross income')
+                            .' | Effective '.$agreement->starts_at->toDateString().'. New versions are added in Author-share agreements; past earnings stay unchanged.';
+                    })->schema([]),
                 Section::make('Google Play sync')
                     ->description(fn (?Collection $record): string => $record
                         ? ucfirst($record->playSync?->status ?? 'pending').': '.($record->playSync?->message ?? 'Save this book to prepare Google Play sync.')

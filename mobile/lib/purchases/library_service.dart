@@ -39,6 +39,7 @@ class HttpLibraryService implements LibraryService {
   ) async {
     final request = http.Request(method, _uri(path))..followRedirects = false;
     request.headers.addAll({
+      ...shelfTestHeaders(request.url),
       'Accept': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
     });

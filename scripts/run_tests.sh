@@ -60,6 +60,8 @@ if "$run_mobile"; then
     cd -- "$run_dir/mobile"
     echo "Running Flutter tests (--mobile requested)"
     "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test --reporter expanded --concurrency=2
+    "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test test/staging_identity_test.dart --reporter expanded \
+        --dart-define=SHELF_TEST_MODE=true
 else
     echo "Flutter/Android tests skipped (no --mobile flag)."
 fi

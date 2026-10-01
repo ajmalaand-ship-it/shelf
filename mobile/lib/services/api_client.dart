@@ -82,12 +82,16 @@ class ApiClient {
     String path, {
     bool refreshEntitlement = false,
   }) async {
-    final headers = <String, String>{'Accept': 'application/json'};
+    final target = baseUri.resolve(path);
+    if (target.origin != baseUri.origin || !target.path.startsWith(baseUri.path)) {
+      throw const FormatException('Invalid API address');
+    }
+    final headers = <String, String>{'Accept': 'application/json', ...shelfTestHeaders(target)};
     if (authorizationToken case final token? when token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
     }
     final response = await _client
-        .get(baseUri.resolve(path), headers: headers)
+        .get(target, headers: headers)
         .timeout(const Duration(seconds: 12));
     if (response.statusCode == 404) throw const ContentNotFoundException();
     if (response.statusCode < 200 || response.statusCode >= 300) {

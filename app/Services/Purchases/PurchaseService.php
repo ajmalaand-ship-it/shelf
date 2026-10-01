@@ -13,6 +13,7 @@ class PurchaseService
 
     public function receive(array $event): void
     {
+        $event['app_user_id'] = \App\Support\Staging::readerId((string) $event['app_user_id']);
         abort_unless(($event['environment'] ?? '') === 'SANDBOX' && ($event['store'] ?? '') === 'PLAY_STORE'
             && ($event['app_id'] ?? '') === config('purchases.app_id'), 422, 'Only Shelf Google Play sandbox events are accepted.');
         $type = $event['type'];
@@ -99,6 +100,9 @@ class PurchaseService
 
     public function reconcile(Reader $reader): void
     {
+        if (\App\Support\Staging::active() && RevenueCatClient::configured()) {
+            $this->confirmStaging($reader);
+        }
         $purchases = Purchase::where('reader_id', $reader->id)->with('book')->get();
         if ($purchases->isEmpty()) { return; }
         $subscriber = $this->provider->subscriber($reader);
@@ -111,5 +115,29 @@ class PurchaseService
                 $this->refreshAccess($reader, $purchase->book);
             }
         }, 3);
+    }
+
+    private function confirmStaging(Reader $reader): void
+    {
+        $subscriber = $this->provider->subscriber($reader);
+        foreach ($subscriber['non_subscriptions'] as $product => $transactions) {
+            $book = Collection::withTrashed()->where('product_id', $product)->first();
+            if (! $book || ! is_array($transactions)) { continue; }
+            foreach ($transactions as $transaction) {
+                if (! is_string($transaction['id'] ?? null) || blank($transaction['id'])
+                    || ! is_string($transaction['purchase_date'] ?? null)) { continue; }
+                $date = CarbonImmutable::parse($transaction['purchase_date']);
+                if (! $this->provider->confirms($subscriber, $book, $date)
+                    || ($transaction['is_sandbox'] ?? null) !== true
+                    || ($transaction['store'] ?? null) !== 'play_store' || ! empty($transaction['refunded_at'])) { continue; }
+                if (! DB::table('purchase_consents')->where('reader_id', $reader->id)->where('collection_id', $book->id)
+                    ->where('created_at', '<=', $date)->exists()) { continue; }
+                $id = 'staging-rest:'.hash('sha256', $reader->id.'|'.$product.'|'.$transaction['id']);
+                $this->receive(['id' => $id, 'type' => 'NON_RENEWING_PURCHASE', 'environment' => 'SANDBOX',
+                    'store' => 'PLAY_STORE', 'app_id' => config('purchases.app_id'),
+                    'app_user_id' => \App\Support\Staging::identity($reader->id), 'product_id' => $product,
+                    'transaction_id' => $id, 'purchased_at_ms' => $date->getTimestampMs(), 'event_timestamp_ms' => now()->getTimestampMs()]);
+            }
+        }
     }
 }

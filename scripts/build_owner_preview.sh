@@ -31,11 +31,11 @@ allprojects {
 }
 GRADLE
 cd "$run_dir/mobile"
-/home/shelf/flutter/bin/flutter build apk --debug --dart-define-from-file="$run_dir/preview.json"
+/home/shelf/flutter/bin/flutter build apk --debug --flavor production --dart-define-from-file="$run_dir/preview.json"
 destination="$repo_root/storage/app/private/owner-apks"
 mkdir -p "$destination"
 apk="$destination/shelf-owner-preview-$(date -u +%Y%m%d-%H%M%S).apk"
-install -m 0600 build/app/outputs/flutter-apk/app-debug.apk "$apk"
+install -m 0600 build/app/outputs/flutter-apk/app-production-debug.apk "$apk"
 sha256sum "$apk"
 "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$apk"
 echo "Private owner APK: $apk"

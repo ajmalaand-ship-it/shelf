@@ -30,6 +30,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('Shelf')
+            ->renderHook('panels::body.start', fn () => \App\Support\Staging::active()
+                ? view('staging.banner') : '')
             ->profile()
             ->multiFactorAuthentication([AppAuthentication::make()->brandName('Shelf')->recoverable()], isRequired: false)
             ->colors([

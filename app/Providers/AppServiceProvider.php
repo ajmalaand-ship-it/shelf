@@ -24,6 +24,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (\App\Support\Staging::active()) {
+            if (! app()->runningUnitTests() && (config('database.connections.mysql.database') !== 'shelf_staging'
+                || app()->environment() !== 'staging')) {
+                throw new \RuntimeException('Staging environment/database boundary is invalid.');
+            }
+            config(['play_sync.enabled' => false, 'play_sync.credentials_path' => null,
+                'mail.default' => 'log', 'queue.default' => 'null', 'queue.connections.database.queue' => 'staging-disabled']);
+            foreach (array_keys(config('mail.mailers')) as $mailer) {
+                config(['mail.mailers.'.$mailer => ['transport' => 'log']]);
+            }
+            \Illuminate\Support\Facades\Event::listen(\Illuminate\Queue\Events\JobProcessing::class,
+                fn () => throw new \RuntimeException('Staging queue workers are disabled.'));
+        }
         RateLimiter::for('reader-auth', function (Request $request) {
             $email = is_string($request->input('email')) ? strtolower(trim($request->input('email'))) : '';
 

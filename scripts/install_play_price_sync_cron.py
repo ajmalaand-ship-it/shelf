@@ -16,6 +16,8 @@ ENTRY = '* * * * * PATH=/usr/local/bin:/usr/bin:/bin /bin/bash /home/shelf/apps/
 
 
 def main():
+    if (Path(__file__).resolve().parent.parent / '.shelf-staging').is_file():
+        raise RuntimeError('Production scheduler installation is forbidden on staging.')
     parser = argparse.ArgumentParser()
     parser.add_argument('--after-backup', required=True)
     args = parser.parse_args()

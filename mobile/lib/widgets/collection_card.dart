@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../models/poetry_collection.dart';
 import '../settings/reader_settings.dart';
+import '../services/api_config.dart';
 
 class CollectionCard extends StatelessWidget {
   const CollectionCard({
@@ -99,6 +100,7 @@ class _Cover extends StatelessWidget {
             ? const _QaCover()
             : CachedNetworkImage(
                 imageUrl: url!,
+                httpHeaders: shelfTestHeaders(Uri.parse(url!)),
                 fit: BoxFit.contain,
                 placeholder: (_, _) => placeholder,
                 errorWidget: (_, _, _) => placeholder,

@@ -6,6 +6,7 @@ import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../models/poem.dart';
+import '../services/api_config.dart';
 import '../purchases/entitlement_controller.dart';
 import '../repository/poetry_repository.dart';
 import 'audio_cache_store.dart';
@@ -201,6 +202,7 @@ class JustAudioController extends AudioPlaybackController {
         // ignore: experimental_member_use
         final source = LockCachingAudioSource(
           plan.access.url,
+          headers: shelfTestHeaders(plan.access.url),
           cacheFile: target,
           tag: mediaItem,
         );

@@ -9,6 +9,7 @@ import '../models/poetry_collection.dart';
 import 'book_purchase_provider.dart';
 import 'download_store.dart';
 import 'library_service.dart';
+import '../services/api_config.dart';
 
 class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
   LibraryController({
@@ -229,7 +230,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
       throw const AccountFailure(503);
     await provider.identify(
       configuration['public_sdk_key'] as String,
-      '$reader',
+      shelfPurchaseIdentity(reader, configuration['identity_prefix'] as String? ?? ''),
     );
     assertIdentity(reader, generation);
   }
