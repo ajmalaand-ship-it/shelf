@@ -27,5 +27,5 @@ apk="$destination/shelf-test-$(date -u +%Y%m%d-%H%M%S).apk"
 install -m 0600 build/app/outputs/flutter-apk/app-staging-release.apk "$apk"
 sha256sum "$apk"
 "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$apk"
-"$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | head -4
+"$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | sed -n '1,4p'
 echo "Private Shelf Test APK: $apk"

@@ -336,6 +336,20 @@ def promotion_allowed(state,commit,actual):
     return state.get('staging_commit')==commit==actual and evidence.get('commit')==commit and evidence.get('passed') is True
 
 
+def production_history_snapshot(agreement_limit=None):
+    # Only aggregate fingerprints leave PHP; no reader or money data is printed.
+    return json.loads(php(PRODUCTION,r'''$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$out=[];
+foreach (['readers','reader_account_actions','personal_access_tokens','purchases','purchase_events','sales_ledger','book_entitlements','purchase_consents','author_share_agreements'] as $table) {
+ $q=Illuminate\Support\Facades\DB::table($table)->orderBy('id');
+ if ($table==='author_share_agreements' && $argv[2]!=='all') {$q->where('id','<=',(int)$argv[2]);}
+ $rows=$q->get();$out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
+}
+$out['agreement_limit']=$argv[2]==='all' ? (int)Illuminate\Support\Facades\DB::table('author_share_agreements')->max('id') : (int)$argv[2];
+echo json_encode($out,JSON_THROW_ON_ERROR);''','all' if agreement_limit is None else agreement_limit))
+
+
 def promote(commit):
     state=current_state()
     if not promotion_allowed(state,commit,(STAGING/'REVISION').read_text().strip()):
@@ -355,6 +369,7 @@ def promote(commit):
     private_write(saved/'promotion-notes.txt','From '+previous+' to '+commit+'\nRollback code: git switch --detach '+previous+'\nDatabase: inspect migration batch; do not restore over reader/money changes. Use retained SQL/media backup only with owner approval.\n')
     artisan(PRODUCTION,'down')
     try:
+        unchanged=production_history_snapshot()
         run(['git','merge','--ff-only',commit],PRODUCTION)
         # Keep dependency setup out of maintenance where possible; same lock
         # copies the already tested stage dependencies if it changed.
@@ -368,6 +383,9 @@ def promote(commit):
         artisan(PRODUCTION,'migrate','--force')
         artisan(PRODUCTION,'filament:assets')
         artisan(PRODUCTION,'shelf:check-purchases')
+        if unchanged!=production_history_snapshot(unchanged['agreement_limit']):
+            raise RuntimeError('Past reader/payment/agreement records changed unexpectedly; stop and review.')
+        print('PASS: all previous reader, purchase, refund, ledger and agreement records unchanged.',flush=True)
     finally:
         artisan(PRODUCTION,'up')
     artisan(PRODUCTION,'shelf:check-owner-shares')

@@ -6,6 +6,11 @@ there does not change the real Shelf. The admin and Android app show a red
 **TEST COPY** banner. Search engines are told not to index it, and a private
 access check protects its pages and API.
 
+cPanel requires web entries under `public_html`. Staging's dedicated entry
+`public/apps/shelf-staging/public` points only to its separate public folder;
+its application, database, storage and secrets remain separate. It does not
+point to the real Shelf's application or media.
+
 | Copy | Address | Android app |
 | --- | --- | --- |
 | Real Shelf | https://shelf.services/admin | Shelf (`services.shelf.app`) |
@@ -116,5 +121,40 @@ activity. Restore SQL/media only with the owner's approval. Staging's prior
 release remains under `/home/shelf/apps/shelf-staging-releases/`; switch back
 only after considering its database migrations.
 
-Release evidence and private APK download command will be recorded here after
-the initial approved rollout passes.
+## Initial setup evidence — 1 October 2026
+
+Production backups before setup/document-root correction were verified at
+`/home/shelf/backups/shelf/20261001-052248/` and
+`/home/shelf/backups/shelf/20261001-053344/`.
+Staging HTTPS/AutoSSL, private access gate, red admin banner, API marker, noindex,
+six-book catalogue/covers, locked paid text, denied webhooks/private files,
+independent database/files, forced-off Play sync, mail logging and disabled
+queues passed direct checks. Synthetic registration, verification mail logging,
+email/password sign-in and authenticated account checks passed and were rolled
+back. Owner-only initial data isolation and the repeated backed-up catalogue
+refresh passed; 80 referenced media files were verified. Production was healthy
+and its catalogue unchanged during the isolation probes.
+
+The deployed `0e496a6` commit passed `scripts/run_tests.sh --mobile`: 179 PHP
+tests / 2,185 assertions, 135 Flutter tests and the additional staging-identity
+test. Newer rollout commits must pass the same checks before promotion. The
+private `/home/shelf/staging-runtime/release-state.json` is the authoritative
+record of the exact staging/production commits, check evidence and latest
+production promotion backup; `workflow.py status` shows it without secrets.
+
+Shelf Test APK built from that tested app code (1.0.3, build 12):
+`/home/shelf/staging-runtime/storage/app/private/test-apks/shelf-test-20261001-060423.apk`.
+Signature verified; package `services.shelf.app.staging`, label `Shelf Test`,
+red icon. SHA-256:
+`7adfc1fc99aa3550921047d3e2e29ae210822a0cdce44b15d22ee1dbc041f9ef`.
+
+In Windows PowerShell, download to your current folder:
+
+```powershell
+scp "root@157.250.199.106:/home/shelf/staging-runtime/storage/app/private/test-apks/shelf-test-20261001-060423.apk" .
+```
+
+Install beside Shelf and test the screens/reading on your phone. Email/password
+works without Google setup; get verification links from the private staging
+mail log. Google sign-in and staging store purchases require the separate
+configuration described above. No physical-phone result is claimed here.
