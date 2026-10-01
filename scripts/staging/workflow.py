@@ -17,6 +17,7 @@ import tarfile
 import tempfile
 import urllib.error
 import urllib.request
+from urllib.parse import quote
 
 sys.dont_write_bytecode = True
 PRODUCTION = Path('/home/shelf/apps/shelf')
@@ -229,13 +230,13 @@ def https_checks():
         req=urllib.request.Request(base+path,headers=headers,method=method,data=data)
         try:
             with urllib.request.urlopen(req,timeout=20) as response:
-                return response.status,dict(response.headers),response.read()
+                return response.status,{k.lower():v for k,v in response.headers.items()},response.read()
         except urllib.error.HTTPError as response:
-            return response.code,dict(response.headers),response.read()
+            return response.code,{k.lower():v for k,v in response.headers.items()},response.read()
     assert request('/api/app-config')[0]==401
     status,headers,body=request('/api/app-config',True)
     assert status==200 and json.loads(body)['environment']=='staging'
-    assert headers.get('X-Shelf-Environment')=='staging' and 'noindex' in headers.get('X-Robots-Tag','')
+    assert headers.get('x-shelf-environment')=='staging' and 'noindex' in headers.get('x-robots-tag','')
     assert request('/api/purchases/webhook',True,'POST',b'{}')[0]==403
     assert request('/api/auth/config',True)[0]==200
     assert request('/api/library',True)[0]==401
@@ -244,7 +245,7 @@ def https_checks():
     assert b'TEST COPY' in request('/admin/login',True)[2]
     status,_,body=request('/api/collections',True)
     books=json.loads(body)['data']; assert status==200 and len(books)>=6
-    status,_,body=request('/api/collections/'+books[0]['slug']+'/poems',True)
+    status,_,body=request('/api/collections/'+quote(books[0]['slug'],safe='')+'/poems',True)
     items=json.loads(body)['data']; assert status==200
     locked=next(item for item in items if item['locked'])
     status,_,body=request('/api/poems/'+str(locked['id']),True)
@@ -327,7 +328,7 @@ def deploy(commit):
     (app/'public/robots.txt').write_text('User-agent: *\nDisallow: /\n')
     switch_staging(app)
     state=current_state();state.update(staging_commit=commit,checks=None);save_state(state)
-    checked(app,commit)
+    checked(app,commit,initial=current_state().get('initial_isolation_verified') is not True)
 
 
 def promotion_allowed(state,commit,actual):
@@ -342,7 +343,12 @@ def promote(commit):
     log=RUNTIME/('checks-'+commit+'.log')
     if hashlib.sha256(log.read_bytes()).hexdigest()!=state['checks']['log_sha256']:
         raise RuntimeError('Staging check evidence changed.')
-    if run(['git','status','--porcelain'],PRODUCTION).strip(): raise RuntimeError('Production checkout is not clean.')
+    # The cPanel-created public entry is runtime, excluded by the staged .gitignore.
+    entry=PRODUCTION/'public/apps/shelf-staging/public'
+    if not entry.is_symlink() or entry.readlink()!=STAGING/'public':
+        raise RuntimeError('Staging public entry changed.')
+    if run(['git','status','--porcelain','--','.',':!public/apps/'],PRODUCTION).strip():
+        raise RuntimeError('Production checkout is not clean.')
     previous=run(['git','rev-parse','HEAD'],PRODUCTION).strip()
     run(['git','merge-base','--is-ancestor',previous,commit],PRODUCTION)
     saved=backup(PRODUCTION)
