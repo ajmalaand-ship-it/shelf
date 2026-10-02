@@ -263,6 +263,7 @@ def https_checks():
 def checked(app, commit, initial=False):
     artisan(app,'shelf:check-owner-shares')
     artisan(app,'shelf:check-staging',*(['--initial'] if initial else []))
+    artisan(app,'shelf:check-play-refunds','--simulate-after-backup')
     # Snapshot source before/after staging mutation check proves no source change.
     with tempfile.TemporaryDirectory(prefix='staging-isolation-',dir='/home/shelf/tmp') as temporary:
         one,two=Path(temporary)/'one.json',Path(temporary)/'two.json'
@@ -271,16 +272,20 @@ def checked(app, commit, initial=False):
         source_catalogue(two)
         if one.read_bytes()!=two.read_bytes(): raise RuntimeError('Production catalogue changed during isolation check; stop and review.')
     https_checks()
-    # Actual deployed commit's tests; PHP uses memory DB, Flutter disposable copy.
+    # Only run Flutter when this release changed mobile/, per the owner rule.
+    previous = run(['git', 'rev-parse', 'HEAD'], PRODUCTION).strip()
+    changed = subprocess.run(['git', 'diff', '--quiet', previous, commit, '--', 'mobile/'], cwd=SOURCE)
+    if changed.returncode not in (0, 1): raise RuntimeError('Could not determine mobile test scope.')
+    test_command = ['bash', 'scripts/run_tests.sh'] + (['--mobile'] if changed.returncode == 1 else [])
     log=RUNTIME/('checks-'+commit+'.log')
     with log.open('w') as output:
-        result=subprocess.run(['bash','scripts/run_tests.sh','--mobile'],cwd=app,stdout=output,stderr=subprocess.STDOUT)
+        result=subprocess.run(test_command,cwd=app,stdout=output,stderr=subprocess.STDOUT)
     if result.returncode: raise RuntimeError('Staging automated checks failed; private log: '+str(log))
     state=current_state(); state.update(staging_commit=commit,checks={'commit':commit,'passed':True,
-        'checked_at':datetime.now(timezone.utc).isoformat(),'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+        'checked_at':datetime.now(timezone.utc).isoformat(),'mobile_tests':changed.returncode == 1,'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
     if initial: state['initial_isolation_verified']=True
     save_state(state)
-    print('PASS: deployed commit automated PHP/Flutter checks. Staging approval evidence recorded.',flush=True)
+    print('PASS: deployed commit automated checks (Flutter only when mobile changed). Staging approval evidence recorded.',flush=True)
 
 
 def setup(commit):

@@ -77,6 +77,28 @@ class PurchaseService
         }, 3);
     }
 
+    public function recordGoogleRefund(Purchase $purchase, array $void, string $matchedBy): bool
+    {
+        return DB::transaction(function () use ($purchase, $void, $matchedBy): bool {
+            $reader = $purchase->reader_id ? Reader::whereKey($purchase->reader_id)->lockForUpdate()->first() : null;
+            $purchase = Purchase::whereKey($purchase->id)->lockForUpdate()->firstOrFail();
+            $eventId = 'google-voided:'.hash('sha256', 'services.shelf.app|'.$purchase->id.'|'.$void['voidedTimeMillis']);
+            $event = PurchaseEvent::where('provider_event_id', $eventId)->first();
+            $alreadyRefunded = SalesLedger::withTestPurchases()->where('entry_key', 'refund:'.$purchase->id)->exists();
+            $event ??= PurchaseEvent::create([
+                'provider_event_id' => $eventId, 'event_type' => 'GOOGLE_VOIDED_PURCHASE',
+                'reader_id' => $purchase->reader_id, 'collection_id' => $purchase->collection_id,
+                'transaction_id' => $purchase->transaction_id, 'environment' => $purchase->environment,
+                'occurred_at' => CarbonImmutable::createFromTimestampMs($void['voidedTimeMillis']),
+                'details' => ['source' => 'google_voided_purchases', 'matched_by' => $matchedBy,
+                    'voided_source' => $void['voidedSource'] ?? null, 'voided_reason' => $void['voidedReason'] ?? null],
+            ]);
+            $this->reverse($purchase, 'refund', $event);
+            if ($reader && $purchase->book) { $this->refreshAccess($reader, $purchase->book); }
+            return ! $alreadyRefunded;
+        }, 3);
+    }
+
     private function reverse(Purchase $purchase, string $status, ?PurchaseEvent $event = null): void
     {
         $key = $status.':'.$purchase->id;
@@ -84,7 +106,7 @@ class PurchaseService
         $sale = SalesLedger::withTestPurchases()->where('entry_key', 'sale:'.$purchase->id)->first();
         SalesLedger::create(['purchase_id' => $purchase->id, 'event_id' => $event?->id, 'entry_key' => $key,
             'status' => $status, 'currency' => $sale?->currency, 'amount' => $status === 'refund' && $sale?->amount !== null ? '-'.$sale->amount : null,
-            'occurred_at' => $event?->occurred_at ?? now(), 'agreement_snapshot' => $sale?->agreement_snapshot, 'earnings_status' => 'test']);
+            'occurred_at' => $event?->occurred_at ?? now(), 'agreement_snapshot' => $sale?->agreement_snapshot, 'earnings_status' => $purchase->environment === 'SANDBOX' ? 'test' : 'unknown']);
     }
 
     private function refreshAccess(Reader $reader, Collection $book): void
@@ -100,13 +122,15 @@ class PurchaseService
         if (\App\Support\Staging::active() && RevenueCatClient::configured()) {
             $this->confirmStaging($reader);
         }
-        $purchases = Purchase::where('reader_id', $reader->id)->with('book')->get();
+        $purchases = Purchase::where('reader_id', $reader->id)->with(['book', 'entries'])->get();
         if ($purchases->isEmpty()) { return; }
-        $subscriber = $this->provider->subscriber($reader);
+        $needsCheck = $purchases->contains(fn ($purchase) => ! $purchase->entries->contains(fn ($entry) => in_array($entry->status, ['refund', 'revoke'], true)));
+        $subscriber = $needsCheck ? $this->provider->subscriber($reader) : null;
         DB::transaction(function () use ($reader, $subscriber, $purchases): void {
             Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail();
             foreach ($purchases as $purchase) {
-                if (! $this->provider->confirms($subscriber, $purchase->book, $purchase->purchased_at)) {
+                if (! $purchase->entries()->whereIn('status', ['refund', 'revoke'])->exists()
+                    && ! $this->provider->confirms($subscriber, $purchase->book, $purchase->purchased_at)) {
                     $this->reverse($purchase, 'revoke');
                 }
                 $this->refreshAccess($reader, $purchase->book);

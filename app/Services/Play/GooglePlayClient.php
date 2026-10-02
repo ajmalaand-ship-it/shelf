@@ -74,7 +74,7 @@ class GooglePlayClient
             400, 409 => 'Google Play could not accept this product or price. Check the Play app setup and price; Shelf will retry.',
             429 => 'Google Play is busy. Shelf will retry automatically.',
             default => 'Google Play is temporarily unavailable. Shelf will retry automatically.',
-        });
+        }, $response->status());
     }
 
     private function request(string $method, string $path, array $body = [], array $query = [], bool $missingAllowed = false): Response
@@ -89,6 +89,16 @@ class GooglePlayClient
         $this->check($response, $missingAllowed);
 
         return $response;
+    }
+
+    public function voidedPurchases(?string $pageToken = null): Response
+    {
+        if (\App\Support\Staging::active() || config('play_sync.package') !== 'services.shelf.app') {
+            throw new PlaySyncException('Production refund polling is forbidden on the test copy or another package.');
+        }
+        return $this->request('GET', '/purchases/voidedpurchases', query: array_filter([
+            'type' => 0, 'maxResults' => 1000, 'token' => $pageToken,
+        ], fn ($value) => $value !== null));
     }
 
     public function sync(Collection $book): void
