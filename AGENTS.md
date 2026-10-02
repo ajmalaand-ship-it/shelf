@@ -128,6 +128,7 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-02: Owner approved first-purchase fixes: exclude sandbox purchases from all real income while retaining clearly labelled Test history; automatic ownership refresh with clear errors; Allowed/Blocked admin badges; Library covers, Read book, downloaded/remove state, one account icon and pull-to-refresh. Develop isolated, stage and promote identical commit with backup/release script; tests, bumped Play AAB and Shelf Test APK. No rewriting purchase/source history.
 - 2026-10-01: D10 decided. The owner sets author-share percentages per book in
   the admin. All six current books: 100% of the net amount received to اجمل اند,
   effective 1 October 2026. For سيند په پرخه کې, author پروین پژواک permits the

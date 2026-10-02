@@ -238,6 +238,13 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                     ),
                     const SizedBox(height: 8),
                     if (!widget.ownedMode) BookPriceLabel(book: book),
+                    if (!widget.ownedMode &&
+                        LibraryScope.of(context)?.refreshFailed == true)
+                      Text(
+                        AppStrings.of(context).isEnglish
+                            ? LibraryScope.of(context)!.message!
+                            : 'کتابتون تازه نه شو. انټرنېټ ته وصل شئ او بیا هڅه وکړئ. کتاب بیا مه پېرئ.',
+                      ),
                     if (!widget.ownedMode)
                       OutlinedButton(
                         key: Key('buy-coming-soon'),

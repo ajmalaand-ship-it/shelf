@@ -224,6 +224,36 @@ void main() {
     expect(library.owns(43), false);
     expect(provider.user, '${accounts.user!.id}');
   });
+  test('confirmed ownership notifies immediately, startup and resume refresh automatically', () async {
+    expect(api.calls, contains('library')); // startup
+    var observed = false;
+    library.addListener(() {
+      if (library.owns(42)) observed = true;
+    });
+    api.owned = true;
+    await library.purchase(
+      book,
+      const StoreBookProduct('shelf_book_42', '€2.79'),
+      true,
+    );
+    expect(observed, true);
+    expect(api.calls, contains('library/confirm'));
+    api.owned = false;
+    library.didChangeAppLifecycleState(AppLifecycleState.resumed);
+    await library.refresh();
+    expect(library.owns(42), false);
+  });
+  test('automatic refresh errors are visible and clear on recovery', () async {
+    api.offline = true;
+    library.didChangeAppLifecycleState(AppLifecycleState.resumed);
+    await expectLater(library.refresh(), throwsStateError);
+    expect(library.refreshFailed, true);
+    expect(library.message, contains('do not buy again'));
+    api.offline = false;
+    await library.refresh();
+    expect(library.refreshFailed, false);
+    expect(library.message, isNull);
+  });
   test('download preserves source, offline limit, clock rollback, refund and restore', () async {
     api.owned = true;
     await library.download(book);

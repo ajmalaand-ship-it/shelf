@@ -42,6 +42,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
   Set<int> downloaded = {};
   DateTime? validUntil, _lastObserved;
   bool busy = false, initialized = false, buyingBlocked = false;
+  bool refreshFailed = false;
   Map<String, dynamic> configuration = {};
   String? message;
   final Set<VoidCallback> stopReading = {};
@@ -77,6 +78,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
     validUntil = null;
     _lastObserved = null;
     initialized = false;
+    refreshFailed = false;
     busy = false;
     message = null;
     for (final stop in stopReading.toList()) {
@@ -101,7 +103,8 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
         .catchError((Object _) {
           if (generation == _generation) {
             initialized = true;
-            message = 'Go online to check your Library. Downloaded books stay available within their offline limit.';
+            refreshFailed = true;
+            message = 'Could not refresh My Library. Go online and try again. If you just bought a book, do not buy again.';
             notifyListeners();
           }
         });
@@ -197,6 +200,10 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
       validUntil = serverExpiry.isBefore(maxExpiry) ? serverExpiry : maxExpiry;
       _lastObserved = clock();
       buyingBlocked = data['buying_blocked'] == true;
+      message = null;
+      refreshFailed = false;
+      initialized = true;
+      notifyListeners();
       await _persist(reader, generation);
       assertIdentity(reader, generation);
       message = removed.isEmpty
@@ -216,6 +223,18 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
         await downloads.clear(reader);
         notifyListeners();
       }
+      refreshFailed = true;
+      message = error.status == 401 || error.status == 403
+          ? 'Sign in again to refresh My Library. Do not buy again.'
+          : 'Could not refresh My Library. Go online and try again. If you just bought a book, do not buy again.';
+      notifyListeners();
+      rethrow;
+    } catch (_) {
+      if (generation == _generation) {
+        refreshFailed = true;
+        message = 'Could not refresh My Library. Go online and try again. If you just bought a book, do not buy again.';
+        notifyListeners();
+      }
       rethrow;
     }
   }
@@ -230,7 +249,10 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
       throw const AccountFailure(503);
     await provider.identify(
       configuration['public_sdk_key'] as String,
-      shelfPurchaseIdentity(reader, configuration['identity_prefix'] as String? ?? ''),
+      shelfPurchaseIdentity(
+        reader,
+        configuration['identity_prefix'] as String? ?? '',
+      ),
     );
     assertIdentity(reader, generation);
   }

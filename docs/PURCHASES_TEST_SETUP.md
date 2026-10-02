@@ -315,3 +315,40 @@ delete records to undo configuration.
 API setup references: [RevenueCat product creation](https://www.revenuecat.com/docs/api-v2/product),
 [entitlement attachment](https://www.revenuecat.com/docs/api-v2/entitlement),
 [sandbox webhook creation](https://www.revenuecat.com/docs/api-v2/integration).
+
+
+## First test purchase fixes — 2 October 2026
+
+Ordinary `SalesLedger` queries include only purchases explicitly marked PRODUCTION.
+This default covers amounts, author totals, dashboard queries and income exports;
+SANDBOX and unknown modes fail closed. There are currently no separate income
+widgets or export routes to bypass that boundary. New financial features must use
+this model default, never raw `DB::table('sales_ledger')` totals. Income currencies
+remain separate. `withTestPurchases()` is reserved for explicitly labelled history,
+idempotency and refund/access checks, never income calculations. History JSON
+includes `income_mode` and `is_test`. The admin retains the test price/transaction,
+shows **Test** and **Test — no income** for earnings, owed amounts and payouts.
+New sandbox sale/refund/revoke entries use earnings status `test` and do not compute
+author earnings. Prior immutable ledger entries and agreement snapshots are retained.
+No structure or data migration is needed.
+
+The Library publishes verified ownership before saving the local manifest, so the
+book page immediately changes to **Open owned book** on server confirmation. A
+store success alone still grants no access. Existing startup, app-resume and periodic
+server checks now expose refresh failures with a do-not-buy-again message. Library
+covers use the authenticated, host-checked media client and downloaded covers when
+available; cover widgets are isolated by reader/book/download state. The Library
+uses pull-to-refresh and a small refresh icon, retains the single header account
+icon, and replaces the download action with **Downloaded ✓** / **Remove download**
+after downloading. Source text, RTL book layout and 30-day offline limits are unchanged.
+
+Release checks include real-income isolation and labelled history. Promotion uses
+`scripts/staging/workflow.py promote COMMIT` only after deployment and passing checks
+at the identical commit. It takes a verified fresh backup and fingerprints all past
+reader/payment/agreement records before/after. Rollback is the prior recorded code
+commit; no financial rows should be edited or restored over later purchases.
+
+App version: **1.0.4 (13)**. The production AAB updates Shelf through Google Play;
+Shelf Test is separate and has no production reader accounts or purchases. The owner
+must check the installed app on real phones; automated screenshots cover Pashto and
+English at 320×568 and 430×932, with owned/downloaded/refresh-error states.
