@@ -24,11 +24,19 @@ README.md and any remaining docs describe the old app technically; they are not 
 - If a task conflicts with this file, or something is not covered, STOP and ask.
 
 ## 3. Current step
-Step 2 — Build the Shelf foundation (started 25 September 2026).
-Focus: a foundation for a large multi-author online bookstore and reader. The admin must be
-able to add unlimited authors and books. The 6 existing books are examples; do not spend
-effort perfecting them.
-Current task: Step 2, task 2 (move to shelf account) nearly done; waiting for DNS and SSL.
+Step 4 — Accounts and purchases, test mode; construction continues.
+Step 2 is closed. Step 3 catalogue/reader features exist; outstanding acceptance
+checks are recorded separately from unfinished building work in
+`docs/STATUS_RECONCILIATION_2026-10-02.md` and Master Record Part 10.
+Next recommended building task: finish Step 4 sales/author accounting (6.9),
+without enabling real payments or automatic payouts. This is a recommendation,
+not implementation approval. Play product/price sync remains blocked by the last
+403 and disabled; regular off-server backup and recovery work remain unfinished.
+Second-phone restore is deferred to the pre-release checklist, not passed and
+not requested now. Prioritize construction; automate necessary checks and request
+phone checks only for a concrete essential risk. No broad test rerun for status-only
+reconciliation. The owner confirmed refund/download removal, locked paid text with
+sample retained, declined payment locked, and successful repurchase on 2 October.
 
 ## 4. Rules that are never broken
 1. No change without Ajmal's clear OK for that specific task.
@@ -128,6 +136,14 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-02: Owner confirmed Google Play phone refund removes Library book and
+  download, locks paid content while sample works; declined test payment stays
+  locked; repurchase restores Library and paid poem. Second-phone restore deferred
+  to pre-release, never marked passed or requested now. Prioritize construction;
+  use necessary automation, avoid repetitive/broad tests and phone checks unless
+  resolving a concrete essential risk. This task authorizes read-only reconciliation
+  and documentation-only commit/push, with no deployment, rebuild or data changes.
+- 2026-10-02: Owner approved first-purchase fixes: exclude sandbox purchases from all real income while retaining clearly labelled Test history; automatic ownership refresh with clear errors; Allowed/Blocked admin badges; Library covers, Read book, downloaded/remove state, one account icon and pull-to-refresh. Develop isolated, stage and promote identical commit with backup/release script; tests, bumped Play AAB and Shelf Test APK. No rewriting purchase/source history.
 - 2026-10-01: D10 decided. The owner sets author-share percentages per book in
   the admin. All six current books: 100% of the net amount received to اجمل اند,
   effective 1 October 2026. For سيند په پرخه کې, author پروین پژواک permits the
