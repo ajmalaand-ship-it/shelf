@@ -244,6 +244,9 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                         AppStrings.of(context).isEnglish
                             ? LibraryScope.of(context)!.message!
                             : 'کتابتون تازه نه شو. انټرنېټ ته وصل شئ او بیا هڅه وکړئ. کتاب بیا مه پېرئ.',
+                        textDirection: AppStrings.of(context).isEnglish
+                            ? TextDirection.ltr
+                            : TextDirection.rtl,
                       ),
                     if (!widget.ownedMode)
                       OutlinedButton(
