@@ -18,7 +18,7 @@ Codex (the coding assistant on the server) follows **AGENTS.md** in the Shelf co
 
 **Status of this version**
 
-Master Record v2.0 was approved on 25 September 2026 and amended in v2.1 on 27 September 2026. This version 2.2 restored every v2.0 requirement and clarified R3 and staging. This version 2.3 (28 September 2026) records the new way of working approved by Ajmal (Codex runs server commands after Ajmal’s approval; Claude makes technical decisions; Ajmal is asked owner questions only) and closes **Step 2**. Current step: **Step 3 — Catalogue and reading** (see Part 10).
+Master Record v2.0 was approved on 25 September 2026 and amended in v2.1 on 27 September 2026. This version 2.2 restored every v2.0 requirement and clarified R3 and staging. This version 2.3 (28 September 2026) records the new way of working approved by Ajmal (Codex runs server commands after Ajmal’s approval; Claude makes technical decisions; Ajmal is asked owner questions only) and closes **Step 2**. Current construction: **Step 4 — Accounts and purchases (test mode)**; the current status reconciliation in Part 10 supersedes the historical 28 September snapshot. Outstanding Step 3 acceptance and pre-release checks are kept separate.
 
 **Contents**
 
@@ -531,6 +531,26 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Current reconciliation — 2 October 2026
+
+The historical table below records the 28 September milestone; this update is
+current. No step is declared accepted without its evidence and owner acceptance.
+Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.md).
+
+| Area | Current status |
+| --- | --- |
+| Construction | Step 2 closed; Step 3 catalogue/reader features built, outstanding acceptance retained. Step 4 accounts, sandbox purchases, Library/offline and refund detection built; financial construction remains. No real-money/public release authorization. |
+| Phone evidence, owner-confirmed 2 October | Refund removed book from Library and app reported download removed; paid content locked, free sample worked. Declined test payment stayed locked. Repurchase restored Library and opened paid poem. |
+| Focused server snapshot, 04:52:11 UTC | Reader 3, book 3: sandbox purchases 5 and 6; original sale ledger 13 USD +2.99, refund ledger 14 USD -2.99, repurchase ledger 15 USD +2.99. All labelled Test; zero real-income rows. Google refund event 18 matched order; repurchase event 19. Entitlement active after repurchase, checked 04:45:55 UTC. |
+| Delivered fixes verified in code | Ownership published immediately after server confirmation; automatic startup/resume refresh and explicit errors; book action reads Open owned book. Admin Buying shows Allowed green / Blocked red. Deployed code at 2f0c2bf includes e4a286f, 69b4690 and d12a770. Phone evidence above supports purchase/refund behavior; it does not claim an owner visual check of admin badges. |
+| Refund schedule | Latest audited scheduled check 04:45:01 UTC: completed HTTP 200, one duplicate handled, no additional refund, no conflict/unmatched. No new polling/purchase/refund triggered by this task. |
+| Unfinished building | Step 4: real-sale verification/accounting path, immutable estimates/confirmed owed/manual payment records, per-currency reporting; product/price sync integration blocked by last 403, disabled. Step 5: regular off-server backup/recovery workflow and operating instructions; retention work after D14. See detailed separation below. |
+| Pre-release checks | Second-phone restore DEFERRED, NOT PASSED, not requested now. Keep reading/import acceptance, final account/isolation/offline/withdrawal checks, signing/listing/privacy/rights and recovery acceptance on a targeted checklist; do not use them to stall construction. |
+| Recommended one next building task | Finish Step 4 / 6.9 sales and author-share accounting: immutable real-sale financial entries, historical agreement basis, unknown/provisional net inputs, three separate figures and per-currency owner reporting. Test stays excluded. No real payments or automatic payouts. Recommendation only; not begun. |
+| Documentation and GitHub | This reconciliation is documentation-only, based on GitHub main a624ea7 because deployed code 2f0c2bf has unpushed implementation ancestors. Push only documentation; do not deploy or silently push those code ancestors in this task. |
+
+## Historical milestone — 28 September 2026
+
 | Item                                              | Status                                                                                                                                                                                                                                                                                                 |
 |---------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Date                                              | 28 September 2026 (evening)                                                                                                                                                                                                                                                                            |
@@ -553,6 +573,14 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 | Open items                                        | SSH config file owned by the wrong user (server fix by root, not urgent). Repeated failed root login attempts (server security, later). Original poet of لمر ګلی unknown. Other projects also fill /tmp.                                                   |
 
 # Part 11 — Decision log
+
+- **2 October 2026:** Owner confirmed real Google Play phone refund/download
+  removal, paid access locked with free sample retained, declined payment locked,
+  and successful repurchase restoring Library/paid reading. Owner defers second-phone
+  restore to the pre-release checklist, not passed/not requested now, and prioritizes
+  construction with necessary automation rather than repetitive tests/phone checks.
+  Approved one focused read-only record check and documentation-only commit/push;
+  no implementation, deployment, rebuild or production data changes.
 
 | Date       | Decision                                                                                                                                                                                                                                                                                                                                                                                      |
 |------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -640,7 +668,7 @@ Separate /api/owner-preview path, signed temporary access and isolated caches, k
 
 ---
 
-# Addendum — owner decisions after v2.3 (29 September–1 October 2026)
+# Addendum — owner decisions after v2.3 (29 September–2 October 2026)
 
 These decisions are binding and will be folded into the next full version. Where they differ from the text above, this addendum wins.
 
@@ -663,7 +691,6 @@ These decisions are binding and will be folded into the next full version. Where
 | Test app | Owner test builds are delivered the proven way: Codex builds an owner-preview APK with a fresh 7-day token and gives one scp download command. |
 | D10 (1 Oct 2026) | The owner sets author-share percentages per book in the admin. All six current books: 100% of the net amount received to اجمل اند, effective 1 October 2026. For سيند په پرخه کې, author پروین پژواک permits the owner to keep all income; written permission is retained by the owner. اجمل اند receives 100% as translator/publisher. New versions record owner/time; past agreements and financial records remain unchanged. |
 | Staging (1 Oct 2026) | Private staging.shelf.services in the Shelf cPanel account, with separate folder/database/user/APP_KEY/secrets, catalogue-only refresh and only the owner admin copied. No reader or financial/personal data is copied. Play price sync permanently disabled, emails logged, queues/scheduler disabled, test payments only with staging-prefixed RevenueCat identities and separate credentials; REST verification, no staging webhooks. Shelf Test Android app services.shelf.app.staging installs alongside Shelf. Every change goes to staging first; production promotion requires the identical staged commit with passing checks, backup first, migration, health verification and rollback instructions. Production daily backup and webhook stay unchanged. |
-
 | First purchase fixes (2 Oct 2026) | Owner approved excluding test/sandbox purchases from all real-income totals, author amounts, dashboards and exports while retaining clearly labelled Test history. Immediate server-confirmed ownership update; startup/resume Library refresh and visible failures; Allowed/Blocked admin badges; Library covers, Read book, downloaded/remove state, one account icon, pull-to-refresh and small refresh icon. Isolated development, staging first, promotion of identical commit through release script with fresh backup, required PHP/Flutter tests, commit, bumped Google Play AAB and Shelf Test APK. Existing reader, purchase, ledger, agreement and source records remain unchanged. |
-
 | Google refund detection (2 Oct 2026) | Owner approved the simpler Google Voided Purchases API route using existing Shelf Play credentials, without new RevenueCat/Pub/Sub notification setup. Read-only API probe first; production check every 15 minutes, exact purchase matching, immutable refund entries, Test labels retained, D12/D13 access removal, idempotency, safe errors and logs. Develop in isolation, stage first, promote identical commit with backup, tests and commit. |
+| Construction priority and phone evidence (2 Oct 2026) | Owner phone results and focused server evidence are recorded in Part 10 and STATUS_RECONCILIATION_2026-10-02.md. Second-phone restore moves to the pre-release checklist: deferred, not passed, not requested now. Prioritize finishing construction; automate necessary checks and avoid repetitive tests/phone requests unless they resolve a concrete essential risk. No broad suite rerun for status reconciliation. This task is documentation-only commit/push, no deployment/rebuild/data changes or new implementation. |

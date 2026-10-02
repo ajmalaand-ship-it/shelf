@@ -280,7 +280,9 @@ or change prices manually in Play Console.
 Validation: `scripts/run_tests.sh --mobile`: 173 PHP tests / 2,095 assertions and
 134 Flutter tests passed. Tests cover denied-sync early stop, private-key fail
 closed, purchase/refund/isolation/offline checks and purchase layouts on small
-and large phones. Physical-phone purchase/restore/refund testing is still pending.
+and large phones. At that milestone physical-phone purchase/restore/refund testing was pending.
+The 2 October owner evidence below supersedes that status; second-phone restore
+is deferred to pre-release and is not passed.
 
 Built and signature-verified `1.0.3` (version code `12`) artifacts:
 
@@ -305,7 +307,9 @@ be tested with that Play-installed build, not the sideloaded owner-preview APK.
 After Google sync succeeds, sign in to the owner reader account, accept the
 sample-first agreement and buy **only when Google explicitly shows a test
 payment method**. Verify My Library, cancellation, refund, account isolation,
-offline expiry and restore on another phone. No real money or public release.
+offline expiry. Second-phone restore is now deferred to the pre-release checklist
+by the 2 October owner decision; do not request it now or mark it passed.
+No real money or public release.
 
 For rollback, set both `SHELF_PURCHASES_ENABLED=false` and
 `SHELF_PLAY_SYNC_ENABLED=false`, then run `php artisan optimize:clear`.
@@ -352,3 +356,20 @@ App version: **1.0.4 (13)**. The production AAB updates Shelf through Google Pla
 Shelf Test is separate and has no production reader accounts or purchases. The owner
 must check the installed app on real phones; automated screenshots cover Pashto and
 English at 320×568 and 430×932, with owned/downloaded/refresh-error states.
+
+## Owner phone evidence and reconciliation — 2 October 2026
+
+Owner confirmed: refund removed book/download and locked paid text while sample
+worked; declined test payment stayed locked; repurchase restored Library and
+paid poem reading. Focused read-only server snapshot at 04:52:11 UTC corroborates
+purchase 5/refund ledger 14 and separate repurchase 6/ledger 15; active entitlement,
+all Test, zero real-income rows. Latest scheduled refund audit 04:45:01 UTC:
+HTTP 200, one duplicate, no extra refund. No new purchase/refund/poll was triggered.
+
+[Current reconciliation and next building task](STATUS_RECONCILIATION_2026-10-02.md)
+separates construction from pre-release acceptance. **Second-phone restore is
+DEFERRED, NOT PASSED, not requested now.** Product/price sync's last 403 remains
+unresolved and sync disabled; it is distinct from the working refund API.
+Regular off-server backup/recovery remains unfinished. Ownership refresh and
+admin Allowed/Blocked fixes are present in deployed code, inspected directly.
+No broad test rerun, rebuild, deployment or production data change in this task.
