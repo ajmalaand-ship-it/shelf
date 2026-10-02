@@ -28,9 +28,10 @@ Step 4 — Accounts and purchases, test mode; construction continues.
 Step 2 is closed. Step 3 catalogue/reader features exist; outstanding acceptance
 checks are recorded separately from unfinished building work in
 `docs/STATUS_RECONCILIATION_2026-10-02.md` and Master Record Part 10.
-Next recommended building task: finish Step 4 sales/author accounting (6.9),
-without enabling real payments or automatic payouts. This is a recommendation,
-not implementation approval. Play product/price sync remains blocked by the last
+Step 4 sales/author accounting (6.9) is built with an append-only journal,
+confirmed figures, payment records/reversals and per-currency owner balances.
+See docs/ACCOUNTING.md; deployment evidence is in the established release state.
+No real payments or automatic payouts are enabled. Step 4 is not all complete. Play product/price sync remains blocked by the last
 403 and disabled; regular off-server backup and recovery work remain unfinished.
 Second-phone restore is deferred to the pre-release checklist, not passed and
 not requested now. Prioritize construction; automate necessary checks and request
@@ -136,6 +137,13 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-02: Owner approved completing sales/author accounting under 6.9/D10:
+  inspect source history by book/rights holder; immutable agreement-based estimates,
+  confirmed owed and actual payment records, linked corrections/reversals, duplicate
+  prevention, unknown net/fees/taxes retained and Test excluded; per-currency totals.
+  Recordkeeping only, no payouts. Isolated implementation, necessary automation,
+  backed-up reversible schema, staging then identical-commit production promotion,
+  project records, commit/push; preserve purchase/access behavior and deferred restore.
 - 2026-10-02: Owner confirmed Google Play phone refund removes Library book and
   download, locks paid content while sample works; declined test payment stays
   locked; repurchase restores Library and paid poem. Second-phone restore deferred

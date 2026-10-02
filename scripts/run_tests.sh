@@ -46,8 +46,12 @@ mkdir -p -- "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME"
 
 cd -- "$repo_root"
 echo "Running PHP tests (temporary files: $run_dir)"
-php -d sys_temp_dir="$run_dir" -d upload_tmp_dir="$run_dir" \
-    -d session.save_path="$run_dir" vendor/bin/phpunit --do-not-cache-result
+php_args=(--do-not-cache-result)
+if [[ -n "${SHELF_PHP_TEST_FILTER:-}" ]]; then
+    php_args+=(--filter "$SHELF_PHP_TEST_FILTER")
+fi
+php -d display_errors=1 -d sys_temp_dir="$run_dir" -d upload_tmp_dir="$run_dir" \
+    -d session.save_path="$run_dir" vendor/bin/phpunit "${php_args[@]}"
 
 if "$run_mobile"; then
     # Flutter generates build and .dart_tool files in the project directory.

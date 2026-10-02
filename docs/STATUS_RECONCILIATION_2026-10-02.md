@@ -1,5 +1,23 @@
 # Shelf status reconciliation — 2 October 2026
 
+## Later accounting construction update
+
+The owner subsequently approved the recommended accounting task. The missing
+6.9/D10 owner workflows are built: Accounting journal, Author balances and Sales
+ledger source-history filters/links. Unknown net figures remain unknown; Test is
+excluded; adjustments and payments/reversals are append-only. No real payments
+or automatic payouts are enabled. See [accounting tools and verification](ACCOUNTING.md).
+The established release state records the exact staging/promotion commit, checks
+and backup. No phone test is requested; second-phone restore remains deferred,
+not passed. Product sync 403 and regular off-server backup/recovery remain
+unfinished; Step 4 is not all complete. Next building priority: off-server backup
+and repeatable recovery (Step 5).
+
+The remainder below is the historical documentation-only reconciliation before
+that implementation; its "not begun" recommendation and Git ancestry warning
+have been superseded by the approved accounting branch merge and delivery.
+
+
 Documentation-only task. Governing sources: AGENTS.md, Master Record v2.3 and
 owner addenda, including the current construction-priority direction. No deploy,
 rebuild, new implementation, purchase, refund, provider poll or production data

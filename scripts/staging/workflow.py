@@ -264,6 +264,7 @@ def checked(app, commit, initial=False):
     artisan(app,'shelf:check-owner-shares')
     artisan(app,'shelf:check-staging',*(['--initial'] if initial else []))
     artisan(app,'shelf:check-play-refunds','--simulate-after-backup')
+    artisan(app,'shelf:check-accounting','--simulate-after-backup')
     # Snapshot source before/after staging mutation check proves no source change.
     with tempfile.TemporaryDirectory(prefix='staging-isolation-',dir='/home/shelf/tmp') as temporary:
         one,two=Path(temporary)/'one.json',Path(temporary)/'two.json'
@@ -279,7 +280,8 @@ def checked(app, commit, initial=False):
     test_command = ['bash', 'scripts/run_tests.sh'] + (['--mobile'] if changed.returncode == 1 else [])
     log=RUNTIME/('checks-'+commit+'.log')
     with log.open('w') as output:
-        result=subprocess.run(test_command,cwd=app,stdout=output,stderr=subprocess.STDOUT)
+        test_env=os.environ.copy(); test_env.pop('SHELF_PHP_TEST_FILTER',None)
+        result=subprocess.run(test_command,cwd=app,stdout=output,stderr=subprocess.STDOUT,env=test_env)
     if result.returncode: raise RuntimeError('Staging automated checks failed; private log: '+str(log))
     state=current_state(); state.update(staging_commit=commit,checks={'commit':commit,'passed':True,
         'checked_at':datetime.now(timezone.utc).isoformat(),'mobile_tests':changed.returncode == 1,'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
@@ -346,10 +348,10 @@ def production_history_snapshot(agreement_limit=None):
     return json.loads(php(PRODUCTION,r'''$app=require $argv[1].'/bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 $out=[];
-foreach (['readers','reader_account_actions','personal_access_tokens','purchases','purchase_events','sales_ledger','book_entitlements','purchase_consents','author_share_agreements'] as $table) {
+foreach (['readers','reader_account_actions','personal_access_tokens','purchases','purchase_events','sales_ledger','book_entitlements','purchase_consents','author_share_agreements','accounting_entries','accounting_shares'] as $table) {
  $q=Illuminate\Support\Facades\DB::table($table)->orderBy('id');
  if ($table==='author_share_agreements' && $argv[2]!=='all') {$q->where('id','<=',(int)$argv[2]);}
- $rows=$q->get();$out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
+ $rows=Illuminate\Support\Facades\Schema::hasTable($table) ? $q->get() : collect();$out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
 }
 $out['agreement_limit']=$argv[2]==='all' ? (int)Illuminate\Support\Facades\DB::table('author_share_agreements')->max('id') : (int)$argv[2];
 echo json_encode($out,JSON_THROW_ON_ERROR);''','all' if agreement_limit is None else agreement_limit))
@@ -388,6 +390,7 @@ def promote(commit):
         artisan(PRODUCTION,'migrate','--force')
         artisan(PRODUCTION,'filament:assets')
         artisan(PRODUCTION,'shelf:check-purchases')
+        artisan(PRODUCTION,'shelf:check-accounting')
         if unchanged!=production_history_snapshot(unchanged['agreement_limit']):
             raise RuntimeError('Past reader/payment/agreement records changed unexpectedly; stop and review.')
         print('PASS: all previous reader, purchase, refund, ledger and agreement records unchanged.',flush=True)
