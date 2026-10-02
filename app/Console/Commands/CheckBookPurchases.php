@@ -19,6 +19,17 @@ class CheckBookPurchases extends Command
     {
         if (! $this->option('simulate-after-backup')) {
             $this->info('Purchase configuration: '.(\App\Services\Purchases\RevenueCatClient::configured() ? 'sandbox configured' : 'disabled pending Shelf RevenueCat setup'));
+            if (SalesLedger::whereHas('purchase', fn ($q) => $q->where('environment', '!=', 'PRODUCTION'))->exists()) {
+                $this->error('Test purchases leaked into real income.');
+                return self::FAILURE;
+            }
+            $testHistory = SalesLedger::withTestPurchases()->with('purchase')
+                ->whereHas('purchase', fn ($q) => $q->where('environment', '!=', 'PRODUCTION'))->get();
+            if ($testHistory->contains(fn ($entry) => $entry->income_mode !== 'Test')) {
+                $this->error('Test history is not labelled.');
+                return self::FAILURE;
+            }
+            $this->info('PASS: Test history labelled; default income/author totals and exports exclude test purchases.');
             $this->info('No global access. No real payments enabled.');
             return self::SUCCESS;
         }
@@ -60,7 +71,7 @@ class CheckBookPurchases extends Command
             foreach ([$event, $event, array_replace($event, ['id' => 'synthetic-duplicate-'.$tag])] as $payload) {
                 $this->probe('POST', '/api/purchases/webhook', ['event' => $payload], $authorization, 200);
             }
-            if (Purchase::where('reader_id', $reader->id)->count() !== 1 || SalesLedger::whereHas('purchase', fn ($q) => $q->where('reader_id', $reader->id))->count() !== 1) {
+            if (Purchase::where('reader_id', $reader->id)->count() !== 1 || SalesLedger::withTestPurchases()->whereHas('purchase', fn ($q) => $q->where('reader_id', $reader->id))->count() !== 1) {
                 throw new \RuntimeException('Duplicate purchase/ledger entry.');
             }
             $this->probe('GET', '/api/library/poems/'.$item->id, [], 'Bearer '.$token, 200);

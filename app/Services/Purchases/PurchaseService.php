@@ -55,18 +55,15 @@ class PurchaseService
             if ($type === 'NON_RENEWING_PURCHASE') {
                 $purchase ??= Purchase::create(['reader_id' => $reader->id, 'collection_id' => $book->id, 'store' => 'PLAY_STORE',
                     'environment' => 'SANDBOX', 'transaction_id' => $event['transaction_id'], 'product_id' => $book->product_id, 'purchased_at' => $purchasedAt]);
-                if (! SalesLedger::where('entry_key', 'sale:'.$purchase->id)->exists()) {
+                if (! SalesLedger::withTestPurchases()->where('entry_key', 'sale:'.$purchase->id)->exists()) {
                     $agreement = AuthorShareAgreement::where('collection_id', $book->id)->where('starts_at', '<=', $purchasedAt)->orderByDesc('starts_at')->orderByDesc('id')->first();
                     $amount = $event['price_in_purchased_currency'] ?? null;
+                    // This handler accepts sandbox only: no author earnings or income.
                     $estimates = null;
-                    if ($agreement?->basis === 'gross' && strtolower(trim($agreement->deductions)) === 'none' && is_numeric($amount)) {
-                        $estimates = array_map(fn ($c) => ['author_id' => $c['author_id'], 'amount' => (string) \Brick\Math\BigDecimal::of((string) $amount)
-                            ->multipliedBy((string) $c['percentage'])->dividedBy('100', 6, \Brick\Math\RoundingMode::HALF_UP)], $agreement->contributors);
-                    }
                     SalesLedger::create(['purchase_id' => $purchase->id, 'event_id' => $entry->id, 'entry_key' => 'sale:'.$purchase->id,
                         'status' => 'sale', 'currency' => $event['currency'] ?? null, 'amount' => $amount,
                         'occurred_at' => $purchasedAt, 'agreement_snapshot' => $agreement?->toArray(),
-                        'estimated_earnings' => $estimates, 'earnings_status' => $estimates ? 'provisional' : 'unknown']);
+                        'estimated_earnings' => $estimates, 'earnings_status' => 'test']);
                 }
                 // A refund received before the sale is a tombstone, not permission to unlock.
                 foreach (PurchaseEvent::where('transaction_id', $purchase->transaction_id)->where('collection_id', $book->id)
@@ -83,11 +80,11 @@ class PurchaseService
     private function reverse(Purchase $purchase, string $status, ?PurchaseEvent $event = null): void
     {
         $key = $status.':'.$purchase->id;
-        if (SalesLedger::where('entry_key', $key)->exists()) { return; }
-        $sale = SalesLedger::where('entry_key', 'sale:'.$purchase->id)->first();
+        if (SalesLedger::withTestPurchases()->where('entry_key', $key)->exists()) { return; }
+        $sale = SalesLedger::withTestPurchases()->where('entry_key', 'sale:'.$purchase->id)->first();
         SalesLedger::create(['purchase_id' => $purchase->id, 'event_id' => $event?->id, 'entry_key' => $key,
             'status' => $status, 'currency' => $sale?->currency, 'amount' => $status === 'refund' && $sale?->amount !== null ? '-'.$sale->amount : null,
-            'occurred_at' => $event?->occurred_at ?? now(), 'agreement_snapshot' => $sale?->agreement_snapshot]);
+            'occurred_at' => $event?->occurred_at ?? now(), 'agreement_snapshot' => $sale?->agreement_snapshot, 'earnings_status' => 'test']);
     }
 
     private function refreshAccess(Reader $reader, Collection $book): void

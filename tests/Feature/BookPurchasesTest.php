@@ -151,9 +151,11 @@ class BookPurchasesTest extends TestCase
         $agreement = AuthorShareAgreement::create(['collection_id' => $this->book->id, 'contributors' => [['author_id' => $author->id, 'percentage' => 25]],
             'basis' => 'gross', 'deductions' => 'none', 'sharing_terms' => 'Agreed share', 'starts_at' => now()->subHour()]);
         $this->webhook()->assertOk();
-        $sale = SalesLedger::firstOrFail();
+        $sale = SalesLedger::withTestPurchases()->firstOrFail();
         $this->assertEquals($agreement->id, $sale->agreement_snapshot['id']);
-        $this->assertEquals('0.747500', $sale->estimated_earnings[0]['amount']);
+        $this->assertNull($sale->estimated_earnings);
+        $this->assertSame('test', $sale->earnings_status);
+        $this->assertSame(0, SalesLedger::count());
         AuthorShareAgreement::create(['collection_id' => $this->book->id, 'contributors' => [['author_id' => $author->id, 'percentage' => 50]],
             'basis' => 'net', 'deductions' => 'store fees', 'sharing_terms' => 'New agreement', 'starts_at' => now()->addHour()]);
         $this->assertEquals($agreement->id, $sale->fresh()->agreement_snapshot['id']);

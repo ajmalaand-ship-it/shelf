@@ -9,7 +9,6 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
 
 class ReaderResource extends Resource
@@ -24,9 +23,11 @@ class ReaderResource extends Resource
         return $table->columns([
             TextColumn::make('id')->label('Reader ID')->sortable(),
             TextColumn::make('email')->searchable(),
-            IconColumn::make('buying_blocked')->boolean()->label('Buying blocked'),
+            TextColumn::make('buying_blocked')->label('Buying')->badge()
+                ->formatStateUsing(fn ($state) => $state ? 'Blocked' : 'Allowed')
+                ->color(fn ($state) => $state ? 'danger' : 'success'),
             TextColumn::make('purchases_count')->counts('purchases')->label('Purchases'),
-            TextColumn::make('refunds_count')->getStateUsing(fn ($record) => \App\Models\SalesLedger::where('status', 'refund')->whereHas('purchase', fn ($q) => $q->where('reader_id', $record->id))->count())->label('Refunds'),
+            TextColumn::make('refunds_count')->getStateUsing(fn ($record) => \App\Models\SalesLedger::withTestPurchases()->where('status', 'refund')->whereHas('purchase', fn ($q) => $q->where('reader_id', $record->id))->count())->label('Refunds'),
         ])->recordActions([
             Action::make('buying')->label('Buying permission')->schema([Toggle::make('buying_blocked')->label('Block new purchases')])
                 ->fillForm(fn ($record) => ['buying_blocked' => $record->buying_blocked])
