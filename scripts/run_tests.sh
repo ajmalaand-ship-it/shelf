@@ -2,14 +2,16 @@
 set -euo pipefail
 
 usage() {
-    echo "Usage: scripts/run_tests.sh [--mobile]"
+    echo "Usage: scripts/run_tests.sh [--mobile|--backup]"
     echo "Always runs PHP tests. Use --mobile only when mobile/ changed in this task."
 }
 
 run_mobile=false
+run_backup=false
 case "${1:-}" in
     '') ;;
     --mobile) run_mobile=true; shift ;;
+    --backup) run_backup=true; shift ;;
     -h|--help) usage; exit 0 ;;
     *) usage >&2; exit 2 ;;
 esac
@@ -45,6 +47,11 @@ export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Djava.io.tmp
 mkdir -p -- "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME"
 
 cd -- "$repo_root"
+if "$run_backup"; then
+    echo "Running focused backup/recovery checks (no PHP or phone suite)"
+    python3 -B -m unittest discover -s scripts -p 'test_shelf_*backup.py' -v
+    exit 0
+fi
 echo "Running PHP tests (temporary files: $run_dir)"
 php_args=(--do-not-cache-result)
 if [[ -n "${SHELF_PHP_TEST_FILTER:-}" ]]; then

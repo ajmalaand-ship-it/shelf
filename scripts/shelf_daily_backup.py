@@ -82,7 +82,7 @@ def option_value(value):
         '\n', '\\n').replace('\r', '\\r').replace('\t', '\\t') + '"'
 
 
-def dump_database(folder, settings):
+def dump_database(folder, settings, *, full_objects=False):
     credentials = folder / '.mysql.cnf'
     options = {'host': settings['DB_HOST'], 'port': settings['DB_PORT'],
                'user': settings['DB_USERNAME'], 'password': settings['DB_PASSWORD']}
@@ -100,7 +100,8 @@ def dump_database(folder, settings):
             subprocess.run(
                 ['mysqldump', f'--defaults-file={credentials}', '--single-transaction',
                  '--quick', '--skip-lock-tables', '--skip-add-locks', '--comments',
-                 '--dump-date', '--', settings['DB_DATABASE']],
+                 '--dump-date', *(['--routines', '--events', '--triggers'] if full_objects else []),
+                 '--', settings['DB_DATABASE']],
                 check=True, stdout=stream, stderr=subprocess.DEVNULL, env=env,
             )
     finally:

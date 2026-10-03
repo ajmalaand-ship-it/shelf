@@ -261,6 +261,28 @@ def https_checks():
 
 
 def checked(app, commit, initial=False):
+    previous = current_state().get('production_commit')
+    changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    backup_scope = {'scripts/shelf_offsite_backup.py', 'scripts/test_shelf_offsite_backup.py', 'scripts/shelf_daily_backup.py',
+                    'scripts/run_tests.sh', 'scripts/staging/workflow.py', 'docs/OFFSERVER_BACKUP.md',
+                    'docs/MASTER_RECORD.md', 'AGENTS.md'}
+    if changes and set(changes) <= backup_scope and 'scripts/shelf_offsite_backup.py' in changes:
+        # This task explicitly excludes broad PHP/phone reruns. The new transfer
+        # code never boots Laravel; test it at the identical staged commit.
+        log = RUNTIME / ('checks-' + commit + '.log')
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh', '--backup'], cwd=app,
+                                    stdout=output, stderr=subprocess.STDOUT)
+        if result.returncode:
+            raise RuntimeError('Staged backup checks failed; private log: ' + str(log))
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit': commit, 'passed': True,
+            'checked_at': datetime.now(timezone.utc).isoformat(), 'mobile_tests': False,
+            'scope': 'backup-only', 'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: identical staged commit focused backup checks; no broad PHP/phone rerun.', flush=True)
+        return
     artisan(app,'shelf:check-owner-shares')
     artisan(app,'shelf:check-staging',*(['--initial'] if initial else []))
     artisan(app,'shelf:check-play-refunds','--simulate-after-backup')
@@ -368,8 +390,16 @@ def promote(commit):
     entry=PRODUCTION/'public/apps/shelf-staging/public'
     if not entry.is_symlink() or entry.readlink()!=STAGING/'public':
         raise RuntimeError('Staging public entry changed.')
-    if run(['git','status','--porcelain','--','.',':!public/apps/'],PRODUCTION).strip():
-        raise RuntimeError('Production checkout is not clean.')
+    dirty = run(['git','status','--porcelain','--','.',':!public/apps/'],PRODUCTION).strip()
+    runtime_handler = (PRODUCTION/'public/.htaccess').read_bytes()
+    if dirty:
+        original = run(['git', 'show', 'HEAD:public/.htaccess'], PRODUCTION).encode()
+        handler = b"\n# php -- BEGIN cPanel-generated handler, do not edit\n# Set the \u201cea-php83\u201d package as the default \u201cPHP\u201d programming language.\n<IfModule mime_module>\n  AddHandler application/x-httpd-ea-php83 .php .php8 .phtml\n</IfModule>\n# php -- END cPanel-generated handler, do not edit\n"
+        handler = handler.decode('unicode_escape').encode('utf-8')
+        if dirty != 'M public/.htaccess' or runtime_handler != original + handler:
+            raise RuntimeError('Production checkout has changes beyond the verified cPanel handler.')
+        if run(['git', 'diff', '--name-only', 'HEAD', commit, '--', 'public/.htaccess'], PRODUCTION).strip():
+            raise RuntimeError('Release changes the runtime cPanel handler; stop.')
     previous=run(['git','rev-parse','HEAD'],PRODUCTION).strip()
     run(['git','merge-base','--is-ancestor',previous,commit],PRODUCTION)
     saved=backup(PRODUCTION)
@@ -378,6 +408,8 @@ def promote(commit):
     try:
         unchanged=production_history_snapshot()
         run(['git','merge','--ff-only',commit],PRODUCTION)
+        if (PRODUCTION/'public/.htaccess').read_bytes() != runtime_handler:
+            raise RuntimeError('Runtime cPanel handler changed unexpectedly.')
         # Keep dependency setup out of maintenance where possible; same lock
         # copies the already tested stage dependencies if it changed.
         if (PRODUCTION/'composer.lock').read_bytes()!=(STAGING/'composer.lock').read_bytes():

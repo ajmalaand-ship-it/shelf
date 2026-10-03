@@ -137,6 +137,17 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-03: Owner confirms external recovery key at D:\shelf-recovery-key.secret
+  on an unencrypted USB (SCP 100%, 65 bytes). Preserve existing key and OAuth.
+  Complete staging/promotion, encrypted upload/download/isolated restore, schedule,
+  mocked failure verification (no owner test notification), records and commit/push.
+- 2026-10-02: Owner chose existing OneDrive for Step 5 off-server backup/recovery.
+  Prepare in isolation, stage first, encrypt database/content/configuration before
+  copy-only upload to dedicated Shelf-Backups, keep OAuth/key private and retain
+  recovery key independently. Check connected quota before retention. Give one
+  private browser authorization step; no secrets in chat. Completion requires
+  download and isolated restore evidence, scheduling and failure reporting.
+  No broad PHP/phone rerun; product-sync 403 unfinished, second-phone restore deferred.
 - 2026-10-02: Owner approved completing sales/author accounting under 6.9/D10:
   inspect source history by book/rights holder; immutable agreement-based estimates,
   confirmed owed and actual payment records, linked corrections/reversals, duplicate
