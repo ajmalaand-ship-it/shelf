@@ -32,7 +32,11 @@ Step 4 sales/author accounting (6.9) is built with an append-only journal,
 confirmed figures, payment records/reversals and per-currency owner balances.
 See docs/ACCOUNTING.md; deployment evidence is in the established release state.
 No real payments or automatic payouts are enabled. Step 4 is not all complete. Play product/price sync remains blocked by the last
-403 and disabled; regular off-server backup and recovery work remain unfinished.
+403 and disabled. Step 5 OneDrive encrypted upload/download and isolated
+recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
+append-only retention with monthly review. See docs/OFFSERVER_BACKUP.md.
+Actual alert email delivery/first unattended run remain unverified; recovery
+key is owner-confirmed on an unencrypted USB, preserved unchanged.
 Second-phone restore is deferred to the pre-release checklist, not passed and
 not requested now. Prioritize construction; automate necessary checks and request
 phone checks only for a concrete essential risk. No broad test rerun for status-only

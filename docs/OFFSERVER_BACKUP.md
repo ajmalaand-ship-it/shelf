@@ -1,8 +1,9 @@
 # Shelf OneDrive backup and recovery
 
-Preparation for Step 5, authorized 2 October 2026 after deployed `5ff131f`.
-The owner chose their existing OneDrive. **Not complete until an uploaded copy
-is downloaded and restored, scheduling is verified, and failure reporting works.**
+Step 5 OneDrive backup/recovery, authorized 2 October and continued 3 October 2026.
+The owner chose their existing OneDrive. Production upload/download/isolated
+restore and schedule installation passed on 3 October; evidence is below. Actual
+email delivery and the first unattended cron execution remain unverified.
 Product/price sync remains disabled with its unresolved 403. Second-phone purchase
 restore is deferred, not passed. This task requires no broad PHP or phone rerun.
 
@@ -191,3 +192,65 @@ append-only, with no automatic deletion. Existing local nightly backups keep the
 unchanged 14-copy policy. Review offsite capacity and oldest copies monthly;
 reserve 100 MiB free and fail rather than consume that reserve. No unrelated
 OneDrive files are listed for retention or deleted.
+
+## Deployment and remote recovery evidence — 3 October 2026
+
+Implementation `44ce420d2bef9113380b58e3a738c86d7e31d49c` passed
+14 focused backup tests on staging and direct HTTPS isolation/health checks.
+Staging local encrypted drill restored 34 tables and 88 media/source files.
+Identical-commit production promotion passed history/health checks; verified
+backup `/home/shelf/backups/shelf/20261003-200920/`. Runtime cPanel PHP handler
+was preserved. The final evidence/record update is also staged and promoted;
+the authoritative exact final commit and backup are in
+`/home/shelf/staging-runtime/release-state.json`.
+
+Production encrypted package:
+`shelf-production-20261003T201052Z-4660ab40d2edb6b5.tar.gpg`
+(794,019,925 bytes), OneDrive folder **Shelf-Backups**. Ciphertext SHA-256:
+`8acf529fa0127770b85c860f066fc93617e2f8b40b49dd4b4a6ae65a7229c48d`.
+Uploaded by immutable copy, downloaded back, checksum/decryption/extraction
+passed. Restore at **2026-10-03 20:31:01 UTC** imported **34 tables** in a
+disposable socket-only MariaDB with networking, event scheduler and replication
+startup disabled. Canonical schema/rows re-dump was identical. All **774
+media/source files**, required environment/provider/signing files, runtime
+handler/crontab and Git code archive matched their inventories/checksums.
+Downloaded `.tar.json` sidecar independently matched local metadata. Restored
+Laravel was never booted: no restored-app mail, payments, webhooks or cron.
+The isolated database was stopped and its private workspace removed.
+
+Schedule: **03:30 daily, America/Lower_Princes (AST, UTC−04:00), 07:30 UTC**.
+The pre-schedule verified backup and previous crontab are at
+`/home/shelf/backups/shelf/20261003-203119/`. Exactly one offsite job was
+installed; existing 03:00 local, disabled product-sync runner and 15-minute
+refund jobs were preserved. Every run uploads and downloads/restores a new
+encrypted package. Check `last-success.json`, `last-upload.json`, recovery
+evidence and `storage/logs/offsite-backup.log`; if timestamps are older than
+a day, ask Codex to investigate rather than assuming a cron entry proves success.
+
+At current package size/free capacity, roughly 1,162 further daily copies fit
+before other OneDrive use or package growth. This is a planning estimate, not a
+guarantee. Monthly review remains necessary. Neither remote copies nor local
+offsite ciphertext are automatically deleted. On-server nightly retention is
+still 14. Folder-capacity shortage fails without deletion; existing copies stay.
+
+Failure verification injected a synthetic packaging failure in temporary files,
+proved private failure recording and exception propagation, and intercepted
+the generic owner-only sendmail request. **No owner test notification sent;
+actual email delivery is unverified.** Safe evidence:
+`/home/shelf/backups/shelf/offsite/failure-handling-check.json`. The first
+unattended 03:30 run is not claimed passed by a manual scheduler exercise.
+
+For replacement-server recovery, retain this runbook and the USB key, download
+both the chosen `.tar.gpg` and `.tar.json` from Shelf-Backups, then use the
+`recover` procedure above. It verifies/imports only a new isolated workspace,
+not the live database. Code/dependencies/domain/HTTPS reinstallation and any
+production cutover still need the documented owner-approved plan. A complete
+replacement-host cutover has not been exercised.
+
+Manual scheduled-entry evidence (3 October 2026): fresh package
+`shelf-production-20261003T203339Z-db49e08f6b471fde.tar.gpg` uploaded,
+downloaded and restored successfully at 20:35:10 UTC (34 tables, 774
+media/source files, schema/rows and configuration/code checksums identical).
+`/home/shelf/backups/shelf/offsite/last-success.json` records successful
+completion with recovery_verified=true. This verifies the installed entry point,
+not an unattended cron launch.
