@@ -544,10 +544,10 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 | Focused server snapshot, 04:52:11 UTC | Reader 3, book 3: sandbox purchases 5 and 6; original sale ledger 13 USD +2.99, refund ledger 14 USD -2.99, repurchase ledger 15 USD +2.99. All labelled Test; zero real-income rows. Google refund event 18 matched order; repurchase event 19. Entitlement active after repurchase, checked 04:45:55 UTC. |
 | Delivered fixes verified in code | Ownership published immediately after server confirmation; automatic startup/resume refresh and explicit errors; book action reads Open owned book. Admin Buying shows Allowed green / Blocked red. Deployed code at 2f0c2bf includes e4a286f, 69b4690 and d12a770. Phone evidence above supports purchase/refund behavior; it does not claim an owner visual check of admin badges. |
 | Refund schedule | Latest audited scheduled check 04:45:01 UTC: completed HTTP 200, one duplicate handled, no additional refund, no conflict/unmatched. No new polling/purchase/refund triggered by this task. |
-| Unfinished building | Step 4: product/price sync integration blocked by last 403, disabled; live purchases remain sandbox-only pending separate real-payment approval. Owner accounting construction is recorded below. Step 5: OneDrive encrypted upload/download/isolated restore and operating instructions built and verified 3 October; daily 03:30 AST schedule installed. Actual alert delivery remains unverified; first unattended run failed 4 October at 07:32:19 UTC after upload, without recovery evidence. Account-data retention work waits for D14. See detailed separation below. |
+| Unfinished building | Step 4: product/price sync integration blocked by last 403, disabled; live purchases remain sandbox-only pending separate real-payment approval. Owner accounting construction is recorded below. Step 5: OneDrive encrypted upload/download/isolated restore and operating instructions built and verified 3 October; daily 03:30 AST schedule installed. Actual alert delivery remains unverified; first unattended run failed 4 October at 07:32:19 UTC after upload. Repair deployed at c887f91; controlled scheduled verification is recorded below, separately from future unattended success. Account-data retention work waits for D14. See detailed separation below. |
 | Pre-release checks | Second-phone restore DEFERRED, NOT PASSED, not requested now. Keep reading/import acceptance, final account/isolation/offline/withdrawal checks, signing/listing/privacy/rights and recovery acceptance on a targeted checklist; do not use them to stall construction. |
 | Accounting construction (2 Oct) | Approved and built: Sales ledger historical book/rights-holder filters; Accounting journal for estimates, confirmations, linked adjustments/payment records/reversals; Author balances with separate currencies and unknown figures. Default scopes exclude Test. Necessary focused verification and required staging/full-PHP/rollback gates; deployed at 5ff131f and retained in 5f75fa0, with historical agreements preserved; exact backup recorded by release workflow. See ACCOUNTING.md. No payout or real-payment activation. |
-| Next building priority | Step 5 / 6.11: repair the failed unattended backup/recovery path; manual recovery passed 3 October, but unattended success is absent. Keep product-sync 403 and D14 retention work visible. Second-phone restore remains a pre-release check, not an implementation blocker. |
+| Next building priority | Step 4 / D9 and 6.4: finish admin-to-Play product/price integration blocked by HTTP 403; the Step 5 / 6.11 repair is recorded below. D14 retention/privacy remains owner-decision dependent. Second-phone restore remains a pre-release check, not an implementation blocker. |
 | Documentation and GitHub | At 4 October inspection, GitHub main and staging/production are 5f75fa0; accounting 5ff131f is included. The earlier unpushed-code warning is superseded. This task commits/pushes documentation only, without deployment. |
 
 ## Historical milestone — 28 September 2026
@@ -711,7 +711,7 @@ media/source files, schema/rows and configuration/code checksums identical).
 completion with recovery_verified=true. This verifies the installed entry point,
 not an unattended cron launch.
 
-## Read-only reconciliation — 4 October 2026
+## Historical read-only reconciliation — 4 October 2026 (before repair)
 
 GitHub main and both staging/production release-state commits were
 `5f75fa0eea475431cbad9d7e0587a384e3f933c0` at inspection. Accounting
@@ -756,3 +756,66 @@ the first unattended attempt demonstrably failed despite the manual pass.
 Repair requires a separate approved task; it is not started here. Step 4
 admin-to-Play product/price integration (D9) and Step 5 retention/privacy (D14,
 6.10) remain separate unfinished work.
+
+## Unattended backup repair — 4 October 2026
+
+Owner authorized the repair after reconciliation d8e5499. Exact cause confirmed
+by replaying the failed run's existing uploaded package under the cron PATH:
+`drill → restore_database → subprocess.Popen` could not find **mariadbd**.
+The installed daemon is **/usr/sbin/mariadbd**; manual login PATH includes
+/usr/sbin, while cron uses **/usr/local/bin:/usr/bin:/bin**. Download, decryption
+and file checks reached SQL restoration before this failure. This was the
+original recovery error, independently reproduced without invoking alerts.
+
+Repair **c887f91fe52e0166cf936056b27e247ec8134946** passed staging's
+16 focused backup regressions and HTTPS isolation checks, then identical-commit
+production promotion with verified backup
+`/home/shelf/backups/shelf/20261004-233613/`. No broad PHP/phone tests.
+Recovery launches the daemon by its absolute installed path. Scheduled failure
+records now identify package/upload/recovery/success-record stages, error type
+and allowlisted executable names when available, withholding arguments/output.
+Alert exceptions are recorded separately in alert-failure.json and cannot mask
+the original error. Mocked transport tests send no notification.
+The focused staging gate includes the already approved accounting/status
+reconciliation documents; application changes still require their normal gate.
+
+**Controlled scheduled-environment verification PASSED**, as user shelf with
+HOME=/home/shelf, USER/LOGNAME=shelf, SHELL=/bin/sh, working directory
+/home/shelf, stdin noninteractive, clean environment and the exact cron PATH.
+The promoted `scheduled` entry point created and uploaded a fresh encrypted
+package, downloaded/decrypted it and verified isolated recovery:
+`shelf-production-20261004T233755Z-2d2f4eee28debdf2.tar.gpg`.
+Ciphertext SHA-256:
+`e572e1959c76ce513bb3a9b5d31c00cbc1fcb5dcd21eb476c4ec47ee782369a4`.
+Recovery finished **2026-10-04 23:39:27 UTC**: **34 tables**, identical schema/rows;
+**774 media/source files**, configuration and code inventories matched.
+Socket-only disposable MariaDB, no restored app startup; workspace cleaned up.
+Private recovery evidence and last-success.json record this success.
+The failed 07:30 package and original failure record remain preserved.
+
+This controlled run does **not** establish future unattended cron success.
+Next automatic run: **5 October 2026, 03:30 America/Lower_Princes / 07:30 UTC**.
+Cron was inspected read-only; all existing jobs and its PATH remain unchanged.
+Review the next run's new last-success and recovery timestamps before claiming
+unattended success. Historical failure.json can remain after a newer success;
+compare timestamps rather than treating its presence alone as a fresh failure.
+
+Alert configuration: one marked owner with a valid address and executable
+/usr/sbin/sendmail. Existing cron/mail delivery logs are not readable by shelf;
+no actual delivery evidence was established. **No test notification sent; actual
+alert delivery remains unverified.** Keys/OAuth, owner-confirmed separate
+unencrypted USB key, existing backups, append-only offsite retention/monthly
+review/100 MiB reserve and local retention 14 are preserved. Runtime cPanel
+handler is untouched. Full replacement-host recovery/cutover remains unverified.
+Second-phone restore remains deferred to pre-release, NOT PASSED. Product-sync
+HTTP 403 remains unresolved/disabled; D14 retention remains an owner decision.
+Neither Step 4 nor Step 5 is declared complete.
+
+Next unfinished building task: **Step 4 — Accounts and purchases, D9 / 6.4,
+admin-to-Play product and price integration**. Resolve the recorded 403 and prove
+admin-managed product/pricing sync before enabling its runner; this is the
+remaining purchase integration construction after accounting and backup repair.
+D14 privacy/retention work (Step 5 / 6.10) waits for its owner decision. No product
+sync or retention work started in this task. For rollback, retain backups and
+financial history, return code to the previous revision through the approved
+release workflow; no database schema change or cron/key/OAuth rollback is needed.

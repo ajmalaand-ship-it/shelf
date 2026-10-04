@@ -37,8 +37,11 @@ recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
 append-only retention with monthly review. See docs/OFFSERVER_BACKUP.md.
 OneDrive implementation/evidence is deployed at 5f75fa0. First unattended run
 failed 4 October at 07:32:19 UTC after upload; no recovery success recorded.
-Next building task is Step 5 / 6.11: repair unattended backup/recovery. Actual
-alert delivery and replacement-host recovery remain unverified; recovery key
+Step 5 / 6.11 repair deployed at c887f91: absolute MariaDB daemon path,
+safe failure stages and original-error preservation on alert failure. See the
+runbook for controlled scheduled verification; future unattended success must
+be recorded separately. Actual alert delivery and replacement-host recovery
+remain unverified; recovery key
 is owner-confirmed on an unencrypted USB, preserved unchanged.
 Second-phone restore is deferred to the pre-release checklist, not passed and
 not requested now. Prioritize construction; automate necessary checks and request
