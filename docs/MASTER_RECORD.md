@@ -853,3 +853,33 @@ America/Lower_Princes / 07:30 UTC; last success is still the controlled 4 Octobe
 replacement-host recovery unverified; D14 awaits owner decision; second-phone
 restore deferred to pre-release, NOT PASSED. Steps 4 and 5 remain open.
 Next work: resolve this authorization block, then finish D9/6.4 integration.
+
+## Pricing permission confirmation and continued diagnosis — 4 October 2026
+
+Owner confirmed exact service account shelf-play@shelf-510123.iam.gserviceaccount.com
+and app services.shelf.app: app-level View app information, View financial data,
+Manage orders and subscriptions, Manage store presence checked; app quality and
+policy declarations greyed checked; App Admin and all account permissions unchecked.
+No permission changed. This supersedes the permission-export request above.
+Manage store presence is granted; no broader permissions are requested.
+
+Independent native cURL at 23:55:00 UTC, existing service credentials and documented
+androidpublisher scope: product GET 200; documented USD 2.99 conversion POST 403
+PERMISSION_DENIED without reason/details. Same denial independently of Laravel
+request serialization; no evidenced code fix. Official Google docs support app
+permissions for pricing/products and no longer require Cloud-project linking.
+The exact Google backend restriction/account prerequisite remains unknown.
+
+Next essential owner action: Play Console → Help → Contact us, submit the
+prepared [pricing authorization support report](PLAY_PRICE_SYNC_VERIFICATION.md)
+asking for the specific restriction and least-privilege correction. No support
+message sent by the agent, no secrets in the report. No permission toggles,
+credential recreation, product write, setup retry, sync enablement or deployment.
+Deployed code remains c887f91; documentation committed separately. Preserved
+synchronized records and cPanel handler; no broad/phone/backup recovery tests.
+
+Future unattended backup: 5 October 03:30 America/Lower_Princes / 07:30 UTC;
+controlled verification is still the last observed success. Alert delivery and
+replacement-host recovery unverified; D14 undecided; second-phone restore
+deferred to pre-release, NOT PASSED. Steps 4 and 5 remain open. D9/6.4 resumes
+when Google's restriction/correction is established, without speculative Admin.

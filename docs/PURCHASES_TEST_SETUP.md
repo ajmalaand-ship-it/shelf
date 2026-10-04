@@ -13,8 +13,9 @@ works for shelf_book_3 (ACTIVE/buy), but the documented non-mutating USD 2.99
 conversion still returns 403 PERMISSION_DENIED using the exact configured
 shelf-play@shelf-510123.iam.gserviceaccount.com identity. Previous owner-confirmed
 permissions and merchant setup are preserved; do not repeat setup speculatively.
-One read-only Console permission export is needed to establish its current exact
-grant. See PLAY_PRICE_SYNC_VERIFICATION.md for the action, evidence and limits.
+Owner now confirmed Manage store presence at app level for this exact identity;
+native cURL reproduced the pricing denial. The export request is superseded.
+See PLAY_PRICE_SYNC_VERIFICATION.md for the prepared Google support report.
 No product write, price/availability change or sync enablement occurred.
 
 ## Google Play Console
