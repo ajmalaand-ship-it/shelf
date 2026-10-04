@@ -7,11 +7,14 @@ The owner subsequently approved the recommended accounting task. The missing
 ledger source-history filters/links. Unknown net figures remain unknown; Test is
 excluded; adjustments and payments/reversals are append-only. No real payments
 or automatic payouts are enabled. See [accounting tools and verification](ACCOUNTING.md).
-The established release state records the exact staging/promotion commit, checks
-and backup. No phone test is requested; second-phone restore remains deferred,
-not passed. Product sync 403 and regular off-server backup/recovery remain
-unfinished; Step 4 is not all complete. Next building priority: off-server backup
-and repeatable recovery (Step 5).
+Accounting was deployed at 5ff131f and remains in deployed/pushed 5f75fa0.
+OneDrive encrypted upload/download/decryption and isolated recovery passed on
+3 October (34 tables, 774 files). The first unattended run failed after upload
+on 4 October; the manual run is still the last success. Actual alert delivery
+and replacement-host recovery remain unverified. Product sync 403 is unresolved;
+second-phone restore is deferred, not passed. Neither Step 4 nor Step 5 is complete.
+Next building priority: repair unattended backup/recovery (Step 5 / 6.11).
+See OFFSERVER_BACKUP.md and Master Record Part 10 for current evidence.
 
 The remainder below is the historical documentation-only reconciliation before
 that implementation; its "not begun" recommendation and Git ancestry warning

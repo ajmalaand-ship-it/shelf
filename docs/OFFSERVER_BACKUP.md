@@ -3,7 +3,7 @@
 Step 5 OneDrive backup/recovery, authorized 2 October and continued 3 October 2026.
 The owner chose their existing OneDrive. Production upload/download/isolated
 restore and schedule installation passed on 3 October; evidence is below. Actual
-email delivery and the first unattended cron execution remain unverified.
+email delivery remains unverified; the first unattended run failed on 4 October.
 Product/price sync remains disabled with its unresolved 403. Second-phone purchase
 restore is deferred, not passed. This task requires no broad PHP or phone rerun.
 
@@ -254,3 +254,49 @@ media/source files, schema/rows and configuration/code checksums identical).
 `/home/shelf/backups/shelf/offsite/last-success.json` records successful
 completion with recovery_verified=true. This verifies the installed entry point,
 not an unattended cron launch.
+
+## Read-only reconciliation — 4 October 2026
+
+GitHub main and both staging/production release-state commits were
+`5f75fa0eea475431cbad9d7e0587a384e3f933c0` at inspection. Accounting
+`5ff131f` is an ancestor: Accounting journal, Author balances and Sales ledger
+are deployed; historical agreement snapshots remain preserved and Test
+transactions excluded from real income. OneDrive implementation/evidence is
+deployed at `5f75fa0`; latest promotion backup is
+`/home/shelf/backups/shelf/20261003-204156/`. This reconciliation changes
+only documentation in an isolated checkout; no deployment or tests are run.
+The unrelated cPanel-generated PHP handler remains untouched.
+
+**First unattended run: FAILED, not passed.** Existing scheduled log
+`storage/logs/offsite-backup.log` reports `FileNotFoundError` (details withheld).
+`last-upload.json` records package
+`shelf-production-20261004T073043Z-983d1910c66c57ed.tar.gpg`
+uploaded at **2026-10-04 07:31:41 UTC**, following the 03:30 local / 07:30 UTC
+launch. `failure.json` records failure at **07:32:19 UTC**. There is no
+recovery evidence for that package. `last-success.json` remains **3 October
+20:35:11 UTC**, the earlier manual scheduled-entry run, not unattended success.
+The log may show an error from failure handling; it does not establish the
+original failing operation or actual alert delivery. No repair, rerun, restore
+or notification was attempted. Direct `crontab -l` was denied by PAM in this
+session; schedule installation evidence and existing execution records were used.
+
+The two successful 3 October remote drills remain valid: encrypted copies in
+Shelf-Backups were downloaded/decrypted, with identical database schema/rows
+(**34 tables**) and checksums for **774 media/source files**, code and recovery
+configuration. Daily schedule remains **03:30 America/Lower_Princes / 07:30 UTC**.
+Offsite retention has no automatic deletion and requires monthly capacity review;
+local nightly retention remains **14**. Owner-confirmed recovery key on a
+separate unencrypted USB is preserved; its contents were not read or printed.
+Actual alert delivery and full replacement-host recovery/cutover remain
+unverified. Product-sync 403 remains unresolved and its runner disabled.
+Second-phone restore remains explicitly deferred to pre-release, NOT PASSED.
+Neither Step 4 nor Step 5 is declared complete.
+
+**Next unfinished building task: Step 5 — Ready for release, off-server backup
+and tested restore; requirement 6.11 (Testing, backups and recovery).** Diagnose
+and repair the unattended scheduled backup/failure-handling path, then establish
+successful recovery through the scheduled environment. This comes next because
+the first unattended attempt demonstrably failed despite the manual pass.
+Repair requires a separate approved task; it is not started here. Step 4
+admin-to-Play product/price integration (D9) and Step 5 retention/privacy (D14,
+6.10) remain separate unfinished work.

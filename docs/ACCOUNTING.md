@@ -113,4 +113,7 @@ Current progress and completion evidence belong in Master Record Part 10 and the
 status reconciliation. Step 4 is **not all complete**: second-phone restore remains
 deferred to pre-release, NOT PASSED. Product/price sync's last HTTP 403 and disabled
 runner remain unfinished; working refund API access does not prove price permissions.
-Regular off-server backup and tested recovery remain unfinished Step 5 work.
+Accounting deployed at 5ff131f, retained in deployed/pushed 5f75fa0.
+Step 5 OneDrive remote isolated recovery passed 3 October (34 tables, 774 files);
+first unattended run failed 4 October after upload. Actual alerts and replacement-
+host recovery remain unverified. See OFFSERVER_BACKUP.md.

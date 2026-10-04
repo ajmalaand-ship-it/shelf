@@ -531,7 +531,7 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
-## Current reconciliation — 2 October 2026 (accounting construction update)
+## Current reconciliation — 4 October 2026 (documentation-only update)
 
 The historical table below records the 28 September milestone; this update is
 current. No step is declared accepted without its evidence and owner acceptance.
@@ -544,11 +544,11 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 | Focused server snapshot, 04:52:11 UTC | Reader 3, book 3: sandbox purchases 5 and 6; original sale ledger 13 USD +2.99, refund ledger 14 USD -2.99, repurchase ledger 15 USD +2.99. All labelled Test; zero real-income rows. Google refund event 18 matched order; repurchase event 19. Entitlement active after repurchase, checked 04:45:55 UTC. |
 | Delivered fixes verified in code | Ownership published immediately after server confirmation; automatic startup/resume refresh and explicit errors; book action reads Open owned book. Admin Buying shows Allowed green / Blocked red. Deployed code at 2f0c2bf includes e4a286f, 69b4690 and d12a770. Phone evidence above supports purchase/refund behavior; it does not claim an owner visual check of admin badges. |
 | Refund schedule | Latest audited scheduled check 04:45:01 UTC: completed HTTP 200, one duplicate handled, no additional refund, no conflict/unmatched. No new polling/purchase/refund triggered by this task. |
-| Unfinished building | Step 4: product/price sync integration blocked by last 403, disabled; live purchases remain sandbox-only pending separate real-payment approval. Owner accounting construction is recorded below. Step 5: OneDrive encrypted upload/download/isolated restore and operating instructions built and verified 3 October; daily 03:30 AST schedule installed. Actual alert delivery/first unattended run remain unverified. Account-data retention work waits for D14. See detailed separation below. |
+| Unfinished building | Step 4: product/price sync integration blocked by last 403, disabled; live purchases remain sandbox-only pending separate real-payment approval. Owner accounting construction is recorded below. Step 5: OneDrive encrypted upload/download/isolated restore and operating instructions built and verified 3 October; daily 03:30 AST schedule installed. Actual alert delivery remains unverified; first unattended run failed 4 October at 07:32:19 UTC after upload, without recovery evidence. Account-data retention work waits for D14. See detailed separation below. |
 | Pre-release checks | Second-phone restore DEFERRED, NOT PASSED, not requested now. Keep reading/import acceptance, final account/isolation/offline/withdrawal checks, signing/listing/privacy/rights and recovery acceptance on a targeted checklist; do not use them to stall construction. |
-| Accounting construction (2 Oct) | Approved and built: Sales ledger historical book/rights-holder filters; Accounting journal for estimates, confirmations, linked adjustments/payment records/reversals; Author balances with separate currencies and unknown figures. Default scopes exclude Test. Necessary focused verification and required staging/full-PHP/rollback gates; exact promotion commit/backup recorded by release workflow. See ACCOUNTING.md. No payout or real-payment activation. |
-| Next building priority | OneDrive backup/recovery construction now verified (3 October), with delivery/unattended-run limitations recorded; keep separate product-sync 403 and D14 retention work visible. Second-phone restore remains a pre-release check, not an implementation blocker. |
-| Documentation and GitHub | This reconciliation is documentation-only, based on GitHub main a624ea7 because deployed code 2f0c2bf has unpushed implementation ancestors. Push only documentation; do not deploy or silently push those code ancestors in this task. |
+| Accounting construction (2 Oct) | Approved and built: Sales ledger historical book/rights-holder filters; Accounting journal for estimates, confirmations, linked adjustments/payment records/reversals; Author balances with separate currencies and unknown figures. Default scopes exclude Test. Necessary focused verification and required staging/full-PHP/rollback gates; deployed at 5ff131f and retained in 5f75fa0, with historical agreements preserved; exact backup recorded by release workflow. See ACCOUNTING.md. No payout or real-payment activation. |
+| Next building priority | Step 5 / 6.11: repair the failed unattended backup/recovery path; manual recovery passed 3 October, but unattended success is absent. Keep product-sync 403 and D14 retention work visible. Second-phone restore remains a pre-release check, not an implementation blocker. |
+| Documentation and GitHub | At 4 October inspection, GitHub main and staging/production are 5f75fa0; accounting 5ff131f is included. The earlier unpushed-code warning is superseded. This task commits/pushes documentation only, without deployment. |
 
 ## Historical milestone — 28 September 2026
 
@@ -710,3 +710,49 @@ media/source files, schema/rows and configuration/code checksums identical).
 `/home/shelf/backups/shelf/offsite/last-success.json` records successful
 completion with recovery_verified=true. This verifies the installed entry point,
 not an unattended cron launch.
+
+## Read-only reconciliation — 4 October 2026
+
+GitHub main and both staging/production release-state commits were
+`5f75fa0eea475431cbad9d7e0587a384e3f933c0` at inspection. Accounting
+`5ff131f` is an ancestor: Accounting journal, Author balances and Sales ledger
+are deployed; historical agreement snapshots remain preserved and Test
+transactions excluded from real income. OneDrive implementation/evidence is
+deployed at `5f75fa0`; latest promotion backup is
+`/home/shelf/backups/shelf/20261003-204156/`. This reconciliation changes
+only documentation in an isolated checkout; no deployment or tests are run.
+The unrelated cPanel-generated PHP handler remains untouched.
+
+**First unattended run: FAILED, not passed.** Existing scheduled log
+`storage/logs/offsite-backup.log` reports `FileNotFoundError` (details withheld).
+`last-upload.json` records package
+`shelf-production-20261004T073043Z-983d1910c66c57ed.tar.gpg`
+uploaded at **2026-10-04 07:31:41 UTC**, following the 03:30 local / 07:30 UTC
+launch. `failure.json` records failure at **07:32:19 UTC**. There is no
+recovery evidence for that package. `last-success.json` remains **3 October
+20:35:11 UTC**, the earlier manual scheduled-entry run, not unattended success.
+The log may show an error from failure handling; it does not establish the
+original failing operation or actual alert delivery. No repair, rerun, restore
+or notification was attempted. Direct `crontab -l` was denied by PAM in this
+session; schedule installation evidence and existing execution records were used.
+
+The two successful 3 October remote drills remain valid: encrypted copies in
+Shelf-Backups were downloaded/decrypted, with identical database schema/rows
+(**34 tables**) and checksums for **774 media/source files**, code and recovery
+configuration. Daily schedule remains **03:30 America/Lower_Princes / 07:30 UTC**.
+Offsite retention has no automatic deletion and requires monthly capacity review;
+local nightly retention remains **14**. Owner-confirmed recovery key on a
+separate unencrypted USB is preserved; its contents were not read or printed.
+Actual alert delivery and full replacement-host recovery/cutover remain
+unverified. Product-sync 403 remains unresolved and its runner disabled.
+Second-phone restore remains explicitly deferred to pre-release, NOT PASSED.
+Neither Step 4 nor Step 5 is declared complete.
+
+**Next unfinished building task: Step 5 — Ready for release, off-server backup
+and tested restore; requirement 6.11 (Testing, backups and recovery).** Diagnose
+and repair the unattended scheduled backup/failure-handling path, then establish
+successful recovery through the scheduled environment. This comes next because
+the first unattended attempt demonstrably failed despite the manual pass.
+Repair requires a separate approved task; it is not started here. Step 4
+admin-to-Play product/price integration (D9) and Step 5 retention/privacy (D14,
+6.10) remain separate unfinished work.
