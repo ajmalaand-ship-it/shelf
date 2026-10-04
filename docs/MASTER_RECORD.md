@@ -819,3 +819,37 @@ D14 privacy/retention work (Step 5 / 6.10) waits for its owner decision. No prod
 sync or retention work started in this task. For rollback, retain backups and
 financial history, return code to the previous revision through the approved
 release workflow; no database schema change or cron/key/OAuth rollback is needed.
+
+## Step 4 / D9 and 6.4 — current investigation, 4 October 2026
+
+Reused the preserved pricing investigation and owner-confirmed permissions and
+merchant setup. Current configured identity is
+shelf-play@shelf-510123.iam.gserviceaccount.com, project shelf-510123,
+package services.shelf.app, documented androidpublisher OAuth scope.
+Bounded GET of shelf_book_3 passed (HTTP 200, ACTIVE, buy); documented,
+non-mutating USD 2.99 price conversion again returned HTTP 403 PERMISSION_DENIED
+with no reason/details. No new request defect established; exact ineffective
+Console grant/account prerequisite remains unknown. Prior PATCH denial is
+preserved evidence, not a new write. Current official Google docs checked.
+
+Effective sync remains disabled, price queue empty. Books 3–8 retain approved
+USD 2.99 prices, Published states and canonical product IDs. Book 3 local sync
+Error; others Pending, with no new sync-status/data change. No product write,
+availability change, credential recreation, setup repetition or broad admin
+request. Deployed code remains c887f91; prior pushed records 93f73df preserved.
+
+One necessary read-only owner action: Play Console → Users and permissions →
+search shelf-play@shelf-510123.iam.gserviceaccount.com → Export user list;
+provide only that identity's CSV row to establish active access, expiry and
+app/account permissions for services.shelf.app. Manage store presence maps to
+CAN_MANAGE_PUBLIC_LISTING. This resolves the exact-grant uncertainty before
+another setup change or Google escalation. Detailed evidence, official sources
+and enablement gates: [price-sync investigation](PLAY_PRICE_SYNC_VERIFICATION.md).
+
+No application changes/deployment, broad tests, backup recovery, phone checks
+or notifications. Next automatic offsite run remains 5 October 03:30
+America/Lower_Princes / 07:30 UTC; last success is still the controlled 4 October
+23:39:27 UTC verification, not unattended evidence. Actual alert delivery and
+replacement-host recovery unverified; D14 awaits owner decision; second-phone
+restore deferred to pre-release, NOT PASSED. Steps 4 and 5 remain open.
+Next work: resolve this authorization block, then finish D9/6.4 integration.

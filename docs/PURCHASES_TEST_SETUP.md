@@ -6,6 +6,17 @@ boundary. Prices are set ONLY in the Shelf admin. The owner approved USD 2.99
 test prices for the six existing books; later price edits also belong only in
 the admin. Author percentages remain owner decisions.
 
+## Current price-sync gate — 4 October 2026
+
+Sync remains disabled; the dedicated queue has zero jobs. Fresh product read
+works for shelf_book_3 (ACTIVE/buy), but the documented non-mutating USD 2.99
+conversion still returns 403 PERMISSION_DENIED using the exact configured
+shelf-play@shelf-510123.iam.gserviceaccount.com identity. Previous owner-confirmed
+permissions and merchant setup are preserved; do not repeat setup speculatively.
+One read-only Console permission export is needed to establish its current exact
+grant. See PLAY_PRICE_SYNC_VERIFICATION.md for the action, evidence and limits.
+No product write, price/availability change or sync enablement occurred.
+
 ## Google Play Console
 
 1. Create the Shelf Play app, upload the signed AAB to owner-only internal testing,

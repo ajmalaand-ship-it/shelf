@@ -32,7 +32,10 @@ Step 4 sales/author accounting (6.9) is built with an append-only journal,
 confirmed figures, payment records/reversals and per-currency owner balances.
 Deployed at 5ff131f and retained in 5f75fa0; see docs/ACCOUNTING.md.
 No real payments or automatic payouts are enabled. Step 4 is not all complete. Play product/price sync remains blocked by the last
-403 and disabled. Step 5 OneDrive encrypted upload/download and isolated
+403 and disabled. Fresh 4 October product read succeeded, conversion denied;
+zero price jobs. Current exact-identity permission export requested, without
+repeating setup or granting broad access. See docs/PLAY_PRICE_SYNC_VERIFICATION.md.
+Step 5 OneDrive encrypted upload/download and isolated
 recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
 append-only retention with monthly review. See docs/OFFSERVER_BACKUP.md.
 OneDrive implementation/evidence is deployed at 5f75fa0. First unattended run
