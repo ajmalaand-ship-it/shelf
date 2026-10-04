@@ -133,7 +133,7 @@ class OffsiteBackupTests(unittest.TestCase):
             if args[0] == 'mysqldump':
                 dumps.append(result)
             return result
-        with patch.object(backup, 'run', side_effect=capture_dump), self.assertRaisesRegex(RuntimeError, 'Recovered database differs'):
+        with patch.dict(os.environ, {'PATH': '/usr/local/bin:/usr/bin:/bin'}), patch.object(backup, 'run', side_effect=capture_dump), self.assertRaisesRegex(RuntimeError, 'Recovered database differs'):
             # A hand-written incomplete dump cannot match a canonical restore.
             backup.restore_database(fixture, workspace)
         self.assertFalse((workspace / 'mysql.pid').exists())
@@ -141,8 +141,36 @@ class OffsiteBackupTests(unittest.TestCase):
         (fixture / 'database.sql').write_bytes(dumps[0])
         second = self.root / 'second-db'
         second.mkdir()
-        self.assertEqual(backup.restore_database(fixture, second), 1)
+        with patch.dict(os.environ, {'PATH': '/usr/local/bin:/usr/bin:/bin'}):
+            self.assertEqual(backup.restore_database(fixture, second), 1)
         self.assertFalse((second / 'mysql.pid').exists())
+
+    def test_scheduled_original_failure_survives_alert_failure(self):
+        private = self.root / 'private'; private.mkdir()
+        (private / 'settings.json').write_text(json.dumps({'schedule_enabled': True, 'retention': 'append-only'}))
+        original = backup.BackupCommandError('mysql', missing=True)
+        with patch.object(backup, 'ROOT', self.root), patch.object(backup, 'PRIVATE', private), \
+             patch.object(backup, 'APP', backup.PRODUCTION), \
+             patch.object(backup, 'build_package', return_value=self.root / 'fixture'), \
+             patch.object(backup, 'upload'), patch.object(backup, 'drill', side_effect=original), \
+             patch.object(backup, 'run', side_effect=RuntimeError('synthetic private alert detail')):
+            with self.assertRaises(backup.BackupCommandError) as caught:
+                backup.scheduled()
+        self.assertIs(caught.exception, original)
+        record = json.loads((self.root / 'failure.json').read_text())
+        self.assertEqual(record['stage'], 'recovery')
+        self.assertEqual(record['executable'], 'mysql')
+        self.assertTrue(record['executable_missing'])
+        self.assertTrue((self.root / 'alert-failure.json').exists())
+        self.assertNotIn('synthetic private', (self.root / 'alert-failure.json').read_text())
+        self.assertFalse((self.root / 'last-success.json').exists())
+
+    def test_command_diagnostics_withhold_arguments_and_output(self):
+        with patch.object(backup.subprocess, 'run', side_effect=FileNotFoundError('secret')):
+            with self.assertRaises(backup.BackupCommandError) as caught:
+                backup.run(['mysql', 'secret-token'])
+        self.assertEqual(caught.exception.executable, 'mysql')
+        self.assertNotIn('secret', str(caught.exception))
 
     def test_failure_alert_has_no_secrets_and_targets_only_owner(self):
         with patch.object(backup, 'ROOT', self.root), \

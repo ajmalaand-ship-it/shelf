@@ -36,10 +36,24 @@ CONFIG = PRIVATE / 'rclone.conf'
 NAME = re.compile(r'shelf-(production|staging)-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{16}\.tar\.gpg')
 
 
+class BackupCommandError(RuntimeError):
+    def __init__(self, executable, missing=False):
+        known = {'mariadbd', 'mariadb-install-db', 'mysql', 'mysqldump', 'php',
+                 'sendmail', 'gpg', 'git', 'crontab', 'rclone'}
+        self.executable = Path(str(executable)).name
+        if self.executable not in known:
+            self.executable = 'external-command'
+        self.missing = missing
+        super().__init__('Backup command unavailable.' if missing else 'Backup command failed; output withheld.')
+
+
 def run(args, **kwargs):
-    result = subprocess.run(list(map(str, args)), capture_output=True, **kwargs)
+    try:
+        result = subprocess.run(list(map(str, args)), capture_output=True, **kwargs)
+    except FileNotFoundError:
+        raise BackupCommandError(args[0], missing=True) from None
     if result.returncode:
-        raise RuntimeError('Command failed; private process output withheld.')
+        raise BackupCommandError(args[0])
     return result.stdout
 
 
@@ -351,11 +365,14 @@ def restore_database(target, workspace):
     socket = workspace / 'mysql.sock'
     run(['mariadb-install-db', '--no-defaults', '--datadir=' + str(data),
          '--auth-root-authentication-method=normal', '--skip-test-db'])
-    process = subprocess.Popen(['mariadbd', '--no-defaults', '--datadir=' + str(data),
-                                '--socket=' + str(socket), '--skip-networking', '--event-scheduler=OFF', '--skip-slave-start',
-                                '--pid-file=' + str(workspace / 'mysql.pid'),
-                                '--log-error=' + str(workspace / 'mysql.log')],
-                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        process = subprocess.Popen(['/usr/sbin/mariadbd', '--no-defaults', '--datadir=' + str(data),
+                                    '--socket=' + str(socket), '--skip-networking', '--event-scheduler=OFF', '--skip-slave-start',
+                                    '--pid-file=' + str(workspace / 'mysql.pid'),
+                                    '--log-error=' + str(workspace / 'mysql.log')],
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except FileNotFoundError:
+        raise BackupCommandError('/usr/sbin/mariadbd', missing=True) from None
     client = ['mysql', '--no-defaults', '--protocol=SOCKET', '--socket=' + str(socket), '-u', 'root']
     try:
         for _ in range(100):
@@ -420,9 +437,12 @@ def local_drill(path):
               'OneDrive recovery remains unverified.')
 
 
-def report_failure():
+def report_failure(stage="unknown", error=None):
+    record = {"stage": stage, "error_type": type(error).__name__ if error else "unknown"}
+    if isinstance(error, BackupCommandError):
+        record.update(executable=error.executable, executable_missing=error.missing)
     write_json(ROOT / 'failure.json', {'failed_at': datetime.now(timezone.utc).isoformat(),
-                                      'message': 'Shelf off-server backup failed. Inspect status privately; local backups preserved.'})
+                                      'message': 'Shelf off-server backup failed. Inspect status privately; local backups preserved.', **record})
     # The task authorizes backup failure reporting. Only a generic alert is sent
     # to Shelf's marked owner, never reader addresses or process/provider output.
     code = r'''require $argv[1].'/vendor/autoload.php';
@@ -449,15 +469,30 @@ def scheduled():
     lock_fd = os.open(ROOT / '.lock', os.O_CREAT | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
     with os.fdopen(lock_fd, 'a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        stage = "package"
         try:
             with tempfile.TemporaryDirectory(prefix='shelf-offsite-', dir='/home/shelf/tmp') as temporary:
                 package = build_package(APP, Path(temporary), ROOT)
+            stage = "upload"
             upload(package)
+            stage = "recovery"
             drill(package)
+            stage = "success-record"
             write_json(ROOT / 'last-success.json', {'package': package.name,
                 'finished_at': datetime.now(timezone.utc).isoformat(), 'recovery_verified': True})
-        except Exception:
-            report_failure()
+        except Exception as error:
+            try:
+                report_failure(stage, error)
+            except Exception as alert_error:
+                # Never replace the original failure with an alert transport error.
+                try:
+                    write_json(ROOT / 'alert-failure.json', {
+                        'failed_at': datetime.now(timezone.utc).isoformat(),
+                        'stage': stage, 'original_error_type': type(error).__name__,
+                        'alert_error_type': type(alert_error).__name__})
+                except Exception:
+                    pass
+                print('Backup alert failed; original backup error retained; details withheld.', file=sys.stderr)
             raise
 
 

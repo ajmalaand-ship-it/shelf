@@ -265,7 +265,8 @@ def checked(app, commit, initial=False):
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
     backup_scope = {'scripts/shelf_offsite_backup.py', 'scripts/test_shelf_offsite_backup.py', 'scripts/shelf_daily_backup.py',
                     'scripts/run_tests.sh', 'scripts/staging/workflow.py', 'docs/OFFSERVER_BACKUP.md',
-                    'docs/MASTER_RECORD.md', 'AGENTS.md'}
+                    'docs/MASTER_RECORD.md', 'AGENTS.md', 'docs/ACCOUNTING.md',
+                    'docs/STATUS_RECONCILIATION_2026-10-02.md'}
     if changes and set(changes) <= backup_scope and any(name in changes for name in ('scripts/shelf_offsite_backup.py', 'docs/OFFSERVER_BACKUP.md')):
         # This task explicitly excludes broad PHP/phone reruns. The new transfer
         # code never boots Laravel; test it at the identical staged commit.
