@@ -228,7 +228,7 @@ service-account product GET 200 and conversion/PATCH denial evidence are retaine
 Owner-user success supports functioning calculation for this package; it does
 not prove all service-account/account prerequisites or product writes work.
 
-**Smallest justified next action:** submit the revised paired-results report
+**Historical next action (superseded by the implementation audit below):** submit the revised paired-results report
 below via Play Console → Help → Contact us, asking Google to identify the exact
 service-account restriction and compare the consumer/quota context. No permission
 toggle or broader Admin access is justified. Agent has not contacted support.
@@ -264,3 +264,112 @@ D14 undecided; second-phone restore deferred, NOT PASSED. Steps 4/5 stay open.
 
 References: [conversion request](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization/convertRegionPrices?hl=en),
 [quota-project selection](https://docs.cloud.google.com/docs/quotas/set-quota-project).
+
+
+## Shelf implementation/configuration audit — 5 October 2026 UTC
+
+No conversion/product request repeated in this audit. No established local defect;
+no application changes, deployment, products/prices/permissions/credential edits,
+support contact or notifications. The previous owner Explorer success and exact
+server denial remain paired evidence, without assigning a permission cause.
+
+### Actual admin-to-worker path
+
+- `CollectionForm.php` supplies the admin USD price; transactional EditCollection/
+  CreateCollection saves reach `Collection::booted()` saving/saved hooks
+  (`app/Models/Collection.php:53,90`). Price/title/publication/deletion changes
+  persist price audit and durable revisioned sync intent after commit.
+- `PlayPriceSync::request/enqueue` (`app/Services/Play/PlayPriceSync.php:12,29`)
+  schedules book IDs only on dedicated database `play-prices`; configuration
+  disabled means no dispatch. Worker reads the current book under locks, rather
+  than an old serialized price, in `run` at line 49. Retry records retain safe
+  messages. Publication controls activation; no owner price is invented.
+- Every-minute cron invokes `scripts/run_play_price_sync.sh`, production-only
+  root check, working directory /home/shelf/apps/shelf, flock, fresh CLI pending
+  command then short-lived dedicated queue worker. Initial cron working directory
+  /home/shelf and PATH /usr/local/bin:/usr/bin:/bin were reproduced for the
+  configuration-only probe; the actual sync entry point was not run.
+- `SyncPlayBook::handle` reaches the same `GooglePlayClient::sync`. Product GET,
+  conversion POST, product PATCH, and separate state POST all use `request()`
+  at line 80 and `token()` at line 22. Same base URL/package, bearer authentication,
+  JSON Accept, redirect policy/timeouts and client; only method/path/body/query
+  differ. GET sends no JSON body. Modern GET/state use oneTimeProducts; PATCH
+  uses onetimeproducts exactly as documented. USD 2.99 converts to units "2",
+  nanos 990000000. No separate pricing credentials, audience or OAuth scope.
+
+### Runtime evidence and limits
+
+Private configuration-only probe bootstrapped the deployed production app twice:
+ordinary CLI and clean noninteractive cron environment as shelf. Both PHP 8.3.35,
+production base, .env, uncached configuration, staging false, sync false,
+services.shelf.app. Credential file hashes matched without recording their value
+here; both decoded identity matches owner-inspected
+shelf-play@shelf-510123.iam.gserviceaccount.com and project shelf-510123.
+Neither inherited SHELF_PLAY_SYNC_ENABLED, SHELF_PLAY_SERVICE_ACCOUNT_PATH,
+APP_ENV, APP_CONFIG_CACHE, GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_CLOUD_QUOTA_PROJECT.
+Probe performs no token exchange, HTTP or database writes.
+
+`config/play_sync.php` is the sole production loader, explicit private path,
+fixed approved package. `token()` validates file location/permissions/type,
+signs service-account JWT iss matching that email, no delegated subject,
+androidpublisher scope, OAuth token audience. No ADC or quota-project environment
+handling in this custom client. Config/env overrides could matter to Laravel
+bootstrap, but none appeared in these two actual contexts; config cache absent.
+Staging AppServiceProvider overrides sync false/credentials null deliberately.
+Promotion workflow optimize:clear; purchase setup initially disables sync,
+uses a subprocess-only enabled override and enables persistently only after
+all approved synchronizations succeed. Original fc10347 implementation and
+later d178bc0 endpoint/body correction inspected; no repeated setup.
+
+Web document root resolves the same production public directory and cPanel PHP83
+handler is preserved. Source wiring shares config, but no Shelf-owned PHP process
+was present during bounded host process inspection; actual web process environment
+and effective web config are **not directly verified**. No temporary production
+route/file was added. This limitation cannot explain the existing CLI-only denial
+by itself. Cron starts fresh PHP processes, no long-lived price worker config.
+Last measured price queue zero; sync remains disabled in both fresh probes.
+
+### Pricing and documented permissions
+
+D9 requires admin-only USD input and Google's automatic local prices. Conversion
+is a chosen implementation of that requirement, not a universal Play API mandate.
+The modern OneTimeProduct PATCH takes explicit regional price/availability and
+regionsVersion; no documented autoConvertMissingPrices option. Legacy
+inappproducts.patch does have that option, but previous legacy API investigation
+was denied with a migrate-to-new-API message. Replacing the modern workflow or
+freezing owner Explorer prices is not an established fix, and prior modern PATCH
+403 remains independently unresolved. Keep existing approved pricing/availability.
+
+Official method references require androidpublisher scope. Setup guide requires
+API enabled, service account invited with appropriate Play permissions, and no
+longer requires linking Play to a developer Cloud project. Owner confirmed merchant
+setup historically. Play permission guide explicitly covers edit pricing/in-app
+products under Manage store presence and supports app-specific access. The method
+references do not publish a finer conversion-specific Play permission or demand
+App Admin/account-wide access. Public docs cannot prove Google's effective grant
+or prerequisite evaluation for this specific call.
+
+Remaining hypotheses: effective Google monetization grant/account prerequisite
+not reflected in inspected grants; consumer-project routing differing from Explorer;
+less likely unseen web-only overrides (not a cause established for CLI failure).
+No permission toggle, Cloud IAM grant or credential replacement justified.
+
+**ONE next discriminating check, not executed:** one calculation-only request
+with the existing server service-account token, same endpoint/body/client, adding
+only `x-goog-user-project: shelf-510123` as a request-local header; no persistent
+config change. Success would implicate consumer-project handling and justify
+focused investigation before any sync. A structured SERVICE_DISABLED or
+USER_PROJECT_DENIED/serviceusage.services.use error would identify a Cloud
+consumer prerequisite for that explicit-header variant, not prove the original
+Play denial had that cause. The same generic 403 would show explicit routing to
+the intended project did not resolve it, reducing this hypothesis without proving
+a missing Play permission. Cloud documentation notes serviceusage.services.use
+is required for explicit quota-project use; do not grant it speculatively.
+Support draft above is held pending this additional evidence; nothing sent.
+
+References: [conversion](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization/convertRegionPrices),
+[modern PATCH](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization.onetimeproducts/patch),
+[legacy auto conversion](https://developers.google.com/android-publisher/api-ref/rest/v3/inappproducts/patch),
+[setup](https://developers.google.com/android-publisher/getting_started),
+[Play permissions](https://support.google.com/googleplay/android-developer/answer/9844686),
+[consumer project](https://docs.cloud.google.com/docs/quotas/set-quota-project).

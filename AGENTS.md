@@ -34,8 +34,9 @@ Deployed at 5ff131f and retained in 5f75fa0; see docs/ACCOUNTING.md.
 No real payments or automatic payouts are enabled. Step 4 is not all complete. Play product/price sync remains blocked by the last
 403 and disabled. Fresh 4 October product read succeeded, conversion denied;
 zero price jobs. Owner verified app-level Manage store presence for the exact
-identity/package; native cURL independently reproduced the denial. Google
-support restriction diagnosis is next; no Admin/global grant requested. See docs/PLAY_PRICE_SYNC_VERIFICATION.md.
+identity/package; native cURL independently reproduced the denial. Shelf-side implementation/config audit found no established local defect; a
+request-local consumer-project comparison is next, before support. No Admin/global
+grant requested. See docs/PLAY_PRICE_SYNC_VERIFICATION.md.
 Step 5 OneDrive encrypted upload/download and isolated
 recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
 append-only retention with monthly review. See docs/OFFSERVER_BACKUP.md.

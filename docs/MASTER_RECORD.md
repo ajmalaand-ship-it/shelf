@@ -902,10 +902,48 @@ No products/prices/permissions/credentials changed; sync remains disabled.
 No browser token requested/copied, no code deploy or broad suite.
 Deployed code remains c887f91; prior pushed documentation ee8d0b2.
 
-Next: submit the revised paired-results support report in
-[price-sync evidence](PLAY_PRICE_SYNC_VERIFICATION.md), asking Google to identify
-the exact service-account/consumer-context restriction and least-privilege fix.
+Historical next action (superseded by the Shelf-side audit below): paired-results
+support report prepared in [price-sync evidence](PLAY_PRICE_SYNC_VERIFICATION.md);
+no report sent.
 Existing manual/controlled backup evidence preserved; next automatic run
 5 October 03:30 America/Lower_Princes / 07:30 UTC, unattended success not yet
 verified. Actual alert delivery/replacement-host recovery unverified; D14 open;
 second-phone restore deferred, NOT PASSED. Steps 4 and 5 remain open.
+
+
+## Step 4 / D9 and §6.4 — Shelf-side audit, 5 October 2026 UTC
+
+Implementation traced from transactional admin save through Collection model
+hooks, durable revisioned PlayPriceSync intent, dedicated cron/queue and
+GooglePlayClient. GET/conversion/PATCH share token loader, scope, bearer/client,
+package and URL base; documented endpoint casing/body correction already present.
+Fresh production bootstrap in ordinary CLI and clean shelf cron environment
+(PATH /usr/local/bin:/usr/bin:/bin, initial cwd /home/shelf) resolves identical
+credential file, owner-inspected service identity, project shelf-510123 and
+services.shelf.app, sync disabled, staging false, no config cache or relevant
+inherited env override. No HTTP requests made. Web shares source/document root,
+but actual web runtime env was not directly measurable (no Shelf PHP process
+present); not claimed verified. No concrete local defect established or code fix.
+
+Conversion is an implementation choice for D9's Google-generated regional prices;
+modern product PATCH requires explicit regional settings and regionsVersion,
+without legacy autoConvertMissingPrices. Legacy API previously required migration;
+no unapproved alternative pricing or availability workflow adopted. Prior PATCH
+403 also remains. Official docs confirm androidpublisher scope, service-account
+Play setup and Manage store presence pricing/product rights; no evidenced mandate
+for Admin or account-wide grants. Owner's granted permission remains authoritative.
+
+Next single discriminating check: request-local x-goog-user-project shelf-510123
+on one otherwise unchanged service-account calculation. Not executed this task.
+Success implicates consumer routing; structured consumer/serviceusage error
+identifies the explicit variant's Cloud prerequisite; unchanged generic 403
+reduces that hypothesis but proves no particular missing Play grant. No speculative
+IAM/permission/credential edits; support draft held. Detailed functions, evidence,
+limits and official references: [PLAY_PRICE_SYNC_VERIFICATION.md](PLAY_PRICE_SYNC_VERIFICATION.md).
+
+Documentation-only audit; deployed code c887f91, preceding pushed docs f6eff7c.
+Sync/products/prices unchanged, cPanel handler and synchronized records preserved.
+No broad suite, backup recovery, phone test or notifications. Next unattended
+backup due 5 October 03:30 America/Lower_Princes / 07:30 UTC remains unverified;
+actual alert delivery and replacement-host recovery unverified. D14 undecided;
+second-phone restore deferred to pre-release, NOT PASSED. Steps 4/5 remain open.
