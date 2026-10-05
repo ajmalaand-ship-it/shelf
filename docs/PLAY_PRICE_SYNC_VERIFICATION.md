@@ -417,3 +417,47 @@ Cloud/Play write performed. Private sanitized evidence:
 Sync confirmed false before the request and in its output. Products, prices,
 permissions, credentials and deployed code c887f91 unchanged. No tests,
 deployment or broad documentation reconciliation for this diagnostic.
+
+
+## Temporary account-level Play grants / single check — 5 October 2026 UTC
+
+Owner reports saving the following ACCOUNT-level permissions for
+shelf-play@shelf-510123.iam.gserviceaccount.com at approximately **00:38 UTC**:
+View app information and download bulk reports; View financial data, orders, and
+cancellation survey responses; Manage orders and subscriptions; Manage store
+presence. These are temporary diagnostic grants across an account with other
+apps. Admin was not requested. No Cloud IAM change is confirmed. This supersedes
+earlier statements that account-level permissions were unchecked as a description
+of current permissions; those statements remain valid historical evidence.
+
+One owner-authorized calculation-only request executed **00:39:20 UTC**, using
+existing service-account credential and androidpublisher scope, native cURL,
+POST https://androidpublisher.googleapis.com/androidpublisher/v3/applications/services.shelf.app/pricing:convertRegionPrices
+with exact body {"price":{"currencyCode":"USD","units":"2","nanos":990000000}}.
+**No x-goog-user-project header** and no API key. Fresh token obtained privately
+through existing loader; no credential/token values printed or stored.
+
+Result: **HTTP 403**, sanitized error:
+
+```json
+{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}
+```
+
+No structured details or error reasons returned. This is approximately 80 seconds
+after the owner-reported save time: propagation may still be pending. It does
+not prove the saved grants failed, that account-wide access is required, or that
+a particular permission is missing. No retry loop or second request. Conversion
+remains unverified after these grants; product-write access/full sync also remain
+unverified. The earlier explicit-header USER_PROJECT_DENIED is separate evidence;
+no confirmed Cloud IAM change and no header integration proposed from this result.
+
+**Open follow-up:** review/remove the temporary account-wide grants with the
+owner after the diagnostic window; retain only verified necessary access scoped
+as narrowly as supported. No automatic permission changes, no assumed removal
+completed. Any later propagation check requires a separately bounded request;
+none scheduled or executed here.
+
+Sync confirmed false before and in the result; no products, prices, credentials
+or permissions changed by the agent. Deployed code c887f91 unchanged. No broad
+tests or deployment; only this verification document updated. Private sanitized
+result: /home/shelf/tmp/shelf-play-sync-20261004/account-grants-comparison-safe.json.
