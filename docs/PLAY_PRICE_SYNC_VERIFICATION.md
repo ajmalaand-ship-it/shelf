@@ -373,3 +373,47 @@ References: [conversion](https://developers.google.com/android-publisher/api-ref
 [setup](https://developers.google.com/android-publisher/getting_started),
 [Play permissions](https://support.google.com/googleplay/android-developer/answer/9844686),
 [consumer project](https://docs.cloud.google.com/docs/quotas/set-quota-project).
+
+
+## Explicit consumer-project comparison — 5 October 2026, 00:29:38 UTC
+
+Owner authorized the single proposed calculation-only comparison. Existing server
+service-account credential, androidpublisher scope, native cURL client, endpoint
+and exact USD 2.99 body retained; only request header added:
+`x-goog-user-project: shelf-510123`. Fresh token obtained through the existing
+loader; no credential/token values printed or stored. No API key added.
+
+Result: **HTTP 403 PERMISSION_DENIED**, with a new structured error:
+
+```json
+{
+  "code": 403,
+  "status": "PERMISSION_DENIED",
+  "reason": "USER_PROJECT_DENIED",
+  "domain": "googleapis.com",
+  "metadata": {
+    "containerInfo": "shelf-510123",
+    "consumer": "projects/shelf-510123",
+    "service": "androidpublisher.googleapis.com"
+  }
+}
+```
+
+Sanitized message: caller lacks permission to use project shelf-510123; Google
+names `serviceusage.services.use`, available via Service Usage Consumer or a custom
+role. This identifies the Cloud prerequisite for **this explicit-header variant**.
+It does not establish that the original header-free generic permission denial was
+caused by that prerequisite, nor demonstrate that satisfying it would authorize
+Play pricing or product PATCH. No speculative IAM grant or persistent header fix.
+The original denial and owner Explorer success remain distinct evidence.
+
+Practical implication: the header-only variant is blocked before it can establish
+whether explicit consumer selection fixes pricing. Do not implement this header
+or change permissions solely from this result. The held support draft can now
+include both error forms when escalation is separately chosen; nothing sent.
+The preceding proposed check is now executed; no repeated request or further
+Cloud/Play write performed. Private sanitized evidence:
+`/home/shelf/tmp/shelf-play-sync-20261004/consumer-project-safe.json`.
+Sync confirmed false before the request and in its output. Products, prices,
+permissions, credentials and deployed code c887f91 unchanged. No tests,
+deployment or broad documentation reconciliation for this diagnostic.
