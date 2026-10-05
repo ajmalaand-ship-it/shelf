@@ -141,8 +141,8 @@ in-app products, with app grants supported. Its setup guide explicitly says
 Cloud-project linking is no longer required. Do not recreate keys, re-link
 projects, re-upload releases or toggle permissions speculatively.
 
-**One necessary Console action:** Play Console → Help → Contact us: submit the
-following report asking Google to identify the pricing authorization restriction.
+**Historical support draft (superseded by the Explorer comparison below):**
+Play Console → Help → Contact us; earlier report retained as investigation history.
 No agent message has been sent to support; the owner submits it. Do not attach
 service-account JSON, bearer tokens, keys, .env or reader/order data.
 
@@ -178,3 +178,89 @@ References: [service-account setup and no linking requirement](https://developer
 [app-level grants](https://developers.google.com/android-publisher/api-ref/rest/v3/grants?hl=en),
 [pricing permission](https://support.google.com/googleplay/android-developer/answer/9844686),
 [conversion request/scope](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization/convertRegionPrices?hl=en).
+
+## Owner APIs Explorer success / exact server comparison — 5 October 2026 UTC
+
+Owner reports Google APIs Explorer successfully returned convertedRegionPrices,
+convertedOtherRegionsPrice and regionVersion={"version":"2026/01"} for
+services.shelf.app using precisely:
+
+POST https://androidpublisher.googleapis.com/androidpublisher/v3/applications/services.shelf.app/pricing:convertRegionPrices
+
+```json
+{"price":{"currencyCode":"USD","units":"2","nanos":990000000}}
+```
+
+This is owner-reported successful calculation evidence; no products were changed.
+At **2026-10-05 00:17:11 UTC**, one native cURL reproduction with the existing
+server service-account credential and the exact endpoint/body above returned
+**HTTP 403**. Sanitized complete error fields:
+
+```json
+{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}
+```
+
+No reason/errors array or details supplied. Safe private evidence:
+/home/shelf/tmp/shelf-play-sync-20261004/explorer-comparison-safe.json.
+
+| Dimension | Server probe | Successful owner Explorer test |
+| --- | --- | --- |
+| Principal | shelf-play@shelf-510123.iam.gserviceaccount.com | Owner browser identity; distinct from server account; exact email not requested/recorded |
+| OAuth | Service-account JWT grant; androidpublisher scope | Explorer browser OAuth; effective scope not supplied in owner evidence |
+| Package, endpoint and Money body | Exact request above | Same request above |
+| Credential Cloud project | shelf-510123 | Explorer client/consumer project not established |
+| Explicit quota override | No quota_project_id in credential; GOOGLE_CLOUD_QUOTA_PROJECT absent; no x-goog-user-project or API key sent | Header/API-key/consumer configuration not established |
+| Outcome | 403 PERMISSION_DENIED | Successful three-field conversion, regionVersion 2026/01 |
+
+The custom server client neither uses ADC nor delegates to the owner's identity.
+Its token is freshly acquired with the existing private key; no browser token was
+requested/copied. Cloud's general quota documentation uses a service account's
+associated project by default when no override is specified. The lack of an
+explicit quota header alone does not establish a configuration fault; the exact
+Play consumer-project resolution is not visible in this response. No speculative
+quota header, project/IAM grant, API key or credential change was made.
+
+The comparison demonstrates a caller/client-dependent outcome for the same
+valid calculation request. It changes both principal and client environment,
+so it proves neither a specific missing Play permission nor a quota-project
+cause. App-level Manage store presence remains owner-confirmed granted. Prior
+service-account product GET 200 and conversion/PATCH denial evidence are retained.
+Owner-user success supports functioning calculation for this package; it does
+not prove all service-account/account prerequisites or product writes work.
+
+**Smallest justified next action:** submit the revised paired-results report
+below via Play Console → Help → Contact us, asking Google to identify the exact
+service-account restriction and compare the consumer/quota context. No permission
+toggle or broader Admin access is justified. Agent has not contacted support.
+
+> Package services.shelf.app (Shelf): identical convertRegionPrices request
+> succeeds in Google APIs Explorer as the owner, but fails with our server
+> service account shelf-play@shelf-510123.iam.gserviceaccount.com.
+> POST https://androidpublisher.googleapis.com/androidpublisher/v3/applications/services.shelf.app/pricing:convertRegionPrices
+> Body: {"price":{"currencyCode":"USD","units":"2","nanos":990000000}}.
+> Owner Explorer returned convertedRegionPrices, convertedOtherRegionsPrice and
+> regionVersion {"version":"2026/01"}. On 2026-10-05 00:17:11 UTC our server
+> returned HTTP 403: {"error":{"code":403,"message":"The caller does not have permission",
+> "status":"PERMISSION_DENIED"}}, without reason/details. Existing credentials,
+> Cloud project shelf-510123, service-account JWT OAuth grant, scope
+> https://www.googleapis.com/auth/androidpublisher. No API key or explicit
+> x-goog-user-project/quota override. Server product GET previously returned 200;
+> conversion denial reproduced through Laravel and native cURL.
+> Owner verified app-level View app information, View financial data, Manage
+> orders and subscriptions, Manage store presence for this exact account/package.
+> No App Admin/account-wide permissions. Selling merchant profile previously
+> confirmed linked. The Explorer test changes both identity and client environment;
+> we do not know its effective scope or consumer/quota-project configuration.
+> Please identify the effective monetization restriction, including any consumer-
+> project prerequisite, and least-privilege correction. No keys/tokens attached.
+
+Sync remains disabled. No products, prices, availability, permissions or
+credentials changed; no code deployment or broad tests. Deployed code c887f91,
+prior documentation ee8d0b2, new records committed separately. Existing handler
+and synchronized documents preserved. Automatic backup next due 5 October
+03:30 America/Lower_Princes / 07:30 UTC; unattended success remains unverified
+at this check. Actual alert delivery/replacement-host recovery unverified;
+D14 undecided; second-phone restore deferred, NOT PASSED. Steps 4/5 stay open.
+
+References: [conversion request](https://developers.google.com/android-publisher/api-ref/rest/v3/monetization/convertRegionPrices?hl=en),
+[quota-project selection](https://docs.cloud.google.com/docs/quotas/set-quota-project).

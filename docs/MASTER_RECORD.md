@@ -883,3 +883,29 @@ controlled verification is still the last observed success. Alert delivery and
 replacement-host recovery unverified; D14 undecided; second-phone restore
 deferred to pre-release, NOT PASSED. Steps 4 and 5 remain open. D9/6.4 resumes
 when Google's restriction/correction is established, without speculative Admin.
+
+## Owner Explorer success and server reproduction — 5 October 2026 UTC
+
+Owner reports successful APIs Explorer calculation for services.shelf.app with
+USD units "2", nanos 990000000: convertedRegionPrices, convertedOtherRegionsPrice,
+regionVersion {"version":"2026/01"}. Exact same endpoint/body reproduced once
+on server at 00:17:11 UTC with existing service credential: HTTP 403,
+PERMISSION_DENIED, "The caller does not have permission", no reason/details.
+Caller shelf-play@shelf-510123.iam.gserviceaccount.com, androidpublisher scope,
+credential project shelf-510123. No explicit quota_project_id, quota environment
+override, API key or x-goog-user-project; browser consumer/project/scope unknown.
+
+Browser success changed identity and client environment together. It establishes
+successful calculation for the owner, not a specific missing permission or
+quota configuration. App-level Manage store presence is still confirmed granted.
+No products/prices/permissions/credentials changed; sync remains disabled.
+No browser token requested/copied, no code deploy or broad suite.
+Deployed code remains c887f91; prior pushed documentation ee8d0b2.
+
+Next: submit the revised paired-results support report in
+[price-sync evidence](PLAY_PRICE_SYNC_VERIFICATION.md), asking Google to identify
+the exact service-account/consumer-context restriction and least-privilege fix.
+Existing manual/controlled backup evidence preserved; next automatic run
+5 October 03:30 America/Lower_Princes / 07:30 UTC, unattended success not yet
+verified. Actual alert delivery/replacement-host recovery unverified; D14 open;
+second-phone restore deferred, NOT PASSED. Steps 4 and 5 remain open.
