@@ -542,6 +542,48 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Production webhook preparation — 7 October 2026 (latest)
+
+Fresh read-only RevenueCat inspection confirms one existing Shelf webhook:
+project Shelf/projbbce26da, app appf83cd58c5c/services.shelf.app,
+Shelf sandbox book purchases/whintgr75a4892970 at
+https://shelf.services/api/purchases/webhook; sandbox environment and exactly
+NON_RENEWING_PURCHASE, CANCELLATION, EXPIRATION filters. Only the environment
+filter needs an owner dashboard edit to Sandbox and Production / Both. Retain
+app scope, URL, Authorization and filters; no duplicate webhook. **PENDING OWNER
+ACTION / NOT VERIFIED**, not completed by this task. Short instructions and
+source evidence: [production verification](PRODUCTION_PURCHASE_VERIFICATION.md).
+
+Deployed 340634b already authenticates and handles both environments, rejects new
+real sales with gate OFF, processes matched prior-real-purchase refunds/revocations
+with gate OFF (including deleted-reader history), verifies reader/book/REST receipt,
+prevents duplicates and preserves append-only accounting. No local implementation
+gap found; existing focused staged evidence reviewed, not rerun. No deployment,
+database/history changes, webhook/provider writes, credentials/permissions edit,
+Android build/upload or Play product/price work. Real checkout remains disabled.
+Documentation-only synchronization leaves authoritative runtime release 340634b;
+cPanel handler preserved. Installed Android app unchanged.
+
+**D14 = account deletion and data retention:** owner must choose retention periods
+for sales, security and deleted-account records and the deletion/restore identity
+policy. These block policy-specific retention/deletion implementation and final
+privacy wording, not generic purchase/webhook construction. Existing deletion and
+financial history remain unchanged pending decision.
+**D16 = final launch catalogue:** owner chooses which books launch. It blocks final
+book-specific launch preparation/acceptance, not generic payment construction.
+Rights/credits/samples and exact product/entitlement availability must be checked
+for those books; launch prices/regions need separate owner approval. USD 2.99 on
+books 3–8 is test-only, not approved launch pricing. Last verified Play inventory:
+book 3 present, books 4–8 absent; do not assume all six must launch.
+Neither D14 nor D16 blocks this preparation; both remain pre-launch requirements.
+
+Next: owner saves the existing webhook edit; bounded read-only confirmation can
+then record configuration success. Actual production delivery/real purchase
+acceptance needs separate launch approval. Release-capable source exists; Android
+build/acceptance, manual launch catalogue, D14 and targeted pre-release checks
+remain. Automatic sync DEFERRED / NOT COMPLETED; 403 work stopped. Steps 4/5 open;
+second-phone restore DEFERRED / NOT PASSED. No new recovery/alert/grant-removal claim.
+
 ## Android release purchase construction — 7 October 2026 (latest)
 
 Owner approved release-mode Android support behind disabled controls. Source now

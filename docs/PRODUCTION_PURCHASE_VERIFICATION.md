@@ -4,6 +4,79 @@ Owner authorization: 7 October 2026. Build/test the production verification path
 keep real purchases off. Manual Play products/prices/availability for first 100
 books remain approved. Automatic sync DEFERRED / NOT COMPLETED; 403 work stopped.
 
+## Production webhook coverage preparation — 7 October 2026
+
+Read-only RevenueCat V2 list on 7 October 2026,
+confirmed exactly one webhook for the existing URL:
+
+- Project **Shelf** (`projbbce26da`); Google Play app `appf83cd58c5c`,
+  package `services.shelf.app`. Runtime app mapping matches.
+- Existing webhook **Shelf sandbox book purchases** (`whintgr75a4892970`),
+  URL `https://shelf.services/api/purchases/webhook`.
+- Environment **sandbox**; filters `non_renewing_purchase`, `cancellation`,
+  `expiration`. Current dashboard change is **PENDING OWNER ACTION**, not done.
+
+**Owner action — one edit:** RevenueCat → Shelf (`projbbce26da`) → Integrations
+→ Webhooks → edit **Shelf sandbox book purchases** (`whintgr75a4892970`). Keep
+app scope `appf83cd58c5c` / `services.shelf.app`, URL and existing Authorization
+unchanged. Set Environment to **Sandbox and Production / Both**. Keep event
+coverage **NON_RENEWING_PURCHASE, CANCELLATION, EXPIRATION**, then Save.
+Use this existing webhook; no duplicate, credential rotation or app-scope change.
+Rollback is the same webhook's Environment back to Sandbox; no history deletion.
+
+RevenueCat documents environment/app/type filters and identifies non-renewing
+purchase and cancellation/refund events:
+[webhook settings](https://www.revenuecat.com/docs/integrations/webhooks),
+[event definitions](https://www.revenuecat.com/docs/integrations/webhooks/event-types-and-fields).
+Shelf has permanent per-book non-consumables, not subscriptions; retain the
+existing expiration/revocation coverage without adding unsupported lifecycle or
+transfer events. Existing 15-minute Google voided-purchase polling is preserved.
+
+Local endpoint `POST /api/purchases/webhook` already checks configured credentials,
+exact Authorization with hash_equals, validated fields, numeric reader identity,
+exact app/PLAY_STORE and SANDBOX/PRODUCTION environment. New sales require server
+REST evidence to agree; failed/unknown evidence never unlocks. Event/transaction
+conflicts and duplicates preserve append-only history. With real-sale gate OFF,
+new PRODUCTION NON_RENEWING_PURCHASE is rejected (422, no unlock/sale), whereas
+CANCELLATION/EXPIRATION for an existing matching real purchase still process,
+including deleted-reader history. Broadening delivery does not enable checkout
+or real-sale acceptance. Staging still rejects all webhooks.
+
+No implementation change needed. Existing 340634b staged/promotion evidence
+(62 PHP / 474 assertions and 20 Flutter checks) already covers authentication,
+gate-off real-sale rejection, sandbox confirmation/duplicates, verified real sale,
+refunds with sales off/deleted readers, restore/isolation and immutable accounting.
+Reviewed evidence and code; no repeated test suite, synthetic live delivery,
+Android build/upload, product/price/provider write, permission or secret change.
+No production delivery/configuration success is claimed until the owner saves
+and a bounded read-only check confirms the setting. A real purchase/delivery
+acceptance test remains separately launch-approved. Runtime release stays 340634b;
+this task only synchronizes documentation, no application rollout or DB change.
+
+### D14 and D16: construction versus launch
+
+- **D14 = account deletion and data retention.** Owner decisions still needed:
+  how long sales, security and deleted-account records are retained, and what
+  deletion means for restoring purchases (including any retained identity link
+  and how that is explained to readers). These block the corresponding retention/
+  deletion-policy implementation and final privacy wording. Existing account
+  deletion keeps financial history; do not invent retention periods or change it.
+- **D16 = final launch catalogue**, the choice of books included at launch. It is
+  not a webhook/environment switch or a missing generic payment feature. It
+  blocks final book-specific launch preparation/acceptance, not reusable purchase
+  construction. Known rights/credits, samples, store availability and mappings
+  must be confirmed for the chosen books. Launch prices/regions need their own
+  owner approval under D9/payment setup; USD 2.99 on books 3–8 is TEST ONLY.
+- Neither decision blocks this webhook preparation or already-built production
+  verification/Android source. Both must be resolved before public launch; launch
+  approval, approved release build, manual catalogue completion and targeted
+  acceptance remain separate. Last verified Play inventory: shelf_book_3 exists,
+  shelf_book_4 through shelf_book_8 absent. Do not infer all six must launch.
+
+Automatic sync DEFERRED / NOT COMPLETED; 403 work stopped. Steps 4 and 5 remain
+open. Second-phone restore remains DEFERRED / NOT PASSED; grant-removal owner
+confirmation and targeted recovery/phone acceptance remain unchanged.
+
 ## Verification and controls
 
 - PurchaseWebhookController still authenticates the existing provider authorization
@@ -89,7 +162,7 @@ reader/money activity.
    No Console/provider product change is performed here; last inventory remains
    book 3 present, 4–8 missing, until a later verified owner update.
 4. Review existing authenticated app-scoped webhook to include production events
-   when separately authorized (current setup is sandbox-only). Preserve credentials,
+   using the exact owner edit above (still sandbox-only until saved/verified). Preserve credentials,
    correct identities, refund polling and acknowledgement; verify launch operations.
 5. Complete targeted pre-release acceptance: signing/OAuth/listing, privacy/support/
    deletion and owner D14 retention policy, launch catalogue/rights D16, remaining

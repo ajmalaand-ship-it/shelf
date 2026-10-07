@@ -405,3 +405,11 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
   receipts. Restore remains independent of buying. No Android artifact/upload or
   provider settings changed; installed app unchanged. See
   docs/PRODUCTION_PURCHASE_VERIFICATION.md and latest Master Record status.
+
+- 2026-10-07: Production webhook preparation: read-only provider inspection confirms
+  existing Shelf webhook whintgr75a4892970 is sandbox-only. Owner edit to Both
+  environments pending; preserve existing app, URL, auth and three event filters.
+  Deployed 340634b needs no code change; real checkout stays OFF and prior-real
+  refunds still process. D14 blocks retention/deletion policy implementation;
+  D16 is the launch book list, not a generic purchase-construction blocker.
+  USD 2.99 values are test-only. See latest Master Record and production runbook.
