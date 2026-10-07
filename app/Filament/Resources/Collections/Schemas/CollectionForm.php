@@ -26,9 +26,9 @@ class CollectionForm
                     ->schema([
                         TextInput::make('title')->label('Book title')->required()->maxLength(255),
                         TextInput::make('subtitle')->label('Subtitle')->maxLength(255),
-                        TextInput::make('price_usd')->label('Book price (USD)')->numeric()->minValue(0.01)->maxValue(99999999.99)
+                        TextInput::make('price_usd')->label('Approved reference price (USD)')->numeric()->minValue(0.01)->maxValue(99999999.99)
                             ->step(0.01)->required(fn (Get $get): bool => $get('status') === 'published')
-                            ->helperText('Change prices here only. Saving sends this USD price to Google Play, which sets local prices. Test sales only.'),
+                            ->helperText('Manage products, prices and availability in Play Console for the first 100 books. Record the approved USD reference here; saving does not change Google Play. Checkout uses Google’s local price. Test sales only.'),
                         Select::make('book_type')->label('Book type')->options(['poetry' => 'Poetry', 'prose' => 'Prose'])->required()->default('poetry')->rules([Rule::in(['poetry', 'prose'])]),
                         Select::make('categories')->relationship('categories', 'name')->multiple()->searchable()->preload(),
                         Select::make('language')->options(fn () => config('books.languages'))
@@ -81,10 +81,8 @@ class CollectionForm
                         return $shares.' | '.($agreement->basis === 'net' ? 'Net amount received' : 'Gross income')
                             .' | Effective '.$agreement->starts_at->toDateString().'. New versions are added in Author-share agreements; past earnings stay unchanged.';
                     })->schema([]),
-                Section::make('Google Play sync')
-                    ->description(fn (?Collection $record): string => $record
-                        ? ucfirst($record->playSync?->status ?? 'pending').': '.($record->playSync?->message ?? 'Save this book to prepare Google Play sync.')
-                        : 'Save the book to prepare Google Play sync.')->schema([]),
+                Section::make('Google Play products and prices')
+                    ->description('Managed manually in Play Console. Automatic sync: DEFERRED. Saving this book does not create a Play product or change its price or availability. After publishing or withdrawing, review availability in Play Console.')->schema([]),
                 Section::make('Order / Publication')
                     ->columns(2)
                     ->schema([
@@ -99,7 +97,7 @@ class CollectionForm
                             ->unique(ignoreRecord: true)->maxLength(255)
                             ->helperText('Generated from the title when blank on a new book. Title edits never change it. Change an existing identifier only deliberately.'),
                         TextInput::make('product_id')->label('Google Play product ID')->disabled()->dehydrated(false)
-                            ->helperText('Automatically generated and synced to Google Play. Permanent; RevenueCat uses the same identifier.'),
+                            ->helperText('Permanent Shelf mapping. Create or check this exact ID in Play Console and RevenueCat; saving does not create the Play product.'),
                     ])
                     ->collapsible()
                     ->collapsed(),

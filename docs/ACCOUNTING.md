@@ -1,5 +1,11 @@
 # Sales and author-share accounting — Step 4 / 2 October 2026
 
+> **Current amendment — 7 October 2026:** first 100 books use manual Play Console
+> products/prices/availability. Automatic sync DEFERRED, not completed; all 403
+> investigation/retry/support next actions below are historical and stopped.
+> See [owner checklist and next construction](MANUAL_PLAY_PRODUCTS.md). Temporary
+> account-grant removal is pending confirmation; Steps 4/5 remain open.
+
 Approved scope: Master Record 6.9 and D10. Owner-only recordkeeping, no money
 transfers or automatic payouts. Existing purchases, entitlements, refunds and
 Library behavior remain unchanged; live purchasing remains sandbox-only.
@@ -115,5 +121,6 @@ deferred to pre-release, NOT PASSED. Product/price sync's last HTTP 403 and disa
 runner remain unfinished; working refund API access does not prove price permissions.
 Accounting deployed at 5ff131f, retained in deployed/pushed 5f75fa0.
 Step 5 OneDrive remote isolated recovery passed 3 October (34 tables, 774 files);
-first unattended run failed 4 October after upload. Actual alerts and replacement-
+first unattended run failed 4 October after upload; repair c887f91 and controlled
+cron-environment recovery passed later that day. Future unattended success, actual alerts and replacement-
 host recovery remain unverified. See OFFSERVER_BACKUP.md.

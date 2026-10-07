@@ -1,10 +1,28 @@
 # Shelf single-book purchases — owner-only test setup
 
+> **Current amendment — 7 October 2026:** first 100 books use manual Play Console
+> products/prices/availability. Automatic sync DEFERRED, not completed; all 403
+> investigation/retry/support next actions below are historical and stopped.
+> See [owner checklist and next construction](MANUAL_PLAY_PRODUCTS.md). Temporary
+> account-grant removal is pending confirmation; Steps 4/5 remain open.
+
 This implementation accepts Google Play **SANDBOX** purchases only. No real
 payments are enabled. Staging is required before the Master Record's launch/testing
 boundary. Prices are set ONLY in the Shelf admin. The owner approved USD 2.99
 test prices for the six existing books; later price edits also belong only in
 the admin. Author percentages remain owner decisions.
+
+## Current price-sync gate — 4 October 2026
+
+Sync remains disabled; the dedicated queue has zero jobs. Fresh product read
+works for shelf_book_3 (ACTIVE/buy), but the documented non-mutating USD 2.99
+conversion still returns 403 PERMISSION_DENIED using the exact configured
+shelf-play@shelf-510123.iam.gserviceaccount.com identity. Previous owner-confirmed
+permissions and merchant setup are preserved; do not repeat setup speculatively.
+Owner now confirmed Manage store presence at app level for this exact identity;
+native cURL reproduced the pricing denial. The export request is superseded.
+See PLAY_PRICE_SYNC_VERIFICATION.md for the prepared Google support report.
+No product write, price/availability change or sync enablement occurred.
 
 ## Google Play Console
 

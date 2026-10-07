@@ -21,6 +21,11 @@ class SyncPlayPrices extends Command
 
             return self::INVALID;
         }
+        if (config('play_sync.deferred', true)) {
+            $this->info('Disabled: automatic sync DEFERRED. Manage products, prices and availability in Play Console. Historical sync records are retained.');
+
+            return self::SUCCESS;
+        }
         $books = Collection::withTrashed()->when($this->argument('book'), fn ($q, $id) => $q->whereKey($id))->orderBy('id');
         if ($this->option('status')) {
             foreach ($books->get() as $book) {

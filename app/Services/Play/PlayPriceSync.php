@@ -11,6 +11,9 @@ class PlayPriceSync
 {
     public function request(Collection $book): void
     {
+        if (config('play_sync.deferred', true)) {
+            return; // Preserve historical sync records; manual saves create no sync intent.
+        }
         DB::transaction(function () use ($book): void {
             $sync = PlayProductSync::where('collection_id', $book->id)->lockForUpdate()->first();
             $values = ['status' => 'pending', 'message' => GooglePlayClient::configured()
@@ -48,6 +51,9 @@ class PlayPriceSync
 
     public function run(int $bookId): void
     {
+        if (config('play_sync.deferred', true)) {
+            return; // Even a retained queued job must not retry or rewrite sync history.
+        }
         // Lock in the same order as admin saves. A concurrent edit becomes a new pending
         // revision after this transaction, rather than being acknowledged by an old job.
         DB::transaction(function () use ($bookId): void {

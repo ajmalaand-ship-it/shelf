@@ -31,14 +31,22 @@ checks are recorded separately from unfinished building work in
 Step 4 sales/author accounting (6.9) is built with an append-only journal,
 confirmed figures, payment records/reversals and per-currency owner balances.
 Deployed at 5ff131f and retained in 5f75fa0; see docs/ACCOUNTING.md.
-No real payments or automatic payouts are enabled. Step 4 is not all complete. Play product/price sync remains blocked by the last
-403 and disabled. Step 5 OneDrive encrypted upload/download and isolated
+No real payments or automatic payouts are enabled. Step 4 remains open.
+For the first 100 books, Play products/prices/availability are managed manually
+in Play Console. Automatic sync is DEFERRED, not completed, and disabled;
+403 investigation/retries are stopped. See docs/MANUAL_PLAY_PRODUCTS.md.
+Temporary account-level grants from 5 October require owner removal confirmation;
+preserve Shelf app-level access and existing credentials.
+Step 5 OneDrive encrypted upload/download and isolated
 recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
 append-only retention with monthly review. See docs/OFFSERVER_BACKUP.md.
 OneDrive implementation/evidence is deployed at 5f75fa0. First unattended run
 failed 4 October at 07:32:19 UTC after upload; no recovery success recorded.
-Next building task is Step 5 / 6.11: repair unattended backup/recovery. Actual
-alert delivery and replacement-host recovery remain unverified; recovery key
+Step 5 / 6.11 repair deployed at c887f91: absolute MariaDB daemon path,
+safe failure stages and original-error preservation on alert failure. See the
+runbook for controlled scheduled verification; future unattended success must
+be recorded separately. Actual alert delivery and replacement-host recovery
+remain unverified; recovery key
 is owner-confirmed on an unencrypted USB, preserved unchanged.
 Second-phone restore is deferred to the pre-release checklist, not passed and
 not requested now. Prioritize construction; automate necessary checks and request
@@ -144,6 +152,8 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-07: For Shelf’s first 100 books, the owner creates and manages Google Play products, prices and availability manually in Play Console. Automatic admin-to-Play product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled. Stop 403 investigations, calculations, retries and support follow-ups unless the owner explicitly reopens automatic sync. Existing product mappings, credentials, app-level access, verification, acknowledgements, entitlements, refunds, accounting and historical records are preserved. Admin USD prices are approved reference values; saving does not update Play. Checkout uses Google’s localized store price. No Play product creation/change is authorized in this task.
+
 - 2026-10-03: Owner confirms external recovery key at D:\shelf-recovery-key.secret
   on an unencrypted USB (SCP 100%, 65 bytes). Preserve existing key and OAuth.
   Complete staging/promotion, encrypted upload/download/isolated restore, schedule,

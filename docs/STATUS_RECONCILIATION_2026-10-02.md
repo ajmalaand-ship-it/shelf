@@ -1,5 +1,11 @@
 # Shelf status reconciliation — 2 October 2026
 
+> **Current amendment — 7 October 2026:** first 100 books use manual Play Console
+> products/prices/availability. Automatic sync DEFERRED, not completed; all 403
+> investigation/retry/support next actions below are historical and stopped.
+> See [owner checklist and next construction](MANUAL_PLAY_PRODUCTS.md). Temporary
+> account-grant removal is pending confirmation; Steps 4/5 remain open.
+
 ## Later accounting construction update
 
 The owner subsequently approved the recommended accounting task. The missing
@@ -10,10 +16,12 @@ or automatic payouts are enabled. See [accounting tools and verification](ACCOUN
 Accounting was deployed at 5ff131f and remains in deployed/pushed 5f75fa0.
 OneDrive encrypted upload/download/decryption and isolated recovery passed on
 3 October (34 tables, 774 files). The first unattended run failed after upload
-on 4 October; the manual run is still the last success. Actual alert delivery
+on 4 October; repair deployed at c887f91. See the latest runbook evidence for
+controlled scheduled verification; future unattended success is separate. Actual alert delivery
 and replacement-host recovery remain unverified. Product sync 403 is unresolved;
 second-phone restore is deferred, not passed. Neither Step 4 nor Step 5 is complete.
-Next building priority: repair unattended backup/recovery (Step 5 / 6.11).
+Next building priority: Step 4 / D9 and 6.4 admin-to-Play product/price integration,
+blocked by HTTP 403. D14 retention/privacy still waits for the owner decision.
 See OFFSERVER_BACKUP.md and Master Record Part 10 for current evidence.
 
 The remainder below is the historical documentation-only reconciliation before

@@ -16,7 +16,7 @@ class GooglePlayClient
 
     public static function configured(): bool
     {
-        return ! \App\Support\Staging::active() && (bool) config('play_sync.enabled') && filled(config('play_sync.credentials_path'));
+        return ! config('play_sync.deferred', true) && ! \App\Support\Staging::active() && (bool) config('play_sync.enabled') && filled(config('play_sync.credentials_path'));
     }
 
     private function token(): string
@@ -103,6 +103,9 @@ class GooglePlayClient
 
     public function sync(Collection $book): void
     {
+        if (config('play_sync.deferred', true)) {
+            throw new PlaySyncException('Automatic sync is deferred. Manage products and prices in Play Console.');
+        }
         if ($book->product_id !== 'shelf_book_'.$book->id) {
             throw new PlaySyncException('This book needs its permanent Shelf product ID.');
         }

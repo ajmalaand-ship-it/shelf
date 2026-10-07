@@ -279,6 +279,17 @@ Codex ends every task with: **Done:** / **Tested:** / **Problems:** / **Next:** 
 
 ## 6.4 Buying a book
 
+**Owner amendment — 7 October 2026 (supersedes prior admin-only D9):**
+For Shelf’s first 100 books, the owner creates and manages Google Play products,
+prices and availability manually in Play Console. Automatic admin-to-Play
+product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled.
+Stop 403 investigations, calculations, retries and support follow-ups unless the
+owner explicitly reopens automatic sync. Existing product mappings, credentials,
+app-level access, verification, acknowledgements, entitlements, refunds,
+accounting and historical records are preserved. Admin USD prices are approved
+reference values; saving does not update Play. Checkout uses Google’s localized
+store price. No Play product creation/change is authorized in this task.
+
 - Each book has its own price and its own store product. No subscription in Version 1.
 - Payments use Shelf’s own RevenueCat project and Shelf’s own Google Play products. Current provider requirements are checked before setup.
 - A purchase counts only after the payment provider confirms it to the server. A success screen in the app alone never unlocks a book.
@@ -518,7 +529,7 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 | D6  | App name and Android ID               | **Decided 27 Sep:** Shelf, services.shelf.app; slogan کتاب مو ژوند بدلوي.                                                                           |
 | D7  | Reader sign-in methods                | Open — Step 4                                                                                                                                                                                   |
 | D8  | Payment channels and territories      | Open — Step 4                                                                                                                                                                                   |
-| D9  | Prices and currencies                 | Open — Step 4                                                                                                                                                                                   |
+| D9  | Prices and currencies                 | **Amended 7 Oct:** manual Play Console products/prices for first 100 books; automatic sync DEFERRED, not completed. USD 2.99 test approval retained for books 3–8.                                                                                                                                                                                   |
 | D10 | Author and rights-holder agreements   | Decided 1 October 2026: owner sets per-book shares in admin; all six current books 100% net received to اجمل اند. See the addendum for book 6 permission and immutable agreement versions. |
 | D11 | Withdrawn books already bought        | Open — Step 4                                                                                                                                                                                   |
 | D12 | Refund handling                       | Open — Step 4                                                                                                                                                                                   |
@@ -530,6 +541,51 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## Current owner amendment — 7 October 2026
+
+For Shelf’s first 100 books, the owner creates and manages Google Play products,
+prices and availability manually in Play Console. Automatic admin-to-Play
+product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled.
+Stop 403 investigations, calculations, retries and support follow-ups unless the
+owner explicitly reopens automatic sync. Existing product mappings, credentials,
+app-level access, verification, acknowledgements, entitlements, refunds,
+accounting and historical records are preserved. Admin USD prices are approved
+reference values; saving does not update Play. Checkout uses Google’s localized
+store price. No Play product creation/change is authorized in this task.
+
+Read-only catalogue/Play list at 20:10:10 UTC: six Published paid books,
+IDs 3–8, each recorded USD 2.99 and exact shelf_book_<id> mapping. Only
+shelf_book_3 exists in Play: buy ACTIVE, US USD 2.99/AVAILABLE, legacy-compatible.
+Books 4–8 missing in Play. Sync false, zero play-prices jobs. Checklist and short
+owner instructions: [manual Play products](MANUAL_PLAY_PRODUCTS.md).
+No source, publication, price, financial data, credentials or Play products changed.
+Temporary four ACCOUNT-level grants saved around 5 October 00:38 UTC remain
+**REMOVAL PENDING OWNER CONFIRMATION**; preserve existing Shelf app-level grants.
+No permission write, credential removal or re-invitation performed.
+
+Necessary implementation: admin reference-price/manual status wording, deferral
+guard preventing saves/jobs/direct sync from invoking Play or rewriting sync
+history. Refund polling remains independent. Focused staging verification uses
+PlayPriceSyncTest, BookPurchasesTest, VoidedPurchasesTest and AccountingTest;
+no mobile files changed, no broad suite/phone rerun. Rollback: previous release
+through staging/promotion, retaining database history and handler.
+
+**Next independent unfinished construction: Step 4 / §6.4 production-mode
+purchase verification and sale recording behind disabled release controls.**
+PurchaseService::receive and RevenueCatClient::confirms currently require sandbox;
+production-mode verification is not built. A separate approved construction task
+can implement/test it in isolation without enabling real payments and without
+waiting for automatic price sync or D14. No such implementation in this task.
+D14 retention/deleted-account/privacy work remains owner-decision dependent.
+Second-phone restore remains DEFERRED / NOT PASSED, alongside targeted reading,
+Word import, offline/isolation/withdrawal and final launch acceptance checks.
+Actual backup alert delivery and replacement-host cutover remain unverified;
+no new backup schedule/recovery claim. Steps 4 and 5 are NOT complete.
+
+Historical status and investigation recommendations below are superseded by
+this amendment; retained as evidence, not instructions to resume sync.
+
 
 ## Current reconciliation — 4 October 2026 (documentation-only update)
 
@@ -544,10 +600,10 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 | Focused server snapshot, 04:52:11 UTC | Reader 3, book 3: sandbox purchases 5 and 6; original sale ledger 13 USD +2.99, refund ledger 14 USD -2.99, repurchase ledger 15 USD +2.99. All labelled Test; zero real-income rows. Google refund event 18 matched order; repurchase event 19. Entitlement active after repurchase, checked 04:45:55 UTC. |
 | Delivered fixes verified in code | Ownership published immediately after server confirmation; automatic startup/resume refresh and explicit errors; book action reads Open owned book. Admin Buying shows Allowed green / Blocked red. Deployed code at 2f0c2bf includes e4a286f, 69b4690 and d12a770. Phone evidence above supports purchase/refund behavior; it does not claim an owner visual check of admin badges. |
 | Refund schedule | Latest audited scheduled check 04:45:01 UTC: completed HTTP 200, one duplicate handled, no additional refund, no conflict/unmatched. No new polling/purchase/refund triggered by this task. |
-| Unfinished building | Step 4: product/price sync integration blocked by last 403, disabled; live purchases remain sandbox-only pending separate real-payment approval. Owner accounting construction is recorded below. Step 5: OneDrive encrypted upload/download/isolated restore and operating instructions built and verified 3 October; daily 03:30 AST schedule installed. Actual alert delivery remains unverified; first unattended run failed 4 October at 07:32:19 UTC after upload, without recovery evidence. Account-data retention work waits for D14. See detailed separation below. |
+| Unfinished building | Step 4: product/price sync integration blocked by last 403, disabled; live purchases remain sandbox-only pending separate real-payment approval. Owner accounting construction is recorded below. Step 5: OneDrive encrypted upload/download/isolated restore and operating instructions built and verified 3 October; daily 03:30 AST schedule installed. Actual alert delivery remains unverified; first unattended run failed 4 October at 07:32:19 UTC after upload. Repair deployed at c887f91; controlled scheduled verification is recorded below, separately from future unattended success. Account-data retention work waits for D14. See detailed separation below. |
 | Pre-release checks | Second-phone restore DEFERRED, NOT PASSED, not requested now. Keep reading/import acceptance, final account/isolation/offline/withdrawal checks, signing/listing/privacy/rights and recovery acceptance on a targeted checklist; do not use them to stall construction. |
 | Accounting construction (2 Oct) | Approved and built: Sales ledger historical book/rights-holder filters; Accounting journal for estimates, confirmations, linked adjustments/payment records/reversals; Author balances with separate currencies and unknown figures. Default scopes exclude Test. Necessary focused verification and required staging/full-PHP/rollback gates; deployed at 5ff131f and retained in 5f75fa0, with historical agreements preserved; exact backup recorded by release workflow. See ACCOUNTING.md. No payout or real-payment activation. |
-| Next building priority | Step 5 / 6.11: repair the failed unattended backup/recovery path; manual recovery passed 3 October, but unattended success is absent. Keep product-sync 403 and D14 retention work visible. Second-phone restore remains a pre-release check, not an implementation blocker. |
+| Next building priority | Step 4 / D9 and 6.4: finish admin-to-Play product/price integration blocked by HTTP 403; the Step 5 / 6.11 repair is recorded below. D14 retention/privacy remains owner-decision dependent. Second-phone restore remains a pre-release check, not an implementation blocker. |
 | Documentation and GitHub | At 4 October inspection, GitHub main and staging/production are 5f75fa0; accounting 5ff131f is included. The earlier unpushed-code warning is superseded. This task commits/pushes documentation only, without deployment. |
 
 ## Historical milestone — 28 September 2026
@@ -574,6 +630,9 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 | Open items                                        | SSH config file owned by the wrong user (server fix by root, not urgent). Repeated failed root login attempts (server security, later). Original poet of لمر ګلی unknown. Other projects also fill /tmp.                                                   |
 
 # Part 11 — Decision log
+
+- **7 October 2026:** For Shelf’s first 100 books, the owner creates and manages Google Play products, prices and availability manually in Play Console. Automatic admin-to-Play product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled. Stop 403 investigations, calculations, retries and support follow-ups unless the owner explicitly reopens automatic sync. Existing product mappings, credentials, app-level access, verification, acknowledgements, entitlements, refunds, accounting and historical records are preserved. Admin USD prices are approved reference values; saving does not update Play. Checkout uses Google’s localized store price. No Play product creation/change is authorized in this task.
+
 
 - **2 October 2026:** Owner confirmed real Google Play phone refund/download
   removal, paid access locked with free sample retained, declined payment locked,
@@ -682,7 +741,7 @@ These decisions are binding and will be folded into the next full version. Where
 | Visible-item clarification (30 Sep 2026) | Keep item visibility unchanged; Ajmal will choose visible items in the admin. Publication remains pending this choice: read-only preflight found no visible items in books 3, 4, 6, 7 or 8, and only item 152 in book 5. No publication or temporary samples were applied. |
 | D7 | Reader sign-in: Google sign-in + email/password. Registration is open to any email (owner decision); the staging boundary (6.11) still applies before real readers other than the owner. Google Cloud project shelf-510123; the Play Store signing key SHA-1 must be added to the Android OAuth client before release. |
 | D8 | Payments through Google Play (App Store later with an iOS version), using Shelf's own RevenueCat project. |
-| D9 | One price per book in US dollars, set and edited ONLY in the Shelf admin; Google Play shows it in the reader's local currency. Admin price changes automatically sync to Google Play: create missing one-time products, update their prices with Google's automatic local prices, and activate/deactivate with the book's publication state. The owner never creates products or edits prices in Play Console. Step 4 Task 2b test price approved: USD 2.99 on the six existing books, with backup first and actor/time recorded. Sync remains disabled until the owner provides server-only service-account credentials; one Play-enabled service account is used by both Shelf sync and RevenueCat. No real money. |
+| D9 | **Amended 7 October 2026:** For Shelf’s first 100 books, the owner creates and manages Google Play products, prices and availability manually in Play Console. Automatic admin-to-Play product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled. Stop 403 investigations, calculations, retries and support follow-ups unless the owner explicitly reopens automatic sync. Existing product mappings, credentials, app-level access, verification, acknowledgements, entitlements, refunds, accounting and historical records are preserved. Admin USD prices are approved reference values; saving does not update Play. Checkout uses Google’s localized store price. No Play product creation/change is authorized in this task. Existing six books retain approved USD 2.99 test reference prices. |
 | D11 | Readers who bought a book keep it forever, even if the book is later withdrawn. New readers cannot buy a withdrawn book. |
 | D12 | All sales are final; Shelf gives no refunds except accidental duplicate purchases or a book that does not work (owner decides in the admin). Google Play's own 48-hour refund window cannot be disabled: if Google refunds, access is removed. Before buying, the reader ticks: "Read the free sample first. All sales are final. I agree." The admin shows refunds per reader and can block a reader from buying. |
 | D13 | Bought books can be downloaded and read offline. The app checks ownership with the server whenever it is online. An offline copy stays readable for at most 30 days without a successful check; after that the reader must go online once. A refunded or revoked book, and its downloaded copy, is removed at the next check. |
@@ -711,7 +770,7 @@ media/source files, schema/rows and configuration/code checksums identical).
 completion with recovery_verified=true. This verifies the installed entry point,
 not an unattended cron launch.
 
-## Read-only reconciliation — 4 October 2026
+## Historical read-only reconciliation — 4 October 2026 (before repair)
 
 GitHub main and both staging/production release-state commits were
 `5f75fa0eea475431cbad9d7e0587a384e3f933c0` at inspection. Accounting
@@ -756,3 +815,194 @@ the first unattended attempt demonstrably failed despite the manual pass.
 Repair requires a separate approved task; it is not started here. Step 4
 admin-to-Play product/price integration (D9) and Step 5 retention/privacy (D14,
 6.10) remain separate unfinished work.
+
+## Unattended backup repair — 4 October 2026
+
+Owner authorized the repair after reconciliation d8e5499. Exact cause confirmed
+by replaying the failed run's existing uploaded package under the cron PATH:
+`drill → restore_database → subprocess.Popen` could not find **mariadbd**.
+The installed daemon is **/usr/sbin/mariadbd**; manual login PATH includes
+/usr/sbin, while cron uses **/usr/local/bin:/usr/bin:/bin**. Download, decryption
+and file checks reached SQL restoration before this failure. This was the
+original recovery error, independently reproduced without invoking alerts.
+
+Repair **c887f91fe52e0166cf936056b27e247ec8134946** passed staging's
+16 focused backup regressions and HTTPS isolation checks, then identical-commit
+production promotion with verified backup
+`/home/shelf/backups/shelf/20261004-233613/`. No broad PHP/phone tests.
+Recovery launches the daemon by its absolute installed path. Scheduled failure
+records now identify package/upload/recovery/success-record stages, error type
+and allowlisted executable names when available, withholding arguments/output.
+Alert exceptions are recorded separately in alert-failure.json and cannot mask
+the original error. Mocked transport tests send no notification.
+The focused staging gate includes the already approved accounting/status
+reconciliation documents; application changes still require their normal gate.
+
+**Controlled scheduled-environment verification PASSED**, as user shelf with
+HOME=/home/shelf, USER/LOGNAME=shelf, SHELL=/bin/sh, working directory
+/home/shelf, stdin noninteractive, clean environment and the exact cron PATH.
+The promoted `scheduled` entry point created and uploaded a fresh encrypted
+package, downloaded/decrypted it and verified isolated recovery:
+`shelf-production-20261004T233755Z-2d2f4eee28debdf2.tar.gpg`.
+Ciphertext SHA-256:
+`e572e1959c76ce513bb3a9b5d31c00cbc1fcb5dcd21eb476c4ec47ee782369a4`.
+Recovery finished **2026-10-04 23:39:27 UTC**: **34 tables**, identical schema/rows;
+**774 media/source files**, configuration and code inventories matched.
+Socket-only disposable MariaDB, no restored app startup; workspace cleaned up.
+Private recovery evidence and last-success.json record this success.
+The failed 07:30 package and original failure record remain preserved.
+
+This controlled run does **not** establish future unattended cron success.
+Next automatic run: **5 October 2026, 03:30 America/Lower_Princes / 07:30 UTC**.
+Cron was inspected read-only; all existing jobs and its PATH remain unchanged.
+Review the next run's new last-success and recovery timestamps before claiming
+unattended success. Historical failure.json can remain after a newer success;
+compare timestamps rather than treating its presence alone as a fresh failure.
+
+Alert configuration: one marked owner with a valid address and executable
+/usr/sbin/sendmail. Existing cron/mail delivery logs are not readable by shelf;
+no actual delivery evidence was established. **No test notification sent; actual
+alert delivery remains unverified.** Keys/OAuth, owner-confirmed separate
+unencrypted USB key, existing backups, append-only offsite retention/monthly
+review/100 MiB reserve and local retention 14 are preserved. Runtime cPanel
+handler is untouched. Full replacement-host recovery/cutover remains unverified.
+Second-phone restore remains deferred to pre-release, NOT PASSED. Product-sync
+HTTP 403 remains unresolved/disabled; D14 retention remains an owner decision.
+Neither Step 4 nor Step 5 is declared complete.
+
+Next unfinished building task: **Step 4 — Accounts and purchases, D9 / 6.4,
+admin-to-Play product and price integration**. Resolve the recorded 403 and prove
+admin-managed product/pricing sync before enabling its runner; this is the
+remaining purchase integration construction after accounting and backup repair.
+D14 privacy/retention work (Step 5 / 6.10) waits for its owner decision. No product
+sync or retention work started in this task. For rollback, retain backups and
+financial history, return code to the previous revision through the approved
+release workflow; no database schema change or cron/key/OAuth rollback is needed.
+
+## Step 4 / D9 and 6.4 — current investigation, 4 October 2026
+
+Reused the preserved pricing investigation and owner-confirmed permissions and
+merchant setup. Current configured identity is
+shelf-play@shelf-510123.iam.gserviceaccount.com, project shelf-510123,
+package services.shelf.app, documented androidpublisher OAuth scope.
+Bounded GET of shelf_book_3 passed (HTTP 200, ACTIVE, buy); documented,
+non-mutating USD 2.99 price conversion again returned HTTP 403 PERMISSION_DENIED
+with no reason/details. No new request defect established; exact ineffective
+Console grant/account prerequisite remains unknown. Prior PATCH denial is
+preserved evidence, not a new write. Current official Google docs checked.
+
+Effective sync remains disabled, price queue empty. Books 3–8 retain approved
+USD 2.99 prices, Published states and canonical product IDs. Book 3 local sync
+Error; others Pending, with no new sync-status/data change. No product write,
+availability change, credential recreation, setup repetition or broad admin
+request. Deployed code remains c887f91; prior pushed records 93f73df preserved.
+
+One necessary read-only owner action: Play Console → Users and permissions →
+search shelf-play@shelf-510123.iam.gserviceaccount.com → Export user list;
+provide only that identity's CSV row to establish active access, expiry and
+app/account permissions for services.shelf.app. Manage store presence maps to
+CAN_MANAGE_PUBLIC_LISTING. This resolves the exact-grant uncertainty before
+another setup change or Google escalation. Detailed evidence, official sources
+and enablement gates: [price-sync investigation](PLAY_PRICE_SYNC_VERIFICATION.md).
+
+No application changes/deployment, broad tests, backup recovery, phone checks
+or notifications. Next automatic offsite run remains 5 October 03:30
+America/Lower_Princes / 07:30 UTC; last success is still the controlled 4 October
+23:39:27 UTC verification, not unattended evidence. Actual alert delivery and
+replacement-host recovery unverified; D14 awaits owner decision; second-phone
+restore deferred to pre-release, NOT PASSED. Steps 4 and 5 remain open.
+Next work: resolve this authorization block, then finish D9/6.4 integration.
+
+## Pricing permission confirmation and continued diagnosis — 4 October 2026
+
+Owner confirmed exact service account shelf-play@shelf-510123.iam.gserviceaccount.com
+and app services.shelf.app: app-level View app information, View financial data,
+Manage orders and subscriptions, Manage store presence checked; app quality and
+policy declarations greyed checked; App Admin and all account permissions unchecked.
+No permission changed. This supersedes the permission-export request above.
+Manage store presence is granted; no broader permissions are requested.
+
+Independent native cURL at 23:55:00 UTC, existing service credentials and documented
+androidpublisher scope: product GET 200; documented USD 2.99 conversion POST 403
+PERMISSION_DENIED without reason/details. Same denial independently of Laravel
+request serialization; no evidenced code fix. Official Google docs support app
+permissions for pricing/products and no longer require Cloud-project linking.
+The exact Google backend restriction/account prerequisite remains unknown.
+
+Next essential owner action: Play Console → Help → Contact us, submit the
+prepared [pricing authorization support report](PLAY_PRICE_SYNC_VERIFICATION.md)
+asking for the specific restriction and least-privilege correction. No support
+message sent by the agent, no secrets in the report. No permission toggles,
+credential recreation, product write, setup retry, sync enablement or deployment.
+Deployed code remains c887f91; documentation committed separately. Preserved
+synchronized records and cPanel handler; no broad/phone/backup recovery tests.
+
+Future unattended backup: 5 October 03:30 America/Lower_Princes / 07:30 UTC;
+controlled verification is still the last observed success. Alert delivery and
+replacement-host recovery unverified; D14 undecided; second-phone restore
+deferred to pre-release, NOT PASSED. Steps 4 and 5 remain open. D9/6.4 resumes
+when Google's restriction/correction is established, without speculative Admin.
+
+## Owner Explorer success and server reproduction — 5 October 2026 UTC
+
+Owner reports successful APIs Explorer calculation for services.shelf.app with
+USD units "2", nanos 990000000: convertedRegionPrices, convertedOtherRegionsPrice,
+regionVersion {"version":"2026/01"}. Exact same endpoint/body reproduced once
+on server at 00:17:11 UTC with existing service credential: HTTP 403,
+PERMISSION_DENIED, "The caller does not have permission", no reason/details.
+Caller shelf-play@shelf-510123.iam.gserviceaccount.com, androidpublisher scope,
+credential project shelf-510123. No explicit quota_project_id, quota environment
+override, API key or x-goog-user-project; browser consumer/project/scope unknown.
+
+Browser success changed identity and client environment together. It establishes
+successful calculation for the owner, not a specific missing permission or
+quota configuration. App-level Manage store presence is still confirmed granted.
+No products/prices/permissions/credentials changed; sync remains disabled.
+No browser token requested/copied, no code deploy or broad suite.
+Deployed code remains c887f91; prior pushed documentation ee8d0b2.
+
+Historical next action (superseded by the Shelf-side audit below): paired-results
+support report prepared in [price-sync evidence](PLAY_PRICE_SYNC_VERIFICATION.md);
+no report sent.
+Existing manual/controlled backup evidence preserved; next automatic run
+5 October 03:30 America/Lower_Princes / 07:30 UTC, unattended success not yet
+verified. Actual alert delivery/replacement-host recovery unverified; D14 open;
+second-phone restore deferred, NOT PASSED. Steps 4 and 5 remain open.
+
+
+## Step 4 / D9 and §6.4 — Shelf-side audit, 5 October 2026 UTC
+
+Implementation traced from transactional admin save through Collection model
+hooks, durable revisioned PlayPriceSync intent, dedicated cron/queue and
+GooglePlayClient. GET/conversion/PATCH share token loader, scope, bearer/client,
+package and URL base; documented endpoint casing/body correction already present.
+Fresh production bootstrap in ordinary CLI and clean shelf cron environment
+(PATH /usr/local/bin:/usr/bin:/bin, initial cwd /home/shelf) resolves identical
+credential file, owner-inspected service identity, project shelf-510123 and
+services.shelf.app, sync disabled, staging false, no config cache or relevant
+inherited env override. No HTTP requests made. Web shares source/document root,
+but actual web runtime env was not directly measurable (no Shelf PHP process
+present); not claimed verified. No concrete local defect established or code fix.
+
+Conversion is an implementation choice for D9's Google-generated regional prices;
+modern product PATCH requires explicit regional settings and regionsVersion,
+without legacy autoConvertMissingPrices. Legacy API previously required migration;
+no unapproved alternative pricing or availability workflow adopted. Prior PATCH
+403 also remains. Official docs confirm androidpublisher scope, service-account
+Play setup and Manage store presence pricing/product rights; no evidenced mandate
+for Admin or account-wide grants. Owner's granted permission remains authoritative.
+
+Next single discriminating check: request-local x-goog-user-project shelf-510123
+on one otherwise unchanged service-account calculation. Not executed this task.
+Success implicates consumer routing; structured consumer/serviceusage error
+identifies the explicit variant's Cloud prerequisite; unchanged generic 403
+reduces that hypothesis but proves no particular missing Play grant. No speculative
+IAM/permission/credential edits; support draft held. Detailed functions, evidence,
+limits and official references: [PLAY_PRICE_SYNC_VERIFICATION.md](PLAY_PRICE_SYNC_VERIFICATION.md).
+
+Documentation-only audit; deployed code c887f91, preceding pushed docs f6eff7c.
+Sync/products/prices unchanged, cPanel handler and synchronized records preserved.
+No broad suite, backup recovery, phone test or notifications. Next unattended
+backup due 5 October 03:30 America/Lower_Princes / 07:30 UTC remains unverified;
+actual alert delivery and replacement-host recovery unverified. D14 undecided;
+second-phone restore deferred to pre-release, NOT PASSED. Steps 4/5 remain open.

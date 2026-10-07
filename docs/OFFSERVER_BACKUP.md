@@ -1,9 +1,17 @@
 # Shelf OneDrive backup and recovery
 
+> **Current amendment — 7 October 2026:** first 100 books use manual Play Console
+> products/prices/availability. Automatic sync DEFERRED, not completed; all 403
+> investigation/retry/support next actions below are historical and stopped.
+> See [owner checklist and next construction](MANUAL_PLAY_PRODUCTS.md). Temporary
+> account-grant removal is pending confirmation; Steps 4/5 remain open.
+
 Step 5 OneDrive backup/recovery, authorized 2 October and continued 3 October 2026.
 The owner chose their existing OneDrive. Production upload/download/isolated
 restore and schedule installation passed on 3 October; evidence is below. Actual
-email delivery remains unverified; the first unattended run failed on 4 October.
+email delivery remains unverified. The first unattended run failed on 4 October;
+repair c887f91 and controlled cron-environment recovery subsequently passed.
+Future unattended cron success remains unverified.
 Product/price sync remains disabled with its unresolved 403. Second-phone purchase
 restore is deferred, not passed. This task requires no broad PHP or phone rerun.
 
@@ -255,7 +263,7 @@ media/source files, schema/rows and configuration/code checksums identical).
 completion with recovery_verified=true. This verifies the installed entry point,
 not an unattended cron launch.
 
-## Read-only reconciliation — 4 October 2026
+## Historical read-only reconciliation — 4 October 2026 (before repair)
 
 GitHub main and both staging/production release-state commits were
 `5f75fa0eea475431cbad9d7e0587a384e3f933c0` at inspection. Accounting
@@ -300,3 +308,66 @@ the first unattended attempt demonstrably failed despite the manual pass.
 Repair requires a separate approved task; it is not started here. Step 4
 admin-to-Play product/price integration (D9) and Step 5 retention/privacy (D14,
 6.10) remain separate unfinished work.
+
+## Unattended backup repair — 4 October 2026
+
+Owner authorized the repair after reconciliation d8e5499. Exact cause confirmed
+by replaying the failed run's existing uploaded package under the cron PATH:
+`drill → restore_database → subprocess.Popen` could not find **mariadbd**.
+The installed daemon is **/usr/sbin/mariadbd**; manual login PATH includes
+/usr/sbin, while cron uses **/usr/local/bin:/usr/bin:/bin**. Download, decryption
+and file checks reached SQL restoration before this failure. This was the
+original recovery error, independently reproduced without invoking alerts.
+
+Repair **c887f91fe52e0166cf936056b27e247ec8134946** passed staging's
+16 focused backup regressions and HTTPS isolation checks, then identical-commit
+production promotion with verified backup
+`/home/shelf/backups/shelf/20261004-233613/`. No broad PHP/phone tests.
+Recovery launches the daemon by its absolute installed path. Scheduled failure
+records now identify package/upload/recovery/success-record stages, error type
+and allowlisted executable names when available, withholding arguments/output.
+Alert exceptions are recorded separately in alert-failure.json and cannot mask
+the original error. Mocked transport tests send no notification.
+The focused staging gate includes the already approved accounting/status
+reconciliation documents; application changes still require their normal gate.
+
+**Controlled scheduled-environment verification PASSED**, as user shelf with
+HOME=/home/shelf, USER/LOGNAME=shelf, SHELL=/bin/sh, working directory
+/home/shelf, stdin noninteractive, clean environment and the exact cron PATH.
+The promoted `scheduled` entry point created and uploaded a fresh encrypted
+package, downloaded/decrypted it and verified isolated recovery:
+`shelf-production-20261004T233755Z-2d2f4eee28debdf2.tar.gpg`.
+Ciphertext SHA-256:
+`e572e1959c76ce513bb3a9b5d31c00cbc1fcb5dcd21eb476c4ec47ee782369a4`.
+Recovery finished **2026-10-04 23:39:27 UTC**: **34 tables**, identical schema/rows;
+**774 media/source files**, configuration and code inventories matched.
+Socket-only disposable MariaDB, no restored app startup; workspace cleaned up.
+Private recovery evidence and last-success.json record this success.
+The failed 07:30 package and original failure record remain preserved.
+
+This controlled run does **not** establish future unattended cron success.
+Next automatic run: **5 October 2026, 03:30 America/Lower_Princes / 07:30 UTC**.
+Cron was inspected read-only; all existing jobs and its PATH remain unchanged.
+Review the next run's new last-success and recovery timestamps before claiming
+unattended success. Historical failure.json can remain after a newer success;
+compare timestamps rather than treating its presence alone as a fresh failure.
+
+Alert configuration: one marked owner with a valid address and executable
+/usr/sbin/sendmail. Existing cron/mail delivery logs are not readable by shelf;
+no actual delivery evidence was established. **No test notification sent; actual
+alert delivery remains unverified.** Keys/OAuth, owner-confirmed separate
+unencrypted USB key, existing backups, append-only offsite retention/monthly
+review/100 MiB reserve and local retention 14 are preserved. Runtime cPanel
+handler is untouched. Full replacement-host recovery/cutover remains unverified.
+Second-phone restore remains deferred to pre-release, NOT PASSED. Product-sync
+HTTP 403 remains unresolved/disabled; D14 retention remains an owner decision.
+Neither Step 4 nor Step 5 is declared complete.
+
+Next unfinished building task: **Step 4 — Accounts and purchases, D9 / 6.4,
+admin-to-Play product and price integration**. Resolve the recorded 403 and prove
+admin-managed product/pricing sync before enabling its runner; this is the
+remaining purchase integration construction after accounting and backup repair.
+D14 privacy/retention work (Step 5 / 6.10) waits for its owner decision. No product
+sync or retention work started in this task. For rollback, retain backups and
+financial history, return code to the previous revision through the approved
+release workflow; no database schema change or cron/key/OAuth rollback is needed.

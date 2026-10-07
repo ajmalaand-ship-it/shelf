@@ -263,6 +263,33 @@ def https_checks():
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    manual_scope = {'config/play_sync.php', 'app/Services/Play/GooglePlayClient.php',
+                    'app/Services/Play/PlayPriceSync.php', 'app/Console/Commands/SyncPlayPrices.php',
+                    'app/Filament/Resources/Collections/Schemas/CollectionForm.php',
+                    'app/Filament/Resources/Collections/Tables/CollectionsTable.php',
+                    'tests/Feature/PlayPriceSyncTest.php', 'scripts/staging/workflow.py', 'AGENTS.md',
+                    'docs/MASTER_RECORD.md', 'docs/ACCOUNTING.md', 'docs/OFFSERVER_BACKUP.md',
+                    'docs/PLAY_PRICE_SYNC_VERIFICATION.md', 'docs/PURCHASES_TEST_SETUP.md',
+                    'docs/STATUS_RECONCILIATION_2026-10-02.md', 'docs/MANUAL_PLAY_PRODUCTS.md'}
+    if changes and set(changes) <= manual_scope and 'config/play_sync.php' in changes:
+        # Owner authorized focused checks for the first-100-books manual amendment.
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'PlayPriceSyncTest|BookPurchasesTest|VoidedPurchasesTest|AccountingTest'
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+                                    stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Staged manual Play checks failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit': commit, 'passed': True,
+            'checked_at': datetime.now(timezone.utc).isoformat(), 'mobile_tests': False,
+            'scope': 'manual-play', 'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: identical staged commit focused manual Play/purchase/refund/accounting checks.', flush=True)
+        return
     backup_scope = {'scripts/shelf_offsite_backup.py', 'scripts/test_shelf_offsite_backup.py', 'scripts/shelf_daily_backup.py',
                     'scripts/run_tests.sh', 'scripts/staging/workflow.py', 'docs/OFFSERVER_BACKUP.md',
                     'docs/MASTER_RECORD.md', 'AGENTS.md', 'docs/ACCOUNTING.md',

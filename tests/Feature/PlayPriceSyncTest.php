@@ -34,7 +34,7 @@ class PlayPriceSyncTest extends TestCase
         parent::setUp();
         Bus::fake();
         Http::preventStrayRequests();
-        config(['play_sync.enabled' => false]);
+        config(['play_sync.enabled' => false, 'play_sync.deferred' => false]);
         $key = openssl_pkey_new(['private_key_bits' => 2048]);
         openssl_pkey_export($key, $private);
         $this->publicKey = openssl_pkey_get_details($key)['key'];
@@ -97,6 +97,31 @@ class PlayPriceSyncTest extends TestCase
         (new SyncPlayBook($book->id))->handle(app(PlayPriceSync::class));
 
         return PlayProductSync::where('collection_id', $book->id)->firstOrFail();
+    }
+
+    public function test_manual_mode_preserves_mapping_price_audit_and_sync_history_without_jobs_or_http(): void
+    {
+        $book = $this->book();
+        $history = $book->playSync()->first()->getAttributes();
+        config(['play_sync.deferred' => true, 'play_sync.enabled' => true]);
+        $book->update(['title' => 'Manual title', 'price_usd' => '3.99']);
+        $this->assertSame('shelf_book_'.$book->id, $book->fresh()->product_id);
+        $this->assertSame($history, $book->playSync()->first()->getAttributes());
+        $this->assertDatabaseHas('book_price_changes', ['collection_id' => $book->id, 'old_price_usd' => '2.99', 'new_price_usd' => '3.99']);
+        $this->assertFalse(app(PlayPriceSync::class)->enqueue($book->id));
+        (new SyncPlayBook($book->id))->handle(app(PlayPriceSync::class));
+        $this->assertSame($history, $book->playSync()->first()->getAttributes());
+        $this->artisan('shelf:sync-play-prices', ['--once' => true])->expectsOutputToContain('Disabled')->assertSuccessful();
+        try {
+            app(\App\Services\Play\GooglePlayClient::class)->sync($book);
+            $this->fail('Direct sync must be blocked while deferred.');
+        } catch (\App\Services\Play\PlaySyncException $error) {
+            $this->assertStringContainsString('deferred', $error->getMessage());
+        }
+        $new = $this->book();
+        $this->assertNull($new->playSync()->first());
+        Http::assertNothingSent();
+        Bus::assertNothingDispatched();
     }
 
     public function test_disabled_sync_keeps_pending_without_http_or_jobs(): void
@@ -225,8 +250,8 @@ class PlayPriceSyncTest extends TestCase
         Bus::assertDispatched(SyncPlayBook::class, fn ($job) => $job->connection === 'database' && $job->queue === 'play-prices');
         $this->assertSame('2.99', $book->refresh()->price_usd);
         $this->actingAs(User::factory()->state(['is_owner' => true])->create());
-        $this->get(CollectionResource::getUrl('index'))->assertOk()->assertSee('Google Play')->assertSee('Pending');
-        $this->get(CollectionResource::getUrl('edit', ['record' => $book]))->assertOk()->assertSee('Google Play sync');
+        $this->get(CollectionResource::getUrl('index'))->assertOk()->assertSee('Google Play')->assertSee('Manual');
+        $this->get(CollectionResource::getUrl('edit', ['record' => $book]))->assertOk()->assertSee('Google Play products and prices')->assertSee('DEFERRED')->assertSee('saving does not change Google Play');
     }
 
     public function test_price_migration_restores_old_prices_and_keeps_traceable_reverse_entries(): void
