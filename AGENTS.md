@@ -32,6 +32,10 @@ Step 4 sales/author accounting (6.9) is built with an append-only journal,
 confirmed figures, payment records/reversals and per-currency owner balances.
 Deployed at 5ff131f and retained in 5f75fa0; see docs/ACCOUNTING.md.
 No real payments or automatic payouts are enabled. Step 4 remains open.
+Production-mode server verification is built behind the OFF-by-default
+SHELF_REAL_PURCHASES_ENABLED control; staging forces it off. Provider webhook
+and independent REST evidence must agree; Test remains excluded from real income.
+See docs/PRODUCTION_PURCHASE_VERIFICATION.md for evidence and launch gates.
 For the first 100 books, Play products/prices/availability are managed manually
 in Play Console. Automatic sync is DEFERRED, not completed, and disabled;
 403 investigation/retries are stopped. See docs/MANUAL_PLAY_PRODUCTS.md.
@@ -152,6 +156,7 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-07: Owner approved constructing production-mode purchase verification behind disabled controls, with existing RevenueCat/Google Play integration. Real transactions require authenticated provider-event environment and independent server REST is_sandbox evidence to agree, with the exact reader, book, permanent entitlement and unique purchase-time match. Unknown, malformed, ambiguous or failed evidence never grants access or renews an offline lease. Test transactions remain excluded from real income. Production acceptance defaults OFF and is forced OFF on staging; no real payment or public release is authorized. Manual Play workflow for first 100 books remains approved; automatic sync DEFERRED, 403 work stopped. Focused isolated tests, staging, verified-backup promotion, records and commit/push authorized. No product, price, credential, permission or historical data change.
 - 2026-10-07: For Shelf’s first 100 books, the owner creates and manages Google Play products, prices and availability manually in Play Console. Automatic admin-to-Play product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled. Stop 403 investigations, calculations, retries and support follow-ups unless the owner explicitly reopens automatic sync. Existing product mappings, credentials, app-level access, verification, acknowledgements, entitlements, refunds, accounting and historical records are preserved. Admin USD prices are approved reference values; saving does not update Play. Checkout uses Google’s localized store price. No Play product creation/change is authorized in this task.
 
 - 2026-10-03: Owner confirms external recovery key at D:\shelf-recovery-key.secret

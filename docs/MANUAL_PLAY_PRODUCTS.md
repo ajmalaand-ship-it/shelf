@@ -1,5 +1,11 @@
 # Manual Google Play products — first 100 Shelf books
 
+> Production server verification construction (7 October 2026) is now built
+> behind an OFF-by-default gate. Synthetic focused tests pass; no actual real
+> purchase or launch approval. See [verification and remaining launch gates](PRODUCTION_PURCHASE_VERIFICATION.md).
+> Earlier sandbox-only implementation/next-construction statements are historical;
+> manual Play pricing remains approved and automatic sync remains deferred.
+
 Owner decision, 7 October 2026: products, prices and availability are managed
 in Play Console. Automatic sync **DEFERRED / NOT COMPLETED**, disabled; stop
 403 investigations/retries. This supersedes earlier admin-only price instructions.

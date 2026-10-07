@@ -1,5 +1,11 @@
 # Sales and author-share accounting — Step 4 / 2 October 2026
 
+> Production server verification construction (7 October 2026) is now built
+> behind an OFF-by-default gate. Synthetic focused tests pass; no actual real
+> purchase or launch approval. See [verification and remaining launch gates](PRODUCTION_PURCHASE_VERIFICATION.md).
+> Earlier sandbox-only implementation/next-construction statements are historical;
+> manual Play pricing remains approved and automatic sync remains deferred.
+
 > **Current amendment — 7 October 2026:** first 100 books use manual Play Console
 > products/prices/availability. Automatic sync DEFERRED, not completed; all 403
 > investigation/retry/support next actions below are historical and stopped.

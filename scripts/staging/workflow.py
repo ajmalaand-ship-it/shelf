@@ -263,6 +263,32 @@ def https_checks():
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    purchase_scope = {'config/purchases.php', 'app/Services/Purchases/RevenueCatClient.php',
+                      'app/Services/Purchases/PurchaseService.php', 'app/Http/Controllers/LibraryController.php',
+                      'app/Providers/AppServiceProvider.php', 'app/Console/Commands/CheckBookPurchases.php',
+                      'tests/Feature/BookPurchasesTest.php', 'scripts/staging/workflow.py', 'AGENTS.md',
+                      'docs/MASTER_RECORD.md', 'docs/PRODUCTION_PURCHASE_VERIFICATION.md',
+                      'docs/PURCHASES_TEST_SETUP.md', 'docs/STATUS_RECONCILIATION_2026-10-02.md',
+                      'docs/MANUAL_PLAY_PRODUCTS.md', 'docs/ACCOUNTING.md'}
+    if changes and set(changes) <= purchase_scope and 'config/purchases.php' in changes:
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'BookPurchasesTest|VoidedPurchasesTest|AccountingTest|PlayPriceSyncTest'
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+                                    stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Staged production verification checks failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        artisan(app, 'shelf:check-purchases')
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit': commit, 'passed': True,
+            'checked_at': datetime.now(timezone.utc).isoformat(), 'mobile_tests': False,
+            'scope': 'production-verification', 'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: staged production verification, sandbox, refunds, accounting and manual sync regressions.', flush=True)
+        return
     manual_scope = {'config/play_sync.php', 'app/Services/Play/GooglePlayClient.php',
                     'app/Services/Play/PlayPriceSync.php', 'app/Console/Commands/SyncPlayPrices.php',
                     'app/Filament/Resources/Collections/Schemas/CollectionForm.php',

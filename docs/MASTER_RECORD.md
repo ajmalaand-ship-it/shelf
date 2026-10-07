@@ -542,6 +542,54 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Production verification construction — 7 October 2026 (latest)
+
+Owner approved constructing production-mode purchase verification behind disabled
+controls, with existing RevenueCat/Google Play integration. Real transactions
+require authenticated provider-event environment and independent server REST
+is_sandbox evidence to agree, with the exact reader, book, permanent entitlement
+and unique purchase-time match. Unknown, malformed, ambiguous or failed evidence
+never grants access or renews an offline lease. Test transactions remain excluded
+from real income. Production acceptance defaults OFF and is forced OFF on staging;
+no real payment or public release is authorized.
+
+Implemented: environment-aware immutable purchases/events, real-sale ledger rows
+using provider-reported currency/amount, historical agreement snapshots, unknown
+fees/taxes/net earnings retained, duplicate/conflict checks, environment-aware
+REST reconciliation/restore, and refunds including deleted-account history while
+sales are disabled. Existing SDK acknowledgement and Google voided-purchase
+polling preserved. No schema migration or scripted existing-data change.
+Manual Play products/prices/availability remain owner-managed for first 100;
+automatic sync DEFERRED / NOT COMPLETED, disabled; 403 work stopped.
+
+Evidence: isolated focused BookPurchasesTest, VoidedPurchasesTest, AccountingTest
+and PlayPriceSyncTest: **61 tests / 461 assertions**. Production-mode evidence is
+synthetic, not an actual charged transaction. No mobile change, rebuild, phone
+request, product/price change, permission/credential edit or provider write.
+Staging/promoted exact commit and backup are recorded in authoritative
+/home/shelf/staging-runtime/release-state.json after actual deployment; rollout
+checks ensure real-sale gate remains OFF and historical records are unchanged.
+Rollback: previous release code through staging, preserve money/reader history;
+no database rollback needed. cPanel handler preserved.
+
+**Next construction:** adapt Android purchase configuration/messages for release
+mode behind disabled controls (current app requires test_mode=true), retaining
+the owner-only test flow. This is a separate task, not implemented here.
+D14 retention/deleted-account/privacy work still needs the owner policy.
+Before real sales: owner launch approval, release-capable tested Android build,
+manual launch products/local prices/regions and exact RevenueCat non-consumable
+entitlement mapping, app-scoped authenticated provider webhook covering production,
+refund/acknowledgement operational verification, signing/listing/legal/rights and
+remaining targeted launch acceptance. Current credentials and permissions are
+not changed in this construction task. A later approved rollout alone may enable
+SHELF_REAL_PURCHASES_ENABLED; staging can never accept real sales.
+Second-phone restore remains DEFERRED / NOT PASSED; reading/import and recovery
+acceptance remain separate pre-release checks. Steps 4 and 5 are NOT complete.
+
+The earlier statement below that production-mode server verification is not
+built is superseded by this construction evidence, not by launch approval.
+
+
 ## Current owner amendment — 7 October 2026
 
 For Shelf’s first 100 books, the owner creates and manages Google Play products,
@@ -630,6 +678,8 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 | Open items                                        | SSH config file owned by the wrong user (server fix by root, not urgent). Repeated failed root login attempts (server security, later). Original poet of لمر ګلی unknown. Other projects also fill /tmp.                                                   |
 
 # Part 11 — Decision log
+
+- **7 October 2026, production construction:** Owner approved constructing production-mode purchase verification behind disabled controls, with existing RevenueCat/Google Play integration. Real transactions require authenticated provider-event environment and independent server REST is_sandbox evidence to agree, with the exact reader, book, permanent entitlement and unique purchase-time match. Unknown, malformed, ambiguous or failed evidence never grants access or renews an offline lease. Test transactions remain excluded from real income. Production acceptance defaults OFF and is forced OFF on staging; no real payment or public release is authorized. Preserves manual first-100-book pricing, acknowledgement, refunds and accounting. Owner authorized focused tests, staging/backed-up promotion and commit/push; no real-sale activation.
 
 - **7 October 2026:** For Shelf’s first 100 books, the owner creates and manages Google Play products, prices and availability manually in Play Console. Automatic admin-to-Play product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled. Stop 403 investigations, calculations, retries and support follow-ups unless the owner explicitly reopens automatic sync. Existing product mappings, credentials, app-level access, verification, acknowledgements, entitlements, refunds, accounting and historical records are preserved. Admin USD prices are approved reference values; saving does not update Play. Checkout uses Google’s localized store price. No Play product creation/change is authorized in this task.
 

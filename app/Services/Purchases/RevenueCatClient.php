@@ -55,29 +55,52 @@ class RevenueCatClient
         }
     }
 
-    public function confirms(array $subscriber, Collection $book, \DateTimeInterface $purchasedAt): bool
+    public static function productionEnabled(): bool
     {
-        $entitlement = $subscriber['entitlements'][$book->product_id] ?? null;
-        // Shelf books are permanent, non-subscription entitlements. Never accept a promo/global grant.
-        if (! is_array($entitlement) || ($entitlement['product_identifier'] ?? null) !== $book->product_id
-            || ! array_key_exists('expires_date', $entitlement) || $entitlement['expires_date'] !== null) {
-            return false;
-        }
-        foreach ($subscriber['non_subscriptions'][$book->product_id] ?? [] as $purchase) {
-            if (($purchase['store'] ?? null) !== 'play_store' || ($purchase['is_sandbox'] ?? null) !== true
-                || ! empty($purchase['refunded_at']) || ! is_string($purchase['purchase_date'] ?? null)) {
-                continue;
-            }
+        return ! \App\Support\Staging::active() && config('purchases.production_enabled') === true;
+    }
+
+    /** Classify only the matching server-fetched Play transaction, never a client flag. */
+    public function purchaseEnvironment(array $subscriber, Collection $book, \DateTimeInterface $purchasedAt): ?string
+    {
+        $transactions = $subscriber['non_subscriptions'][$book->product_id] ?? [];
+        abort_unless(is_array($transactions), 503, 'Store confirmation is incomplete. Please try again.');
+        $matches = [];
+        foreach ($transactions as $purchase) {
+            abort_unless(is_array($purchase) && is_string($purchase['purchase_date'] ?? null)
+                && preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/', $purchase['purchase_date']), 503,
+                'Store confirmation is incomplete. Please try again.');
             try {
-                // API v1 non-subscription IDs are RevenueCat IDs, not Google transaction IDs.
-                // Match the authenticated webhook's store/product/purchase time instead.
-                if (abs(CarbonImmutable::parse($purchase['purchase_date'])->getTimestamp() - $purchasedAt->getTimestamp()) <= 1) {
-                    return true;
-                }
+                $date = CarbonImmutable::parse($purchase['purchase_date']);
             } catch (\Throwable) {
-                continue;
+                abort(503, 'Store confirmation is incomplete. Please try again.');
             }
+            if (abs($date->getTimestamp() - $purchasedAt->getTimestamp()) > 1) { continue; }
+            abort_unless(($purchase['store'] ?? null) === 'play_store'
+                && is_bool($purchase['is_sandbox'] ?? null), 503,
+                'Store transaction environment is unverified. Please try again.');
+            $matches[] = $purchase;
         }
-        return false;
+        // API v1 IDs are RevenueCat IDs, not Google order IDs. An ambiguous time
+        // match cannot independently verify a particular webhook transaction.
+        abort_if(count($matches) > 1, 503, 'Store confirmation is ambiguous. Please try again.');
+        if (! $matches || ! empty($matches[0]['refunded_at'])) { return null; }
+        return $matches[0]['is_sandbox'] ? 'SANDBOX' : 'PRODUCTION';
+    }
+
+    public function confirms(array $subscriber, Collection $book, \DateTimeInterface $purchasedAt, string $environment = 'SANDBOX'): bool
+    {
+        abort_unless(in_array($environment, ['SANDBOX', 'PRODUCTION'], true), 503);
+        $verified = $this->purchaseEnvironment($subscriber, $book, $purchasedAt);
+        abort_if($verified !== null && $verified !== $environment, 503, 'Store transaction environment conflicts with recorded evidence.');
+        $entitlement = $subscriber['entitlements'][$book->product_id] ?? null;
+        abort_if($entitlement !== null && (! is_array($entitlement)
+            || ! array_key_exists('expires_date', $entitlement)
+            || ($entitlement['product_identifier'] ?? null) !== $book->product_id), 503,
+            'Store entitlement mapping is incomplete. Please try again.');
+        // Shelf books are permanent, non-subscription entitlements. No promo/global grant.
+        return $verified === $environment && is_array($entitlement)
+            && ($entitlement['product_identifier'] ?? null) === $book->product_id
+            && array_key_exists('expires_date', $entitlement) && $entitlement['expires_date'] === null;
     }
 }

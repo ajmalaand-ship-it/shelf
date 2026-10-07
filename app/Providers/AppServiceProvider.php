@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
                 || app()->environment() !== 'staging')) {
                 throw new \RuntimeException('Staging environment/database boundary is invalid.');
             }
-            config(['play_sync.enabled' => false, 'play_sync.credentials_path' => null,
+            config(['purchases.production_enabled' => false, 'play_sync.enabled' => false, 'play_sync.credentials_path' => null,
                 'mail.default' => 'log', 'queue.default' => 'null', 'queue.connections.database.queue' => 'staging-disabled']);
             foreach (array_keys(config('mail.mailers')) as $mailer) {
                 config(['mail.mailers.'.$mailer => ['transport' => 'log']]);

@@ -14,33 +14,47 @@ class PurchaseService
     public function receive(array $event): void
     {
         $event['app_user_id'] = \App\Support\Staging::readerId((string) $event['app_user_id']);
-        abort_unless(($event['environment'] ?? '') === 'SANDBOX' && ($event['store'] ?? '') === 'PLAY_STORE'
-            && ($event['app_id'] ?? '') === config('purchases.app_id'), 422, 'Only Shelf Google Play sandbox events are accepted.');
+        $environment = $event['environment'] ?? '';
+        abort_unless(in_array($environment, ['SANDBOX', 'PRODUCTION'], true) && ($event['store'] ?? '') === 'PLAY_STORE'
+            && ($event['app_id'] ?? '') === config('purchases.app_id'), 422, 'Only verified Shelf Google Play events are accepted.');
         $type = $event['type'];
         if ($type === 'TEST') { return; }
         abort_unless(in_array($type, ['NON_RENEWING_PURCHASE', 'CANCELLATION', 'EXPIRATION'], true), 422, 'Unsupported event; no access granted.');
         $book = Collection::withTrashed()->where('product_id', $event['product_id'])->firstOrFail();
         abort_unless($book->product_id === 'shelf_book_'.$book->id, 422);
+        $existing = Purchase::where('store', 'PLAY_STORE')->where('transaction_id', $event['transaction_id'])->first();
+        abort_if($existing && ($existing->environment !== $environment
+            || $existing->reader_id !== (int) $event['app_user_id'] || $existing->collection_id !== $book->id),
+            409, 'Purchase belongs to another account, book or environment.');
+        // A disabled sales gate must still accept refunds/revocations of prior sales.
+        abort_unless($environment === 'SANDBOX' || RevenueCatClient::productionEnabled()
+            || ($existing && $type !== 'NON_RENEWING_PURCHASE'), 422, 'Real purchases are disabled pending owner launch approval.');
         $reader = Reader::find($event['app_user_id']);
         if (! $reader) {
             // Deleting a login never deletes the financial trail or prevents later refunds.
-            $historical = Purchase::where('store', 'PLAY_STORE')->where('environment', 'SANDBOX')
+            $historical = Purchase::where('store', 'PLAY_STORE')->where('environment', $environment)
                 ->where('transaction_id', $event['transaction_id'])->where('collection_id', $book->id)
                 ->where('reader_id', (int) $event['app_user_id'])->first();
             abort_unless($type !== 'NON_RENEWING_PURCHASE' && $historical, 404);
         }
-        if (PurchaseEvent::where('provider_event_id', $event['id'])->exists()) { return; }
+        $duplicate = PurchaseEvent::where('provider_event_id', $event['id'])->first();
+        if ($duplicate) {
+            abort_unless($duplicate->reader_id === (int) $event['app_user_id'] && $duplicate->collection_id === $book->id
+                && $duplicate->environment === $environment && $duplicate->transaction_id === $event['transaction_id']
+                && $duplicate->event_type === $type, 409, 'Provider event conflicts with recorded history.');
+            return;
+        }
         $purchasedAt = CarbonImmutable::createFromTimestampMs($event['purchased_at_ms']);
         $occurredAt = CarbonImmutable::createFromTimestampMs($event['event_timestamp_ms']);
         $subscriber = $type === 'NON_RENEWING_PURCHASE' ? $this->provider->subscriber($reader) : null;
-        DB::transaction(function () use ($event, $type, $book, $reader, $purchasedAt, $occurredAt, $subscriber): void {
+        DB::transaction(function () use ($event, $type, $book, $reader, $purchasedAt, $occurredAt, $subscriber, $environment): void {
             if ($reader) { Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail(); }
             if (PurchaseEvent::where('provider_event_id', $event['id'])->exists()) { return; }
-            $purchase = Purchase::where('store', 'PLAY_STORE')->where('environment', 'SANDBOX')->where('transaction_id', $event['transaction_id'])->lockForUpdate()->first();
+            $purchase = Purchase::where('store', 'PLAY_STORE')->where('environment', $environment)->where('transaction_id', $event['transaction_id'])->lockForUpdate()->first();
             abort_if($purchase && ($purchase->reader_id !== (int) $event['app_user_id'] || $purchase->collection_id !== $book->id), 409, 'Purchase belongs to another account or book.');
             if ($type === 'NON_RENEWING_PURCHASE') {
                 // Confirmation may arrive after withdrawal; previously initiated purchases remain valid.
-                abort_unless($this->provider->confirms($subscriber, $book, $purchasedAt), 503, 'Confirming your purchase. Please try again.');
+                abort_unless($this->provider->confirms($subscriber, $book, $purchasedAt, $environment), 503, 'Confirming your purchase. Please try again.');
                 if (! $purchase) {
                     abort_unless(DB::table('purchase_consents')->where('reader_id', $reader->id)->where('collection_id', $book->id)
                         ->where('created_at', '<=', $purchasedAt->addSeconds(5))->exists(), 409, 'Purchase agreement is missing. Contact Shelf support.');
@@ -48,25 +62,26 @@ class PurchaseService
             }
             $entry = PurchaseEvent::create([
                 'provider_event_id' => $event['id'], 'event_type' => $type, 'reader_id' => (int) $event['app_user_id'],
-                'collection_id' => $book->id, 'transaction_id' => $event['transaction_id'], 'environment' => 'SANDBOX',
+                'collection_id' => $book->id, 'transaction_id' => $event['transaction_id'], 'environment' => $environment,
                 'occurred_at' => $occurredAt, 'details' => ['currency' => $event['currency'] ?? null,
                     'amount' => $event['price_in_purchased_currency'] ?? null, 'cancel_reason' => $event['cancel_reason'] ?? null],
             ]);
             if ($type === 'NON_RENEWING_PURCHASE') {
                 $purchase ??= Purchase::create(['reader_id' => $reader->id, 'collection_id' => $book->id, 'store' => 'PLAY_STORE',
-                    'environment' => 'SANDBOX', 'transaction_id' => $event['transaction_id'], 'product_id' => $book->product_id, 'purchased_at' => $purchasedAt]);
+                    'environment' => $environment, 'transaction_id' => $event['transaction_id'], 'product_id' => $book->product_id, 'purchased_at' => $purchasedAt]);
                 if (! SalesLedger::withTestPurchases()->where('entry_key', 'sale:'.$purchase->id)->exists()) {
                     $agreement = AuthorShareAgreement::where('collection_id', $book->id)->where('starts_at', '<=', $purchasedAt)->orderByDesc('starts_at')->orderByDesc('id')->first();
                     $amount = $event['price_in_purchased_currency'] ?? null;
-                    // This handler accepts sandbox only: no author earnings or income.
+                    // Test earns nothing; unknown real net/fees/taxes are not invented.
                     $estimates = null;
                     SalesLedger::create(['purchase_id' => $purchase->id, 'event_id' => $entry->id, 'entry_key' => 'sale:'.$purchase->id,
                         'status' => 'sale', 'currency' => $event['currency'] ?? null, 'amount' => $amount,
                         'occurred_at' => $purchasedAt, 'agreement_snapshot' => $agreement?->toArray(),
-                        'estimated_earnings' => $estimates, 'earnings_status' => 'test']);
+                        'estimated_earnings' => $estimates, 'earnings_status' => $environment === 'SANDBOX' ? 'test' : 'unknown']);
                 }
                 // A refund received before the sale is a tombstone, not permission to unlock.
                 foreach (PurchaseEvent::where('transaction_id', $purchase->transaction_id)->where('collection_id', $book->id)
+                    ->where('reader_id', $reader->id)->where('environment', $environment)
                     ->whereIn('event_type', ['CANCELLATION', 'EXPIRATION'])->get() as $reversal) {
                     $this->reverse($purchase, $reversal->event_type === 'CANCELLATION' ? 'refund' : 'revoke', $reversal);
                 }
@@ -130,7 +145,7 @@ class PurchaseService
             Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail();
             foreach ($purchases as $purchase) {
                 if (! $purchase->entries()->whereIn('status', ['refund', 'revoke'])->exists()
-                    && ! $this->provider->confirms($subscriber, $purchase->book, $purchase->purchased_at)) {
+                    && ! $this->provider->confirms($subscriber, $purchase->book, $purchase->purchased_at, $purchase->environment)) {
                     $this->reverse($purchase, 'revoke');
                 }
                 $this->refreshAccess($reader, $purchase->book);

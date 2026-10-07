@@ -30,6 +30,10 @@ class CheckBookPurchases extends Command
                 return self::FAILURE;
             }
             $this->info('PASS: Test history labelled; default income/author totals and exports exclude test purchases.');
+            if (\App\Services\Purchases\RevenueCatClient::productionEnabled()) {
+                $this->error('Real purchases enabled; this construction rollout requires the gate off.');
+                return self::FAILURE;
+            }
             $this->info('No global access. No real payments enabled.');
             return self::SUCCESS;
         }

@@ -44,6 +44,179 @@ class BookPurchasesTest extends TestCase
     private function mockProvider(): void { Http::swap(new \Illuminate\Http\Client\Factory); Http::preventStrayRequests(); Http::fake(['api.revenuecat.com/*' => Http::response(['subscriber' => $this->subscriber])]); }
     private function webhook(array $changes = []) { return $this->postJson('/api/purchases/webhook', ['event' => array_replace($this->event, $changes)], ['Authorization' => 'synthetic-auth']); }
 
+    private function realProvider(): void
+    {
+        $this->event['environment'] = 'PRODUCTION';
+        $this->subscriber['non_subscriptions'][$this->book->product_id][0]['is_sandbox'] = false;
+        $this->mockProvider();
+    }
+
+    public function test_real_purchase_gate_defaults_off_and_client_flags_cannot_enable_it(): void
+    {
+        $this->assertFalse(\App\Services\Purchases\RevenueCatClient::productionEnabled());
+        $this->realProvider();
+        $this->webhook(['production_enabled' => true, 'test_mode' => false])->assertUnprocessable();
+        $this->getJson('/api/purchases/config?production_enabled=true')->assertJsonPath('test_mode', true);
+        $this->assertDatabaseCount('purchases', 0);
+        $this->assertDatabaseCount('sales_ledger', 0);
+        Http::assertNothingSent();
+    }
+
+    public function test_verified_real_sale_and_test_sale_are_separate_idempotent_and_snapshot_preserving(): void
+    {
+        config(['purchases.production_enabled' => true]);
+        $author = Author::create(['name' => 'Synthetic rights holder']);
+        $agreement = AuthorShareAgreement::create(['collection_id' => $this->book->id,
+            'contributors' => [['author_id' => $author->id, 'percentage' => 100]], 'basis' => 'net',
+            'deductions' => 'Actual store deductions', 'sharing_terms' => 'Synthetic agreement', 'starts_at' => now()->subHour()]);
+        // A production-enabled server still classifies verified sandbox purchases as Test.
+        $this->webhook()->assertOk();
+        $this->assertSame(0, SalesLedger::count());
+        $this->realProvider();
+        $this->event['transaction_id'] = 'GPA.real-synthetic';
+        $this->event['id'] = 'real-event';
+        $this->event['currency'] = 'EUR';
+        $this->event['price_in_purchased_currency'] = '3.49';
+        $this->webhook()->assertOk();
+        $this->webhook()->assertOk();
+        $this->webhook(['id' => 'real-duplicate'])->assertOk();
+        $this->assertDatabaseCount('purchases', 2);
+        $this->assertDatabaseCount('sales_ledger', 2);
+        $sale = SalesLedger::firstOrFail();
+        $this->assertSame('PRODUCTION', $sale->purchase->environment);
+        $this->assertSame('Real', $sale->income_mode);
+        $this->assertSame('3.490000', $sale->amount);
+        $this->assertSame('EUR', $sale->currency);
+        $this->assertEquals($agreement->id, $sale->agreement_snapshot['id']);
+        foreach (['fees_status', 'taxes_status', 'earnings_status'] as $field) { $this->assertSame('unknown', $sale->$field); }
+        foreach (['estimated_earnings', 'confirmed_owed', 'payments_made'] as $field) { $this->assertNull($sale->$field); }
+        $this->assertSame('test', SalesLedger::withTestPurchases()->whereHas('purchase', fn ($q) => $q->where('environment', 'SANDBOX'))->first()->earnings_status);
+        // Later disablement blocks buying, while prior real purchases still restore.
+        config(['purchases.production_enabled' => false]);
+        $sandbox = Purchase::where('environment', 'SANDBOX')->first();
+        // Retire the Test purchase; restore must check the remaining real environment.
+        $this->webhook(['id' => 'test-refund', 'type' => 'CANCELLATION', 'environment' => 'SANDBOX', 'transaction_id' => $sandbox->transaction_id])->assertOk();
+        $this->postJson('/api/library/restore', [], $this->bearer())->assertOk()->assertJsonPath('books.0.id', $this->book->id);
+        $before = $sale->getAttributes();
+        $this->webhook(['id' => 'real-refund', 'type' => 'CANCELLATION'])->assertOk();
+        $this->webhook(['id' => 'real-refund-again', 'type' => 'CANCELLATION'])->assertOk();
+        $this->assertSame($before, $sale->fresh()->getAttributes());
+        $this->assertSame(2, SalesLedger::count());
+        $this->assertSame('-3.490000', SalesLedger::where('status', 'refund')->first()->amount);
+        $this->assertDatabaseHas('book_entitlements', ['active' => false]);
+    }
+
+    public function test_missing_malformed_conflicting_or_ambiguous_provider_environment_never_unlocks(): void
+    {
+        config(['purchases.production_enabled' => true]);
+        $this->event['environment'] = 'PRODUCTION';
+        foreach ([null, 'false', 0, true] as $flag) {
+            $this->subscriber['non_subscriptions'][$this->book->product_id][0]['is_sandbox'] = $flag;
+            $this->mockProvider();
+            $this->webhook()->assertStatus(503);
+        }
+        unset($this->subscriber['non_subscriptions'][$this->book->product_id][0]['is_sandbox']);
+        $this->mockProvider(); $this->webhook()->assertStatus(503);
+        $this->realProvider();
+        $validDate = $this->subscriber['non_subscriptions'][$this->book->product_id][0]['purchase_date'];
+        foreach (['', 'now', 'invalid-date'] as $date) {
+            $this->subscriber['non_subscriptions'][$this->book->product_id][0]['purchase_date'] = $date;
+            $this->mockProvider(); $this->webhook()->assertStatus(503);
+        }
+        $this->subscriber['non_subscriptions'][$this->book->product_id][0]['purchase_date'] = $validDate;
+        $this->realProvider();
+        $this->subscriber['non_subscriptions'][$this->book->product_id][] = $this->subscriber['non_subscriptions'][$this->book->product_id][0];
+        $this->mockProvider(); $this->webhook()->assertStatus(503);
+        $this->assertDatabaseCount('purchases', 0);
+        $this->assertDatabaseCount('sales_ledger', 0);
+        $this->assertDatabaseCount('book_entitlements', 0);
+    }
+
+    public function test_real_provider_outage_refund_and_wrong_reader_or_product_fail_closed(): void
+    {
+        config(['purchases.production_enabled' => true]); $this->realProvider();
+        Http::swap(new \Illuminate\Http\Client\Factory);
+        Http::fake(['api.revenuecat.com/*' => Http::response([], 503)]);
+        $this->webhook()->assertStatus(503);
+        $this->subscriber['original_app_user_id'] = '999'; $this->mockProvider(); $this->webhook()->assertStatus(503);
+        $this->subscriber['original_app_user_id'] = (string) $this->reader->id;
+        $this->subscriber['entitlements'][$this->book->product_id]['product_identifier'] = 'shelf_book_999';
+        $this->mockProvider(); $this->webhook()->assertStatus(503);
+        $this->subscriber['entitlements'][$this->book->product_id]['product_identifier'] = $this->book->product_id;
+        $this->subscriber['non_subscriptions'][$this->book->product_id][0]['refunded_at'] = now()->toIso8601String();
+        $this->mockProvider(); $this->webhook()->assertStatus(503);
+        $this->assertDatabaseCount('purchases', 0); $this->assertDatabaseCount('book_entitlements', 0);
+    }
+
+    public function test_real_transaction_cannot_move_reader_book_or_environment_and_reordered_refund_stays_locked(): void
+    {
+        config(['purchases.production_enabled' => true]); $this->realProvider();
+        $this->webhook(['id' => 'real-refund-before-sale', 'type' => 'CANCELLATION'])->assertOk();
+        $this->webhook()->assertOk();
+        $this->assertDatabaseHas('book_entitlements', ['active' => false]);
+        $other = Reader::create(['email' => 'other-real@example.test']);
+        $this->webhook(['id' => 'move-reader', 'app_user_id' => (string) $other->id])->assertConflict();
+        $otherBook = Collection::create(['title' => 'Other synthetic book', 'status' => 'published', 'price_usd' => '2.99']);
+        $this->webhook(['id' => 'move-book', 'product_id' => $otherBook->product_id])->assertConflict();
+        $this->webhook(['id' => 'relabel-as-test', 'environment' => 'SANDBOX'])->assertConflict();
+        $this->webhook(['transaction_id' => 'GPA.other-synthetic'])->assertConflict();
+        $this->assertDatabaseCount('purchases', 1); $this->assertDatabaseCount('sales_ledger', 2);
+    }
+
+    public function test_unknown_reverification_does_not_mutate_real_history_or_renew_offline_lease(): void
+    {
+        config(['purchases.production_enabled' => true]); $this->realProvider(); $this->webhook()->assertOk();
+        $before = DB::table('book_entitlements')->first();
+        $this->subscriber['non_subscriptions'][$this->book->product_id][0]['is_sandbox'] = 'false';
+        $this->mockProvider();
+        $this->getJson('/api/library', $this->bearer())->assertStatus(503)->assertJsonMissingPath('offline_valid_until');
+        $this->assertEquals($before, DB::table('book_entitlements')->first());
+        $this->assertDatabaseCount('sales_ledger', 1);
+        $this->assertDatabaseHas('book_entitlements', ['active' => true]);
+    }
+
+    public function test_real_refund_after_account_deletion_remains_processable_with_sales_off(): void
+    {
+        config(['purchases.production_enabled' => true]); $this->realProvider(); $this->webhook()->assertOk();
+        app(AccountActions::class)->delete($this->reader);
+        config(['purchases.production_enabled' => false]);
+        $this->webhook(['id' => 'deleted-real-refund', 'type' => 'CANCELLATION'])->assertOk();
+        $this->assertDatabaseCount('purchases', 1); $this->assertDatabaseCount('sales_ledger', 2);
+        $this->assertSame(2, SalesLedger::count());
+        $this->assertDatabaseCount('book_entitlements', 0);
+    }
+
+    public function test_real_entitlement_direct_requests_and_confirmed_provider_refund(): void
+    {
+        config(['purchases.production_enabled' => true]); $this->realProvider();
+        $item = $this->book->poems()->first();
+        $path = '/api/library/poems/'.$item->id;
+        $this->getJson($path, $this->bearer())->assertNotFound();
+        $this->webhook()->assertOk();
+        $this->getJson($path, $this->bearer())->assertOk()->assertSee('Paid text');
+        $other = Reader::create(['email' => 'other-direct-real@example.test']);
+        $other->forceFill(['email_verified_at' => now()])->save();
+        $this->getJson($path, $this->bearer($other))->assertNotFound();
+        $this->subscriber['entitlements'] = [];
+        $this->subscriber['non_subscriptions'][$this->book->product_id][0]['refunded_at'] = now()->toIso8601String();
+        $this->mockProvider();
+        $this->getJson('/api/library', $this->bearer())->assertOk()->assertJsonCount(0, 'books');
+        $this->getJson($path, $this->bearer())->assertNotFound();
+        $this->assertDatabaseHas('sales_ledger', ['status' => 'revoke']);
+        $this->assertDatabaseHas('book_entitlements', ['active' => false]);
+    }
+
+    public function test_staging_can_never_accept_real_sales_even_when_gate_is_forced_on(): void
+    {
+        config(['staging.testing' => true, 'purchases.production_enabled' => true]);
+        $this->assertFalse(\App\Services\Purchases\RevenueCatClient::productionEnabled());
+        $this->realProvider();
+        try { app(PurchaseService::class)->receive(array_replace($this->event, ['app_user_id' => 'staging_'.$this->reader->id]));
+            $this->fail('Staging accepted a real sale');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $error) { $this->assertSame(422, $error->getStatusCode()); }
+        $this->assertDatabaseCount('purchases', 0);
+    }
+
     public function test_private_credential_path_fails_closed_without_using_inline_fallback(): void
     {
         config(['purchases.secret_key_path' => base_path('.env')]);

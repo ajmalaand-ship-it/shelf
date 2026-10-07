@@ -19,7 +19,7 @@ class LibraryController extends Controller
 
     public function config()
     {
-        return response()->json(['enabled' => RevenueCatClient::configured(), 'test_mode' => true,
+        return response()->json(['enabled' => RevenueCatClient::configured(), 'test_mode' => ! RevenueCatClient::productionEnabled(),
             'public_sdk_key' => RevenueCatClient::configured() ? config('purchases.public_sdk_key') : null,
             'consent' => PurchaseService::CONSENT, 'offline_days' => 30,
             'identity_prefix' => \App\Support\Staging::active() ? 'staging_' : '']);
@@ -51,7 +51,7 @@ class LibraryController extends Controller
                 $testAllowed = $testAllowed || $email === strtolower($ownerEmail)
                     || (str_starts_with($email, $local.'+') && str_ends_with($email, '@'.$domain));
             }
-            abort_unless($testAllowed, 403, 'Test purchases are limited to the owner account until staging and release approval.');
+            abort_unless($testAllowed || RevenueCatClient::productionEnabled(), 403, 'Test purchases are limited to the owner account until staging and release approval.');
             abort_unless($book->isPublished() && $book->price_usd > 0 && $book->product_id === 'shelf_book_'.$book->id, 409, 'This book is not for sale.');
             abort_if(app(BookAccessService::class)->ownsBook($reader, $book), 409, 'This account already owns the book.');
             DB::table('purchase_consents')->insert(['reader_id' => $reader->id, 'collection_id' => $book->id,
