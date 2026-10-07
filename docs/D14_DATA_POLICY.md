@@ -36,7 +36,8 @@ prevent duplicates. The encrypted independent journal reserves claims across
 server loss and older restores. Original reader/book sale and financial snapshots
 remain unchanged. Sales ledger → Recovery history shows the audit.
 
-RevenueCat metadata deletion retries daily. Attribute removal uses documented
+RevenueCat metadata deletion retries daily. Pure V2 paginated attribute reads use
+the existing private V2 key; 404 confirms absence without V1 Get-or-Create. Attribute removal uses documented
 null values with newer timestamps, followed by a server read to verify removal.
 The whole customer is never deleted: RevenueCat documents that this would remove
 sandbox **and production purchase history**, conflicting with approved recovery
@@ -100,6 +101,8 @@ ignore the reservation or transfer it to another account.
 
 ## Provider documentation checked
 
+- [RevenueCat V2 customer attributes](https://www.revenuecat.com/docs/api-v2/customer):
+  read-only paginated metadata/404; V1 Get-or-Create is avoided for deletion.
 - [RevenueCat customer API](https://www.revenuecat.com/docs/api-v1/customers):
   subscriber attributes, null/empty removal, newer update timestamps.
 - [RevenueCat customer profile](https://www.revenuecat.com/docs/dashboard-and-metrics/customer-profile):

@@ -23,7 +23,7 @@ class D14PolicyTest extends TestCase
     {
         parent::setUp();
         Http::preventStrayRequests();
-        config(['purchases.enabled' => true, 'purchases.secret_key' => 'synthetic', 'purchases.secret_key_path' => null,
+        config(['purchases.enabled' => true, 'purchases.metadata_key' => 'synthetic-v2', 'purchases.metadata_key_path' => null, 'purchases.secret_key' => 'synthetic', 'purchases.secret_key_path' => null,
             'purchases.webhook_authorization' => 'synthetic', 'purchases.app_id' => 'synthetic', 'purchases.public_sdk_key' => 'goog_synthetic']);
         $this->original = Reader::create(['email' => 'deleted@example.test']);
         $this->target = Reader::create(['email' => 'new@example.test']);
@@ -49,6 +49,11 @@ class D14PolicyTest extends TestCase
             $mock->shouldReceive('record')->andReturn(['record_id' => str_repeat('a', 32)]);
             $mock->shouldReceive('claim')->andReturn(['record_id' => str_repeat('b', 32)]);
         });
+    }
+    private function metadata(array $attributes = []): array
+    {
+        return ['object' => 'list', 'items' => collect($attributes)->map(fn ($item, $key) =>
+            ['name' => $key, 'updated_at' => $item['updated_at_ms']])->values()->all(), 'next_page' => null];
     }
     private function provider(): void
     {
@@ -169,7 +174,7 @@ class D14PolicyTest extends TestCase
         $this->assertSame(1, app(ProviderDeletionWorker::class)->run()['pending']);
         $this->assertDatabaseHas('provider_deletions', ['status' => 'pending', 'attempts' => 1]);
         Http::swap(new \Illuminate\Http\Client\Factory); Http::preventStrayRequests();
-        Http::fake(['api.revenuecat.com/*' => Http::response(['subscriber' => $this->subscriber])]);
+        Http::fake(['api.revenuecat.com/*' => Http::response($this->metadata())]);
         $this->assertSame(1, app(ProviderDeletionWorker::class)->run()['completed']);
         $this->assertDatabaseCount('purchases', 1); $this->assertDatabaseCount('sales_ledger', 1);
     }
@@ -177,16 +182,24 @@ class D14PolicyTest extends TestCase
     {
         app(AccountActions::class)->delete($this->original);
         $before = $this->subscriber; $before['subscriber_attributes'] = ['$email' => ['value'=>'synthetic@example.test', 'updated_at_ms'=>1]];
-        Http::fakeSequence()->push(['subscriber'=>$before])->push([])->push(['subscriber'=>$this->subscriber]);
+        Http::fakeSequence()->push($this->metadata($before['subscriber_attributes']))->push([])->push($this->metadata());
         $this->assertSame(1, app(ProviderDeletionWorker::class)->run()['completed']);
         Http::assertSent(fn ($request) => $request->method()==='POST' && $request['attributes']['$email']['value'] === null);
         Http::assertNotSent(fn ($request) => $request->method()==='DELETE');
     }
+    public function test_absent_provider_customer_completes_without_get_or_create_or_write(): void
+    {
+        app(AccountActions::class)->delete($this->original);
+        Http::fake(['api.revenuecat.com/*' => Http::response([], 404)]);
+        $this->assertSame(1, app(ProviderDeletionWorker::class)->run()['completed']);
+        Http::assertNotSent(fn ($request) => $request->method() !== 'GET' || str_contains($request->url(), '/v1/'));
+    }
+
     public function test_immutable_provider_metadata_requires_review_without_destructive_delete(): void
     {
         app(AccountActions::class)->delete($this->original);
         $this->subscriber['subscriber_attributes'] = ['$ip'=>['value'=>'192.0.2.1','updated_at_ms'=>1]];
-        Http::fake(['api.revenuecat.com/*'=>Http::response(['subscriber'=>$this->subscriber])]);
+        Http::fake(['api.revenuecat.com/*'=>Http::response($this->metadata($this->subscriber['subscriber_attributes']))]);
         $this->assertSame(1, app(ProviderDeletionWorker::class)->run()['exceptions']);
         $this->assertDatabaseHas('provider_deletions',['status'=>'review_required','exception_code'=>'immutable_provider_metadata']);
         Http::assertNotSent(fn ($request)=>$request->method()!=='GET');

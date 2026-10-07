@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Http;
 
 class RevenueCatClient
 {
-    private static function credential(): ?string
+    private static function credential(bool $metadata = false): ?string
     {
-        $path = config('purchases.secret_key_path');
+        $path = config($metadata ? 'purchases.metadata_key_path' : 'purchases.secret_key_path');
         if (! $path) {
-            return config('purchases.secret_key');
+            return config($metadata ? 'purchases.metadata_key' : 'purchases.secret_key');
         }
         $real = is_string($path) ? realpath($path) : false;
         if (! $real || $real !== $path || ! is_file($real) || ! is_readable($real)
@@ -55,17 +55,43 @@ class RevenueCatClient
         }
     }
 
+    private function metadata(int $readerId): array
+    {
+        // V1 GET is Get-or-Create. Pure V2 attribute reads avoid creating a
+        // customer merely to delete a profile that never used RevenueCat.
+        $key = self::credential(true);
+        abort_unless(filled($key) && ! \App\Support\Staging::active(), 503);
+        $path = '/v2/projects/projbbce26da/customers/'.rawurlencode((string) $readerId).'/attributes';
+        $next = $path;
+        $attributes = [];
+        $seen = [];
+        while ($next !== null) {
+            abort_unless(is_string($next) && ($next === $path || str_starts_with($next, $path.'?'))
+                && ! isset($seen[$next]) && count($seen) < 10, 503, 'Provider metadata pagination is unverified.');
+            $seen[$next] = true;
+            $response = Http::withToken($key)->acceptJson()->withoutRedirecting()->connectTimeout(5)->timeout(12)
+                ->get('https://api.revenuecat.com'.$next);
+            if ($response->status() === 404 && $next === $path) { return []; }
+            $data = $response->json();
+            abort_unless($response->successful() && is_array($data) && ($data['object'] ?? null) === 'list'
+                && is_array($data['items'] ?? null) && array_key_exists('next_page', $data), 503, 'Provider metadata unavailable.');
+            foreach ($data['items'] as $item) {
+                abort_unless(is_array($item) && is_string($item['name'] ?? null) && is_int($item['updated_at'] ?? null)
+                    && ! isset($attributes[$item['name']]), 503);
+                $attributes[$item['name']] = ['updated_at_ms' => $item['updated_at']];
+            }
+            $next = $data['next_page'];
+        }
+        return $attributes;
+    }
+
     /** Remove metadata, preserving provider transaction/refund evidence. */
     public function eraseMetadata(int $readerId): void
     {
-        $reader = new Reader;
-        $reader->id = $readerId;
-        $subscriber = $this->subscriber($reader);
-        abort_unless(array_key_exists('subscriber_attributes', $subscriber)
-            && is_array($subscriber['subscriber_attributes']), 503, 'Provider metadata unavailable.');
+        $metadata = $this->metadata($readerId);
         $attributes = [];
         $immutable = [];
-        foreach ($subscriber['subscriber_attributes'] as $key => $attribute) {
+        foreach ($metadata as $key => $attribute) {
             abort_unless(is_string($key) && is_array($attribute) && is_int($attribute['updated_at_ms'] ?? null), 503);
             // RevenueCat documents these attribution identifiers as immutable.
             // Do not delete the whole customer and destroy necessary history.
@@ -76,9 +102,8 @@ class RevenueCatClient
             $response = Http::withToken(self::credential())->acceptJson()->withoutRedirecting()->connectTimeout(5)->timeout(12)
                 ->post('https://api.revenuecat.com/v1/subscribers/'.rawurlencode(\App\Support\Staging::identity($readerId)).'/attributes', ['attributes' => $attributes]);
             abort_unless($response->successful(), 503, 'Provider metadata deletion remains pending.');
-            $after = $this->subscriber($reader);
-            abort_unless(array_key_exists('subscriber_attributes', $after) && is_array($after['subscriber_attributes'])
-                && array_diff(array_keys($after['subscriber_attributes']), $immutable) === [], 503,
+            $after = $this->metadata($readerId);
+            abort_unless(array_diff(array_keys($after), $immutable) === [], 503,
                 'Provider metadata deletion remains unverified.');
         }
         abort_if($immutable !== [], 409, 'Immutable provider metadata requires reviewed resolution.');
