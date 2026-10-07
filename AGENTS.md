@@ -43,7 +43,11 @@ Step 5 OneDrive encrypted upload/download and isolated
 recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
 90-day offsite retention with a reported protected-last-recovery-set exception; local copies 14. See docs/OFFSERVER_BACKUP.md.
 OneDrive implementation/evidence is deployed at 5f75fa0. First unattended run
-failed 4 October at 07:32:19 UTC after upload; no recovery success recorded.
+failed 4 October at 07:32:19 UTC after upload. Recorded automatic recovery on
+7 October completed at 07:32:37 UTC with recovery_verified=true; independently
+rechecked on D14 resume without rerunning recovery. D14 implementation e387b36
+is staged and promoted; metadata read permission remains externally blocked,
+financial expiry unresolved and D14 not fully complete.
 Step 5 / 6.11 repair deployed at c887f91: absolute MariaDB daemon path,
 safe failure stages and original-error preservation on alert failure. See the
 runbook for controlled scheduled verification; future unattended success must

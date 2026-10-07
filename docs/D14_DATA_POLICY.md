@@ -47,7 +47,11 @@ the owner/provider. No promise is made to delete Google's store orders.
 
 ## Deployment/activation evidence
 
-Core implementation promoted at 34a01db after identical-commit staging checks.
+Core implementation promoted at 34a01db. Final implementation e387b36 promoted
+from that release after identical-commit staging (89 PHP / 656 assertions,
+25 backup checks) and verified backup `/home/shelf/backups/shelf/20261007-231416/`.
+Passing evidence reused on resume; historical records/handler and checkout OFF
+verified again. Records-only follow-up does not change the application release.
 Activation completed 7 October 22:54:41 UTC after verified local backup
 `/home/shelf/backups/shelf/20261007-224743/`. All 14 local and 7 production OneDrive
 sets were inventoried; zero already-absent identities were found. Encrypted remote
@@ -58,15 +62,29 @@ in `release-state.json`; later focused corrections preserve this activation.
 
 ## Current provider configuration blocker
 
-Read-only verification on 7 October returned HTTP 403 for customer attributes
-using Shelf's existing V2 key. No attributes were displayed, no provider write
-was made and permissions/credentials were left unchanged. This is a D14 metadata
-scope gap, not a restart of the deferred Play pricing investigation. Retryable
-cleanup safely stays pending until the owner approves the exact existing-key
-permission `customer_information:customers:read` in RevenueCat project Shelf.
+Read-only comparison on resume: existing project/webhook GET = HTTP 200;
+GET `https://api.revenuecat.com/v2/projects/projbbce26da/customers/{numeric_reader_id}/attributes`
+= HTTP 403 explicitly naming `customer_information:customers:read`. No attributes
+or secrets displayed; no provider writes, permission or credential changes.
+This is unrelated to deferred Play price synchronization.
+
+Owner action: RevenueCat → **Shelf (projbbce26da)** → **Project Settings → API keys**
+→ existing **V2 configuration key** used by Shelf (server reference
+`SHELF_REVENUECAT_V2_SECRET_KEY_PATH`, private file
+`/home/shelf/secrets/revenuecat-v2-secret-key.txt`) → **Customer information → Read only**.
+Add only `customer_information:customers:read`; preserve current scopes.
+The key's dashboard label is not recorded; do not guess or create a replacement.
+If editing existing permissions is unavailable, report that limitation and stop.
+[Official key documentation](https://www.revenuecat.com/docs/projects/authentication)
+describes creation/revocation, not a confirmed in-place editing procedure.
+[Endpoint documentation](https://www.revenuecat.com/docs/api-v2/customer) confirms
+the exact minimum read scope. No V2 write scope or broad administrator grant is needed.
+
 The existing V1 verifier performs null-attribute removal after that pure read;
 no V2 write grant or duplicate webhook/new key is required by this implementation.
 Actual metadata erasure of a live/deleted reader is not claimed as verified.
+D14 remains partially complete: externally blocked metadata cleanup, reviewed
+immutable-metadata exceptions and unresolved financial expiry remain open.
 
 ## Retention and operation
 

@@ -561,13 +561,21 @@ journal with verified publication; account deletion/outbox; owner-only recovery
 with Google order/token status and original RevenueCat entitlement; immutable
 recovery audit/claim; refunds revoke recovered access; scoped dry-run-first expiry
 and incident holds; older recovery replays suppression and blocks reopening.
-Focused staging checks passed on 45b5cc1: 88 PHP tests / 654 assertions and
-23 backup checks (7 D14 plus existing backup regressions); no Flutter/phone suite.
-The final metadata-read correction and its additional focused test are committed;
-core deployment passed at 34a01db with a verified promotion backup, unchanged
-reader/payment/agreement snapshots and preserved cPanel handler. Follow-up owner
-purchase-ID display and prior-purchase recovery when buying is blocked passed
-focused staging checks; final release is identified in release-state.json.
+Final implementation e387b3619a023418ab9851bc1ab3e8dc39e4d344 passed identical-commit
+staging: 89 PHP tests / 656 assertions and 25 backup checks (9 D14 plus 16 existing).
+Passing log hash was reverified; no suite or phone tests repeated on resume.
+Promoted successfully from 34a01db after fresh verified backup
+`/home/shelf/backups/shelf/20261007-231416/`; previous reader, purchase, refund,
+ledger and agreement snapshots and the cPanel handler remain unchanged.
+Production and staging release-state both identify e387b36. Records-only follow-up
+is separate from this tested application release and is pushed with its ancestors.
+Resume found a clean isolated worktree at e387b36 and remote main at f024dbe;
+unfinished operations were final promotion and push. The final staging command
+succeeded. An archived development exit-1 test failed with an invalid isolated
+Laravel compiled-view cache path; current isolated recovery creates that path and
+all 25 backup checks passed. The exact last shell command mentioned in the
+interruption is not preserved in release logs; no final staging/promotion failure
+is evidenced. No implementation restart or live data repair was performed.
 Activation completed 22:54:41 UTC after verified backup
 `/home/shelf/backups/shelf/20261007-224743/`: encrypted OneDrive journal read-back,
 14 local/7 remote backup identity inventories, zero absent identities to record,
@@ -579,10 +587,23 @@ finished 07:32:37 UTC with recovery_verified=true for the pinned
 performed to establish that finding. Actual alert delivery and full replacement-host
 cutover remain unverified; second-phone restore remains deferred pre-release.
 **Provider configuration blocker:** read-only V2 customer-attribute verification
-returned HTTP 403 on 7 October. Existing key lacks usable customer metadata read
-access. No provider write, grant or credential change occurred. Retryable metadata
-cleanup remains pending; owner approval of the existing V2 key's exact
-`customer_information:customers:read` permission is needed. This is unrelated to
+returned HTTP 403 on 7 October. Resume read-only comparison returned HTTP 200
+for existing project/webhook access and HTTP 403 for customer attributes; the
+provider response explicitly named `customer_information:customers:read`.
+Exact endpoint: GET `https://api.revenuecat.com/v2/projects/projbbce26da/customers/{numeric_reader_id}/attributes`.
+The current encrypted independent journal was fetched and validated again (zero
+records); journal directory 0700, baseline/retention configuration 0600.
+Public checkout configuration still reports production_checkout_enabled=false.
+Existing key lacks usable customer metadata read access. No provider write, grant or credential change occurred. Retryable metadata
+cleanup remains pending. Owner: RevenueCat → Shelf (projbbce26da) → Project
+Settings → API keys → existing V2 configuration key used by Shelf → Customer
+information → Read only (`customer_information:customers:read`); preserve all
+existing permissions. If this dashboard does not offer editing, stop and report
+that limitation: official documentation establishes creation/revocation and the
+required permission but does not establish in-place permission editing. No key
+replacement is authorized. See D14 runbook for the private key-path identifier.
+D14 is NOT fully complete: provider metadata cleanup is blocked, immutable
+metadata exceptions require reviewed resolution, and financial expiry is undecided. This is unrelated to
 deferred Play product/price sync; no pricing 403 work was resumed.
 No live reader was deleted to test. Financial records/agreements stay unchanged.
 RevenueCat whole-customer deletion conflicts with required purchase/refund history;
