@@ -51,6 +51,7 @@ class SaleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
+            TextColumn::make('purchase.id')->label('Purchase ID')->sortable(),
             TextColumn::make('purchase.book.title')->label('Book')->searchable(),
             TextColumn::make('purchase.reader.email')->label('Reader')->placeholder('Deleted account')->searchable(),
             TextColumn::make('purchase.transaction_id')->label('Store transaction')->searchable(),
