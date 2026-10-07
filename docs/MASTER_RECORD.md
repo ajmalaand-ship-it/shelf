@@ -534,13 +534,41 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 | D11 | Withdrawn books already bought        | Open — Step 4                                                                                                                                                                                   |
 | D12 | Refund handling                       | Open — Step 4                                                                                                                                                                                   |
 | D13 | Offline limits and storage clearing   | Open — Step 3/4. Current state: browsing the catalogue needs internet, so withdrawn or unpublished books are never shown from old saved data.                                                   |
-| D14 | Account deletion and data retention   | Open — Step 5                                                                                                                                                                                   |
+| D14 | Account deletion and data retention   | Policy approved 7 October; implementation/tested source below; financial expiry unresolved — Step 5                                                                                                                                                                                   |
 | D15 | App interface languages and wording   | Open — Step 3                                                                                                                                                                                   |
 | D16 | Launch catalogue                      | Open — Step 5                                                                                                                                                                                   |
 | D17 | Samples                               | **Decided 27 Sep:** admin chooses each book’s free part; no fixed amount.                                                                                                                       |
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## D14 owner approval — 7 October 2026 (latest)
+
+Approved: confirmed deletion removes profile/access, retaining necessary purchase,
+refund and accounting evidence. Recovery is owner-only, support-assisted and
+provider-verified, never email matching; refunded/revoked purchases stay locked.
+Routine security logs expire after 90 days, with documented/reviewed incident
+exceptions. Local backups retain 14 copies; OneDrive retains 90 days, preserving
+and reporting the last verified recoverable set when expiry would remove it.
+Minimal protected deletion records must survive older database restoration and
+server loss; recovery stops before reopening if current records are unavailable.
+RevenueCat metadata deletion is retryable while necessary refund/recovery proof
+remains. Google's records are outside Shelf's deletion promise. Financial expiry
+remains unresolved; no 90-day financial expiry or statutory deadline is approved.
+This supersedes the recommendation-only D14 sheet below and historical append-only
+OneDrive policy. Implementation is in `docs/D14_DATA_POLICY.md`: encrypted independent OneDrive
+journal with verified publication; account deletion/outbox; owner-only recovery
+with Google order/token status and original RevenueCat entitlement; immutable
+recovery audit/claim; refunds revoke recovered access; scoped dry-run-first expiry
+and incident holds; older recovery replays suppression and blocks reopening.
+Focused isolated checks passed: 62 PHP tests / 479 assertions and 7 new D14 backup
+checks; existing backup regressions passed except the resolved new recovery-runtime
+gap. Staging/promotion and live activation evidence will follow before completion.
+No live reader was deleted to test. Financial records/agreements stay unchanged.
+RevenueCat whole-customer deletion conflicts with required purchase/refund history;
+only metadata is scrubbed/retried, with immutable metadata held for reviewed
+resolution. Provider documentation is linked in the D14 runbook. Step 4 and
+Step 5 remain open; real sales remain OFF and automatic Play sync DEFERRED.
 
 ## Webhook configuration complete; D14 proposals — 7 October 2026 (latest)
 

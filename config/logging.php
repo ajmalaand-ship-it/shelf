@@ -59,8 +59,10 @@ return [
         ],
 
         'single' => [
-            'driver' => 'single',
+            'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
+            // External D14 cleanup honors incident holds; Monolog must not erase them.
+            'days' => 0,
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
@@ -69,7 +71,7 @@ return [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
-            'days' => env('LOG_DAILY_DAYS', 14),
+            'days' => 0,
             'replace_placeholders' => true,
         ],
 

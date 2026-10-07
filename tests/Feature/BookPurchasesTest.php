@@ -20,6 +20,9 @@ class BookPurchasesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->mock(\App\Services\Accounts\DeletionJournal::class, function ($mock) {
+            $mock->shouldReceive('record')->andReturnUsing(fn ($reader) => ['record_id' => str_repeat('a', 32)]);
+        });
         config(['reader_auth.enabled' => true, 'purchases.enabled' => true, 'purchases.secret_key' => 'synthetic-secret',
             'purchases.secret_key_path' => null,
             'purchases.webhook_authorization' => 'synthetic-auth', 'purchases.app_id' => 'shelf-test-app', 'purchases.public_sdk_key' => 'goog_synthetic']);
@@ -368,7 +371,8 @@ class BookPurchasesTest extends TestCase
         try { $this->book->assertPublishable(); $this->fail('Published without price'); }
         catch (\Illuminate\Validation\ValidationException $e) { $this->assertArrayHasKey('price_usd', $e->errors()); }
         $migration = require database_path('migrations/2026_09_30_010000_create_book_purchases.php');
-        $migration->down(); $migration->up();
+        $d14 = require database_path('migrations/2026_10_07_220000_add_d14_recovery_and_deletion_outbox.php');
+        $d14->down(); $migration->down(); $migration->up(); $d14->up();
         $this->assertDatabaseHas('collections', ['id' => $this->book->id, 'product_id' => $id]);
     }
 

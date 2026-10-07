@@ -358,7 +358,7 @@ def restore_files(encrypted, expected, workspace):
     return target, manifest
 
 
-def restore_database(target, workspace):
+def restore_database(target, workspace, deletion_records=None, identity_inventory=None):
     # Disposable server, no TCP port and no production/staging credentials.
     data = workspace / 'mysql'
     data.mkdir(mode=0o700)
@@ -398,6 +398,47 @@ def restore_database(target, workspace):
                                               if line and not line.startswith(b'--'))
         if normalize(canonical) != normalize(original):
             raise RuntimeError('Recovered database differs from backup schema/rows.')
+        if identity_inventory is not None:
+            exists = run(client + ['-N', '-e', "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='shelf_recovery' AND table_name='readers';"])
+            if int(exists.strip()):
+                rows = run(client + ['shelf_recovery', '-N', '-e', "SELECT id,DATE_FORMAT(created_at,'%Y-%m-%dT%H:%i:%sZ') FROM readers ORDER BY id;"])
+                for line in rows.decode().splitlines():
+                    reader, born = line.split('\t')
+                    identity_inventory.add((int(reader), born))
+        if deletion_records is not None:
+            import shelf_deletion_journal as journal
+            # The committed reversible D14 migration adds the journal/outbox tables
+            # to older recovery schemas. Only the disposable socket DB is touched.
+            migrate = r'''require $argv[1].'/vendor/autoload.php';
+$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+config(['database.default'=>'mysql','database.connections.mysql.host'=>'localhost',
+'database.connections.mysql.unix_socket'=>$argv[2],'database.connections.mysql.database'=>'shelf_recovery',
+'database.connections.mysql.username'=>'root','database.connections.mysql.password'=>'',
+'database.connections.mysql.url'=>null]);
+Illuminate\Support\Facades\DB::purge('mysql');
+$exit=Illuminate\Support\Facades\Artisan::call('migrate',['--path'=>'database/migrations/2026_10_07_220000_add_d14_recovery_and_deletion_outbox.php','--force'=>true]);
+exit($exit);'''
+            (workspace / 'views').mkdir(mode=0o700)
+            isolated_env = dict(os.environ, APP_ENV='testing', DB_CONNECTION='mysql', DB_HOST='localhost',
+                DB_SOCKET=str(socket), DB_DATABASE='shelf_recovery', DB_USERNAME='root', DB_PASSWORD='', DB_URL='',
+                LOG_CHANNEL='null', CACHE_STORE='array', SESSION_DRIVER='array', MAIL_MAILER='log',
+                VIEW_COMPILED_PATH=str(workspace / 'views'), APP_CONFIG_CACHE=str(workspace / 'config.php'),
+                APP_SERVICES_CACHE=str(workspace / 'services.php'), APP_PACKAGES_CACHE=str(workspace / 'packages.php'))
+            run(['php', '-r', migrate, APP, socket], cwd=APP, env=isolated_env)
+            run(client + ['shelf_recovery'], input=journal.replay_sql(deletion_records))
+            # Recoveries are claims, not permission to bypass a fresh provider check.
+            run(client + ['shelf_recovery'], input=b'UPDATE book_entitlements SET active=0;')
+            sanitized = run(['mysqldump', '--no-defaults', '--protocol=SOCKET', '--socket=' + str(socket),
+                             '-u', 'root', '--skip-add-locks', '--skip-lock-tables', '--routines', '--events', '--triggers', '--', 'shelf_recovery'])
+            (target / 'database.sql').write_bytes(sanitized)
+            index = target / 'code' / 'public' / 'index.php'
+            # Even a pre-D14 archived release cannot bypass the recovery barrier.
+            original_index = index.read_text()
+            index.write_text(original_index.replace('<?php', "<?php\nif (is_file(dirname(__DIR__).'/.shelf-recovery-blocked')) { http_response_code(503); exit('Recovery review required.'); }", 1))
+            (target / 'code' / '.shelf-recovery-blocked').write_text('Current deletion journal and provider rechecks required before opening.\n')
+            write_json(target / 'deletion-replay.json', {'records': len(deletion_records), 'replayed_at': datetime.now(timezone.utc).isoformat(),
+                'sanitized_sql_sha256': local.sha256(target / 'database.sql'), 'access_disabled': True})
         tables = run(client + ['-N', '-e', 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema="shelf_recovery";'])
         return int(tables.strip())
     finally:
@@ -544,7 +585,9 @@ def recover(path, destination):
     with tempfile.TemporaryDirectory(prefix='shelf-recover-', dir='/home/shelf/tmp') as temporary:
         workspace = Path(temporary)
         restored, manifest = restore_files(path, info['sha256'], workspace)
-        tables = restore_database(restored, workspace)
+        import shelf_deletion_journal as journal
+        records = journal.current() # Independent latest journal, never the archived DB. Missing/corrupt => stop.
+        tables = restore_database(restored, workspace, deletion_records=records)
         shutil.copytree(restored, destination)
         destination.chmod(0o700)
     print('Isolated recovery verified and retained at ' + str(destination) + '; '

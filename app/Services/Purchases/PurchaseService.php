@@ -122,11 +122,13 @@ class PurchaseService
         SalesLedger::create(['purchase_id' => $purchase->id, 'event_id' => $event?->id, 'entry_key' => $key,
             'status' => $status, 'currency' => $sale?->currency, 'amount' => $status === 'refund' && $sale?->amount !== null ? '-'.$sale->amount : null,
             'occurred_at' => $event?->occurred_at ?? now(), 'agreement_snapshot' => $sale?->agreement_snapshot, 'earnings_status' => $purchase->environment === 'SANDBOX' ? 'test' : 'unknown']);
+        $claim = DB::table('purchase_recovery_claims')->where('purchase_id', $purchase->id)->first();
+        if ($claim && ($recovered = Reader::find($claim->reader_id))) { $this->refreshAccess($recovered, $purchase->book); }
     }
 
-    private function refreshAccess(Reader $reader, Collection $book): void
+    public function refreshAccess(Reader $reader, Collection $book): void
     {
-        $active = Purchase::where('reader_id', $reader->id)->where('collection_id', $book->id)
+        $active = Purchase::where(fn ($q) => $q->where('reader_id', $reader->id)->orWhereIn('id', DB::table('purchase_recovery_claims')->where('reader_id', $reader->id)->select('purchase_id')))->where('collection_id', $book->id)
             ->whereDoesntHave('entries', fn ($q) => $q->whereIn('status', ['refund', 'revoke']))->exists();
         DB::table('book_entitlements')->updateOrInsert(['reader_id' => $reader->id, 'collection_id' => $book->id],
             ['active' => $active, 'checked_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
@@ -137,15 +139,25 @@ class PurchaseService
         if (\App\Support\Staging::active() && RevenueCatClient::configured()) {
             $this->confirmStaging($reader);
         }
-        $purchases = Purchase::where('reader_id', $reader->id)->with(['book', 'entries'])->get();
+        $purchases = Purchase::where(fn ($q) => $q->where('reader_id', $reader->id)->orWhereIn('id', DB::table('purchase_recovery_claims')->where('reader_id', $reader->id)->select('purchase_id')))->with(['book', 'entries'])->get();
         if ($purchases->isEmpty()) { return; }
         $needsCheck = $purchases->contains(fn ($purchase) => ! $purchase->entries->contains(fn ($entry) => in_array($entry->status, ['refund', 'revoke'], true)));
-        $subscriber = $needsCheck ? $this->provider->subscriber($reader) : null;
-        DB::transaction(function () use ($reader, $subscriber, $purchases): void {
+        $subscribers = [];
+        if ($needsCheck) {
+            foreach ($purchases as $purchase) {
+                if ($purchase->entries->contains(fn ($entry) => in_array($entry->status, ['refund', 'revoke'], true))) { continue; }
+                if (! isset($subscribers[$purchase->reader_id])) {
+                    $identity = new Reader;
+                    $identity->id = $purchase->reader_id;
+                    $subscribers[$purchase->reader_id] = $this->provider->subscriber($identity);
+                }
+            }
+        }
+        DB::transaction(function () use ($reader, $subscribers, $purchases): void {
             Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail();
             foreach ($purchases as $purchase) {
                 if (! $purchase->entries()->whereIn('status', ['refund', 'revoke'])->exists()
-                    && ! $this->provider->confirms($subscriber, $purchase->book, $purchase->purchased_at, $purchase->environment)) {
+                    && ! $this->provider->confirms($subscribers[$purchase->reader_id], $purchase->book, $purchase->purchased_at, $purchase->environment)) {
                     $this->reverse($purchase, 'revoke');
                 }
                 $this->refreshAccess($reader, $purchase->book);

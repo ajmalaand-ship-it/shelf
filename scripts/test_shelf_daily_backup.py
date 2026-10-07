@@ -35,7 +35,9 @@ class BackupTests(unittest.TestCase):
         root = self.root / 'backups'
         root.mkdir()
         for day in range(1, 17):
-            (root / f'202609{day:02}-030000').mkdir()
+            folder = root / f'202609{day:02}-030000'
+            folder.mkdir()
+            (folder / 'manifest.json').write_text(json.dumps({'system': 'Shelf'}))
         unrelated = root / 'manual-backup'
         unrelated.mkdir()
         outside = self.root / 'outside'

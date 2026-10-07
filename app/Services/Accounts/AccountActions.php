@@ -52,6 +52,13 @@ class AccountActions
     {
         DB::transaction(function () use ($reader) {
             $reader = Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail();
+            // Durability before erasure: an acknowledged request survives server loss
+            // and an older database restore, even if this transaction later fails.
+            $receipt = app(DeletionJournal::class)->record($reader);
+            DB::table('provider_deletions')->insertOrIgnore([
+                'reader_id' => $reader->id, 'receipt_id' => $receipt['record_id'],
+                'status' => 'pending', 'created_at' => now(), 'updated_at' => now(),
+            ]);
             $reader->tokens()->delete();
             DB::table('reader_account_actions')->where('reader_id', $reader->id)->delete();
             // Money records are retained unchanged. These nullable identifiers have no

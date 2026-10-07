@@ -27,6 +27,9 @@ class ReaderAccountsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->mock(\App\Services\Accounts\DeletionJournal::class, function ($mock) {
+            $mock->shouldReceive('record')->andReturnUsing(fn ($reader) => ['record_id' => str_repeat('a', 32)]);
+        });
         config(['reader_auth.enabled' => true, 'reader_auth.public_registration' => true]);
         Mail::fake();
     }

@@ -55,6 +55,35 @@ class RevenueCatClient
         }
     }
 
+    /** Remove metadata, preserving provider transaction/refund evidence. */
+    public function eraseMetadata(int $readerId): void
+    {
+        $reader = new Reader;
+        $reader->id = $readerId;
+        $subscriber = $this->subscriber($reader);
+        abort_unless(array_key_exists('subscriber_attributes', $subscriber)
+            && is_array($subscriber['subscriber_attributes']), 503, 'Provider metadata unavailable.');
+        $attributes = [];
+        $immutable = [];
+        foreach ($subscriber['subscriber_attributes'] as $key => $attribute) {
+            abort_unless(is_string($key) && is_array($attribute) && is_int($attribute['updated_at_ms'] ?? null), 503);
+            // RevenueCat documents these attribution identifiers as immutable.
+            // Do not delete the whole customer and destroy necessary history.
+            if (in_array($key, ['$idfa', '$idfv', '$gpsAdId', '$ip', '$androidId'], true)) { $immutable[] = $key; continue; }
+            $attributes[$key] = ['value' => null, 'updated_at_ms' => max(now()->getTimestampMs(), $attribute['updated_at_ms'] + 1)];
+        }
+        if ($attributes) {
+            $response = Http::withToken(self::credential())->acceptJson()->withoutRedirecting()->connectTimeout(5)->timeout(12)
+                ->post('https://api.revenuecat.com/v1/subscribers/'.rawurlencode(\App\Support\Staging::identity($readerId)).'/attributes', ['attributes' => $attributes]);
+            abort_unless($response->successful(), 503, 'Provider metadata deletion remains pending.');
+            $after = $this->subscriber($reader);
+            abort_unless(array_key_exists('subscriber_attributes', $after) && is_array($after['subscriber_attributes'])
+                && array_diff(array_keys($after['subscriber_attributes']), $immutable) === [], 503,
+                'Provider metadata deletion remains unverified.');
+        }
+        abort_if($immutable !== [], 409, 'Immutable provider metadata requires reviewed resolution.');
+    }
+
     public static function productionEnabled(): bool
     {
         return ! \App\Support\Staging::active() && config('purchases.production_enabled') === true;

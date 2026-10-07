@@ -68,7 +68,12 @@ class SaleResource extends Resource
             SelectFilter::make('rights_holder')->options(fn () => Author::pluck('name', 'id'))->query(fn (Builder $query, $data) => $query->when($data['value'] ?? null, fn ($q, $v) => $q->forRightsHolder((int) $v))),
             SelectFilter::make('status')->options(['sale' => 'Sale', 'refund' => 'Refund', 'revoke' => 'Revocation']),
             SelectFilter::make('currency')->options(fn () => SalesLedger::withTestPurchases()->whereNotNull('currency')->distinct()->pluck('currency', 'currency')->all()),
-        ])->recordActions([Action::make('accounting')->label('Accounting history')->url(fn ($record) => AccountingEntryResource::getUrl('index', ['sales_ledger' => $record->id]))])->defaultSort('id', 'desc');
+        ])->recordActions([
+            Action::make('recovery_audit')->label('Recovery history')->modalSubmitAction(false)->modalCancelActionLabel('Close')
+                ->modalContent(fn ($record) => view('admin.purchase-recovery-audit', [
+                    'recoveries' => \App\Models\PurchaseRecovery::where('purchase_id', $record->purchase_id)->orderBy('id')->get(),
+                ])),
+            Action::make('accounting')->label('Accounting history')->url(fn ($record) => AccountingEntryResource::getUrl('index', ['sales_ledger' => $record->id]))])->defaultSort('id', 'desc');
     }
 
     public static function getPages(): array

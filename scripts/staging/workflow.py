@@ -263,6 +263,27 @@ def https_checks():
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    d14_scope = {'scripts/shelf_deletion_journal.py', 'app/Models/PurchaseRecovery.php', 'app/Services/Accounts/DeletionJournal.php', 'app/Console/Commands/ProcessD14.php', 'app/Services/Purchases/PurchaseRecoveryService.php', 'docs/MASTER_RECORD.md', 'AGENTS.md', 'scripts/run_tests.sh', 'scripts/test_shelf_daily_backup.py', 'scripts/shelf_d14_baseline.py', 'scripts/shelf_retention.py', 'app/Http/Middleware/RecoveryBlocked.php', 'docs/D14_DATA_POLICY.md', 'config/logging.php', 'scripts/test_shelf_d14_backup.py', 'app/Services/Play/GooglePlayClient.php', 'app/Services/Accounts/ProviderDeletionWorker.php', 'resources/views/admin/purchase-recovery-audit.blade.php', 'tests/Feature/BookPurchasesTest.php', 'resources/views/account/delete.blade.php', 'app/Services/Purchases/RevenueCatClient.php', 'database/migrations/2026_10_07_220000_add_d14_recovery_and_deletion_outbox.php', 'scripts/staging/workflow.py', 'tests/Feature/ReaderAccountsTest.php', 'tests/Feature/D14PolicyTest.php', 'docs/PRODUCTION_PURCHASE_VERIFICATION.md', 'resources/views/account/action.blade.php', 'app/Services/Accounts/AccountActions.php', 'scripts/shelf_d14_maintenance.py', 'scripts/shelf_offsite_backup.py', 'app/Services/Purchases/PurchaseService.php', 'resources/views/privacy.blade.php', 'scripts/shelf_daily_backup.py', 'app/Filament/Resources/Sales/SaleResource.php', 'app/Filament/Resources/Readers/ReaderResource.php', 'docs/OFFSERVER_BACKUP.md', 'bootstrap/app.php'}
+    if changes and set(changes) <= d14_scope and 'tests/Feature/D14PolicyTest.php' in changes:
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'D14PolicyTest|ReaderAccountsTest|BookPurchasesTest|AccountingTest|VoidedPurchasesTest|PlayPriceSyncTest'
+        with log.open('w') as output:
+            for args in (['bash', 'scripts/run_tests.sh'], ['bash', 'scripts/run_tests.sh', '--backup']):
+                result = subprocess.run(args, cwd=app, stdout=output, stderr=subprocess.STDOUT, env=test_env)
+                if result.returncode:
+                    raise RuntimeError('Staged D14 checks failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        artisan(app, 'shelf:check-purchases')
+        artisan(app, 'shelf:check-accounting')
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit': commit, 'passed': True,
+            'checked_at': datetime.now(timezone.utc).isoformat(), 'mobile_tests': False,
+            'scope': 'd14-policy', 'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: staged focused D14 deletion/recovery/retention, accounts, purchases/refunds/accounting and isolation; no phone/broad suite.', flush=True)
+        return
     android_purchase_scope = {'mobile/lib/services/api_config.dart',
         'mobile/lib/purchases/book_purchase_provider.dart', 'mobile/lib/purchases/library_controller.dart',
         'mobile/lib/purchases/purchase_screen.dart', 'mobile/test/book_purchases_test.dart', 'mobile/test/library_ux_test.dart',

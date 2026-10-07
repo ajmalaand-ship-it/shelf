@@ -49,7 +49,10 @@ mkdir -p -- "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME"
 cd -- "$repo_root"
 if "$run_backup"; then
     echo "Running focused backup/recovery checks (no PHP or phone suite)"
-    python3 -B -m unittest discover -s scripts -p 'test_shelf_*backup.py' -v
+    backup_pattern='test_shelf_*backup.py'
+    if [[ "${SHELF_BACKUP_TEST_SCOPE:-}" == 'd14' ]]; then backup_pattern='test_shelf_d14_backup.py';
+    elif [[ -n "${SHELF_BACKUP_TEST_SCOPE:-}" ]]; then echo 'Unknown backup scope' >&2; exit 2; fi
+    python3 -B -m unittest discover -s scripts -p "$backup_pattern" -v
     exit 0
 fi
 echo "Running PHP tests (temporary files: $run_dir)"

@@ -72,7 +72,22 @@ def retain_backups(root):
         raise RuntimeError('Backup root must be a real, canonical directory.')
     if not shutil.rmtree.avoids_symlink_attacks:
         raise RuntimeError('Safe recursive deletion is unavailable.')
-    for folder in backup_folders(root)[14:]:
+    folders = []
+    for folder in backup_folders(root):
+        manifest = folder / 'manifest.json'
+        if manifest.is_symlink() or not manifest.is_file():
+            continue # Unrelated/manual folders are not Shelf retention candidates.
+        record = json.loads(manifest.read_text())
+        if record.get('system') == 'Shelf':
+            folders.append(folder)
+    # main() already verifies the fresh set before calling retention. Inventory
+    # every scoped candidate first; preserve all if inventory cannot be written.
+    inventory = {'local_copies': 14, 'keep': [p.name for p in folders[:14]],
+                 'delete': [p.name for p in folders[14:]]}
+    saved = root / 'local-retention-inventory.json'
+    saved.write_text(json.dumps(inventory, indent=2) + '\n')
+    saved.chmod(0o600)
+    for folder in folders[14:]:
         shutil.rmtree(folder)
 
 

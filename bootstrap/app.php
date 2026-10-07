@@ -13,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(\App\Http\Middleware\StagingAccess::class);
+        $middleware->prepend(\App\Http\Middleware\RecoveryBlocked::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'token', 'id_token']);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'token', 'id_token', 'purchase_token']);
     })->create();

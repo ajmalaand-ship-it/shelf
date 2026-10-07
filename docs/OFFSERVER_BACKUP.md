@@ -1,3 +1,10 @@
+> **D14 amendment, 7 October 2026:** owner-approved offsite retention is now
+> 90 days, with a reported protected last verified recovery set; local copies 14.
+> Historical append-only evidence below describes the earlier policy. Current
+> activation, scoped expiry and independent deletion-journal recovery are documented
+> in [D14_DATA_POLICY.md](D14_DATA_POLICY.md). Recovery must obtain current
+> off-server deletion records and stop before reopening if they are unavailable.
+
 # Shelf OneDrive backup and recovery
 
 > **Current amendment — 7 October 2026:** first 100 books use manual Play Console

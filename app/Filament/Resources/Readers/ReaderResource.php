@@ -29,6 +29,18 @@ class ReaderResource extends Resource
             TextColumn::make('purchases_count')->counts('purchases')->label('Purchases'),
             TextColumn::make('refunds_count')->getStateUsing(fn ($record) => \App\Models\SalesLedger::withTestPurchases()->where('status', 'refund')->whereHas('purchase', fn ($q) => $q->where('reader_id', $record->id))->count())->label('Refunds'),
         ])->recordActions([
+            Action::make('recover')->label('Recover a purchase')->requiresConfirmation()
+                ->modalDescription('Verify the claimant through support. Email matching is insufficient. Only a deleted account’s active purchase can be recovered. Never enter personal data in the case reference.')
+                ->schema([
+                    \Filament\Forms\Components\TextInput::make('purchase_id')->label('Original purchase ID')->integer()->required(),
+                    \Filament\Forms\Components\TextInput::make('purchase_token')->label('Private purchase token (optional)')->helperText('Leave empty to verify the recorded Google order on the server.')->password()->maxLength(4096),
+                    \Filament\Forms\Components\TextInput::make('case_reference')->label('Support case reference')->required()->regex('/^[A-Za-z0-9_-]{3,80}$/D'),
+                    \Filament\Forms\Components\Checkbox::make('claimant_verified')->label('I verified the claimant and their original store purchase')->accepted(),
+                ])->action(function ($record, array $data): void {
+                    app(\App\Services\Purchases\PurchaseRecoveryService::class)->recover(auth()->user(), $record,
+                        (int) $data['purchase_id'], ($data['purchase_token'] ?? ''), $data['case_reference'], (bool) ($data['claimant_verified'] ?? false));
+                    \Filament\Notifications\Notification::make()->title('Purchase recovered; original financial history preserved.')->success()->send();
+                }),
             Action::make('buying')->label('Buying permission')->schema([Toggle::make('buying_blocked')->label('Block new purchases')])
                 ->fillForm(fn ($record) => ['buying_blocked' => $record->buying_blocked])
                 ->action(function ($record, array $data): void {

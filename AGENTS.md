@@ -31,19 +31,17 @@ checks are recorded separately from unfinished building work in
 Step 4 sales/author accounting (6.9) is built with an append-only journal,
 confirmed figures, payment records/reversals and per-currency owner balances.
 Deployed at 5ff131f and retained in 5f75fa0; see docs/ACCOUNTING.md.
-No real payments or automatic payouts are enabled. Step 4 remains open.
-Production-mode server verification is built behind the OFF-by-default
-SHELF_REAL_PURCHASES_ENABLED control; staging forces it off. Provider webhook
-and independent REST evidence must agree; Test remains excluded from real income.
-See docs/PRODUCTION_PURCHASE_VERIFICATION.md for evidence and launch gates.
-For the first 100 books, Play products/prices/availability are managed manually
-in Play Console. Automatic sync is DEFERRED, not completed, and disabled;
-403 investigation/retries are stopped. See docs/MANUAL_PLAY_PRODUCTS.md.
-Temporary account-level grants from 5 October require owner removal confirmation;
-preserve Shelf app-level access and existing credentials.
+No real payments or automatic payouts are enabled. Step 4 is not all complete.
+For the first 100 books, products/prices are managed manually in Play Console;
+automatic sync is DEFERRED and disabled. Do not investigate/retry the 403.
+Production verification and release-mode source support are deployed at 340634b;
+real checkout remains OFF. Existing RevenueCat webhook now receives Both
+Production and Sandbox; actual production delivery remains unverified.
+D14 policy approved 7 October 2026; financial expiry remains unresolved. See
+`docs/D14_DATA_POLICY.md` and the latest Master Record for implementation/evidence.
 Step 5 OneDrive encrypted upload/download and isolated
 recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
-append-only retention with monthly review. See docs/OFFSERVER_BACKUP.md.
+90-day offsite retention with a reported protected-last-recovery-set exception; local copies 14. See docs/OFFSERVER_BACKUP.md.
 OneDrive implementation/evidence is deployed at 5f75fa0. First unattended run
 failed 4 October at 07:32:19 UTC after upload; no recovery success recorded.
 Step 5 / 6.11 repair deployed at c887f91: absolute MariaDB daemon path,

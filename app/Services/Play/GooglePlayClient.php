@@ -91,6 +91,31 @@ class GooglePlayClient
         return $response;
     }
 
+    public function orderPurchaseToken(\App\Models\Purchase $purchase): string
+    {
+        if (\App\Support\Staging::active() || config('play_sync.package') !== 'services.shelf.app') {
+            throw new PlaySyncException('Purchase recovery is forbidden on another package or test copy.');
+        }
+        $order = $this->request('GET', '/orders/'.rawurlencode($purchase->transaction_id))->json();
+        if (! is_array($order) || ($order['orderId'] ?? null) !== $purchase->transaction_id
+            || ($order['state'] ?? null) !== 'PROCESSED' || count($order['lineItems'] ?? []) !== 1
+            || ($order['lineItems'][0]['productId'] ?? null) !== $purchase->product_id
+            || ! is_string($order['purchaseToken'] ?? null) || blank($order['purchaseToken'])) {
+            throw new PlaySyncException('Store order is unavailable or not eligible for recovery.');
+        }
+        return $order['purchaseToken']; // Memory only; never log or persist buyer metadata/token.
+    }
+
+    public function productPurchase(string $token): array
+    {
+        if (\App\Support\Staging::active() || config('play_sync.package') !== 'services.shelf.app') {
+            throw new PlaySyncException('Production purchase recovery is forbidden on another package or test copy.');
+        }
+        $result = $this->request('GET', '/purchases/productsv2/tokens/'.rawurlencode($token))->json();
+        if (! is_array($result)) { throw new PlaySyncException('Purchase verification unavailable.'); }
+        return $result;
+    }
+
     public function voidedPurchases(?string $pageToken = null): Response
     {
         if (\App\Support\Staging::active() || config('play_sync.package') !== 'services.shelf.app') {
