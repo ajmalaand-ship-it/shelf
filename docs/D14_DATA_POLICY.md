@@ -45,6 +45,18 @@ and later refunds. Immutable attribution metadata is recorded as `review_require
 rather than destructively deleting that evidence. Review genuine occurrences with
 the owner/provider. No promise is made to delete Google's store orders.
 
+## Current provider configuration blocker
+
+Read-only verification on 7 October returned HTTP 403 for customer attributes
+using Shelf's existing V2 key. No attributes were displayed, no provider write
+was made and permissions/credentials were left unchanged. This is a D14 metadata
+scope gap, not a restart of the deferred Play pricing investigation. Retryable
+cleanup safely stays pending until the owner approves the exact existing-key
+permission `customer_information:customers:read` in RevenueCat project Shelf.
+The existing V1 verifier performs null-attribute removal after that pure read;
+no V2 write grant or duplicate webhook/new key is required by this implementation.
+Actual metadata erasure of a live/deleted reader is not claimed as verified.
+
 ## Retention and operation
 
 Local daily SQL/media copies retain 14 manifest-labelled Shelf sets; an inventory

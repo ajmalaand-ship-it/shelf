@@ -561,9 +561,16 @@ journal with verified publication; account deletion/outbox; owner-only recovery
 with Google order/token status and original RevenueCat entitlement; immutable
 recovery audit/claim; refunds revoke recovered access; scoped dry-run-first expiry
 and incident holds; older recovery replays suppression and blocks reopening.
-Focused isolated checks passed: 62 PHP tests / 479 assertions and 7 new D14 backup
-checks; existing backup regressions passed except the resolved new recovery-runtime
-gap. Staging/promotion and live activation evidence will follow before completion.
+Focused staging checks passed on 45b5cc1: 88 PHP tests / 654 assertions and
+23 backup checks (7 D14 plus existing backup regressions); no Flutter/phone suite.
+The final metadata-read correction and its additional focused test are committed;
+final staging/promotion and live activation evidence follow before completion.
+**Provider configuration blocker:** read-only V2 customer-attribute verification
+returned HTTP 403 on 7 October. Existing key lacks usable customer metadata read
+access. No provider write, grant or credential change occurred. Retryable metadata
+cleanup remains pending; owner approval of the existing V2 key's exact
+`customer_information:customers:read` permission is needed. This is unrelated to
+deferred Play product/price sync; no pricing 403 work was resumed.
 No live reader was deleted to test. Financial records/agreements stay unchanged.
 RevenueCat whole-customer deletion conflicts with required purchase/refund history;
 only metadata is scrubbed/retried, with immutable metadata held for reviewed
