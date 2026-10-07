@@ -13,7 +13,7 @@ class PurchaseRecoveryService
         abort_unless($owner->is_owner, 403);
         abort_unless($claimantVerified && preg_match('/^[A-Za-z0-9_-]{3,80}$/D', $case), 422,
             'Verify the claimant and enter a support case reference without personal data.');
-        abort_unless($target->email_verified_at && ! $target->buying_blocked && ($token === '' || (strlen($token) >= 10 && strlen($token) <= 4096)), 422);
+        abort_unless($target->email_verified_at && ($token === '' || (strlen($token) >= 10 && strlen($token) <= 4096)), 422);
         $purchase = Purchase::with('book')->findOrFail($purchaseId);
         abort_unless($purchase->reader_id && ! Reader::whereKey($purchase->reader_id)->exists(), 409, 'Original account must be deleted.');
         abort_if($purchase->entries()->whereIn('status', ['refund', 'revoke'])->exists(), 409, 'Refunded or revoked purchases cannot be recovered.');

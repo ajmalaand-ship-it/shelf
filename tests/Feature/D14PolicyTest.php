@@ -88,6 +88,8 @@ class D14PolicyTest extends TestCase
     public function test_owner_recovery_preserves_history_restores_and_refund_revokes(): void
     {
         $before = $this->purchase->fresh()->toArray();
+        // Blocking new buying does not revoke a verified previously bought book.
+        $this->target->forceFill(['buying_blocked' => true])->save();
         app(AccountActions::class)->delete($this->original);
         $this->provider();
         $this->recover();
