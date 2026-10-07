@@ -24,9 +24,11 @@ books remain approved. Automatic sync DEFERRED / NOT COMPLETED; 403 work stopped
   Reordered refund tombstones are scoped to reader/book/environment/transaction.
 - `SHELF_REAL_PURCHASES_ENABLED` defaults false; exact boolean true required.
   Staging forces it false and rejects real events even if overridden in-process.
-  Current test-only owner consent and test_mode=true remain while the gate is off.
-  Config test_mode changes only with the server gate, not client flags. The current
-  Android app deliberately rejects test_mode=false; no mobile code changed here.
+  Server configuration exposes separate production/sandbox checkout availability.
+  Consent rejects production checkout while the real gate is OFF, before payment.
+  Explicit sandbox checkout is owner-only, including when real sales later open.
+  Checkout mode authorizes an operation; verified provider evidence alone labels
+  transactions. Legacy installed owner-test clients retain their consent behavior.
 - Existing recorded real purchases remain verifiable/restorable if buying is later
   disabled; their authenticated refunds/revocations still work, including deleted
   accounts. Malformed/outage rechecks do not renew offline leases or append guesses
@@ -78,9 +80,10 @@ reader/money activity.
 
 1. Explicit owner launch/real-money approval; this construction authorization does
    not permit real payments, public release or changing the server gate.
-2. Release-mode Android integration/build: handle test_mode=false, clear purchase
-   wording, account/availability/consent checks and Google localized checkout prices.
-   Existing internal-test mode must remain usable. A separate construction task.
+2. Build and validate the implemented release-mode Android source in a separately
+   approved release task. No APK/AAB was built or installed in this task. Public
+   release builds must omit SHELF_INTERNAL_TEST_PURCHASES (default false); existing
+   owner-preview/internal-test build scripts explicitly opt in to license testing.
 3. Manually complete/review launch book products, prices, regions and non-consumable
    RevenueCat products/entitlements with exact IDs; verify checkout availability.
    No Console/provider product change is performed here; last inventory remains
@@ -98,3 +101,34 @@ reader/money activity.
 
 Temporary four account-level Play grants still await owner removal confirmation;
 app-level access and credentials preserved. No permissions/prices/products changed.
+
+
+## Android release construction — 7 October 2026
+
+Source now supports production checkout without requiring test_mode=true. Default
+builds refuse new checkout unless the fresh server production gate is true. Before
+calling the SDK, fetch config again, check availability, then authenticate consent
+for the exact reader, canonical book product and checkout mode. Rejected/malformed
+consent, unavailable products, wrong mappings and account changes stop checkout.
+Google's priceString remains the displayed price; server confirmation alone unlocks.
+Restore uses SDK configuration independently of new-sale permission. Purchase,
+acknowledgement, refund, offline and accounting logic remain unchanged.
+
+Existing internal-test AAB/owner-preview scripts explicitly set
+SHELF_INTERNAL_TEST_PURCHASES=true; staging selects test checkout and enforces its
+staging_ identity. This flag cannot make a charged transaction Test, alter server
+verification or enable real-sale acceptance. Owner license-test checkout still
+requires Google's test payment methods: an internal test track alone does not
+prove a sandbox payment. See [Google testing guidance](https://developer.android.com/google/play/billing/test).
+No new test app, release upload, provider changes or phone tests. Installed Android
+apps are unchanged; only committed source and server availability/consent API are
+updated. The disabled real-sale gate cannot authorize release-mode checkout.
+
+Evidence: 62 PHP tests / 474 assertions, 19 focused Flutter tests plus one
+staging-identity check passed through scripts/run_tests.sh --mobile.
+Focused checks cover default release denial, allowed synthetic production checkout,
+stale gate denial before SDK purchase, failed/mismatched consent, localized prices,
+small/large screen buy controls, restore while buying is off, reader isolation,
+refund/download removal and server-only unlocking. Staging workflow records exact
+results and backup in release-state.json; no schema/history edits. Real provider
+checkout remains untested until an explicitly approved release acceptance task.

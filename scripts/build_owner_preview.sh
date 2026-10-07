@@ -31,7 +31,7 @@ allprojects {
 }
 GRADLE
 cd "$run_dir/mobile"
-/home/shelf/flutter/bin/flutter build apk --debug --flavor production --dart-define-from-file="$run_dir/preview.json"
+/home/shelf/flutter/bin/flutter build apk --debug --flavor production --dart-define=SHELF_INTERNAL_TEST_PURCHASES=true --dart-define-from-file="$run_dir/preview.json"
 destination="$repo_root/storage/app/private/owner-apks"
 mkdir -p "$destination"
 apk="$destination/shelf-owner-preview-$(date -u +%Y%m%d-%H%M%S).apk"

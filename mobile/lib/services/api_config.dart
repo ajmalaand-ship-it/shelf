@@ -5,6 +5,9 @@ const shelfApiBaseUrl = String.fromEnvironment(
 );
 
 const shelfTestMode = bool.fromEnvironment('SHELF_TEST_MODE');
+// Enables owner license-test checkout only; never classifies a transaction.
+const shelfInternalTestPurchases = shelfTestMode ||
+    bool.fromEnvironment('SHELF_INTERNAL_TEST_PURCHASES');
 const _testAccessKey = String.fromEnvironment('SHELF_STAGING_ACCESS_KEY');
 
 Map<String, String> shelfTestHeaders(Uri target) {

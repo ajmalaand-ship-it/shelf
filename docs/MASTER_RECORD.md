@@ -542,6 +542,45 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Android release purchase construction — 7 October 2026 (latest)
+
+Owner approved release-mode Android support behind disabled controls. Source now
+uses separate server production/sandbox checkout gates and fresh authenticated
+reader/book/product/mode consent before Google Play purchase. Default builds stop
+before payment while real sales are OFF. Existing owner-test build scripts opt in
+with SHELF_INTERNAL_TEST_PURCHASES; Google license-test payment methods remain
+required. This flag never classifies receipts: provider evidence remains decisive.
+Localized Google prices, server-only unlocking, restore independent of buying,
+identity isolation, acknowledgements/refunds/offline/accounting are preserved.
+
+Evidence: 62 focused PHP tests / 474 assertions; 19 focused Flutter tests plus
+1 staging-identity check passed through scripts/run_tests.sh --mobile.
+Source implemented; installed Android app unchanged. No APK/AAB built, upload,
+provider/product/price/credential/permission change or phone request. Backend
+availability/consent changes use isolated development, focused tests and exact
+staging/verified-backup promotion; authoritative release-state.json records commit
+and backup. No schema or historical data change; cPanel handler preserved.
+Details: [production verification](PRODUCTION_PURCHASE_VERIFICATION.md).
+
+Real sales remain disabled. Before activation: explicit owner launch approval;
+approved release build without the internal-test flag and targeted acceptance;
+app-scoped authenticated RevenueCat production webhook coverage (currently
+SANDBOX-only); manual launch products/prices/regions and exact non-consumable
+entitlement mapping. Last verified Play inventory: shelf_book_3 exists, books 4–8
+missing. Next missing product remains book 4, هېندارې او چینې, shelf_book_4,
+recorded USD 2.99 TEST price; launch price/regions require owner approval. Short
+instructions remain in MANUAL_PLAY_PRODUCTS.md; no values guessed or changed.
+Automatic sync DEFERRED / NOT COMPLETED; no 403 investigation/retries.
+
+Next independent construction selection must follow owner direction; D14 retention/
+privacy construction waits for owner policy. Release build and webhook/catalogue
+configuration are launch preparation, distinct from deferred phone/recovery
+acceptance. Second-phone restore DEFERRED / NOT PASSED. Steps 4 and 5 remain open.
+Temporary account-level grant removal remains pending owner confirmation; preserve
+existing app-level access and credentials. Roll back code through staging without
+rewriting reader/money history. Earlier Android-not-built statements below are
+superseded for source construction only, never for installed-app acceptance.
+
 ## Production verification construction — 7 October 2026 (latest)
 
 Owner approved constructing production-mode purchase verification behind disabled

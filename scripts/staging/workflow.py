@@ -263,6 +263,32 @@ def https_checks():
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    android_purchase_scope = {'mobile/lib/services/api_config.dart',
+        'mobile/lib/purchases/book_purchase_provider.dart', 'mobile/lib/purchases/library_controller.dart',
+        'mobile/lib/purchases/purchase_screen.dart', 'mobile/test/book_purchases_test.dart', 'mobile/test/library_ux_test.dart',
+        'app/Http/Controllers/LibraryController.php', 'tests/Feature/BookPurchasesTest.php',
+        'scripts/build_shelf_release.sh', 'scripts/build_owner_preview.sh', 'scripts/run_tests.sh',
+        'scripts/staging/workflow.py', 'docs/MASTER_RECORD.md', 'docs/PRODUCTION_PURCHASE_VERIFICATION.md', 'AGENTS.md'}
+    if changes and set(changes) <= android_purchase_scope and 'mobile/lib/purchases/library_controller.dart' in changes:
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'BookPurchasesTest|VoidedPurchasesTest|AccountingTest|PlayPriceSyncTest'
+        test_env['SHELF_MOBILE_TEST_SCOPE'] = 'purchases'
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh', '--mobile'], cwd=app,
+                                    stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Staged Android purchase checks failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        artisan(app, 'shelf:check-purchases')
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit': commit, 'passed': True,
+            'checked_at': datetime.now(timezone.utc).isoformat(), 'mobile_tests': True,
+            'scope': 'android-release-purchases', 'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: focused Android release checkout, restore and server verification checks.', flush=True)
+        return
     purchase_scope = {'config/purchases.php', 'app/Services/Purchases/RevenueCatClient.php',
                       'app/Services/Purchases/PurchaseService.php', 'app/Http/Controllers/LibraryController.php',
                       'app/Providers/AppServiceProvider.php', 'app/Console/Commands/CheckBookPurchases.php',

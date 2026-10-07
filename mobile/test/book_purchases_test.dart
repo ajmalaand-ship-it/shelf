@@ -104,6 +104,9 @@ class FakeLibraryApi implements LibraryService {
   FakeLibraryApi(this.clock);
   final DateTime Function() clock;
   bool owned = false, offline = false;
+  bool realCheckout = false, sandboxCheckout = true, rejectConsent = false;
+  Map<String, dynamic>? consentOverride;
+  Map<String, dynamic>? lastConsent;
   int? fail;
   Completer<Map<String, dynamic>>? delayed;
   final calls = <String>[];
@@ -120,10 +123,17 @@ class FakeLibraryApi implements LibraryService {
     if (path == 'purchases/config')
       return {
         'enabled': true,
-        'test_mode': true,
+        'test_mode': !realCheckout,
+        'production_checkout_enabled': realCheckout,
+        'sandbox_checkout_enabled': sandboxCheckout,
         'public_sdk_key': 'goog_synthetic',
       };
-    if (path.endsWith('/consent')) return {'accepted': true};
+    if (path.endsWith('/consent')) {
+      lastConsent = data;
+      if (rejectConsent) throw const AccountFailure(503);
+      return consentOverride ?? {'accepted': true, 'app_user_id': '1',
+        'product_id': 'shelf_book_42', 'checkout_mode': data?['checkout_mode']};
+    }
     if (path == 'library' ||
         path == 'library/confirm' ||
         path == 'library/restore') {
@@ -188,6 +198,7 @@ void main() {
     provider = FakeBookStore();
     store = MemoryDownloads();
     library = LibraryController(
+      internalTestCheckout: true,
       accounts: accounts,
       service: api,
       provider: provider,
@@ -201,6 +212,45 @@ void main() {
     accounts.dispose();
   });
 
+  test('default release refuses disabled real gate before payment; restore still works', () async {
+    library.dispose();
+    library = LibraryController(accounts: accounts, service: api, provider: provider, downloads: store);
+    await library.product(book);
+    expect(library.checkoutAvailable, false);
+    await expectLater(library.purchase(book, const StoreBookProduct('shelf_book_42', '€2.79'), true), throwsA(isA<AccountFailure>()));
+    expect(provider.buys, 0);
+    expect(api.lastConsent, isNull);
+    await library.restore();
+    expect(provider.restores, 1);
+    api.realCheckout = true;
+    api.owned = true;
+    await library.purchase(book, const StoreBookProduct('shelf_book_42', '€2.79'), true);
+    expect(provider.buys, 1);
+    expect(api.lastConsent, {'agree': true, 'checkout_mode': 'production'});
+    expect(library.owns(42), true);
+  });
+  test('fresh gate, server consent and mapping must pass before payment', () async {
+    api.sandboxCheckout = false;
+    await expectLater(library.purchase(book, const StoreBookProduct('shelf_book_42', '€2.79'), true), throwsA(isA<AccountFailure>()));
+    expect(provider.buys, 0);
+    api.sandboxCheckout = true;
+    api.rejectConsent = true;
+    await expectLater(library.purchase(book, const StoreBookProduct('shelf_book_42', '€2.79'), true), throwsA(isA<AccountFailure>()));
+    api.rejectConsent = false;
+    for (final invalid in [
+      {'accepted': false},
+      {'accepted': true, 'app_user_id': '2', 'product_id': 'shelf_book_42', 'checkout_mode': 'sandbox'},
+      {'accepted': true, 'app_user_id': '1', 'product_id': 'shelf_book_43', 'checkout_mode': 'sandbox'},
+      {'accepted': true, 'app_user_id': '1', 'product_id': 'shelf_book_42', 'checkout_mode': 'production'},
+    ]) {
+      api.consentOverride = invalid;
+      await expectLater(library.purchase(book, const StoreBookProduct('shelf_book_42', '€2.79'), true), throwsA(isA<AccountFailure>()));
+    }
+    expect(provider.buys, 0);
+    expect(library.owns(42), false);
+    expect(await library.purchase(book, const StoreBookProduct('shelf_book_43', '€2.79'), true), StorePurchaseResult.failed);
+    expect(provider.buys, 0);
+  });
   test('agreement required, cancelled and pending never unlock, server confirms only this book', () async {
     const product = StoreBookProduct('shelf_book_42', '€2.79');
     expect(
@@ -334,9 +384,16 @@ void main() {
     expect(sent, 1);
   });
   for (final width in [320.0, 430.0]) {
+    for (final testCheckout in [true, false]) {
     testWidgets(
-      'purchase screen $width uses store price, LTR, RTL title and agreement gate',
+      'purchase screen $width test=$testCheckout uses store price and server gate',
       (tester) async {
+        if (!testCheckout) {
+          library.dispose();
+          await tester.runAsync(() async {
+            library = LibraryController(accounts: accounts, service: api, provider: provider, downloads: store);
+          });
+        }
         tester.view.physicalSize = Size(width, 932);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.resetPhysicalSize);
@@ -373,11 +430,16 @@ void main() {
         expect(tester.widget<FilledButton>(buy).onPressed, isNull);
         await tester.tap(find.byKey(const Key('purchase-agreement')));
         await tester.pumpAndSettle();
-        expect(tester.widget<FilledButton>(buy).onPressed, isNotNull);
+        expect(tester.widget<FilledButton>(buy).onPressed, testCheckout ? isNotNull : isNull);
+        if (!testCheckout) {
+          expect(find.textContaining('Purchases are not available yet'), findsOneWidget);
+          expect(provider.buys, 0);
+        }
         expect(tester.getSize(buy).height, greaterThanOrEqualTo(52));
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
       },
     );
+    }
   }
 }

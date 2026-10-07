@@ -398,3 +398,10 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
   confirmed deletion. Check screenshots of account screens and Store/dropdown in
   both languages and small/large phones; run scripts/run_tests.sh --mobile,
   commit, push, and build the owner-preview APK with checksum and expiry report.
+
+- 2026-10-07: Owner approved Android release purchase source construction with real
+  sales OFF. Default checkout requires fresh server production gate and exact
+  reader/product/mode consent; owner-test builds opt in explicitly, never classify
+  receipts. Restore remains independent of buying. No Android artifact/upload or
+  provider settings changed; installed app unchanged. See
+  docs/PRODUCTION_PURCHASE_VERIFICATION.md and latest Master Record status.

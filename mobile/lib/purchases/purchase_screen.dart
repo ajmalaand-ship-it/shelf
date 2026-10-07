@@ -76,6 +76,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     setState(() {
       loading = true;
       message = null;
+      product = null;
     });
     try {
       final library = LibraryScope.of(context);
@@ -91,7 +92,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     } catch (_) {
       if (mounted)
         setState(
-          () => message = 'Test purchases are not configured yet. Please try again after setup.',
+          () => message = 'Purchases are unavailable. Please check again later.',
         );
     } finally {
       if (mounted) setState(() => loading = false);
@@ -127,7 +128,9 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     } on AccountFailure catch (e) {
       if (mounted)
         setState(
-          () => message = e.status == 403
+          () => message = e.status == 503
+              ? 'Purchases are unavailable. Please check again later.'
+              : e.status == 403
               ? 'Verify your email first. If buying is blocked, contact Shelf support.'
               : 'The purchase could not be confirmed. Check My Library before trying again.',
         );
@@ -160,9 +163,11 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Test mode — use only Google Play test payment methods.',
-            ),
+            Text(library?.checkoutAvailable != true
+                ? 'Purchases are not available yet. You can still read the free sample.'
+                : library!.internalTestCheckout
+                    ? 'Owner test — use only Google Play test payment methods.'
+                    : 'Google Play will confirm your payment.'),
             const SizedBox(height: 16),
             if (account == null) ...[
               const Text(
@@ -220,6 +225,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                     !agreed ||
                         loading ||
                         product == null ||
+                        library?.checkoutAvailable != true ||
                         library?.busy == true ||
                         library?.owns(widget.book.id) == true
                     ? null

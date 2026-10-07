@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import '../services/api_config.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class StoreBookProduct {
@@ -22,7 +23,7 @@ class RevenueCatBookProvider implements BookPurchaseProvider {
   @override
   Future<void> identify(String key, String readerId) async {
     if (!key.startsWith('goog_') ||
-        !RegExp(r'^[1-9][0-9]*$').hasMatch(readerId)) {
+        !RegExp(shelfTestMode ? r'^staging_[1-9][0-9]*$' : r'^[1-9][0-9]*$').hasMatch(readerId)) {
       throw StateError('Shelf purchase configuration is unavailable');
     }
     if (_key == null) {

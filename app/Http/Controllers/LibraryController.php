@@ -20,6 +20,8 @@ class LibraryController extends Controller
     public function config()
     {
         return response()->json(['enabled' => RevenueCatClient::configured(), 'test_mode' => ! RevenueCatClient::productionEnabled(),
+            'production_checkout_enabled' => RevenueCatClient::configured() && RevenueCatClient::productionEnabled(),
+            'sandbox_checkout_enabled' => RevenueCatClient::configured(),
             'public_sdk_key' => RevenueCatClient::configured() ? config('purchases.public_sdk_key') : null,
             'consent' => PurchaseService::CONSENT, 'offline_days' => 30,
             'identity_prefix' => \App\Support\Staging::active() ? 'staging_' : '']);
@@ -38,9 +40,13 @@ class LibraryController extends Controller
 
     public function consent(Request $r, Collection $collection)
     {
-        abort_unless(RevenueCatClient::configured(), 503, 'Test purchases are not configured yet.');
-        $r->validate(['agree' => ['required', 'accepted']]);
-        DB::transaction(function () use ($r, $collection): void {
+        abort_unless(RevenueCatClient::configured(), 503, 'Purchases are not configured yet.');
+        $r->validate(['agree' => ['required', 'accepted'], 'checkout_mode' => ['sometimes', 'required', 'in:sandbox,production']]);
+        // Legacy installed owner-test clients omit the mode. This authorizes checkout,
+        // never labels a receipt: environment still comes only from provider evidence.
+        $mode = $r->input('checkout_mode', RevenueCatClient::productionEnabled() ? 'production' : 'sandbox');
+        abort_if($mode === 'production' && ! RevenueCatClient::productionEnabled(), 503, 'Real purchases are not enabled.');
+        DB::transaction(function () use ($r, $collection, $mode): void {
             $reader = \App\Models\Reader::whereKey($r->user()->id)->lockForUpdate()->firstOrFail();
             $book = Collection::whereKey($collection->id)->lockForUpdate()->firstOrFail();
             abort_if($reader->buying_blocked || ! $reader->email_verified_at, 403, 'This account cannot buy books.');
@@ -51,13 +57,13 @@ class LibraryController extends Controller
                 $testAllowed = $testAllowed || $email === strtolower($ownerEmail)
                     || (str_starts_with($email, $local.'+') && str_ends_with($email, '@'.$domain));
             }
-            abort_unless($testAllowed || RevenueCatClient::productionEnabled(), 403, 'Test purchases are limited to the owner account until staging and release approval.');
+            abort_unless($mode === 'sandbox' ? $testAllowed : RevenueCatClient::productionEnabled(), 403, 'Test purchases are limited to the owner account until staging and release approval.');
             abort_unless($book->isPublished() && $book->price_usd > 0 && $book->product_id === 'shelf_book_'.$book->id, 409, 'This book is not for sale.');
             abort_if(app(BookAccessService::class)->ownsBook($reader, $book), 409, 'This account already owns the book.');
             DB::table('purchase_consents')->insert(['reader_id' => $reader->id, 'collection_id' => $book->id,
                 'wording' => PurchaseService::CONSENT, 'created_at' => now()]);
         });
-        return response()->json(['accepted' => true, 'app_user_id' => \App\Support\Staging::identity($r->user()->id)]);
+        return response()->json(['accepted' => true, 'checkout_mode' => $mode, 'product_id' => $collection->product_id, 'app_user_id' => \App\Support\Staging::identity($r->user()->id)]);
     }
 
     public function book(Request $r, Collection $collection)

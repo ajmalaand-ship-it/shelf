@@ -70,7 +70,13 @@ if "$run_mobile"; then
         -cf - . | tar -C "$run_dir/mobile" -xf -
     cd -- "$run_dir/mobile"
     echo "Running Flutter tests (--mobile requested)"
-    "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test --reporter expanded --concurrency=2
+    mobile_args=()
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "purchases" ]]; then
+        mobile_args=(test/book_purchases_test.dart test/library_ux_test.dart test/staging_identity_test.dart)
+    elif [[ -n "${SHELF_MOBILE_TEST_SCOPE:-}" ]]; then
+        echo "Unknown mobile test scope" >&2; exit 2
+    fi
+    "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test "${mobile_args[@]}" --reporter expanded --concurrency=2
     "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test test/staging_identity_test.dart --reporter expanded \
         --dart-define=SHELF_TEST_MODE=true
 else

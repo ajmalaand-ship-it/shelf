@@ -41,6 +41,21 @@ class BookPurchasesTest extends TestCase
         $this->mockProvider();
     }
 
+    public function test_checkout_mode_is_authorization_not_transaction_classification(): void
+    {
+        $this->getJson('/api/purchases/config')->assertJsonPath('production_checkout_enabled', false)->assertJsonPath('sandbox_checkout_enabled', true);
+        $before = DB::table('purchase_consents')->count();
+        $this->postJson('/api/library/books/'.$this->book->id.'/consent', ['agree' => true, 'checkout_mode' => 'production'], $this->bearer())->assertStatus(503);
+        $this->assertSame($before, DB::table('purchase_consents')->count());
+        $this->postJson('/api/library/books/'.$this->book->id.'/consent', ['agree' => true, 'checkout_mode' => 'sandbox'], $this->bearer())->assertOk()->assertJsonPath('product_id', $this->book->product_id)->assertJsonPath('checkout_mode', 'sandbox');
+        config(['purchases.production_enabled' => true, 'purchases.test_reader_ids' => []]);
+        $this->postJson('/api/library/books/'.$this->book->id.'/consent', ['agree' => true, 'checkout_mode' => 'sandbox'], $this->bearer())->assertForbidden();
+        $this->postJson('/api/library/books/'.$this->book->id.'/consent', ['agree' => true, 'checkout_mode' => 'production'], $this->bearer())->assertOk()->assertJsonPath('checkout_mode', 'production');
+        $this->webhook()->assertOk();
+        $this->assertSame('SANDBOX', Purchase::firstOrFail()->environment);
+        $this->assertSame(0, SalesLedger::count());
+    }
+
     private function mockProvider(): void { Http::swap(new \Illuminate\Http\Client\Factory); Http::preventStrayRequests(); Http::fake(['api.revenuecat.com/*' => Http::response(['subscriber' => $this->subscriber])]); }
     private function webhook(array $changes = []) { return $this->postJson('/api/purchases/webhook', ['event' => array_replace($this->event, $changes)], ['Authorization' => 'synthetic-auth']); }
 

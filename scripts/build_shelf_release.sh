@@ -15,7 +15,7 @@ test -r "$SHELF_SIGNING_PROPERTIES"
 mkdir -p "$run_dir/mobile"
 tar -C "$repo_root/mobile" --exclude='./build' --exclude='./.dart_tool' --exclude='./android/.gradle' --exclude='./.flutter-plugins-dependencies' -cf - . | tar -C "$run_dir/mobile" -xf -
 cd "$run_dir/mobile"
-/home/shelf/flutter/bin/flutter build appbundle --release --flavor production
+/home/shelf/flutter/bin/flutter build appbundle --release --flavor production --dart-define=SHELF_INTERNAL_TEST_PURCHASES=true
 destination="$repo_root/storage/app/private/owner-aabs"
 mkdir -p "$destination"
 aab="$destination/shelf-internal-test-$(date -u +%Y%m%d-%H%M%S).aab"

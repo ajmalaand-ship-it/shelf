@@ -156,6 +156,7 @@ void main() {
           final api = CoveredLibraryApi(() => DateTime.utc(2026, 10, 2))
             ..owned = true;
           final library = LibraryController(
+            internalTestCheckout: true,
             accounts: accounts,
             service: api,
             provider: FakeBookStore(),
@@ -301,6 +302,7 @@ void main() {
       await accounts.signIn('synthetic@example.test', 'synthetic');
       final api = FakeLibraryApi(() => DateTime.utc(2026, 10, 2));
       final library = LibraryController(
+            internalTestCheckout: true,
         accounts: accounts,
         service: api,
         provider: FakeBookStore(),
