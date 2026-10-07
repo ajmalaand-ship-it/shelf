@@ -4,6 +4,22 @@ Owner authorization: 7 October 2026. Build/test the production verification path
 keep real purchases off. Manual Play products/prices/availability for first 100
 books remain approved. Automatic sync DEFERRED / NOT COMPLETED; 403 work stopped.
 
+## Webhook configuration verified — 7 October 2026 (current)
+
+Owner confirms saving Both Production and Sandbox at approximately 21:17 UTC.
+Read-only API verification at 21:19:03 UTC: same existing webhook
+whintgr75a4892970 / Shelf sandbox book purchases, Shelf project projbbce26da,
+appf83cd58c5c / services.shelf.app, URL and three event filters unchanged;
+explicit environment=null (no filter), consistent with Both. See
+[nullable environment API](https://www.revenuecat.com/docs/api-v2/integration).
+**Configuration complete; actual production-event delivery UNVERIFIED.**
+Authorization unchanged per owner; list API does not expose it for comparison.
+HTTPS real checkout OFF; sandbox configured. No provider write, test event,
+purchase, deployment, Android build or repeated suite. Runtime 340634b unchanged.
+The preparation entry below is historical; its owner edit is completed and need
+not be repeated. D14 proposals/work separation are in the latest Master Record;
+none of those policies is approved or implemented by this verification.
+
 ## Production webhook coverage preparation — 7 October 2026
 
 Read-only RevenueCat V2 list on 7 October 2026,
@@ -161,9 +177,9 @@ reader/money activity.
    RevenueCat products/entitlements with exact IDs; verify checkout availability.
    No Console/provider product change is performed here; last inventory remains
    book 3 present, 4–8 missing, until a later verified owner update.
-4. Review existing authenticated app-scoped webhook to include production events
-   using the exact owner edit above (still sandbox-only until saved/verified). Preserve credentials,
-   correct identities, refund polling and acknowledgement; verify launch operations.
+4. Both-environment webhook configuration is verified complete; actual production
+   delivery and launch operations remain unverified. Preserve credentials, correct
+   identities, refund polling and acknowledgement; do not repeat the dashboard edit.
 5. Complete targeted pre-release acceptance: signing/OAuth/listing, privacy/support/
    deletion and owner D14 retention policy, launch catalogue/rights D16, remaining
    phone reading/import/offline/account/withdrawal checks, second-phone restore

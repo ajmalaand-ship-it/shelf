@@ -542,6 +542,76 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Webhook configuration complete; D14 proposals — 7 October 2026 (latest)
+
+Owner saved Both Production and Sandbox on the existing webhook at approximately
+21:17 UTC. Read-only verification at **21:19:03 UTC** confirms Shelf/projbbce26da,
+Shelf sandbox book purchases/whintgr75a4892970, appf83cd58c5c/services.shelf.app,
+existing URL and NON_RENEWING_PURCHASE/CANCELLATION/EXPIRATION filters. Explicit
+API environment=null removes the environment filter, consistent with the owner's
+Both selection and [RevenueCat's nullable API field](https://www.revenuecat.com/docs/api-v2/integration).
+**CONFIGURATION COMPLETE / VERIFIED. Actual production-event delivery UNVERIFIED.**
+Authorization is not exposed by the list API; unchanged per owner confirmation,
+not independently compared or disclosed. HTTPS production_checkout_enabled=false,
+test_mode=true, sandbox_checkout_enabled=true. Receiving notifications does not
+enable sales. No purchase/test event, provider write, deployment or test-suite run.
+Records-only commit/push; runtime release remains 340634b; handler preserved.
+
+### D14 decision sheet — recommendations ONLY, not approved or implemented
+
+Already approved/built: email-confirmed account deletion removes reader profile,
+credentials/tokens and access; immutable transaction/accounting history remains
+without reader name/email. A new account does not automatically inherit purchases.
+Normal reinstall/second-device restore checks the same Shelf identity. Local daily
+backups retain 14 copies; encrypted OneDrive retention is append-only with monthly
+review and no automatic expiry. None of these is changed by proposals below.
+
+| Unresolved owner choice | Recommended option (proposal) | Implication requiring approval |
+| --- | --- | --- |
+| Financial records: what remains and for how long? | Keep the minimal append-only sale/refund/accounting trail and required transaction/reader references; do not schedule financial deletion now. | Retention of references must be disclosed. Owner must establish applicable financial retention requirements before any expiry/anonymization policy; no statutory number is invented and R8 still applies. |
+| Security logs: how long? | Propose 90 days for ordinary Shelf-controlled security/diagnostic logs; isolate only evidence needed for an open incident, reviewed at closure. | This is an operational proposal, not a legally required period. Owner chooses the window/incident exception; hosting/provider logs may need separate controls. |
+| Deleted profiles and deletion receipts: what survives? | Keep current immediate confirmed profile/token removal; retain a minimal restricted deletion receipt until every older recoverable backup expires. No profile/password copy in the receipt. | Approve the minimal identifiers and receipt lifetime. A durable record and recovery reapplication procedure must be built; current wording alone is not implementation. |
+| Books after account deletion: can purchases be recovered? | Offer support-assisted recovery after verifying original purchase and claimant ownership, with explicit approval and an audit trail; never transfer solely because emails match. | This changes the current no-automatic-transfer behavior only if separately approved/built. Choose recovery eligibility and minimal retained proof/link; deletion itself must not be blocked. Until then, existing deletion/access wording applies. |
+| Backups: when does deleted data disappear? | Keep approved local 14-copy rotation; propose a 90-day maximum for routine offsite copies, with recovery-safe, owner-approved removal. Reapply deletions before recovered reader access resumes. | Proposed offsite expiry changes approved append-only retention and needs explicit approval, capacity/recovery review and separate safe implementation. Currently offsite copies can persist indefinitely; do not promise 14-copy expiry for all backups. |
+| Provider-held data: what does a deletion request cover? | Include RevenueCat account metadata in the documented deletion process while preserving necessary purchase/refund evidence; explain separately what Google Play retains. | Owner chooses the scope/exceptions; inspect provider deletion effects before implementing. Do not promise Shelf erases store orders or break later refunds by deleting provider history. |
+
+[Google Play's deletion guidance](https://support.google.com/googleplay/android-developer/answer/13327111?hl=en)
+requires associated-data handling and clear disclosure of justified retained data;
+it does not establish a universal financial retention period for Shelf. No D14
+policy is approved by this decision sheet. Neither numeric proposal is a legal claim.
+
+### Remaining work, without rebuilding completed features
+
+- **Construction (D14-dependent):** implement approved retention rules for logs/
+  expired records and provider metadata; durable deletion receipt plus recovery
+  reapplication; chosen post-deletion purchase recovery, if approved; approved
+  offsite expiry, if approved; align privacy/deletion/support wording with actual
+  behavior. Read-only code search found no deletion journal/reapplication path.
+  Existing deletion page promises restricted-backup expiry within 14-copy retention,
+  while OneDrive is append-only: correct that wording in an approved policy task.
+- **Completed construction to reuse:** accounts/deletion foundation, catalogue/
+  samples/reader, verification in both environments, release-mode Android source,
+  Library/offline/restore/refunds, append-only owner accounting, staging workflow,
+  encrypted offsite backup/recovery and cron-path repair. Automatic Play sync is
+  DEFERRED / NOT COMPLETED, excluded from the current construction queue; no 403 work.
+- **Launch configuration:** D16 final book list; owner launch prices/regions (USD
+  2.99 is TEST ONLY); manual products and exact entitlements for selected books
+  (last verified Play book 3 exists, 4–8 absent); listing/Data safety/support/OAuth/
+  signing; approved production Android artifact without internal-test checkout
+  opt-in; temporary account-level grant removal confirmation; separately approved
+  retirement of old app. Webhook environment configuration is now complete.
+- **Pre-release/operational checks:** actual production-event delivery and approved
+  purchase/refund/acknowledgement acceptance; second-phone restore DEFERRED / NOT
+  PASSED; targeted reading/Word import, offline/account isolation/withdrawal and
+  final UX acceptance, reusing covered cases; unattended backup-success evidence,
+  actual alert delivery and replacement-host recovery/cutover. No new checks here.
+
+Next construction is the approved D14 policy implementation after owner choices;
+no newly established independent generic purchase-code gap remains in the current
+record. Public launch/real payments still require explicit owner approval. Steps
+4 and 5 remain open. This latest entry supersedes pending webhook instructions
+below while preserving their historical evidence.
+
 ## Production webhook preparation — 7 October 2026 (latest)
 
 Fresh read-only RevenueCat inspection confirms one existing Shelf webhook:
