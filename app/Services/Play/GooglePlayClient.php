@@ -96,7 +96,8 @@ class GooglePlayClient
         if (\App\Support\Staging::active() || config('play_sync.package') !== 'services.shelf.app') {
             throw new PlaySyncException('Purchase recovery is forbidden on another package or test copy.');
         }
-        $order = $this->request('GET', '/orders/'.rawurlencode($purchase->transaction_id))->json();
+        try { $order = $this->request('GET', '/orders/'.rawurlencode($purchase->transaction_id))->json(); }
+        catch (\Throwable) { throw new PlaySyncException('Store verification unavailable; no recovery granted.'); }
         if (! is_array($order) || ($order['orderId'] ?? null) !== $purchase->transaction_id
             || ($order['state'] ?? null) !== 'PROCESSED' || count($order['lineItems'] ?? []) !== 1
             || ($order['lineItems'][0]['productId'] ?? null) !== $purchase->product_id
@@ -111,7 +112,8 @@ class GooglePlayClient
         if (\App\Support\Staging::active() || config('play_sync.package') !== 'services.shelf.app') {
             throw new PlaySyncException('Production purchase recovery is forbidden on another package or test copy.');
         }
-        $result = $this->request('GET', '/purchases/productsv2/tokens/'.rawurlencode($token))->json();
+        try { $result = $this->request('GET', '/purchases/productsv2/tokens/'.rawurlencode($token))->json(); }
+        catch (\Throwable) { throw new PlaySyncException('Store verification unavailable; no recovery granted.'); }
         if (! is_array($result)) { throw new PlaySyncException('Purchase verification unavailable.'); }
         return $result;
     }

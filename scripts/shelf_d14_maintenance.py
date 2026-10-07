@@ -67,6 +67,8 @@ def activate():
 
 def main():
     os.umask(0o077)
+    os.environ.update(TMPDIR='/home/shelf/tmp', TMP='/home/shelf/tmp', TEMP='/home/shelf/tmp',
+                      GNUPGHOME='/home/shelf/secrets/backup/gnupg')
     if backup.APP != backup.PRODUCTION or (backup.PRODUCTION / '.shelf-staging').exists():
         raise RuntimeError('D14 maintenance requires promoted production code.')
     parser = argparse.ArgumentParser()

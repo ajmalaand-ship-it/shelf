@@ -28,7 +28,7 @@ class DeletionJournal
     {
         abort_if(\App\Support\Staging::active(), 503);
         $process = new Process(['python3', '-B', base_path('scripts/shelf_deletion_journal.py'), 'append'], base_path(),
-            ['TMPDIR' => '/home/shelf/tmp', 'TMP' => '/home/shelf/tmp', 'TEMP' => '/home/shelf/tmp'], json_encode($record), 120);
+            ['TMPDIR' => '/home/shelf/tmp', 'TMP' => '/home/shelf/tmp', 'TEMP' => '/home/shelf/tmp', 'GNUPGHOME' => '/home/shelf/secrets/backup/gnupg'], json_encode($record), 120);
         try {
             $process->mustRun();
             $verified = json_decode($process->getOutput(), true, 16, JSON_THROW_ON_ERROR);

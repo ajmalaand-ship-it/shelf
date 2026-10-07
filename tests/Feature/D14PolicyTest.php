@@ -96,6 +96,25 @@ class D14PolicyTest extends TestCase
         $this->assertSame(0, SalesLedger::count());
         $this->assertSame(['immutable' => 'synthetic'], SalesLedger::withTestPurchases()->where('status','sale')->first()->agreement_snapshot);
     }
+    public function test_google_order_and_token_checks_are_read_only_and_connection_errors_hide_tokens(): void
+    {
+        config(['play_sync.package' => 'services.shelf.app']);
+        $play = new GooglePlayClient;
+        (new \ReflectionProperty($play, 'token'))->setValue($play, 'synthetic-access-token');
+        Http::fake(['androidpublisher.googleapis.com/*' => Http::sequence()
+            ->push(['orderId' => 'GPA.synthetic', 'state' => 'PROCESSED', 'purchaseToken' => 'synthetic-private-token',
+                'lineItems' => [['productId' => $this->purchase->product_id]]])
+            ->push($this->google)]);
+        $token = $play->orderPurchaseToken($this->purchase);
+        $this->assertSame('synthetic-private-token', $token);
+        $this->assertSame($this->google, $play->productPurchase($token));
+        Http::assertNotSent(fn ($request) => $request->method() !== 'GET');
+        Http::swap(new \Illuminate\Http\Client\Factory); Http::preventStrayRequests();
+        Http::fake(fn () => throw new \Illuminate\Http\Client\ConnectionException('synthetic-private-token'));
+        try { $play->productPurchase($token); $this->fail(); }
+        catch (\App\Services\Play\PlaySyncException $error) { $this->assertStringNotContainsString($token, $error->getMessage()); }
+    }
+
     public function test_recorded_order_lookup_avoids_requesting_device_tokens_from_readers(): void
     {
         app(AccountActions::class)->delete($this->original);

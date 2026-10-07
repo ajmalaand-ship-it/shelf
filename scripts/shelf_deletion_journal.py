@@ -172,6 +172,8 @@ def replay_sql(records):
 
 def main():
     os.umask(0o077)
+    os.environ.update(TMPDIR='/home/shelf/tmp', TMP='/home/shelf/tmp', TEMP='/home/shelf/tmp',
+                      GNUPGHOME='/home/shelf/secrets/backup/gnupg')
     parser = argparse.ArgumentParser()
     parser.add_argument('action', choices=['initialize', 'append', 'status'])
     args = parser.parse_args()
