@@ -26,6 +26,7 @@ def rotate():
         # Conservatively date pre-policy logs on archival day. Never overwrite.
         if target.exists():
             continue
+        path.chmod(0o600)
         path.rename(target)
         # Preserve live writers' inode? Cron opens new file on next invocation;
         # application daily logger opens dated files after promoted config.

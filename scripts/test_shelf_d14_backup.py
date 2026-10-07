@@ -98,6 +98,39 @@ class D14BackupTests(unittest.TestCase):
         logs=self.root/'logs';logs.mkdir();offsite=self.root/'offsite';offsite.mkdir()
         with patch.object(retention,'LOGS',logs),patch.object(backup,'ROOT',offsite):
             with self.assertRaisesRegex(RuntimeError,'No verified'): retention.inventory()
+    def test_destructive_cleanup_uses_only_inventory_scope_and_preserves_verified_pin_and_journal(self):
+        logs,offsite,pinned,old=self.inventory_fixture()
+        (logs/'laravel-2026-09-02.log').write_text('routine')
+        (logs/'financial-history.log').write_text('keep')
+        (offsite/'recovery-key.secret').write_text('keep')
+        self.records[journal.REMOTE+'/head.gpg']=b'keep-journal'
+        for day in range(1,18):
+            name='shelf-production-202609'+str(day).zfill(2)+'T000000Z-'+('a'*16 if day==1 else 'c'*16)+'.tar.gpg'
+            path=offsite/name;path.write_bytes(b'cipher');path.chmod(0o600)
+            path.with_suffix('.json').write_text(json.dumps({'sha256':hashlib.sha256(b'cipher').hexdigest(),'bytes':6}))
+        state=self.root/'state.json';state.write_text(json.dumps({'enabled':False}));state.chmod(0o600)
+        now=datetime(2027,1,1,tzinfo=timezone.utc); actual_inventory=retention.inventory
+        with patch.object(retention,'LOGS',logs),patch.object(backup,'ROOT',offsite),patch.object(retention,'EXCEPTIONS',self.root/'no-holds'),patch.object(retention,'STATE',state),patch.object(retention,'inventory',side_effect=lambda:actual_inventory(now)):
+            retention.execute(False)
+            with self.assertRaisesRegex(RuntimeError,'activation'):retention.execute(True)
+            self.assertIn(backup.REMOTE+'/'+old,self.records)
+            state.write_text(json.dumps({'enabled':True}))
+            retention.execute(True)
+        self.assertIn(backup.REMOTE+'/'+pinned,self.records)
+        self.assertNotIn(backup.REMOTE+'/'+old,self.records)
+        self.assertEqual(self.records[journal.REMOTE+'/head.gpg'],b'keep-journal')
+        self.assertTrue((offsite/pinned).is_file());self.assertTrue((offsite/'recovery-key.secret').is_file())
+        self.assertEqual(len(list(offsite.glob('*.tar.gpg'))),15) # 14 + protected oldest verified set.
+        self.assertTrue((logs/'financial-history.log').is_file());self.assertFalse((logs/'laravel-2026-09-02.log').exists())
+
+    def test_unsafe_log_symlink_stops_cleanup_before_any_remote_delete(self):
+        logs,offsite,pinned,old=self.inventory_fixture()
+        outside=self.root/'unrelated';outside.write_text('keep')
+        (logs/'laravel-2026-09-02.log').symlink_to(outside)
+        with patch.object(retention,'LOGS',logs),patch.object(backup,'ROOT',offsite),patch.object(retention,'EXCEPTIONS',self.root/'no-holds'):
+            with self.assertRaisesRegex(RuntimeError,'Unsafe log'):retention.execute(True)
+        self.assertIn(backup.REMOTE+'/'+old,self.records);self.assertEqual(outside.read_text(),'keep')
+
     def test_older_database_replay_removes_profiles_and_sessions_preserves_money_and_blocks_reopening(self):
         target=self.root/'old';target.mkdir();code=target/'code/public';code.mkdir(parents=True);(code/'index.php').write_text('<?php echo "old app";')
         sql=b"""CREATE TABLE readers (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,email VARCHAR(255),created_at TIMESTAMP NULL) ENGINE=InnoDB;

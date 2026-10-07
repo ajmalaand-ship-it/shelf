@@ -564,7 +564,20 @@ and incident holds; older recovery replays suppression and blocks reopening.
 Focused staging checks passed on 45b5cc1: 88 PHP tests / 654 assertions and
 23 backup checks (7 D14 plus existing backup regressions); no Flutter/phone suite.
 The final metadata-read correction and its additional focused test are committed;
-final staging/promotion and live activation evidence follow before completion.
+core deployment passed at 34a01db with a verified promotion backup, unchanged
+reader/payment/agreement snapshots and preserved cPanel handler. Follow-up owner
+purchase-ID display and prior-purchase recovery when buying is blocked passed
+focused staging checks; final release is identified in release-state.json.
+Activation completed 22:54:41 UTC after verified backup
+`/home/shelf/backups/shelf/20261007-224743/`: encrypted OneDrive journal read-back,
+14 local/7 remote backup identity inventories, zero absent identities to record,
+dry-run zero expiry candidates/exceptions and 03:45 maintenance job installed.
+No live reader was deleted. Existing jobs/credentials remain unchanged.
+Read-only existing offsite evidence also confirms the 7 October scheduled run
+finished 07:32:37 UTC with recovery_verified=true for the pinned
+`shelf-production-20261007T073043Z-a319d3debfd0e839.tar.gpg`; no backup rerun was
+performed to establish that finding. Actual alert delivery and full replacement-host
+cutover remain unverified; second-phone restore remains deferred pre-release.
 **Provider configuration blocker:** read-only V2 customer-attribute verification
 returned HTTP 403 on 7 October. Existing key lacks usable customer metadata read
 access. No provider write, grant or credential change occurred. Retryable metadata

@@ -45,6 +45,17 @@ and later refunds. Immutable attribution metadata is recorded as `review_require
 rather than destructively deleting that evidence. Review genuine occurrences with
 the owner/provider. No promise is made to delete Google's store orders.
 
+## Deployment/activation evidence
+
+Core implementation promoted at 34a01db after identical-commit staging checks.
+Activation completed 7 October 22:54:41 UTC after verified local backup
+`/home/shelf/backups/shelf/20261007-224743/`. All 14 local and 7 production OneDrive
+sets were inventoried; zero already-absent identities were found. Encrypted remote
+journal initialization/read-back passed. Dry-run expiry candidates/exceptions were
+zero; maintenance runs at 03:45. No reader was deleted, RevenueCat written, key
+changed or unrelated job removed during activation. Final release/evidence lives
+in `release-state.json`; later focused corrections preserve this activation.
+
 ## Current provider configuration blocker
 
 Read-only verification on 7 October returned HTTP 403 for customer attributes
