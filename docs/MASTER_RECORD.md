@@ -542,6 +542,51 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Production Android AAB prepared — 8 October 2026 UTC (7 October local)
+
+Owner-approved build only: **BUILD AND RELEASE CHECKS PASSED**, no upload,
+installation, publication or gate enablement. Exact clean source commit:
+`2c8d763d0b6fc8d284652df97b4340d6e5b1ba41`; includes mobile release support from
+`340634b192022228698ab54d04426258382b451b`. Version **1.0.5 (14)** via build
+arguments (source pubspec remains 1.0.4+13); production flavor, application ID
+`services.shelf.app`, API `https://shelf.services/api/`.
+
+Private artifact (0600; older artifacts preserved):
+`/home/shelf/apps/shelf/storage/app/private/owner-aabs/shelf-production-1.0.5-14-2c8d763-20261008-002103.aab`
+SHA-256: `bfa979e4e868d063d0ec83bb10d2005153800fb55604daa4c3c4815549737393`.
+Size 62,036,611 bytes. Matching `.json` sidecar records source, build inputs,
+checks, checksum, certificate and no-upload status. Build log retained privately
+at `/home/shelf/tmp/shelf-production-aab-20261008/build.log`.
+
+Reused existing release procedure, Flutter/JDK/SDK and Shelf upload signing
+properties; task-local runner omitted SHELF_INTERNAL_TEST_PURCHASES opt-in and
+set --build-name=1.0.5 --build-number=14 and the production API define. No source,
+credential, provider or app/testing setup change. Dependency lockfile unchanged.
+ZIP CRC, compiled AAB manifest/version/non-debuggable, signature verification,
+endpoint in each native libapp.so and recorded upload certificate all passed.
+Upload certificate SHA-256:
+`20:65:57:2E:CB:0F:17:4A:9E:66:96:02:23:2F:FC:EA:31:33:53:03:D3:FF:01:1C:AA:EB:72:16:FD:B6:9E:77`.
+Jarsigner verified; existing self-signed upload certificate/no timestamp warnings
+are recorded, no credentials replaced. Build runner exit 1 occurred only after
+successful artifact save/verification because its temporary Gradle directory
+remained nonempty during cleanup. Scoped cleanup retry succeeded; zero daemons
+needed stopping. Artifact/sidecar retained; no build rerun.
+
+Default staging/internal-test flags are false; production checkout requires fresh
+server gate and exact-reader/book/mode consent before SDK payment. Read-only
+server check confirms production_checkout_enabled=false; Play sync deferred=true,
+enabled=false. Restore and server-only unlocking unchanged. Existing 62 PHP /
+474 assertions and 19 Flutter plus staging-identity check reused; no broad/phone
+suite or backend deployment. Installed Android app remains unchanged.
+
+Next: owner final launch catalogue/rights, launch prices/regions and missing manual
+Play products, then separately approved release/targeted acceptance. Financial
+retention unresolved; actual provider erasure, production-event/purchase acceptance,
+second-phone restore, remaining reading/import/offline acceptance, alert delivery
+and replacement-host cutover remain unverified/deferred as previously recorded.
+Real sales OFF, automatic sync DEFERRED, Steps 4/5 open. This completes artifact
+preparation, not launch approval or installed-app acceptance.
+
 ## D14 metadata read permission verified — 8 October 2026 UTC (7 October local)
 
 Owner saved Customer information → Read only on the existing V2 key. One repeat
