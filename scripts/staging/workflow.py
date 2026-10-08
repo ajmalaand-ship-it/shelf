@@ -263,6 +263,30 @@ def https_checks():
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    reviewer_scope = {'app/Services/BookAccessService.php', 'app/Http/Controllers/LibraryController.php',
+        'app/Services/Purchases/PurchaseService.php',
+        'database/migrations/2026_10_08_070000_create_reviewer_book_grants.php',
+        'database/migrations/2026_10_08_070100_prepare_play_reviewer.php',
+        'tests/Feature/ReviewerAccessTest.php', 'scripts/staging/workflow.py'}
+    reviewer_code = {path for path in changes if not path.startswith('docs/') and path != 'AGENTS.md'}
+    if reviewer_code and reviewer_code <= reviewer_scope and 'tests/Feature/ReviewerAccessTest.php' in reviewer_code:
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'ReviewerAccessTest|BookPurchasesTest|RevenueCatEntitlementTest'
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+                stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Focused reviewer checks failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+            'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+            'scope':'reviewer-access', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: focused reviewer login/access/isolation and purchase regressions; staging isolation.', flush=True)
+        return
     privacy_scope = {'resources/views/privacy.blade.php', 'tests/Feature/PrivacySupportTest.php',
                      'mobile/lib/l10n/app_strings.dart', 'mobile/lib/screens/home_screen.dart',
                      'mobile/lib/settings/privacy_support.dart', 'mobile/test/privacy_support_test.dart',

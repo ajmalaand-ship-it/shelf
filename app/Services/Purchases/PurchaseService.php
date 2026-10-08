@@ -136,7 +136,8 @@ class PurchaseService
 
     public function reconcile(Reader $reader): void
     {
-        if (\App\Support\Staging::active() && RevenueCatClient::configured()) {
+        if (\App\Support\Staging::active() && RevenueCatClient::configured()
+            && ! ($reader->buying_blocked && DB::table('reviewer_book_grants')->where('reader_id', $reader->id)->whereNull('revoked_at')->exists())) {
             $this->confirmStaging($reader);
         }
         $purchases = Purchase::where(fn ($q) => $q->where('reader_id', $reader->id)->orWhereIn('id', DB::table('purchase_recovery_claims')->where('reader_id', $reader->id)->select('purchase_id')))->with(['book', 'entries'])->get();

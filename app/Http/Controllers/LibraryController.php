@@ -30,7 +30,7 @@ class LibraryController extends Controller
     public function index(Request $r, PurchaseService $service)
     {
         $service->reconcile($r->user());
-        $books = Collection::whereIn('status', ['published', 'withdrawn'])->whereIn('id', DB::table('book_entitlements')->where('reader_id', $r->user()->id)->where('active', true)->select('collection_id'))
+        $books = Collection::whereIn('status', ['published', 'withdrawn'])->whereIn('id', DB::table('book_entitlements')->where('reader_id', $r->user()->id)->where('active', true)->select('collection_id')->union(DB::table('reviewer_book_grants')->where('reader_id', $r->user()->id)->whereNull('revoked_at')->select('collection_id')))
             ->with(['credits.author', 'categories'])->withCount('poems')->get();
         $data = $books->map(fn ($book) => $this->bookData($r, $book))->all();
         return response()->json(['books' => $data,

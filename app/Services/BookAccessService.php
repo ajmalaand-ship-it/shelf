@@ -10,7 +10,9 @@ class BookAccessService
 {
     public function ownsBook(?Reader $reader, Collection $book): bool
     {
-        return $reader !== null && DB::table('book_entitlements')->where('reader_id', $reader->id)
-            ->where('collection_id', $book->id)->where('active', true)->exists();
+        return $reader !== null && (DB::table('book_entitlements')->where('reader_id', $reader->id)
+            ->where('collection_id', $book->id)->where('active', true)->exists()
+            || DB::table('reviewer_book_grants')->where('reader_id', $reader->id)
+                ->where('collection_id', $book->id)->whereNull('revoked_at')->exists());
     }
 }
