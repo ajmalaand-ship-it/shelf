@@ -19,6 +19,62 @@ superseded. Do not infer the role of original C9:B6 fingerprint. Actual Google
 sign-in in a Play-installed build remains unverified. OAuth-only correction does
 not change packaged source/configuration or require an AAB rebuild.
 
+## Owner identity and audience — confirmed 8 October 2026
+
+Shelf is operated personally by **Ajmal Aand**. A registered business may follow;
+none is claimed now. Owner intends readers of any age and will not publish
+adult-only material. The six launch titles are general poetry collections, not
+specifically written for children. Children's books may be offered later. No
+adults-only restriction or specific Play age-group selections have been approved.
+These are owner-confirmed facts, not a completed content rating or child-safety
+certification. Responsible developer identity is settled; the existing policy
+meta description “published by Hindara” still needs alignment to Ajmal Aand in a
+later authorized website correction. No website change in this task.
+
+**One launch recommendation (not owner-approved or submitted): 13–15, 16–17,
+18 and over.** Existing evidence shows a text-heavy, searchable general poetry
+catalogue, a reader/library and individual purchases; no early-reader design,
+child-specific catalogue or demonstrated developmental suitability for ages
+5-and-under, 6–8 or 9–12. Teen/adult independent readers are the best-supported
+launch fit. This is an inference about current design, not proof every poem is
+suitable for every teenager. It does not replace the owner's any-age intent,
+introduce an app age ban or authorize Restrict Minor Access. Younger selections
+are not omitted to avoid compliance: their design/suitability is not established.
+Google says availability to everyone alone does not justify targeting every age.
+Children's books/design later require revisiting the declaration before release
+of that changed catalogue; this recommendation is not a permanent restriction.
+
+**Target audience versus rating:** selections describe whom the app is designed
+for. IARC rating describes actual content/themes and features. “General poetry”
+and “no adult-only material” do not establish Everyone/PEGI 3 or any other rating.
+Owner/publisher must review the six books and included media against the IARC
+questions (including language, violence, sexual themes/substances where present)
+and accurately describe purchases and sharing features; no rating guessed here.
+
+**Concrete requirements before submitting this recommendation:**
+- Confirm developmental/content suitability for the selected teen groups and
+  complete accurate IARC answers; prepare No ads, app-access instructions and the
+  existing privacy link as Google's prerequisites. No Console entry changed here.
+- Assess child status/data obligations across the approved 174 regions: Google
+  explicitly says even groups under 21 can include children under local law.
+  The proposed 13+ declaration is not a universal Families/COPPA exemption.
+  Where child audiences are included, satisfy Families data/API and monetization
+  rules, including applicable parental consent; unresolved provider/sharing facts
+  still block certification. No ad SDK was found, so adding an ad SDK is not a
+  requirement.
+- For a mixed child/older audience, ensure unapproved child-directed APIs/SDKs are
+  age-screened or collect no child data, and never make them necessary to access
+  content. Existing optional Google sign-in plus email/password is relevant but
+  does not certify the entire child path: RevenueCat/account/log processing and
+  provider terms remain to assess. A neutral age screen is conditional on that
+  finding, not automatically required merely because the app has no ads. No age
+  screen/parental consent implementation is claimed from existing evidence.
+
+Next concrete owner action: review the six launch books/media against the IARC
+content-rating questionnaire and provide the actual content answers for the
+release draft, without submitting Console changes. This advances rating evidence
+without repeating the settled broad audience/identity questions.
+
 ## Copy-ready English listing
 
 Name: **Shelf**
@@ -69,44 +125,103 @@ Do not claim all data is erased: retained purchase/refund/accounting evidence an
 backup/deletion exceptions are explicit. No standalone partial-data-deletion
 feature was found; do not select one as an implemented feature.
 
-Verified collection is separated below from unresolved provider handling. Sharing
-is **UNRESOLVED for every row**, not a verified No. Proposed Required/optional and
-purposes describe the inspected flows; final declaration must cover provider facts.
-Non-ephemeral is established for stored account/purchase records; search processing
-is memory-only in application code, but hosting-log retention makes its ephemeral
-answer unresolved until log handling is confirmed.
+Technical read-only audit, 8 October 2026: collection below is confirmed for the
+configured service, including hosting, rather than only application source. Sharing
+remains unresolved where the full onward-transfer inventory or applicable hosting
+terms cannot be inspected. Do not submit a blanket “Not shared”.
 
-| Google data type | Collected | Shared | Required/optional | Collection purposes | Evidence |
-| --- | --- | --- | --- | --- | --- |
-| Personal info: Name | Yes | UNRESOLVED | Optional | Account management; App functionality | Optional registration name; Shelf stores it. Google token can contain profile claims but Shelf does not store Google name/photo. |
-| Personal info: Email address | Yes | UNRESOLVED | Optional to use app; required for account | Account management; App functionality; Fraud prevention, security and compliance | Verification/login/reset/delete email, hosting mail. Guest samples work. |
-| Personal info: User IDs | Yes | UNRESOLVED | Optional to use app; required for account/ownership | Account management; App functionality; Fraud prevention, security and compliance; Analytics for RevenueCat purchase account association | Shelf reader ID; hashed Google subject; exact reader ID sent to RevenueCat. |
-| Financial info: Purchase history | Yes | UNRESOLVED | Required when using purchase/restore (use Required per SDK guidance) | App functionality; Analytics; Fraud prevention, security and compliance | Google/RevenueCat receipts; server ownership, refunds, accounting. SDK collection cannot be disabled within purchase service. |
-| App activity: In-app search history | Yes | UNRESOLVED | Optional | App functionality | Search query q transmitted to API. No saved search-history table, but request URLs can enter hosting logs; do not claim ephemeral without log evidence. |
-| App activity: App interactions | Request transmission verified; hosting retention unresolved | UNRESOLVED | Required for service requests | App functionality; Fraud prevention, security and compliance | Requests identify book/content/media endpoints, filters and times in hosting operation. No behavioral advertising/profile system; no local reading-position upload found. |
-| App info and performance: Diagnostics | Provider log content/retention UNRESOLVED | UNRESOLVED | UNRESOLVED | App functionality; Analytics (diagnose faults); Fraud prevention, security and compliance | Hosting diagnostic/request/error metadata; not a claim of crash-reporting SDK. |
-| Device or other IDs | UNRESOLVED; no device ID collection call found | UNRESOLVED | UNRESOLVED | Depends on actual provider handling | An IP address alone is not evidence of a unique device/browser/app identifier. No advertising-ID collection call found. |
+| Exact Google category/type | Supported collection answer | Optional/required; purposes |
+| --- | --- | --- |
+| Personal info / Name | Yes, non-ephemeral | Optional registration name; Account management, App functionality. Google token may also contain profile claims; Shelf does not persist Google name/photo. |
+| Personal info / Email address | Yes, non-ephemeral | Optional for guest use, necessary for accounts; Account management, App functionality, Fraud prevention, security and compliance. |
+| Personal info / User IDs | Yes, non-ephemeral | Optional for guest use, necessary for account/ownership; Account management, App functionality, security; Analytics for purchase association. Includes Shelf ID, hashed Google subject and RevenueCat account/anonymous aliases. |
+| Financial info / Purchase history | Yes, non-ephemeral | Required in RevenueCat purchase service per its guide; App functionality, Analytics, Fraud prevention, security and compliance. |
+| App activity / In-app search history | Yes, non-ephemeral | Optional; App functionality; security for operational logs. Actual archived request URLs contain q searches, even though no search-history table exists. |
+| App activity / App interactions | Yes, non-ephemeral | Required for network service; App functionality, Fraud prevention, security and compliance; Analytics for hosting traffic reports. Book/content/filter requests and times are logged. |
+| Location / Approximate location | Yes, non-ephemeral | Required in current hosting statistics; Analytics. HTTPS AWStats uses geoipfree and stores IP-derived country statistics. No location permission is needed for this inference. |
+| App info and performance / Diagnostics | Yes for request/service diagnostic metadata, non-ephemeral | Required during service requests; App functionality, Fraud prevention, security and compliance; Analytics for operational diagnostics. Access logs contain response codes and user agents; Laravel stores service faults. This is not proof of uploaded mobile crash logs. |
+| Device or other IDs | No advertising/hardware ID collection established; remaining provider handling unresolved | No Shelf attribution-ID calls or AD_ID/location permission found. A RevenueCat account alias belongs under User IDs; IP alone does not establish a device identifier. Do not assert a universal provider No. |
 
-**No final sharing answer is confirmed.** Potential service-provider exceptions require evidence that hosting/mail, RevenueCat and encrypted OneDrive
-backup are acting as processors for Shelf, and Google sign-in/store interaction is
-user-initiated as Google describes. Source contains no RevenueCat attribution-ID
-collection, setEmail/setDisplayName/customer attributes, or advertising integration
-calls. Existing provider catalogue evidence does not audit every dashboard
-integration or processor contract. Before final submission, owner must establish processor roles and disclose
-any independently configured non-processor integrations; if present, select Shared
-for their actual data and purpose. These are unresolved factual dependencies, not
-permission to invent a “no sharing” guarantee. No new provider checks here.
+No source/SDK evidence of precise location, contacts, calendar, health, installed-app
+inventory, web-browsing history, SMS, uploaded reader media/files, or a mobile crash
+uploader. Publisher book audio/covers and local share-card export are not reader
+uploads. Google handles card/payment credentials; Shelf receives purchase evidence,
+not card numbers. Optional support mail is user initiated, outside inbox access.
 
-Source-only No findings for other categories: precise or
-approximate location (IP not geolocated in Shelf code; provider inference unresolved), payment-card details,
-contacts, calendar, health, sensitive profile fields, installed-app inventory,
-web-browsing history, SMS, user photo/video/audio/document uploads and crash logs
-(no crash uploader found). Do not confuse publisher covers/audio/downloaded books
-with user-uploaded media. Share-card export is local and user initiated. Optional
-support emails are processed outside the app by the chosen mail provider; disclose
-support-message processing in policy, not access to the user's email inbox.
-If hosting or a dashboard integration infers location, corresponding location
-answers must change; source inspection cannot certify host internals.
+### Actual destinations and forwarding evidence
+
+- **Shelf hosting (Apache/cPanel, database and mail.shelf.services):** account
+  email/optional name/password hash, Google token/hashed subject, reader tokens,
+  purchase/ownership/refund records; request IP, full URL/query, time, status,
+  referrer and user agent. Purposes: account/content delivery, mail confirmation,
+  access verification, security, operations and hosting traffic analytics. Resolved
+  Laravel logging is stack -> single/local daily-file driver; Slack/Papertrail
+  channel definitions are not active. Mail is SMTP port 465, scheme smtps. Mail
+  delivery includes recipient and confirmation/reset/deletion links; remote mail
+  routing and host operator/subprocessor contract are not exposed by account access.
+- **Google:** optional Google authentication exchanges credentials/ID token with
+  Google's sign-in service; Shelf receives email and subject claims. Google Play
+  receives purchase requests and processes payment; Shelf/RevenueCat exchange
+  package/product/purchase-token/order and transaction verification data. These
+  user-initiated authentication/payment flows do not imply Shelf receives payment
+  card information. Google backend certificate/verification calls do not upload a
+  reading history. Account-independent Google telemetry scope is not certified by
+  the core Play-services disclosure alone.
+- **RevenueCat:** numeric Shelf reader ID (staging uses prefixed IDs), purchase
+  token/product/transaction/price/currency and SDK/platform/request metadata for
+  verification, restoration, entitlement association and purchase analytics.
+  Source calls configure/login/logout/products/purchase/restore; no email/name,
+  customer-attribute, advertising identifier or attribution-network calls. Logout
+  can create an anonymous account alias. purchases_flutter 10.13.2 and
+  google_sign_in 7.2.0 (Android implementation 7.2.17) are included; no
+  Firebase/Sentry/ad SDK was found in the inspected dependency inventory.
+  One authenticated V2 GET returned HTTP 200, one complete webhook list (no next
+  page): whintgr75a4892970 -> https://shelf.services/api/purchases/webhook,
+  Shelf app only, both environments, cancellation/non_renewing_purchase/expiration.
+  This forwards transaction data back to Shelf, not an independent recipient.
+  The official V2 integration API exposes **webhooks only**: it cannot establish
+  absence of Amplitude, attribution, ETL or other dashboard integrations. No
+  authenticated dashboard/browser connector is available in this session.
+- **Microsoft OneDrive:** existing verified backup implementation encrypts the
+  database/content/configuration archive locally before Graph upload. Microsoft
+  receives ciphertext plus backup filenames/sizes/times and uploader request/account
+  metadata, not a plaintext reader dataset or recovery key. Recovery evidence is
+  reused. This does not establish an end-to-end-encryption exception for Shelf's
+  own collection: Shelf can decrypt. Applicable Microsoft account terms and any
+  independent metadata processing remain unverified; no credential inspection or
+  recovery rerun is needed.
+
+### Hosting evidence and limits
+
+Read-only structural summaries inspected four Shelf-only September/October log
+archives: 8,215 lines, 28 search-query request lines. Current HTTPS log matches
+combined format. HTTPS AWStats config has LogFormat=1, DNSLookup=0,
+PurgeLogFile=0, ArchiveLogRecords=0 and LoadPlugin="geoipfree"; October HTTPS
+country section has 18 entries. Webalizer country reports also exist. No reader
+values, IPs, query contents, credentials or raw provider response were recorded.
+D14's 90-day routine **application** log rule does not prove Apache archive or
+AWStats/Webalizer expiry; hosting statistics/archive expiry remains unknown.
+Host software/hostname is not evidence of the hosting company's legal identity.
+
+### Sharing conclusions and genuinely missing technical evidence
+
+RevenueCat's current Terms incorporate its DPA, which restricts customer-data
+processing to instructions and documented subprocessors. This supports the
+service-provider exception for its core purchase processing, not a blanket No
+covering unknown forwarding integrations. Google permits service-provider and
+qualifying user-initiated transfers to be excluded from sharing; each actual
+recipient/use must satisfy those conditions. Hosting/mail operator terms and
+Microsoft account terms have not been established. Therefore final per-type
+Shared/Not shared answers remain pending those scoped facts; collection answers
+above no longer depend on an owner describing inspectable log configuration.
+
+Remaining technical evidence: read-only RevenueCat dashboard integration inventory;
+host operator/mail routing terms and retention of Apache/statistics data;
+Microsoft account/service terms for encrypted backup metadata; provider-specific
+identifier/diagnostic handling beyond documented/core configured flows. These are
+access/provider evidence gaps, not owner product decisions. No undocumented API
+probing, setting changes or repeat product verification performed. One sandbox DNS
+failure was followed by one authorized network request; that request succeeded.
 
 RevenueCat explicitly recommends purchase history, non-ephemeral, Required, App
 functionality + Analytics. Google allows optional collection when users can use
@@ -191,13 +306,13 @@ Suggested policy additions (draft, not published):
 - Financial-record retention policy (including justified exceptions); no period or
   jurisdictional/legal conclusion chosen here. Owner may obtain accounting/legal
   advice. This is the one pending policy decision affecting final retention wording.
-- Approve listing copy, target age/content-rating facts, publicly responsible
-  developer identity and continued use of existing support email. Privacy HTML meta
-  says “published by Hindara”; ensure the actual Console developer/entity and policy
-  identify the responsible party consistently, without guessing that identity.
-- Confirm whether owner-configured integrations beyond known Shelf webhook/Play
-  exist and whether processors handle data only for Shelf. This resolves sharing
-  answers; no credentials or provider edit required.
+- Listing-copy approval and actual IARC content answers remain. Identity and broad
+  audience intent are owner-confirmed above; proposed Play age selections are not
+  yet approved. Existing support address remains unchanged. Policy identity meta
+  alignment is a specific later correction, not an unresolved identity decision.
+- Technical integration/contract evidence is tracked separately below; do not ask
+  the owner to describe inspectable configuration or equate missing access with
+  an owner decision.
 
 No new decision required for catalogue, rights, prices, regions, manual products,
 RevenueCat book mapping or corrected certificate. No repeat confirmations.
@@ -228,18 +343,21 @@ errors do not establish uploaded crash logs; actual performance diagnostic logs
 must be mapped to App info and performance/Diagnostics after provider facts.
 IP-based location is declared only if location is inferred. Device or other IDs
 requires an actual device/browser/app identifier, not a blanket label for any IP.
-Sharing, host logs/retention/geolocation, SDK/provider identifiers/integrations and
-processor roles remain unresolved, explicitly separated from source-verified flows.
-Current official Google definitions and RevenueCat guide reread 8 October; no
-provider/Console edits or submission. Do not submit “Not shared” from this draft.
+The technical audit above supersedes the earlier source-only unknowns for search
+retention, request logs, SMTP transport and hosting IP-country inference. Completed
+privacy/support implementation is not reopened; this audit changes documentation
+only. Checkout OFF, automatic pricing sync DEFERRED, AAB 1.0.5 (14) preserved.
 
-## One concrete next owner action
+## Next evidence action and separate owner decisions
 
-Provide existing hosting/provider and RevenueCat integration information (no secrets)
-to resolve log retention, any location/device identifiers and processor/sharing roles.
-Codex can then finalize the unresolved Data safety cells. Financial retention policy,
-target audience/content rating and developer identity remain owner decisions;
-catalogue/rights/price/regions need no repeat confirmation.
+Codex needs read-only access to the RevenueCat dashboard integration inventory and
+hosting/Microsoft service terms to finish sharing answers. No provider setting
+change or owner description of technical configuration is required.
+
+Remaining owner decisions: financial-record retention (no period chosen), listing
+copy and proposed Play age selections; actual IARC content answers remain required.
+Broad audience intent and personal developer identity are confirmed above, not
+questions to repeat. Catalogue/rights/prices/regions stay approved.
 
 ## Official guidance used (checked 8 October 2026)
 
@@ -249,3 +367,11 @@ catalogue/rights/price/regions need no repeat confirmation.
 - [Google User Data/privacy policy requirements](https://support.google.com/googleplay/android-developer/answer/10144311?hl=en).
 - [Google listing fields/limits](https://support.google.com/googleplay/android-developer/answer/9859152?hl=en-en).
 - [Google Play services core SDK disclosure scope](https://developers.google.com/android/guides/play-data-disclosure). This says core SDKs collect none; it does not certify every authentication SDK. [Google authentication overview](https://developer.android.com/identity/credential-manager) and Shelf's actual Google token flow were reviewed; no claim of zero Google authentication processing.
+
+- [RevenueCat V2 integration API scope](https://www.revenuecat.com/docs/api-v2/integration): lists webhook integrations, not all dashboard integration types.
+- [RevenueCat Terms](https://www.revenuecat.com/terms) and [DPA](https://www.revenuecat.com/dpa): core customer-data processing and subprocessors; no inference about enabled external forwarding.
+- [RevenueCat customer attributes](https://www.revenuecat.com/docs/customers/customer-attributes): attribution identifiers require relevant calls; Shelf has none in inspected source.
+
+- [Google target audience and age-group guidance](https://support.google.com/googleplay/android-developer/answer/9867159?hl=en-en): design/suitability, local child status and submission prerequisites.
+- [Google Families policy](https://support.google.com/googleplay/android-developer/answer/9893335?hl=en): child-data, SDK/API and monetization requirements.
+- [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy): mixed-audience optional Google sign-in and full access without a Google account.

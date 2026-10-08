@@ -542,6 +542,33 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Part 10 release review — owner identity/audience and technical evidence, 8 October 2026
+
+OWNER-CONFIRMED: Shelf is operated personally by Ajmal Aand; no registered business
+claimed (one may follow later). Intended readers: any age; no adult-only material.
+Six launch books are general poetry, not specifically children's books; children's
+books may follow. No adults-only restriction or Play age selections approved.
+Recommendation only: 13–15, 16–17, 18+ for the present independent-reader design;
+not an approved restriction, not an IARC rating, not a child-data exemption.
+Rationale, younger-age evidence limits and regional Families/API/consent requirements
+are in [PLAY_RELEASE_REVIEW.md](PLAY_RELEASE_REVIEW.md). Personal identity settled;
+existing “Hindara” privacy meta requires a later identity alignment, no deployment now.
+
+Reviewed and retained previous pending technical audit: archived search queries and
+request metadata are non-ephemeral; hosting geoipfree country statistics establish
+Approximate location/Analytics collection. Local Laravel logging and SMTPS transport
+verified; complete RevenueCat webhook list has one Shelf return destination, but
+other dashboard integrations are not exposed by that API. Sharing/provider evidence
+and financial retention remain unresolved. Earlier next-action requests for owner
+technical configuration and broad audience/identity are superseded.
+
+Next concrete owner action: review six books/media against IARC content questions
+and supply actual answers for the release draft; no Console submission. Codex still
+needs scoped provider/dashboard evidence to finish sharing. Documentation-only
+commit/push includes pending audit; no repeat audits/tests/build/deploy/provider edit.
+Checkout OFF, sync DEFERRED, AAB 1.0.5 (14), approved books/rights/prices/174 regions
+and existing .htaccess preserved. Recommendation approval is not launch approval.
+
 ## Privacy/support corrections — 8 October 2026
 
 Owner authorized implementation, focused validation and staged/backed-up promotion.
