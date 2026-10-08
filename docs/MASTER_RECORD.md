@@ -555,7 +555,21 @@ UNRESOLVED, not confirmed “Not shared”. See PLAY_RELEASE_REVIEW.md.
 AAB 1.0.5 (14) preserved and does NOT contain these source additions; later replacement
 release build/phone acceptance required, no rebuild authorized now. Checkout OFF;
 automatic sync DEFERRED; no provider edit/Console submission/public launch/customer
-deletion. Staging/promotion evidence recorded after actual completion.
+deletion. Implemented release **4c3efd63b63242dfd5a6f7cdb924b74143dd6cbe** passed staged
+focused checks at 05:19:55 UTC: 1 PHP test/14 assertions, 10 Flutter privacy-support/
+language tests plus staging-identity check; direct staged policy/isolation passed.
+Promoted same commit after verified SQL/ZIP/SHA-256 backup
+`/home/shelf/backups/shelf/20261008-052036`. Existing reader/purchase/refund/ledger/
+agreement snapshots and cPanel handler unchanged. Production privacy/deletion GETs
+passed at 05:21:48 UTC; purchase-config confirms checkout OFF. Initial developer
+check used the wrong app-config endpoint and was corrected, no server fault/fix.
+No actual live account deletion or provider erasure test. Isolated initial PHP run
+needed its bootstrap/cache directory; created locally and focused rerun passed.
+No broad suite or app artifact rebuild. Native external intents require later real
+Android phone acceptance with the replacement release build.
+Next owner action: supply existing processor/integration and hosting data-handling
+facts to resolve pending Data safety sharing/log/geolocation/device-ID cells;
+financial retention, target audience and developer identity remain owner decisions.
 
 ## Play listing/Data safety preparation complete — 8 October 2026
 

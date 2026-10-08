@@ -217,8 +217,9 @@ analytics. No ad SDK or maintained reading-progress profile claim substituted fo
 no request collection. Provider erasure is described as queue/retry/read-back,
 not completion. Financial retention remains under review. Deletion/recovery behavior
 unchanged. Historical findings above are preserved; items 1–3, 5 provider wording
-and 6 support access now have source fixes; website deployment evidence follows in
-Master Record. Purchases remain owner-test-only in policy while checkout OFF.
+and 6 support access now have source fixes; website correction staged and promoted at 4c3efd6 with verified backup
+/home/shelf/backups/shelf/20261008-052036; production privacy/deletion HTTP 200
+checked at 05:21:48 UTC, details in Master Record. Purchases remain owner-test-only in policy while checkout OFF.
 
 Exact Google categories correction: account identifiers = Personal info/User IDs;
 purchases = Financial info/Purchase history; remote queries = App activity/In-app
