@@ -263,6 +263,37 @@ def https_checks():
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    privacy_scope = {'resources/views/privacy.blade.php', 'tests/Feature/PrivacySupportTest.php',
+                     'mobile/lib/l10n/app_strings.dart', 'mobile/lib/screens/home_screen.dart',
+                     'mobile/lib/settings/privacy_support.dart', 'mobile/test/privacy_support_test.dart',
+                     'mobile/android/app/src/main/kotlin/services/shelf/app/MainActivity.kt',
+                     'scripts/run_tests.sh', 'scripts/staging/workflow.py'}
+    code_changes = {path for path in changes if not path.startswith('docs/') and path != 'AGENTS.md'}
+    if code_changes and code_changes <= privacy_scope and 'resources/views/privacy.blade.php' in code_changes:
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'PrivacySupportTest'
+        test_env['SHELF_MOBILE_TEST_SCOPE'] = 'privacy-support'
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh', '--mobile'], cwd=app,
+                                    stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Staged privacy/support checks failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        https_checks()
+        # Inspect the actual staged policy, not only its isolated rendered template.
+        gate = settings(STAGING)['SHELF_STAGING_ACCESS_KEY']
+        req = urllib.request.Request('https://staging.shelf.services/privacy', headers={'X-Shelf-Test-Key': gate})
+        with urllib.request.urlopen(req, timeout=20) as response:
+            policy = response.read()
+            assert response.status == 200 and b'purchase analytics' in policy and b'search queries' in policy
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit': commit, 'passed': True,
+            'checked_at': datetime.now(timezone.utc).isoformat(), 'mobile_tests': True,
+            'scope': 'privacy-support', 'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: focused privacy/support and language checks, staged policy and HTTPS isolation.', flush=True)
+        return
     d14_audit_scope = {'app/Filament/Resources/Sales/SaleResource.php', 'scripts/staging/workflow.py',
                        'docs/MASTER_RECORD.md', 'docs/D14_DATA_POLICY.md', 'AGENTS.md'}
     if changes and set(changes) <= d14_audit_scope and 'app/Filament/Resources/Sales/SaleResource.php' in changes:

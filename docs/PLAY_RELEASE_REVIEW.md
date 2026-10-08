@@ -69,33 +69,36 @@ Do not claim all data is erased: retained purchase/refund/accounting evidence an
 backup/deletion exceptions are explicit. No standalone partial-data-deletion
 feature was found; do not select one as an implemented feature.
 
-Prepared table: No ephemeral processing for listed rows, conservatively including
-hosting logs. “Not shared” below uses Google's service-provider and user-initiated
-transfer exceptions, not a claim that no service receives data.
+Verified collection is separated below from unresolved provider handling. Sharing
+is **UNRESOLVED for every row**, not a verified No. Proposed Required/optional and
+purposes describe the inspected flows; final declaration must cover provider facts.
+Non-ephemeral is established for stored account/purchase records; search processing
+is memory-only in application code, but hosting-log retention makes its ephemeral
+answer unresolved until log handling is confirmed.
 
 | Google data type | Collected | Shared | Required/optional | Collection purposes | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| Personal info: Name | Yes | No* | Optional | Account management; App functionality | Optional registration name; Shelf stores it. Google token can contain profile claims but Shelf does not store Google name/photo. |
-| Personal info: Email address | Yes | No* | Optional to use app; required for account | Account management; App functionality; Fraud prevention, security and compliance | Verification/login/reset/delete email, hosting mail. Guest samples work. |
-| Personal info: User IDs | Yes | No* | Optional to use app; required for account/ownership | Account management; App functionality; Fraud prevention, security and compliance; Analytics for RevenueCat purchase account association | Shelf reader ID; hashed Google subject; exact reader ID sent to RevenueCat. |
-| Financial info: Purchase history | Yes | No* | Required when using purchase/restore (use Required per SDK guidance) | App functionality; Analytics; Fraud prevention, security and compliance | Google/RevenueCat receipts; server ownership, refunds, accounting. SDK collection cannot be disabled within purchase service. |
-| App activity: In-app search history | Yes | No* | Optional | App functionality | Search query q transmitted to API. No saved search-history table, but request URLs can enter hosting logs; do not claim ephemeral without log evidence. |
-| App activity: App interactions | Yes | No* | Required | App functionality; Fraud prevention, security and compliance | Requests identify book/content/media endpoints, filters and times in hosting operation. No behavioral advertising/profile system; no local reading-position upload found. |
-| App info and performance: Diagnostics | Yes | No* | Required | App functionality; Analytics (diagnose faults); Fraud prevention, security and compliance | Hosting diagnostic/request/error metadata; not a claim of crash-reporting SDK. |
-| Device or other IDs | Yes (IP/request identifiers) | No* | Required for network service | App functionality; Fraud prevention, security and compliance | Hosting receives IP/request metadata; this classification is conservative, not an advertising-ID claim. |
+| Personal info: Name | Yes | UNRESOLVED | Optional | Account management; App functionality | Optional registration name; Shelf stores it. Google token can contain profile claims but Shelf does not store Google name/photo. |
+| Personal info: Email address | Yes | UNRESOLVED | Optional to use app; required for account | Account management; App functionality; Fraud prevention, security and compliance | Verification/login/reset/delete email, hosting mail. Guest samples work. |
+| Personal info: User IDs | Yes | UNRESOLVED | Optional to use app; required for account/ownership | Account management; App functionality; Fraud prevention, security and compliance; Analytics for RevenueCat purchase account association | Shelf reader ID; hashed Google subject; exact reader ID sent to RevenueCat. |
+| Financial info: Purchase history | Yes | UNRESOLVED | Required when using purchase/restore (use Required per SDK guidance) | App functionality; Analytics; Fraud prevention, security and compliance | Google/RevenueCat receipts; server ownership, refunds, accounting. SDK collection cannot be disabled within purchase service. |
+| App activity: In-app search history | Yes | UNRESOLVED | Optional | App functionality | Search query q transmitted to API. No saved search-history table, but request URLs can enter hosting logs; do not claim ephemeral without log evidence. |
+| App activity: App interactions | Request transmission verified; hosting retention unresolved | UNRESOLVED | Required for service requests | App functionality; Fraud prevention, security and compliance | Requests identify book/content/media endpoints, filters and times in hosting operation. No behavioral advertising/profile system; no local reading-position upload found. |
+| App info and performance: Diagnostics | Provider log content/retention UNRESOLVED | UNRESOLVED | UNRESOLVED | App functionality; Analytics (diagnose faults); Fraud prevention, security and compliance | Hosting diagnostic/request/error metadata; not a claim of crash-reporting SDK. |
+| Device or other IDs | UNRESOLVED; no device ID collection call found | UNRESOLVED | UNRESOLVED | Depends on actual provider handling | An IP address alone is not evidence of a unique device/browser/app identifier. No advertising-ID collection call found. |
 
-*Prepared sharing answer assumes hosting/mail, RevenueCat and encrypted OneDrive
+**No final sharing answer is confirmed.** Potential service-provider exceptions require evidence that hosting/mail, RevenueCat and encrypted OneDrive
 backup are acting as processors for Shelf, and Google sign-in/store interaction is
 user-initiated as Google describes. Source contains no RevenueCat attribution-ID
 collection, setEmail/setDisplayName/customer attributes, or advertising integration
 calls. Existing provider catalogue evidence does not audit every dashboard
-integration or processor contract. Before final submission, owner must disclose
+integration or processor contract. Before final submission, owner must establish processor roles and disclose
 any independently configured non-processor integrations; if present, select Shared
-for their actual data and purpose. This is the remaining factual dependency, not
+for their actual data and purpose. These are unresolved factual dependencies, not
 permission to invent a “no sharing” guarantee. No new provider checks here.
 
-Select No collection for other categories on inspected app behavior: precise or
-approximate location (IP not geolocated in Shelf code), payment-card details,
+Source-only No findings for other categories: precise or
+approximate location (IP not geolocated in Shelf code; provider inference unresolved), payment-card details,
 contacts, calendar, health, sensitive profile fields, installed-app inventory,
 web-browsing history, SMS, user photo/video/audio/document uploads and crash logs
 (no crash uploader found). Do not confuse publisher covers/audio/downloaded books
@@ -166,7 +169,7 @@ Precise corrections required before launch (not deployed in this task):
    final launch privacy wording; never apply routine 90-day logs/backups to money
    records. Provider erasure claims should describe retries/verification procedure,
    not promise that all provider data has already been erased.
-6. Support contact exists on web but purchase errors say “contact Shelf support”
+6. Historical preparation finding: Support contact exists on web but purchase errors say “contact Shelf support”
    without a concrete address/action in mobile. Add a clear support entry alongside
    privacy in a later approved mobile task. No need to invent a support URL.
 
@@ -199,14 +202,43 @@ Suggested policy additions (draft, not published):
 No new decision required for catalogue, rights, prices, regions, manual products,
 RevenueCat book mapping or corrected certificate. No repeat confirmations.
 
+## Corrections implemented — 8 October 2026
+
+Settings now includes English/Pashto Privacy policy and Support entries. Production
+privacy opens https://shelf.services/privacy using the configured API origin;
+mail opens mailto:ajmalaand@gmail.com. Email is visible in Settings, selectable in
+the dialog and copyable even when no email app opens. Browser failure has copyable
+privacy URL fallback. These are mobile source additions only: AAB 1.0.5 (14) does
+not contain them. A later replacement build and phone check are required; no build now.
+
+Public policy now dates the revision October 8, explains remote searches and
+potential request logs, reader-ID/purchase processing and RevenueCat purchase
+analytics. No ad SDK or maintained reading-progress profile claim substituted for
+no request collection. Provider erasure is described as queue/retry/read-back,
+not completion. Financial retention remains under review. Deletion/recovery behavior
+unchanged. Historical findings above are preserved; items 1–3, 5 provider wording
+and 6 support access now have source fixes; website deployment evidence follows in
+Master Record. Purchases remain owner-test-only in policy while checkout OFF.
+
+Exact Google categories correction: account identifiers = Personal info/User IDs;
+purchases = Financial info/Purchase history; remote queries = App activity/In-app
+search history; endpoint access = App activity/App interactions. Generic request
+errors do not establish uploaded crash logs; actual performance diagnostic logs
+must be mapped to App info and performance/Diagnostics after provider facts.
+IP-based location is declared only if location is inferred. Device or other IDs
+requires an actual device/browser/app identifier, not a blanket label for any IP.
+Sharing, host logs/retention/geolocation, SDK/provider identifiers/integrations and
+processor roles remain unresolved, explicitly separated from source-verified flows.
+Current official Google definitions and RevenueCat guide reread 8 October; no
+provider/Console edits or submission. Do not submit “Not shared” from this draft.
+
 ## One concrete next owner action
 
-Approve a scoped privacy/support correction task: add in-app Privacy and Support
-entries and revise the public policy for remote searches/request logs and
-RevenueCat purchase analytics. Codex can implement after authorization, stage and
-validate focused changes; deployment/rebuild would need that next task's scope.
-Financial retention stays unresolved until a separate owner policy decision.
-No changes authorized by this preparation to provider settings/upload/checkout.
+Provide existing hosting/provider and RevenueCat integration information (no secrets)
+to resolve log retention, any location/device identifiers and processor/sharing roles.
+Codex can then finalize the unresolved Data safety cells. Financial retention policy,
+target audience/content rating and developer identity remain owner decisions;
+catalogue/rights/price/regions need no repeat confirmation.
 
 ## Official guidance used (checked 8 October 2026)
 

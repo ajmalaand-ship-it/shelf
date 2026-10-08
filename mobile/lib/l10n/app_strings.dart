@@ -170,6 +170,18 @@ class BookstoreStrings {
   String get languageSaveError => isEnglish
       ? 'Could not save the language. Please try again.'
       : 'ژبه خوندي نه شوه. بیا هڅه وکړئ.';
+  String get privacyPolicy => isEnglish ? 'Privacy policy' : 'د محرمیت تګلاره';
+  String get support => isEnglish ? 'Support' : 'مرسته';
+  String get copyAddress => isEnglish ? 'Copy address' : 'پته کاپي کړئ';
+  String get addressCopied => isEnglish ? 'Address copied' : 'پته کاپي شوه';
+  String get openEmail =>
+      isEnglish ? 'Open email app' : 'د برېښنالیک اپ پرانیزئ';
+  String get emailUnavailable => isEnglish
+      ? 'Could not open an email app. Copy the address below.'
+      : 'د برېښنالیک اپ پرانیستل نه شو. لاندې پته کاپي کړئ.';
+  String get browserUnavailable => isEnglish
+      ? 'Could not open a browser. Copy the link below.'
+      : 'براوزر پرانیستل نه شو. لاندې لینک کاپي کړئ.';
   String get account => isEnglish ? 'Account' : 'حساب';
   String get signIn => isEnglish ? 'Sign in' : 'ننوتل';
   String get createAccount => isEnglish ? 'Create account' : 'حساب جوړول';

@@ -76,6 +76,8 @@ if "$run_mobile"; then
     mobile_args=()
     if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "purchases" ]]; then
         mobile_args=(test/book_purchases_test.dart test/library_ux_test.dart test/staging_identity_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "privacy-support" ]]; then
+        mobile_args=(test/privacy_support_test.dart test/interface_language_test.dart)
     elif [[ -n "${SHELF_MOBILE_TEST_SCOPE:-}" ]]; then
         echo "Unknown mobile test scope" >&2; exit 2
     fi

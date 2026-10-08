@@ -542,6 +542,21 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Privacy/support corrections — 8 October 2026
+
+Owner authorized implementation, focused validation and staged/backed-up promotion.
+Settings source now has bilingual Privacy policy/Support entries, visible selectable
+copyable support email, native external opening and failed-browser/email fallback.
+Public policy accurately discloses remote searches/request metadata, RevenueCat
+reader-ID purchase processing/analytics, pending provider erasure and unresolved
+financial retention. Deletion/recovery behavior unchanged. Data safety review uses
+exact Google categories; sharing/provider log/geolocation/device-ID answers are
+UNRESOLVED, not confirmed “Not shared”. See PLAY_RELEASE_REVIEW.md.
+AAB 1.0.5 (14) preserved and does NOT contain these source additions; later replacement
+release build/phone acceptance required, no rebuild authorized now. Checkout OFF;
+automatic sync DEFERRED; no provider edit/Console submission/public launch/customer
+deletion. Staging/promotion evidence recorded after actual completion.
+
 ## Play listing/Data safety preparation complete — 8 October 2026
 
 Signing correction: owner saved Shelf Android Play/services.shelf.app in

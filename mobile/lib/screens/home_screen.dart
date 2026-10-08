@@ -1,3 +1,4 @@
+import '../settings/privacy_support.dart';
 import '../accounts/account_controller.dart';
 import '../accounts/account_screen.dart';
 import '../purchases/library_controller.dart';
@@ -372,6 +373,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         trailing: const LanguageButton(key: Key('settings-language-toggle')),
       ),
+      const PrivacySupportEntries(),
       ListTile(
         leading: const Icon(Icons.menu_book_outlined),
         title: Text(AppStrings.of(context).readingPreferences),

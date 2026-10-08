@@ -160,6 +160,13 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-08: Owner authorized bilingual Settings Privacy/Support links and
+  copyable email fallback, accurate public search/request-log/RevenueCat disclosures,
+  exact-category Data safety review, focused tests, staging/backed-up promotion and
+  commit/push. Financial retention/provider sharing remain unresolved. Preserve
+  AAB 1.0.5 (14); source additions require later replacement build, no rebuild now.
+  Checkout OFF, sync DEFERRED; no provider edits/submission/customer deletion/launch.
+
 - 2026-10-08 correction: Shelf Android Play/services.shelf.app saved with
   BE:61:2C:CD:0B:79:68:E3:AA:1E:2A:C7:E6:CF:B8:CB:61:8F:DE:24 from Play
   App signing key — In use; owner-provided Cloud screenshot confirms saved value.
