@@ -542,6 +542,58 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Manual-product decisions finalized — 8 October UTC / 7 October local
+
+Owner confirms book 3's Play placeholder name/description corrected following
+**څپو کې انځورونه** / **Full book in your Shelf Library.** Recorded as
+OWNER-CONFIRMED; no independent provider reread. Owner approves retaining the
+existing verified **174 available regions for all six launch books**, and
+reaffirms **USD 2.99 per book**. This is not worldwide coverage: AF and IR were
+absent from the verified explicit region list. Earlier region-decision and book 3
+correction next-action statements below are superseded.
+
+Pending manual-product verification documentation and these decisions are authorized
+for documentation-only commit/push. Existing public/.htaccess change preserved and
+excluded. No provider checks, credential/provider/data edits, rebuild, deployment
+or broad tests. Real checkout remains OFF; automatic pricing sync DEFERRED;
+no public release authorized.
+
+**Single next unfinished release task: final launch rights clearance (owner).**
+Confirm sale/distribution permission for the six selected books and included
+covers/fonts/images/audio, retaining existing credits and written permissions.
+This establishes that the selected catalogue may legally be sold; it does not
+launch the app. Existing book 6 permission need not be recreated. Codex can organize
+existing evidence, but rights-holder permission is an owner responsibility.
+Completed production verification, AAB preparation, product creation/mappings,
+prices, region selection and wording correction must not be reopened.
+
+## Six manual Play products verified — 8 October 2026 UTC / 7 October local
+
+Owner screenshot confirms shelf_book_3 through shelf_book_8 with one active
+purchase option each. One read-only Google list at **03:21:47 UTC** returned
+HTTP 200 with no additional page: all six have option **buy**, ACTIVE,
+legacy-compatible, multi-quantity not enabled, **US USD 2.99 / AVAILABLE**.
+All six share 174 explicit AVAILABLE regions and newRegionsConfig AVAILABLE;
+AF/IR are absent from the explicit list. These product settings do not certify
+app-track distribution or approve launch regions. Earlier missing-products and
+create-book-4 next-action statements below are superseded; creation is complete.
+
+Fresh RevenueCat catalogue/attachment GETs confirm each active non-consumable
+product in Shelf's services.shelf.app app maps alone to its same-named entitlement.
+Read-only Shelf inventory confirms book IDs 3–8 map to the same canonical IDs,
+with USD 2.99 references. No missing/incorrect connection found. Exact provider
+IDs and availability evidence are in [the manual checklist](MANUAL_PLAY_PRODUCTS.md)
+and /home/shelf/tmp/shelf-product-check-20261008/evidence.json.
+
+Book 3 listing remains “Shelf book 3” / “Test 1”. **Next concrete owner action:**
+edit only its Play en-US listing to name **څپو کې انځورونه** and description
+**Full book in your Shelf Library.** Preserve product/option IDs, price and mapping.
+No provider write, credential change, database save, rebuild, deployment or broad
+tests. Real checkout verified OFF; automatic sync disabled and DEFERRED.
+Launch-region/rights decisions and existing acceptance gates remain separate;
+no completed construction or product creation reopened. Documentation only;
+no commit/push requested in this task.
+
 ## Initial launch catalogue and starting prices approved — 8 October UTC / 7 October local
 
 Owner selects **all six existing books, IDs 3–8**, for the initial launch catalogue

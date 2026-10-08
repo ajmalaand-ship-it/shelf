@@ -160,6 +160,15 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-07 local / 8 October UTC: Owner confirms book 3 Play listing placeholder
+  name/description corrected (owner-confirmed, not reread). Keeps the verified 174
+  available regions for all six launch books and USD 2.99 each; not worldwide
+  coverage, AF/IR absent from the verified explicit list. Documentation-only
+  verification/decision commit and push approved; preserve existing .htaccess.
+  No repeat provider checks, rebuild or broad tests. Real checkout OFF; no public
+  release authorized; automatic sync remains DEFERRED. Next unfinished release
+  task: owner final rights clearance, retaining existing permissions/credits.
+
 - 2026-10-07: Owner approved constructing production-mode purchase verification behind disabled controls, with existing RevenueCat/Google Play integration. Real transactions require authenticated provider-event environment and independent server REST is_sandbox evidence to agree, with the exact reader, book, permanent entitlement and unique purchase-time match. Unknown, malformed, ambiguous or failed evidence never grants access or renews an offline lease. Test transactions remain excluded from real income. Production acceptance defaults OFF and is forced OFF on staging; no real payment or public release is authorized. Manual Play workflow for first 100 books remains approved; automatic sync DEFERRED, 403 work stopped. Focused isolated tests, staging, verified-backup promotion, records and commit/push authorized. No product, price, credential, permission or historical data change.
 - 2026-10-07: For Shelf’s first 100 books, the owner creates and manages Google Play products, prices and availability manually in Play Console. Automatic admin-to-Play product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled. Stop 403 investigations, calculations, retries and support follow-ups unless the owner explicitly reopens automatic sync. Existing product mappings, credentials, app-level access, verification, acknowledgements, entitlements, refunds, accounting and historical records are preserved. Admin USD prices are approved reference values; saving does not update Play. Checkout uses Google’s localized store price. No Play product creation/change is authorized in this task.
 

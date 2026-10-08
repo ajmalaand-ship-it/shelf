@@ -19,40 +19,70 @@ individual prices may change later. All are paid books with free samples.
 Shelf references verified 8 October 00:39:22 UTC already equal USD 2.99; no admin
 save needed. Credits, agreements, purchase history and mappings are unchanged.
 
-**Play status last verified 7 October 2026, 20:10:10 UTC.** Fresh read-only list on
-8 October returned HTTP 503; no retry/write. Check Console before creating anything.
+**Verified 8 October 2026 at 03:21:47 UTC (7 October local).** One read-only
+Google oneTimeProducts list returned HTTP 200, with no further page; no retry.
+Owner screenshot independently confirms six products with one active option.
+The earlier books 4–8 missing status is superseded.
 
-| Book | Exact title | Exact existing product mapping | Buy-option ID | Approved USD price | Play status (last verified) |
+| Book | Exact title | Product / entitlement lookup key | Verified buy-option ID | Verified US price | Verified Play status |
 | --- | --- | --- | --- | --- | --- |
-| 3 | څپو کې انځورونه | shelf_book_3 | buy (existing) | 2.99 | Exists; buy ACTIVE; US USD 2.99 AVAILABLE |
-| 4 | هېندارې او چینې | shelf_book_4 | buy (planned; not created) | 2.99 | Missing |
-| 5 | د زړه پر پاڼه مې انځور دی ګلاب | shelf_book_5 | buy (planned; not created) | 2.99 | Missing |
-| 6 | سيند په پرخه کې | shelf_book_6 | buy (planned; not created) | 2.99 | Missing |
-| 7 | دا ښار، هاغه غرونه | shelf_book_7 | buy (planned; not created) | 2.99 | Missing |
-| 8 | دلته ډېر لرې له غرونو | shelf_book_8 | buy (planned; not created) | 2.99 | Missing |
+| 3 | څپو کې انځورونه | shelf_book_3 | buy | USD 2.99 | ACTIVE; US AVAILABLE |
+| 4 | هېندارې او چینې | shelf_book_4 | buy | USD 2.99 | ACTIVE; US AVAILABLE |
+| 5 | د زړه پر پاڼه مې انځور دی ګلاب | shelf_book_5 | buy | USD 2.99 | ACTIVE; US AVAILABLE |
+| 6 | سيند په پرخه کې | shelf_book_6 | buy | USD 2.99 | ACTIVE; US AVAILABLE |
+| 7 | دا ښار، هاغه غرونه | shelf_book_7 | buy | USD 2.99 | ACTIVE; US AVAILABLE |
+| 8 | دلته ډېر لرې له غرونو | shelf_book_8 | buy | USD 2.99 | ACTIVE; US AVAILABLE |
 
-Product IDs are existing Shelf/RevenueCat mappings, not newly invented IDs.
-The missing products' buy-option IDs are planned creation values using the existing
-buy convention; they do not assert that those options already exist. Preserve
-shelf_book_3 and all existing products/options; never create duplicates.
-Regions and outstanding rights remain separate owner decisions. Existing US
-availability does not approve launch regions. Catalogue/price approval does not
-authorize release or enabling real checkout; automatic sync remains DEFERRED.
+All six options are legacy-compatible; multi-quantity is not enabled. All six
+have the same 174 explicit regions AVAILABLE, plus newRegionsConfig AVAILABLE.
+US prices were checked directly, not inferred from the screenshot or Shelf prices.
+Owner now approves keeping these existing 174 available regions for all six
+launch books, at USD 2.99 each. This is not worldwide coverage: AF and IR were
+absent from the verified explicit list. Product settings do not prove app-track
+distribution. No availability in AF/IR is claimed.
 
-## Next concrete owner action
+Fresh RevenueCat GETs verified the existing Shelf Play app appf83cd58c5c/package
+services.shelf.app in project projbbce26da. Every product is active, one-time,
+non-consumable, and attached alone to its matching same-named entitlement.
+Shelf's read-only database inventory maps each book to that exact product ID and
+USD 2.99 reference. Server verification requires the same product/entitlement key
+and a permanent entitlement. **No missing, duplicate or incorrect connection found.**
 
-Play Console → **Shelf (services.shelf.app)** → **Monetize with Play → Products →
-One-time products**: check **shelf_book_4** is absent, then prepare its draft:
-**هېندارې او چینې**, product **shelf_book_4**, Buy option **buy**, **USD 2.99**.
-Keep legacy compatibility enabled and multi-quantity disabled for permanent books.
-Leave launch regions/activation pending separate approval. If the product already
-exists, reuse it and check its mapping instead. Repeat for the other missing rows.
-Keep each existing RevenueCat product attached to its same-named entitlement.
-No app upload, publication, provider write or price change was performed here.
+| Book | RevenueCat product ID | RevenueCat entitlement ID |
+| --- | --- | --- |
+| 3 | prod03ffc5153f | entlb3d491e78e |
+| 4 | prodecb275eeea | entl2dfbb286c0 |
+| 5 | prod5fd4f31cc2 | entlaabc5a9b3a |
+| 6 | prodb325aa52b6 | entl06c6eb0bc9 |
+| 7 | prod2619318d70 | entl5061f62b7b |
+| 8 | prod4681d9138c | entl77a53b0648 |
 
-[Google one-time product guidance](https://support.google.com/googleplay/android-developer/answer/16430488).
-Shelf admin reference changes do not update Play; review prices/availability
-manually in Console. Google's localized checkout price remains authoritative.
+Evidence: /home/shelf/tmp/shelf-product-check-20261008/evidence.json (catalogue
+metadata only). Real checkout OFF; automatic sync DEFERRED / DISABLED.
+No credentials, provider products, prices, regions, mappings or database rows changed.
+No rebuild, deployment, purchase or broad tests; completed product creation is not reopened.
+
+## Owner-confirmed wording and approved regions — 8 October UTC / 7 October local
+
+Owner confirms book 3's placeholder name and description were corrected in Play
+Console following the recorded replacement: **څپو کې انځورونه** / **Full book in
+your Shelf Library.** Status: OWNER-CONFIRMED, not independently reread.
+Owner approves retaining the verified existing 174 available regions for all six
+launch books and reaffirms USD 2.99 per book. AF/IR were absent from the verified
+explicit list; this is not worldwide coverage. No provider checks repeated.
+
+## Single next unfinished release task
+
+Owner: complete final rights clearance for the six selected books and included
+covers/fonts/images/audio, using the existing permissions and credits. This
+establishes permission to sell the selected catalogue; already recorded book 6
+permission and credits need not be recreated. Codex can organize existing evidence,
+but cannot supply or guess rights-holder permission. No upload/public release or
+real checkout is authorized. Product creation, mappings, prices, regions, book 3
+wording, production verification and AAB preparation are not reopened.
+
+Shelf admin reference changes do not update Play. Google's localized checkout
+price remains authoritative.
 
 ## Temporary permission removal — tracked, not done
 
@@ -80,8 +110,8 @@ is disabled until the exact product is returned, consent given and account ready
 The controller checks shelf_book_<book-id> before purchase; server consent checks
 publication/account eligibility, and independent server confirmation grants access.
 No purchase, acknowledgement, entitlement, refund or accounting logic changed.
-Missing Play products cannot supply checkout products; catalogue publication alone
-is not evidence of purchase availability.
+All six selected Play products now exist with verified mappings; catalogue
+publication alone is not evidence of end-to-end purchase availability.
 
 Manual mode blocks new sync intents, enqueue, retained jobs and direct sync;
 historical sync metadata remains untouched. Admin shows Manual and DEFERRED,
