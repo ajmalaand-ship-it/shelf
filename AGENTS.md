@@ -160,6 +160,16 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-08: Owner saved Shelf Android Play OAuth client in shelf-510123,
+  services.shelf.app, replacing SHA-1 C9:B6:1C:FA:91:58:B1:B5:D8:12:DC:29:C4:B2:02:E0:D7:43:DF:C3
+  with DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB,
+  reported copied from Play app-signing certificate; other clients unchanged.
+  Configuration OWNER-CONFIRMED, phone Google sign-in unverified. Preserve AAB
+  1.0.5 (14); no source/packaged config change requiring rebuild. Next: Codex
+  prepares listing/Data safety/privacy/support review; owner reviews/saves entries.
+  Records-only commit/push, .htaccess preserved; checkout OFF, no upload/release,
+  broad tests or repeated completed checks. See latest Master Record Part 10.
+
 - 2026-10-07 local / 8 October UTC: D16 rights clearance OWNER-CONFIRMED:
   permission to sell all six selected books through Shelf in approved 174 regions,
   including covers and any included audio. Evidence is owner chat confirmation;

@@ -82,11 +82,16 @@ again. Real checkout OFF; no public-launch approval.
 
 ## Single next unfinished release task
 
-Owner: add the Play app-signing SHA-1 to Shelf's existing Android OAuth client
-(project shelf-510123, package services.shelf.app), as required by Master Record
-D7. This enables Google sign-in in Play-signed installations. Codex can prepare
-instructions and verify afterward; no provider change performed here. Completed
-product/mapping/price/region/wording/rights and AAB preparation work stays closed.
+OAuth edit is owner-confirmed on 8 October: Shelf Android Play/services.shelf.app
+in shelf-510123 now uses DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB;
+other clients unchanged. This is configuration evidence, not phone sign-in evidence.
+See Master Record Part 10 for old/new fingerprints and preserved AAB 1.0.5 (14).
+
+Next: Codex prepares Play listing/Data safety/privacy/support review against
+implemented behavior; owner reviews/saves entries (Master Record Part 7 Step 5
+and Part 10 Required launch decisions/configuration). No upload or public release;
+checkout OFF. Completed catalogue/product/rights/OAuth edits and AAB preparation
+are not repeated; no rebuild required by this provider-side record change.
 
 Shelf admin reference changes do not update Play. Google's localized checkout
 price remains authoritative.

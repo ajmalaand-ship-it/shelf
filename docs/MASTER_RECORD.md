@@ -542,6 +542,35 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Android OAuth configuration owner-confirmed — 8 October 2026
+
+Owner saved Google Cloud project shelf-510123 → Android OAuth client
+**Shelf Android Play**, package **services.shelf.app**:
+- Previous SHA-1: C9:B6:1C:FA:91:58:B1:B5:D8:12:DC:29:C4:B2:02:E0:D7:43:DF:C3.
+- New SHA-1: DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB,
+  reported by owner as copied from Play's app-signing certificate.
+- Other OAuth clients unchanged, owner-confirmed.
+
+**Configuration change OWNER-CONFIRMED; successful Play-installed phone Google
+sign-in NOT VERIFIED.** Existing release evidence also records this new fingerprint
+as the upload certificate; no independent Play certificate comparison performed.
+Do not repeat the saved edit merely for status. No app/server source or packaged
+configuration changed; preserve verified AAB **1.0.5 (14)**, its checksum and source
+commit recorded below. No concrete rebuild requirement established.
+
+**Single next action: prepare the Play listing/Data safety/privacy/support review**
+(Part 7, Step 5; Part 10, Required launch decisions/configuration). Codex prepares
+accurate draft entries and checks them against implemented account, purchase,
+delete/retention and support behavior; owner reviews and saves Console entries.
+This makes the store disclosures and reader-facing listing consistent with Shelf.
+It does not authorize upload/publication; unresolved D14 financial expiry stays
+explicit rather than receiving an invented deadline. Earlier signing/OAuth edit
+next-action statements are superseded by this owner-confirmed change.
+
+Documentation-only commit/push. Real checkout OFF; automatic sync DEFERRED.
+No upload/public release, provider checks, rebuild, broad tests or repeated
+completed checks. Existing public/.htaccess preserved and excluded.
+
 ## D16 rights clearance owner-confirmed — 8 October UTC / 7 October local
 
 Owner confirms permission to sell all six selected books (IDs 3–8) through Shelf
