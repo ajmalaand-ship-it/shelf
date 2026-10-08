@@ -71,15 +71,22 @@ Owner approves retaining the verified existing 174 available regions for all six
 launch books and reaffirms USD 2.99 per book. AF/IR were absent from the verified
 explicit list; this is not worldwide coverage. No provider checks repeated.
 
+## D16 rights clearance — owner-confirmed
+
+Owner confirms permission to sell all six selected books through Shelf in the
+approved 174 regions, including covers and any included audio. This chat
+confirmation is the evidence; no supporting documents are invented. Catalogue,
+USD 2.99 starting prices and regions already approved. AF/IR absent from the
+verified explicit list; not worldwide coverage. Do not request this confirmation
+again. Real checkout OFF; no public-launch approval.
+
 ## Single next unfinished release task
 
-Owner: complete final rights clearance for the six selected books and included
-covers/fonts/images/audio, using the existing permissions and credits. This
-establishes permission to sell the selected catalogue; already recorded book 6
-permission and credits need not be recreated. Codex can organize existing evidence,
-but cannot supply or guess rights-holder permission. No upload/public release or
-real checkout is authorized. Product creation, mappings, prices, regions, book 3
-wording, production verification and AAB preparation are not reopened.
+Owner: add the Play app-signing SHA-1 to Shelf's existing Android OAuth client
+(project shelf-510123, package services.shelf.app), as required by Master Record
+D7. This enables Google sign-in in Play-signed installations. Codex can prepare
+instructions and verify afterward; no provider change performed here. Completed
+product/mapping/price/region/wording/rights and AAB preparation work stays closed.
 
 Shelf admin reference changes do not update Play. Google's localized checkout
 price remains authoritative.

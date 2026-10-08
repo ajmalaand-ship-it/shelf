@@ -160,6 +160,15 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-07 local / 8 October UTC: D16 rights clearance OWNER-CONFIRMED:
+  permission to sell all six selected books through Shelf in approved 174 regions,
+  including covers and any included audio. Evidence is owner chat confirmation;
+  no invented supporting documents or repeat confirmation. Catalogue, USD 2.99
+  starting prices and regions already approved; AF/IR absent, not worldwide.
+  Documentation-only commit/push; preserve .htaccess, no checks/rebuild/broad tests.
+  Real checkout OFF; no public-launch approval. Next release task: owner adds
+  Play app-signing SHA-1 to existing Shelf Android OAuth client (D7).
+
 - 2026-10-07 local / 8 October UTC: Owner confirms book 3 Play listing placeholder
   name/description corrected (owner-confirmed, not reread). Keeps the verified 174
   available regions for all six launch books and USD 2.99 each; not worldwide

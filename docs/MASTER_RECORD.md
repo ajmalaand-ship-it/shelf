@@ -536,11 +536,33 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 | D13 | Offline limits and storage clearing   | Open — Step 3/4. Current state: browsing the catalogue needs internet, so withdrawn or unpublished books are never shown from old saved data.                                                   |
 | D14 | Account deletion and data retention   | Policy approved 7 October; implementation/tested source below; financial expiry unresolved — Step 5                                                                                                                                                                                   |
 | D15 | App interface languages and wording   | Open — Step 3                                                                                                                                                                                   |
-| D16 | Launch catalogue                      | All six existing books IDs 3–8 selected; outstanding rights/regions separate — Step 5                                                                                                                                                                                   |
+| D16 | Launch catalogue                      | All six books IDs 3–8 selected; owner-confirmed sale rights including covers/any included audio in approved 174 regions; USD 2.99 starting prices — Step 5                                                                                                                                                                                   |
 | D17 | Samples                               | **Decided 27 Sep:** admin chooses each book’s free part; no fixed amount.                                                                                                                       |
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## D16 rights clearance owner-confirmed — 8 October UTC / 7 October local
+
+Owner confirms permission to sell all six selected books (IDs 3–8) through Shelf
+in the approved existing 174 regions, including their covers and any included
+audio. **D16 rights clearance: OWNER-CONFIRMED.** Evidence is this owner's chat
+confirmation; no supporting documents invented or independently verified.
+Catalogue selection, USD 2.99 starting prices and regions are already approved;
+AF/IR were absent from the verified explicit list, not worldwide coverage.
+Earlier requests for this same rights confirmation are superseded; do not repeat.
+
+**Next unfinished release task: Play signing/OAuth setup (owner).** Add the Play
+app-signing certificate SHA-1 to Shelf's existing Android OAuth client in Google
+Cloud project shelf-510123 for services.shelf.app, as required by D7. This enables
+Google sign-in for Play-signed installations. Owner performs the Console change;
+Codex can prepare instructions and subsequently verify the configuration. The
+existing upload-key certificate is not evidence that this step is complete.
+No provider change or upload authorized/performed by this record update.
+
+Documentation-only commit/push; public/.htaccess preserved and excluded. No repeat
+product checks, rebuild or broad tests. Real checkout OFF, automatic sync DEFERRED;
+rights confirmation is not public-launch approval.
 
 ## Manual-product decisions finalized — 8 October UTC / 7 October local
 
