@@ -160,6 +160,12 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-08: Owner authorized dedicated ordinary Google Play reviewer email/password
+  access to six launch books through audited complimentary grants, no purchases/
+  income/admin rights. Normal reader API focused checks and private credentials;
+  no Console-save or phone-access claim. Implemented 34799b8, staging/backed-up
+  promotion and API checks passed. Checkout OFF, sync DEFERRED; no Android rebuild.
+
 - 2026-10-08: Owner authorized bilingual Settings Privacy/Support links and
   copyable email fallback, accurate public search/request-log/RevenueCat disclosures,
   exact-category Data safety review, focused tests, staging/backed-up promotion and

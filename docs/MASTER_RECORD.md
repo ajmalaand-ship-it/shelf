@@ -542,6 +542,46 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Google Play reviewer access — 8 October 2026
+
+Owner authorized a dedicated ordinary email/password reader with complimentary
+reviewer access to six launch books. No existing reviewer account found.
+Created play-reviewer@shelf.services (reader 12), pre-verified and purchase-blocked;
+no users/admin identity or owner privileges. Six explicit reviewer_book_grants
+for books 3–8 record purpose, authorizing owner and grant time, with revocation
+field; independent of purchases, receipts and income. Other readers remain
+account-isolated. Existing server ownership checks and Library now include only
+that reader's unrevoked grants. Credentials stored privately, mode 0600, outside
+Git; password never printed into task output/documentation.
+
+Reversible migrations and source commit 34799b8 passed focused isolated/staged
+checks (21 tests, 301 assertions; no Flutter/broad suite), then identical-commit
+backed-up promotion, final verified backup /home/shelf/backups/shelf/20261008-075312/.
+Normal staging AND production HTTPS reader API: email/password login, verified
+profile, all six Library books/content lists, one non-sample full text per book,
+six covers and book 6 artwork passed; anonymous Library denied, test session
+revoked. Synthetic other-reader/no-grant/revocation/admin-route checks passed.
+No fake purchases/events/ledger/consents created; no real-reader data changed.
+
+First live staging checker hit existing 429 after excessive item requests;
+session revoked, scope narrowed and rate-limit window respected, then passed.
+First promotion history gate flagged the authorized new reader row and stopped
+with maintenance lifted. Read-only current SQL versus verified 074913 backup
+proved every original reader/token/purchase/ledger/agreement row identical;
+only reviewer 12 added. Same-commit completion subsequently passed history gate.
+A task-created Python cache was removed before completion; cPanel .htaccess
+unchanged. No Android rebuild/provider changes/launch. Checkout OFF, pricing sync
+DEFERRED; AAB 1.0.5 (14) preserved. Play Console access entry NOT saved/verified;
+physical-phone access NOT verified.
+
+Copy-ready app instructions: Choose English on first launch or from the Store
+language menu. Tap the person/account icon in Store. Use email/password Sign in
+with the supplied reviewer credentials (not Google sign-in or Create account).
+Return to My Library and tap Read book on any of the six books; open its contents
+and select a poem. All six books have complimentary full access; no registration,
+verification email, OTP or payment required. If the Library is loading, wait or
+pull down to refresh. Keep the password private and unchanged during review.
+
 ## Operator attribution correction; rating review stopped — 8 October 2026
 
 Privacy meta description changed from “published by Hindara” to “operated by
