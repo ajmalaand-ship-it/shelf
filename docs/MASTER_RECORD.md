@@ -542,6 +542,37 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Updated closed-testing Android AAB — 8 October 2026
+
+Owner authorized artifact preparation only, no upload/rollout/launch. Earlier
+verified 1.0.5 (14) predates Privacy/Support Settings; its artifact and SHA-256
+remain unchanged. No active build found; one signed production build completed
+from clean source `4d7457e3125aad48c94a89059504d379d552ca0d`, including staged mobile
+Privacy/Support release `4c3efd63b63242dfd5a6f7cdb924b74143dd6cbe`.
+Next unused version selected via build arguments: **1.0.6 (15)**; no mobile
+source or dependency lockfile change. Existing approved five launcher PNGs
+match build 14 byte-for-byte; no icon recreation.
+
+Private artifact (0600): `/home/shelf/apps/shelf/storage/app/private/owner-aabs/shelf-production-1.0.6-15-4d7457e-20261008-201550.aab`
+SHA-256: `169c7c125bac279def533fd935fa865932f9c1e9ee898d3f0302cb7a9f08d316`.
+Source/build/check evidence saved in matching private `.json`; build log:
+`/home/shelf/tmp/shelf-closed-aab-20261008/build.log`. Package `services.shelf.app`,
+compiled version/non-debuggable manifest, ZIP CRC, JAR signature and existing
+upload certificate SHA-256 `20:65:57:2E:CB:0F:17:4A:9E:66:96:02:23:2F:FC:EA:31:33:53:03:D3:FF:01:1C:AA:EB:72:16:FD:B6:9E:77` passed.
+Production endpoint `https://shelf.services/api/` and Privacy/Support Settings
+markers verified in every compiled libapp.so. Existing self-signed certificate/
+untrusted public chain and no-timestamp warnings retained; jar verified.
+
+Reused prior focused release and staged Privacy/Support evidence (10 Flutter
+tests plus staging identity); no broad suite or phone check repeated. Current
+source mobile tree equals deployed reviewer release 34799b8. Fresh read-only
+runtime confirms real purchases OFF, automatic sync disabled/DEFERRED; build
+omits internal-test checkout opt-in. Reviewer access and cPanel handler retained;
+no backend deployment, credentials/provider/data change. Build preparation has
+no blocker; native links/Play Google sign-in and other recorded phone acceptance
+remain unverified. No upload, closed-track rollout or public launch performed.
+
+
 ## Google Play reviewer access — 8 October 2026
 
 Owner authorized a dedicated ordinary email/password reader with complimentary
