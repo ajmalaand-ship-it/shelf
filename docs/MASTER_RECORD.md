@@ -529,18 +529,48 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 | D6  | App name and Android ID               | **Decided 27 Sep:** Shelf, services.shelf.app; slogan کتاب مو ژوند بدلوي.                                                                           |
 | D7  | Reader sign-in methods                | Open — Step 4                                                                                                                                                                                   |
 | D8  | Payment channels and territories      | Open — Step 4                                                                                                                                                                                   |
-| D9  | Prices and currencies                 | **Amended 7 Oct:** manual Play Console products/prices for first 100 books; automatic sync DEFERRED, not completed. USD 2.99 test approval retained for books 3–8.                                                                                                                                                                                   |
+| D9  | Prices and currencies                 | **Amended 7 Oct:** manual Play Console products/prices for first 100 books; automatic sync DEFERRED, not completed. USD 2.99 starting launch price approved for books 3–8; historical test approval preserved.                                                                                                                                                                                   |
 | D10 | Author and rights-holder agreements   | Decided 1 October 2026: owner sets per-book shares in admin; all six current books 100% net received to اجمل اند. See the addendum for book 6 permission and immutable agreement versions. |
 | D11 | Withdrawn books already bought        | Open — Step 4                                                                                                                                                                                   |
 | D12 | Refund handling                       | Open — Step 4                                                                                                                                                                                   |
 | D13 | Offline limits and storage clearing   | Open — Step 3/4. Current state: browsing the catalogue needs internet, so withdrawn or unpublished books are never shown from old saved data.                                                   |
 | D14 | Account deletion and data retention   | Policy approved 7 October; implementation/tested source below; financial expiry unresolved — Step 5                                                                                                                                                                                   |
 | D15 | App interface languages and wording   | Open — Step 3                                                                                                                                                                                   |
-| D16 | Launch catalogue                      | Open — Step 5                                                                                                                                                                                   |
+| D16 | Launch catalogue                      | All six existing books IDs 3–8 selected; outstanding rights/regions separate — Step 5                                                                                                                                                                                   |
 | D17 | Samples                               | **Decided 27 Sep:** admin chooses each book’s free part; no fixed amount.                                                                                                                       |
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## Initial launch catalogue and starting prices approved — 8 October UTC / 7 October local
+
+Owner selects **all six existing books, IDs 3–8**, for the initial launch catalogue
+(D16 catalogue selection decided). Owner approves **USD 2.99 per book as the
+current starting launch price**, with individual prices changeable later (D9).
+This supersedes the earlier test-only price limitation for these six books;
+historical test transactions, price approvals and financial snapshots remain
+unchanged. Regions and outstanding rights requirements remain separate decisions.
+Selection does not certify rights or authorize public release/real checkout.
+
+Read-only live Shelf inventory at 00:39:22 UTC confirms all six references already
+USD 2.99, canonical shelf_book_3 through shelf_book_8 and existing Published state.
+No supported admin price alignment was necessary; no book/admin/data save occurred.
+Author credits, agreements and purchase history unchanged. Real checkout=false,
+automatic sync enabled=false/deferred=true. No rebuild, deployment or broad tests.
+Fresh read-only Play oneTimeProducts list returned HTTP 503; stopped without
+retry, provider write or pricing diagnostic. Therefore product existence remains
+**last verified 7 October 20:10:10 UTC**, not freshly confirmed: shelf_book_3 exists
+with buy option buy, books 4–8 missing. The single current checklist is
+`docs/MANUAL_PLAY_PRODUCTS.md`; missing products use existing canonical mappings,
+with planned buy-option ID buy explicitly marked as not yet created.
+
+Next concrete owner action: in Play Console → Shelf/services.shelf.app → One-time
+products, check shelf_book_4 is still absent, then prepare its draft using the
+checklist title, product ID shelf_book_4, buy option buy and approved USD 2.99.
+Reuse existing products if present; no duplicate. Regions/activation remain pending
+separate approval. Follow the same checklist for other missing launch products.
+Preserve shelf_book_3 and existing RevenueCat entitlements. No launch/upload or
+real payment authorized; financial retention and deferred acceptance remain open.
 
 ## Production Android AAB prepared — 8 October 2026 UTC (7 October local)
 

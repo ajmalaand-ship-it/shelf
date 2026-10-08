@@ -12,48 +12,47 @@ in Play Console. Automatic sync **DEFERRED / NOT COMPLETED**, disabled; stop
 Shelf admin records the approved USD reference; Google supplies checkout prices.
 No products/prices/availability or permissions changed by this task.
 
-## One owner checklist
+## One owner checklist — selected launch books 3–8
 
-Verified 7 October 2026, 20:10:10 UTC: production read-only database transaction
-and complete paginated Play oneTimeProducts GET for services.shelf.app.
-All six books Published, none deleted. Play list contains only shelf_book_3.
-All are **paid with free samples**, not free books. USD 2.99 is the recorded
-owner-approved **test** price, not a new real-sales approval.
+Owner approves all six existing books for initial launch at **USD 2.99 each**;
+individual prices may change later. All are paid books with free samples.
+Shelf references verified 8 October 00:39:22 UTC already equal USD 2.99; no admin
+save needed. Credits, agreements, purchase history and mappings are unchanged.
 
-| Book ID | Exact catalogue title | Free/paid | Existing Shelf/RevenueCat product mapping | Approved test price | Play exists? |
+**Play status last verified 7 October 2026, 20:10:10 UTC.** Fresh read-only list on
+8 October returned HTTP 503; no retry/write. Check Console before creating anything.
+
+| Book | Exact title | Exact existing product mapping | Buy-option ID | Approved USD price | Play status (last verified) |
 | --- | --- | --- | --- | --- | --- |
-| 3 | څپو کې انځورونه | Paid; free sample | shelf_book_3 | USD 2.99 | Yes; buy ACTIVE; US USD 2.99 AVAILABLE; legacy-compatible |
-| 4 | هېندارې او چینې | Paid; free sample | shelf_book_4 | USD 2.99 | No |
-| 5 | د زړه پر پاڼه مې انځور دی ګلاب | Paid; free sample | shelf_book_5 | USD 2.99 | No |
-| 6 | سيند په پرخه کې | Paid; free sample | shelf_book_6 | USD 2.99 | No |
-| 7 | دا ښار، هاغه غرونه | Paid; free sample | shelf_book_7 | USD 2.99 | No |
-| 8 | دلته ډېر لرې له غرونو | Paid; free sample | shelf_book_8 | USD 2.99 | No |
+| 3 | څپو کې انځورونه | shelf_book_3 | buy (existing) | 2.99 | Exists; buy ACTIVE; US USD 2.99 AVAILABLE |
+| 4 | هېندارې او چینې | shelf_book_4 | buy (planned; not created) | 2.99 | Missing |
+| 5 | د زړه پر پاڼه مې انځور دی ګلاب | shelf_book_5 | buy (planned; not created) | 2.99 | Missing |
+| 6 | سيند په پرخه کې | shelf_book_6 | buy (planned; not created) | 2.99 | Missing |
+| 7 | دا ښار، هاغه غرونه | shelf_book_7 | buy (planned; not created) | 2.99 | Missing |
+| 8 | دلته ډېر لرې له غرونو | shelf_book_8 | buy (planned; not created) | 2.99 | Missing |
 
-These are existing mappings, **not proposed IDs**. No extra book or product ID
-is proposed. Preserve shelf_book_3 and all mappings. There is no missing title,
-ID or test-price decision for book 4. Territories and final launch prices/catalogue
-are not newly approved here; retain the existing owner-only testing boundary.
-Play availability in every reader country is not established by a US listing.
+Product IDs are existing Shelf/RevenueCat mappings, not newly invented IDs.
+The missing products' buy-option IDs are planned creation values using the existing
+buy convention; they do not assert that those options already exist. Preserve
+shelf_book_3 and all existing products/options; never create duplicates.
+Regions and outstanding rights remain separate owner decisions. Existing US
+availability does not approve launch regions. Catalogue/price approval does not
+authorize release or enabling real checkout; automatic sync remains DEFERRED.
 
-## Next missing paid product — owner steps
+## Next concrete owner action
 
-1. Play Console → Shelf (services.shelf.app) → Monetize with Play → Products →
-   One-time products → Create product. First check that shelf_book_4 is still absent.
-2. Product ID **shelf_book_4**; title **هېندارې او چینې**; description may be
-   “Full book in your Shelf Library.” This short listing description is proposed,
-   not book source text. Create a **Buy** purchase option, ID **buy**, with legacy
-   compatibility enabled and multi-quantity disabled. It is a permanent book unlock.
-3. Set approved test price **USD 2.99**. Review Google's local prices and the
-   existing intended test regions; save and activate the Buy option for testing.
-   Keep the app on owner-only internal testing; use only test payment methods.
-4. In RevenueCat, check existing shelf_book_4 product is attached to the existing
-   shelf_book_4 entitlement. Keep IDs unchanged. In Shelf, check availability and
-   Google’s localized checkout price before a sandbox purchase.
+Play Console → **Shelf (services.shelf.app)** → **Monetize with Play → Products →
+One-time products**: check **shelf_book_4** is absent, then prepare its draft:
+**هېندارې او چینې**, product **shelf_book_4**, Buy option **buy**, **USD 2.99**.
+Keep legacy compatibility enabled and multi-quantity disabled for permanent books.
+Leave launch regions/activation pending separate approval. If the product already
+exists, reuse it and check its mapping instead. Repeat for the other missing rows.
+Keep each existing RevenueCat product attached to its same-named entitlement.
+No app upload, publication, provider write or price change was performed here.
 
-Console guidance: [Google one-time products](https://support.google.com/googleplay/android-developer/answer/16430488),
-[product creation](https://support.google.com/googleplay/android-developer/answer/1153481).
-Publishing/withdrawal or price changes require a manual Console availability/price
-review; an admin save does not do it. Existing buyers retain server-verified access.
+[Google one-time product guidance](https://support.google.com/googleplay/android-developer/answer/16430488).
+Shelf admin reference changes do not update Play; review prices/availability
+manually in Console. Google's localized checkout price remains authoritative.
 
 ## Temporary permission removal — tracked, not done
 
@@ -92,8 +91,7 @@ No schema or scripted data change; cPanel handler and prior uncommitted records
 are preserved. Focused tests: 52 tests, 375 assertions in isolated checkout.
 Staging/promotion evidence is recorded separately after actual deployment.
 
-Next separate construction: production-mode purchase verification and sale
-recording behind disabled controls (Step 4 / §6.4); current implementation is
-sandbox-only. No real-payment activation approved. D14 retention still needs
-owner policy. Second-phone restore and final phone/launch/recovery acceptance
-remain separate pre-release checks, not passed. Steps 4 and 5 stay open.
+Production verification/release purchase support and the production AAB are
+prepared; do not reopen that construction. D14 financial retention remains
+unresolved; live provider erasure and targeted phone/launch/recovery acceptance
+remain unverified/deferred. Steps 4 and 5 remain open; real checkout OFF.
