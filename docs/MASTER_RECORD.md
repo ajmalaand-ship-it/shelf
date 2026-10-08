@@ -542,6 +542,34 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Play listing/Data safety preparation complete — 8 October 2026
+
+Signing correction: owner saved Shelf Android Play/services.shelf.app in
+shelf-510123 with **BE:61:2C:CD:0B:79:68:E3:AA:1E:2A:C7:E6:CF:B8:CB:61:8F:DE:24**,
+from Play “App signing key — In use”; owner-provided Google Cloud screenshot
+confirms exact fingerprint and “OAuth client saved”. Owner-confirmed configuration,
+not successful Play-phone sign-in. DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB
+is the upload certificate; earlier instruction/record using it for Play signing
+was incorrect and is superseded. Original C9:B6 certificate role remains unknown.
+Other clients unchanged; preserve verified AAB 1.0.5 (14), no rebuild now.
+
+[PLAY_RELEASE_REVIEW.md](PLAY_RELEASE_REVIEW.md) provides copy-ready listing,
+source/SDK-grounded Data safety table, official guidance and precise policy gaps.
+Anonymous HTTPS GETs at 05:05:24 UTC: privacy and account/delete 200; candidate
+support URL 404, not an existing support page. Existing support email retained.
+Missing in-app privacy access/support contact, policy search/request-log disclosure,
+RevenueCat purchase analytics and updated date identified, not fixed/deployed here.
+Financial retention remains unresolved. Sharing selections require existing
+processor/integration facts; target age/developer identity/copy approval remain
+owner inputs. No completed catalogue/rights/price/region/product work reopened.
+
+**Next concrete owner action:** approve the scoped privacy/support correction task
+specified in the review (in-app links/contact and accurate public disclosures).
+Codex implements only in that next approved task. Preparation completed, not final
+Console submission or compliance/phone acceptance. Documentation-only commit/push;
+no provider edits, upload, rebuild, deployment or broad tests. Checkout OFF;
+automatic sync DEFERRED; existing cPanel .htaccess preserved and excluded.
+
 ## Android OAuth configuration owner-confirmed — 8 October 2026
 
 Owner saved Google Cloud project shelf-510123 → Android OAuth client

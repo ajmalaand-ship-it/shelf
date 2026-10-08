@@ -160,6 +160,16 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+- 2026-10-08 correction: Shelf Android Play/services.shelf.app saved with
+  BE:61:2C:CD:0B:79:68:E3:AA:1E:2A:C7:E6:CF:B8:CB:61:8F:DE:24 from Play
+  App signing key — In use; owner-provided Cloud screenshot confirms saved value.
+  DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB is upload cert;
+  earlier instruction/record was incorrect. C9:B6 role unknown. Phone sign-in
+  unverified; other clients unchanged, AAB 1.0.5 (14) preserved. Listing/Data safety/
+  privacy/support preparation completed in docs/PLAY_RELEASE_REVIEW.md. Policy/
+  in-app disclosure gaps recorded, financial retention unresolved. Records-only
+  commit/push; no provider edits/upload/rebuild/deployment/broad tests. Checkout OFF.
+
 - 2026-10-08: Owner saved Shelf Android Play OAuth client in shelf-510123,
   services.shelf.app, replacing SHA-1 C9:B6:1C:FA:91:58:B1:B5:D8:12:DC:29:C4:B2:02:E0:D7:43:DF:C3
   with DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB,

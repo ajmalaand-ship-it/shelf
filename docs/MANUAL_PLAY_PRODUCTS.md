@@ -82,16 +82,12 @@ again. Real checkout OFF; no public-launch approval.
 
 ## Single next unfinished release task
 
-OAuth edit is owner-confirmed on 8 October: Shelf Android Play/services.shelf.app
-in shelf-510123 now uses DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB;
-other clients unchanged. This is configuration evidence, not phone sign-in evidence.
-See Master Record Part 10 for old/new fingerprints and preserved AAB 1.0.5 (14).
-
-Next: Codex prepares Play listing/Data safety/privacy/support review against
-implemented behavior; owner reviews/saves entries (Master Record Part 7 Step 5
-and Part 10 Required launch decisions/configuration). No upload or public release;
-checkout OFF. Completed catalogue/product/rights/OAuth edits and AAB preparation
-are not repeated; no rebuild required by this provider-side record change.
+Corrected OAuth certificate and completed release listing/Data safety preparation:
+see [PLAY_RELEASE_REVIEW.md](PLAY_RELEASE_REVIEW.md). BE:61:2C:CD:0B:79:68:E3:AA:1E:2A:C7:E6:CF:B8:CB:61:8F:DE:24
+is owner-confirmed Play app-signing SHA-1; DA:24 is upload SHA-1, earlier record
+incorrect. No certificate role inferred for C9:B6. Phone sign-in unverified.
+AAB 1.0.5 (14) preserved. Next owner action: approve scoped privacy/support fixes
+identified by the review; no repeat product checks or provider edits. Checkout OFF.
 
 Shelf admin reference changes do not update Play. Google's localized checkout
 price remains authoritative.
