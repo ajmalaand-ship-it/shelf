@@ -27,9 +27,9 @@ adult-only material. The six launch titles are general poetry collections, not
 specifically written for children. Children's books may be offered later. No
 adults-only restriction or specific Play age-group selections have been approved.
 These are owner-confirmed facts, not a completed content rating or child-safety
-certification. Responsible developer identity is settled; the existing policy
-meta description “published by Hindara” still needs alignment to Ajmal Aand in a
-later authorized website correction. No website change in this task.
+certification. Public privacy metadata and visible operator text now identify
+Ajmal Aand (focused staging/backed-up promotion c618814, 8 October). Historical
+author/publisher credits were not changed.
 
 **One launch recommendation (not owner-approved or submitted): 13–15, 16–17,
 18 and over.** Existing evidence shows a text-heavy, searchable general poetry
@@ -70,10 +70,11 @@ and accurately describe purchases and sharing features; no rating guessed here.
   finding, not automatically required merely because the app has no ads. No age
   screen/parental consent implementation is claimed from existing evidence.
 
-Next concrete owner action: review the six launch books/media against the IARC
-content-rating questionnaire and provide the actual content answers for the
-release draft, without submitting Console changes. This advances rating evidence
-without repeating the settled broad audience/identity questions.
+Content-rating preparation is incomplete; owner stopped the assistant content
+review and cancelled its remaining questions on 8 October. The owner will handle
+Google Play’s actual questionnaire directly. No content answers/rating approved
+or submitted; no poetry edited, removed or restricted. See
+[IARC_CONTENT_RATING_WORKSHEET.md](IARC_CONTENT_RATING_WORKSHEET.md).
 
 ## Copy-ready English listing
 

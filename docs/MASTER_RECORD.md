@@ -542,6 +542,24 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## Operator attribution correction; rating review stopped — 8 October 2026
+
+Privacy meta description changed from “published by Hindara” to “operated by
+Ajmal Aand”; visible text states Shelf is operated personally by Ajmal Aand.
+Historical book/author/publisher credits unchanged. Commit c618814 passed isolated
+and staged PrivacySupportTest (1 test, 17 assertions; no mobile/broad suite), then
+identical-commit promotion with verified backup
+/home/shelf/backups/shelf/20261008-063229/. Existing financial/deletion policy,
+reader/purchase/ledger/agreement history and cPanel .htaccess preserved.
+
+Owner stopped the poem-by-poem review and cancelled remaining questions.
+[IARC_CONTENT_RATING_WORKSHEET.md](IARC_CONTENT_RATING_WORKSHEET.md) is INCOMPLETE;
+no proposed content classifications approved/submitted or assistant interpretations
+recorded as owner-confirmed facts. Owner will handle actual Play questionnaire
+directly. No poetry edited, removed or restricted. Any-age intent preserved;
+age selections unapproved. Checkout OFF, pricing sync DEFERRED; no build or launch.
+AAB 1.0.5 (14) unchanged; prior mobile additions still need a later replacement build.
+
 ## Part 10 release review — owner identity/audience and technical evidence, 8 October 2026
 
 OWNER-CONFIRMED: Shelf is operated personally by Ajmal Aand; no registered business
