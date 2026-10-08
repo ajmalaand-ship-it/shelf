@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Privacy Policy for Shelf, published by Hindara.">
+    <meta name="description" content="Privacy Policy for Shelf, operated by Ajmal Aand.">
     <title>Privacy Policy — Shelf</title>
     <style>
         :root {
@@ -119,6 +119,7 @@
             <p class="updated">Last updated: October 8, 2026</p>
         </header>
 
+        <p>Shelf is operated personally by Ajmal Aand.</p>
         <p>Shelf is a bookstore and reader. You can browse books and read approved samples without an account.</p>
         <h2>Reader account information</h2>
         <p>We keep your email address, optional display name, sign-in method, email-verification time and account timestamps. For authentication we store a password hash when you use a password, a hashed Google sign-in identifier when linked, and hashed, expiring sign-in and email-action tokens. We never store plaintext passwords or Google ID tokens. Google profile photos, contacts, date of birth, address and phone number are not collected.</p>

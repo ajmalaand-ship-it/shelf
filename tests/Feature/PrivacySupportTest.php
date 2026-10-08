@@ -8,6 +8,9 @@ class PrivacySupportTest extends TestCase
     public function test_policy_discloses_search_provider_processing_and_unresolved_retention(): void
     {
         $this->get('/privacy')->assertOk()
+            ->assertSee('Privacy Policy for Shelf, operated by Ajmal Aand.')
+            ->assertSee('Shelf is operated personally by Ajmal Aand.')
+            ->assertDontSee('published by Hindara')
             ->assertSee('October 8, 2026')->assertSee('search queries')
             ->assertSee('purchase analytics')->assertSee('Shelf reader identifier')
             ->assertSee('Financial retention is still under review')

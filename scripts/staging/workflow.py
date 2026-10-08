@@ -275,7 +275,9 @@ def checked(app, commit, initial=False):
         test_env['SHELF_PHP_TEST_FILTER'] = 'PrivacySupportTest'
         test_env['SHELF_MOBILE_TEST_SCOPE'] = 'privacy-support'
         with log.open('w') as output:
-            result = subprocess.run(['bash', 'scripts/run_tests.sh', '--mobile'], cwd=app,
+            mobile_changed = any(path.startswith('mobile/') for path in code_changes)
+            args = ['bash', 'scripts/run_tests.sh'] + (['--mobile'] if mobile_changed else [])
+            result = subprocess.run(args, cwd=app,
                                     stdout=output, stderr=subprocess.STDOUT, env=test_env)
         if result.returncode:
             raise RuntimeError('Staged privacy/support checks failed; private log: ' + str(log))
@@ -287,12 +289,13 @@ def checked(app, commit, initial=False):
         with urllib.request.urlopen(req, timeout=20) as response:
             policy = response.read()
             assert response.status == 200 and b'purchase analytics' in policy and b'search queries' in policy
+            assert b'operated by Ajmal Aand' in policy and b'published by Hindara' not in policy
         state = current_state()
         state.update(staging_commit=commit, checks={'commit': commit, 'passed': True,
-            'checked_at': datetime.now(timezone.utc).isoformat(), 'mobile_tests': True,
+            'checked_at': datetime.now(timezone.utc).isoformat(), 'mobile_tests': mobile_changed,
             'scope': 'privacy-support', 'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
         save_state(state)
-        print('PASS: focused privacy/support and language checks, staged policy and HTTPS isolation.', flush=True)
+        print('PASS: focused privacy/support checks (mobile only if changed), staged policy and HTTPS isolation.', flush=True)
         return
     d14_audit_scope = {'app/Filament/Resources/Sales/SaleResource.php', 'scripts/staging/workflow.py',
                        'docs/MASTER_RECORD.md', 'docs/D14_DATA_POLICY.md', 'AGENTS.md'}
