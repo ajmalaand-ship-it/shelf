@@ -60,31 +60,23 @@ zero; maintenance runs at 03:45. No reader was deleted, RevenueCat written, key
 changed or unrelated job removed during activation. Final release/evidence lives
 in `release-state.json`; later focused corrections preserve this activation.
 
-## Current provider configuration blocker
+## Provider metadata permission verified — 8 October UTC / 7 October local
 
-Read-only comparison on resume: existing project/webhook GET = HTTP 200;
+Owner saved Customer information → Read only on the existing V2 key. One repeat
 GET `https://api.revenuecat.com/v2/projects/projbbce26da/customers/{numeric_reader_id}/attributes`
-= HTTP 403 explicitly naming `customer_information:customers:read`. No attributes
-or secrets displayed; no provider writes, permission or credential changes.
-This is unrelated to deferred Play price synchronization.
+at 00:13:34 UTC returned HTTP 200 with expected list shape. The former read-scope
+403 blocker is resolved; no secrets/attributes displayed, write probe, credential
+change or customer deletion. Zero unfinished/eligible deletion jobs exist, so
+there is no approved pending cleanup to drain. Existing 03:45 worker remains.
 
-Owner action: RevenueCat → **Shelf (projbbce26da)** → **Project Settings → API keys**
-→ existing **V2 configuration key** used by Shelf (server reference
-`SHELF_REVENUECAT_V2_SECRET_KEY_PATH`, private file
-`/home/shelf/secrets/revenuecat-v2-secret-key.txt`) → **Customer information → Read only**.
-Add only `customer_information:customers:read`; preserve current scopes.
-The key's dashboard label is not recorded; do not guess or create a replacement.
-If editing existing permissions is unavailable, report that limitation and stop.
-[Official key documentation](https://www.revenuecat.com/docs/projects/authentication)
-describes creation/revocation, not a confirmed in-place editing procedure.
-[Endpoint documentation](https://www.revenuecat.com/docs/api-v2/customer) confirms
-the exact minimum read scope. No V2 write scope or broad administrator grant is needed.
-
-The existing V1 verifier performs null-attribute removal after that pure read;
-no V2 write grant or duplicate webhook/new key is required by this implementation.
-Actual metadata erasure of a live/deleted reader is not claimed as verified.
-D14 remains partially complete: externally blocked metadata cleanup, reviewed
-immutable-metadata exceptions and unresolved financial expiry remain open.
+The approved implementation reads attributes with V2
+`customer_information:customers:read`, removes mutable attributes using existing
+V1 POST `/v1/subscribers/{reader_id}/attributes` null values, and verifies by V2
+read-back. No additional scope is established as necessary; V2 read_write is not
+used. Actual provider erasure remains unverified until genuine approved deleted-
+reader work exists. Immutable metadata is held for reviewed resolution; never
+remove whole-customer purchase/refund history. Financial expiry remains unresolved.
+Prior focused tests reused, real checkout OFF, automatic Play sync DEFERRED.
 
 ## Retention and operation
 

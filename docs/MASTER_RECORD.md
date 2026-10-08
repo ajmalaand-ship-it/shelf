@@ -542,6 +542,49 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 # Part 10 — Current status
 
+## D14 metadata read permission verified — 8 October 2026 UTC (7 October local)
+
+Owner saved Customer information → Read only on the existing V2 key. One repeat
+of the previously denied customer-attributes GET at 00:13:34 UTC returned HTTP
+200 with the expected paginated-list shape. Existing credential reused; no
+customer data/secrets displayed or provider write/customer deletion performed.
+**Metadata read permission blocker RESOLVED.** Earlier 403 entries are historical.
+Read-only database counts: zero unfinished provider-deletion jobs and zero jobs
+eligible for deleted-reader cleanup. Nothing needs draining now. The deployed
+approved worker can read metadata and uses the existing separate V1 credential
+for POST `/v1/subscribers/{reader_id}/attributes` null-value removal, then V2
+read-back. No additional permission is established as necessary; no write probe
+was performed. Real provider erasure remains unverified until a genuine approved
+deletion creates eligible work. Immutable metadata, if encountered, still requires
+review; whole-customer deletion remains prohibited. Financial expiry unresolved;
+D14 is not declared fully complete. Real checkout=false, Play sync deferred=true.
+Prior 89 PHP / 656 assertions and 25 backup checks reused; no suite/deployment.
+
+Prioritized remaining work (supersedes historical construction recommendations):
+1. **Construction/release preparation:** no newly established generic purchase,
+   accounting, deletion-journal or backup-code gap. Prepare/validate the implemented
+   production-mode Android artifact in a separately approved task, with real
+   checkout OFF and internal-test checkout opt-in absent. Installed app does not
+   yet contain this release-mode source. Financial-expiry implementation waits for
+   an owner policy; do not invent or apply a log/backup deadline to money records.
+2. **Required launch decisions/configuration:** D16 final books/rights and final
+   prices/regions (USD 2.99 is test-only); manually complete selected Play products
+   (last verified shelf_book_3 exists, 4–8 absent), exact RevenueCat mappings;
+   signing/OAuth, listing/Data safety/privacy/support review; confirm removal of
+   only four temporary account-level Play grants, preserving app access; separately
+   approved old-app retirement. Owner launch approval must precede gate enablement.
+3. **Deferred targeted acceptance/operations:** release-app reading/real Word import,
+   remaining offline/account isolation/withdrawal/UX checks, second-phone restore
+   DEFERRED / NOT PASSED, actual backup alert delivery and full replacement-host
+   cutover. Actual production-event delivery and real purchase/refund/acknowledgement
+   acceptance await separately approved launch testing. Completed sandbox/refund,
+   isolated recovery and October 7 automatic backup evidence must not be repeated
+   merely for status. Automatic price sync stays DEFERRED, outside this queue.
+
+Recommended next task: prepare and validate the production Android release
+artifact behind the disabled real-sale gate, without uploading or launching.
+Steps 4 and 5 remain open; no new app build or launch work performed here.
+
 ## D14 owner approval — 7 October 2026 (latest)
 
 Approved: confirmed deletion removes profile/access, retaining necessary purchase,

@@ -46,7 +46,9 @@ OneDrive implementation/evidence is deployed at 5f75fa0. First unattended run
 failed 4 October at 07:32:19 UTC after upload. Recorded automatic recovery on
 7 October completed at 07:32:37 UTC with recovery_verified=true; independently
 rechecked on D14 resume without rerunning recovery. D14 implementation e387b36
-is staged and promoted; metadata read permission remains externally blocked,
+is staged and promoted. Owner granted existing V2 Customer information Read only;
+one metadata GET passed HTTP 200 at 8 October 00:13:34 UTC (7 October local).
+No eligible cleanup jobs exist; actual provider erasure remains unverified,
 financial expiry unresolved and D14 not fully complete.
 Step 5 / 6.11 repair deployed at c887f91: absolute MariaDB daemon path,
 safe failure stages and original-error preservation on alert failure. See the
