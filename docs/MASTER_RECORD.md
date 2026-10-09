@@ -579,6 +579,56 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Corrected Review 3 Shelf Test phone APK — 9 October 2026
+
+Owner authorized build-only preparation from latest clean development source
+**a66864e0f128bb0f137a65bdb72f021cca4553c2** (a66864e), including correction
+**340142b43cd42047e7bd76c0718ce1904ca87768** (340142b). No newer work was
+omitted. Immutable git-archive source and disposable build workspace; version
+supplied through build arguments, no source/pubspec/lockfile changes.
+
+**Artifact:** Shelf Test **1.0.10 (19)**, services.shelf.app.staging,
+https://staging.shelf.services/api/. Next unused code 19 confirmed against retained
+staging APK versions 12/13/16/17/18. Exact private path:
+`/home/shelf/staging-runtime/storage/app/private/test-apks/shelf-review-3-corrected-test-1.0.10-19-340142b-20261009-234648.apk`
+SHA-256 `576419c4f4b3758276675493a49a81f3d59eeaaa825d77a53fa1d749d1e1657f`; **62350628 bytes**, mode 0600,
+matching private JSON evidence. Same verified signing certificate SHA-256
+2065572ecb0f174a9e669602232ffcea31335303d3ff011caaeb7216fdb69e77
+as Shelf Test build 18; same package and increasing code enable in-place update
+without uninstalling or clearing data. Actual installed data retention remains
+pending owner phone observation. Existing Play Shelf stays separate.
+
+**Packaged checks passed:** release signature, manifest version/label/package,
+non-debuggable mode, ZIP CRC; staging endpoint/Test banner in every native app
+library; compiled exact **د لوست سیټینګ** with old phrase absent; localized
+untitled-poem accessibility labels, poetry action asset and local-script digit
+mapping; all 84 original logo/action PNGs byte-identical, original three fonts,
+pagination/pinned previews and native avatar channel. Manifest launcher points
+to supplied Shelf mark plus red Test badge; all **20 retained launcher density
+PNGs** match original alpha/visible pixels and adaptive background/foreground/
+monochrome references resolve. Android shrank unreferenced round-icon resources
+and optimized invisible transparent RGB values; verification accounts for these
+without rebuilding or changing the mark. Actual titled/untitled distinction and
+display-only digit behavior use completed unchanged-source test evidence.
+
+**Evidence reused:** 39 focused correction Flutter tests + 1 staging-identity
+test, required PHP smoke 1 test / 17 assertions, scoped analysis no issues;
+no unrelated suite repeated. Reused correction-log SHA-256
+f6450997169f639afc6c38547256d135a5cf18942d71c97c4105669c133adfb1.
+Build/verification scripts/logs: /home/shelf/tmp/shelf-review3-corrected-apk-20261009/.
+Task build workspace cleaned, including any recreated task Gradle cache; secrets
+stay private. Master Record updated additively, newer/unrelated records preserved.
+
+**Pending/boundaries:** corrected Android phone acceptance PENDING, iOS validation
+NOT VERIFIED, second/cover-photo purpose pending clarification. Staging backend
+remains 9a748ef; no backend deployment/migration, production AAB, store upload,
+production setting/data/source change or transaction. Checkout OFF; pricing sync
+DEFERRED/disabled and second-phone restore owner-deferred. Next: download this APK
+into Windows Downloads\Shelf-Review-3, update Shelf Test in place and review the
+four corrections, retained settings/positions and existing previews/photo controls.
+Then a separately authorized Google Play test-track update; public Android
+release stays held for complete/accepted iOS and owner-approved joint launch.
+
 ## Review 3 focused owner-feedback correction — 9 October 2026
 
 Owner authorized four source-only corrections, continuing latest development
