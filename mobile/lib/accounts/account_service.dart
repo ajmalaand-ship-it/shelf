@@ -15,17 +15,20 @@ class ReaderAccount {
     required this.verified,
     required this.method,
     this.name,
+    this.hasAvatar = false,
   });
   factory ReaderAccount.fromJson(Map<String, dynamic> json) => ReaderAccount(
     id: json['id'] as int,
     email: json['email'] as String,
     name: json['name'] as String?,
+    hasAvatar: json['has_avatar'] == true,
     verified: json['email_verified'] as bool,
     method: json['sign_in_method'] as String,
   );
   final int id;
   final String email;
   final String? name;
+  final bool hasAvatar;
   final bool verified;
   final String method;
 }

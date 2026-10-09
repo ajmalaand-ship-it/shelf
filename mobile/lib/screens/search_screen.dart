@@ -1,3 +1,5 @@
+import '../widgets/shelf_assets.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -125,7 +127,7 @@ class _SearchScreenState extends State<SearchScreen> {
           onChanged: (_) => _schedule(),
           decoration: InputDecoration(
             labelText: AppStrings.of(context).searchHint,
-            prefixIcon: Icon(Icons.search),
+            prefixIcon: ShelfActionIcon('search'),
           ),
         ),
         const SizedBox(height: 16),
@@ -186,9 +188,11 @@ class _SearchScreenState extends State<SearchScreen> {
         const SizedBox(height: 24),
         if (_hasQuery && !_loading && !_failed && _results.isNotEmpty)
           SectionTitle(
-            AppStrings.of(context).isEnglish
-                ? 'Search results (${_results.length})'
-                : 'د لټون پایلې (${_results.length})',
+            AppStrings.of(context).choose(
+              'Search results (${_results.length})',
+              'د لټون پایلې (${_results.length})',
+              'نتایج جستجو (${_results.length})',
+            ),
           ),
         if (_loading)
           const Center(child: CircularProgressIndicator())
@@ -205,17 +209,6 @@ class _SearchScreenState extends State<SearchScreen> {
             ownerPreview: widget.navigation.ownerPreview,
             onTap: (b) => widget.navigation.openBook(context, b.slug),
           ),
-        if (!_loading && !_failed) ...[
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(AppStrings.of(context).searchHint),
-          ),
-        ],
       ],
     );
   }

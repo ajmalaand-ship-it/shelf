@@ -1,3 +1,5 @@
+import '../widgets/shelf_assets.dart';
+
 import 'package:flutter/material.dart';
 
 import 'reader_settings.dart';
@@ -49,7 +51,7 @@ class ReadingPreferences extends StatelessWidget {
                       tooltip: MaterialLocalizations.of(context)
                           .closeButtonTooltip,
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
+                      icon: const ShelfActionIcon('close'),
                     ),
                   ],
                 ),
@@ -77,9 +79,11 @@ class ReadingPreferences extends StatelessWidget {
                         vertical: 8,
                       ),
                       child: Text(
-                        strings.isEnglish
-                            ? 'Books change your life'
-                            : 'کتاب مو ژوند بدلوي',
+                        strings.choose(
+                          'Books change your life',
+                          'کتاب مو ژوند بدلوي',
+                          'کتاب زندگی شما را تغییر می‌دهد',
+                        ),
                         key: const Key('reading-live-preview-text'),
                         maxLines: 1,
                         softWrap: false,
@@ -103,7 +107,11 @@ class ReadingPreferences extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          strings.isEnglish ? 'Reading mode' : 'د لوست بڼه',
+                          strings.choose(
+                            'Reading mode',
+                            'د لوست بڼه',
+                            'شیوهٔ خواندن',
+                          ),
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
@@ -117,10 +125,16 @@ class ReadingPreferences extends StatelessWidget {
                                 selected: settings.readingMode == mode,
                                 label: Text(
                                   mode == ReadingMode.scroll
-                                      ? (strings.isEnglish
-                                            ? 'Scroll'
-                                            : 'پرله‌پسې لوست')
-                                      : (strings.isEnglish ? 'Pages' : 'پاڼې'),
+                                      ? (strings.choose(
+                                          'Scroll',
+                                          'پرله‌پسې لوست',
+                                          'خواندن پیوسته',
+                                        ))
+                                      : (strings.choose(
+                                          'Pages',
+                                          'پاڼې',
+                                          'صفحه‌ها',
+                                        )),
                                 ),
                                 labelStyle: TextStyle(
                                   color: settings.readingMode == mode
@@ -141,9 +155,11 @@ class ReadingPreferences extends StatelessWidget {
                           children: [
                             IconButton.filledTonal(
                               key: const Key('font-size-decrease'),
-                              tooltip: strings.isEnglish
-                                  ? 'Smaller text'
-                                  : 'کوچنۍ لیکنه',
+                              tooltip: strings.choose(
+                                'Smaller text',
+                                'کوچنۍ لیکنه',
+                                'متن کوچک‌تر',
+                              ),
                               onPressed:
                                   settings.fontSize <=
                                       ReaderSettings.minimumFontSize
@@ -165,9 +181,11 @@ class ReadingPreferences extends StatelessWidget {
                             ),
                             IconButton.filledTonal(
                               key: const Key('font-size-increase'),
-                              tooltip: strings.isEnglish
-                                  ? 'Larger text'
-                                  : 'لویه لیکنه',
+                              tooltip: strings.choose(
+                                'Larger text',
+                                'لویه لیکنه',
+                                'متن بزرگ‌تر',
+                              ),
                               onPressed:
                                   settings.fontSize >=
                                       ReaderSettings.maximumFontSize
@@ -246,7 +264,11 @@ class ReadingPreferences extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          strings.isEnglish ? 'Page color' : 'د پاڼې رنګ',
+                          strings.choose(
+                            'Page color',
+                            'د پاڼې رنګ',
+                            'رنگ صفحه',
+                          ),
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 12),

@@ -1,3 +1,5 @@
+import '../widgets/shelf_assets.dart';
+
 import 'dart:io';
 import 'dart:async';
 
@@ -431,17 +433,20 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
         _restoreScroll(shape);
         return details;
       }
-      final english = AppStrings.of(context).isEnglish;
       final next = _adjacent(1), previous = _adjacent(-1);
       final boundary =
           poem.hasMore && !widget.ownedMode && !widget.ownerPreviewMode
-          ? (english
-                ? 'Sample — full section locked'
-                : 'نمونه — بشپړه برخه تړلې ده')
+          ? (AppStrings.of(context).choose(
+              'Sample — full section locked',
+              'نمونه — بشپړه برخه تړلې ده',
+              'نمونه — بخش کامل قفل است',
+            ))
           : next != null && !_canEnter(next)
-          ? (english
-                ? 'Next section unavailable'
-                : 'بله برخه اوس نه شي لوستل کېدای')
+          ? (AppStrings.of(context).choose(
+              'Next section unavailable',
+              'بله برخه اوس نه شي لوستل کېدای',
+              'بخش بعدی در دسترس نیست',
+            ))
           : null;
       final scale = MediaQuery.textScalerOf(context);
       final boundaryPainter =
@@ -516,7 +521,6 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
     animation: widget.settings,
     builder: (context, _) {
       final colors = ReaderPaletteColors.forPalette(widget.settings.palette);
-      final english = AppStrings.of(context).isEnglish;
       return Scaffold(
         backgroundColor: colors.background,
         appBar: AppBar(
@@ -534,7 +538,8 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
               : null,
           actions: [
             IconButton(
-              tooltip: english ? 'Share' : 'شریکول',
+              tooltip: AppStrings.of(context)
+                  .choose('Share', 'شریکول', 'اشتراک‌گذاری'),
               key: const Key('reader-share'),
               onPressed:
                   !_valid ||
@@ -550,13 +555,15 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
                         ),
                       ),
                     ),
-              icon: const Icon(Icons.ios_share_rounded),
+              icon: ShelfActionIcon(
+                'share',
+                dark: widget.settings.palette == ReaderPalette.dark,
+              ),
             ),
-            IconButton(
-              tooltip: AppStrings.of(context).readingPreferences,
+            ShelfFontButton(
               key: const Key('reader-font-chooser'),
               onPressed: () => showReadingPreferences(context, widget.settings),
-              icon: const Icon(Icons.text_fields_rounded),
+              dark: widget.settings.palette == ReaderPalette.dark,
             ),
           ],
         ),
@@ -567,21 +574,34 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
             ? null
             : SafeArea(
                 top: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  child: TextButton(
-                    key: const Key('reader-contents'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: colors.foreground,
+                child: ColoredBox(
+                  color: colors.foreground.withValues(alpha: .055),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
                     ),
-                    onPressed: () {
-                      unawaited(_save());
-                      Navigator.maybePop(context);
-                    },
-                    child: Text(AppStrings.of(context).contents),
+                    child: TextButton(
+                      key: const Key('reader-contents'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: colors.foreground,
+                      ),
+                      onPressed: () {
+                        unawaited(_save());
+                        Navigator.maybePop(context);
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ShelfActionIcon(
+                            "contents",
+                            dark: widget.settings.palette == ReaderPalette.dark,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(AppStrings.of(context).contents),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -594,12 +614,16 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
                   padding: const EdgeInsets.all(8),
                   child: Text(
                     _saveFailed
-                        ? (english
-                              ? 'Reading position could not be saved.'
-                              : 'د لوست ځای خوندي نه شو.')
-                        : (english
-                              ? 'Book text changed. This section starts again.'
-                              : 'متن بدل شوی؛ دا برخه له پیله لوستل کېږي.'),
+                        ? (AppStrings.of(context).choose(
+                            'Reading position could not be saved.',
+                            'د لوست ځای خوندي نه شو.',
+                            'موقعیت خواندن ذخیره نشد.',
+                          ))
+                        : (AppStrings.of(context).choose(
+                            'Book text changed. This section starts again.',
+                            'متن بدل شوی؛ دا برخه له پیله لوستل کېږي.',
+                            'متن کتاب تغییر کرده است. این بخش از آغاز خوانده می‌شود.',
+                          )),
                     key: const Key('reading-position-notice'),
                     style: TextStyle(color: colors.foreground),
                   ),
@@ -612,9 +636,11 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
                     child: !_valid
                         ? Center(
                             child: Text(
-                              english
-                                  ? 'Return to Contents and check book access.'
-                                  : 'لړلیک ته ستانه شئ او د کتاب لاسرسی وګورئ.',
+                              AppStrings.of(context).choose(
+                                'Return to Contents and check book access.',
+                                'لړلیک ته ستانه شئ او د کتاب لاسرسی وګورئ.',
+                                'به فهرست برگردید و دسترسی کتاب را بررسی کنید.',
+                              ),
                               key: const Key('reader-access-changed'),
                               style: TextStyle(color: colors.foreground),
                             ),
@@ -866,7 +892,8 @@ class _AudioPlayerPanel extends StatelessWidget {
 
       return Semantics(
         container: true,
-        label: 'د شعر غږ',
+        label: AppStrings.of(context)
+            .choose('Book audio', 'د شعر غږ', 'صدای کتاب'),
         child: DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(color: colors.muted.withValues(alpha: 0.35)),
@@ -879,11 +906,16 @@ class _AudioPlayerPanel extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.graphic_eq_rounded, color: colors.muted),
+                    ShelfActionIcon(
+                      'audio',
+                      dark: colors.background.computeLuminance() < .3,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        poem.audioLabel ?? 'د شعر غږ',
+                        poem.audioLabel ??
+                            AppStrings.of(context)
+                                .choose('Book audio', 'د شعر غږ', 'صدای کتاب'),
                         style: TextStyle(color: colors.muted),
                       ),
                     ),
@@ -892,7 +924,11 @@ class _AudioPlayerPanel extends StatelessWidget {
                 if (state == AudioControlState.error) ...[
                   const SizedBox(height: 10),
                   Text(
-                    controller.errorMessage ?? 'غږ ونه غږېد.',
+                    AppStrings.of(context).choose(
+                      'Could not play audio. Try again.',
+                      controller.errorMessage ?? 'غږ ونه غږېد.',
+                      'صدا پخش نشد. دوباره کوشش کنید.',
+                    ),
                     key: const Key('audio-error'),
                     style: TextStyle(color: colors.foreground),
                   ),
@@ -900,8 +936,8 @@ class _AudioPlayerPanel extends StatelessWidget {
                     alignment: AlignmentDirectional.centerStart,
                     child: TextButton.icon(
                       onPressed: () => controller.retry(poem),
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('بيا هڅه وکړئ'),
+                      icon: const ShelfActionIcon('refresh'),
+                      label: Text(AppStrings.of(context).retry),
                     ),
                   ),
                 ] else ...[
@@ -925,7 +961,11 @@ class _AudioPlayerPanel extends StatelessWidget {
                     children: [
                       IconButton.filledTonal(
                         key: const Key('audio-play-pause'),
-                        tooltip: playing ? 'تم' : 'غږول',
+                        tooltip: playing
+                            ? AppStrings.of(context)
+                                  .choose('Pause', 'تم', 'توقف')
+                            : AppStrings.of(context)
+                                  .choose('Play', 'غږول', 'پخش'),
                         onPressed: loading
                             ? null
                             : () => controller.toggle(poem),
@@ -954,7 +994,8 @@ class _AudioPlayerPanel extends StatelessWidget {
                       if (active && controller.cacheProgress != null)
                         Text(
                           controller.cacheProgress! >= 1
-                              ? 'ساتل شوی'
+                              ? AppStrings.of(context)
+                                    .choose('Saved', 'ساتل شوی', 'ذخیره‌شده')
                               : '${(controller.cacheProgress! * 100).round()}٪',
                           key: const Key('audio-cache-status'),
                           style: TextStyle(color: colors.muted),
@@ -1004,9 +1045,12 @@ class _ReaderError extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('شعر ترلاسه نه شو.', style: TextStyle(color: color)),
+        Text(AppStrings.of(context).error, style: TextStyle(color: color)),
         const SizedBox(height: 12),
-        OutlinedButton(onPressed: onRetry, child: const Text('بيا هڅه وکړئ')),
+        OutlinedButton(
+          onPressed: onRetry,
+          child: Text(AppStrings.of(context).retry),
+        ),
       ],
     ),
   );

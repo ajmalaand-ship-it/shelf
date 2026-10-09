@@ -12,6 +12,7 @@ class ShareCardRequest {
     required this.text,
     required this.theme,
     this.fontFamily = 'Vazirmatn',
+    this.fontSize = 20,
   });
 
   final PoemDetail poem;
@@ -20,6 +21,7 @@ class ShareCardRequest {
   final String text;
   final ShareCardTheme theme;
   final String fontFamily;
+  final double fontSize;
 }
 
 class ShareCardPage {

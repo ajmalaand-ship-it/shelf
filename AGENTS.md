@@ -163,6 +163,16 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-09: Shelf Review 3 authorized on latest isolated Review 2 branch:
+  supplied bilingual logo/action icons; interface languages پښتو، دری، English;
+  pinned live share preview; Contents footer; localized font names/minimum 16;
+  سیټینګ; private account-avatar upload/replace/remove; duplicate search hint removal.
+  Existing English/LTR account and purchase policy retained. Cover/second-photo
+  purpose pending clarification; no public profile. Focused checks and records;
+  no production deployment/live migration/release build/store upload/transaction.
+  Checkout OFF, pricing sync and second-phone restore deferred; latest Master
+  Record's binding Android/iOS joint-launch amendment remains authoritative.
+
 - 2026-10-08 authorization, implementation continued 9 October: Owner approved
   Figma Review 2 https://www.figma.com/design/NVSrbPa6eJJVUfIK3vdUeJ?node-id=7-5.
   Shared Flutter Store, Book details, My Library, Search, Reader and Reading

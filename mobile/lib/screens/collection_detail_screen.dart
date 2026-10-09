@@ -1,3 +1,4 @@
+import '../widgets/shelf_assets.dart';
 import '../accounts/account_controller.dart';
 import '../accounts/account_screen.dart';
 import '../purchases/library_controller.dart';
@@ -65,16 +66,15 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
         toolbarHeight:
             56 * MediaQuery.textScalerOf(context).scale(1).clamp(1, 2),
         title: Text(
-          AppStrings.of(context).isEnglish ? 'Book details' : 'د کتاب په اړه',
+          AppStrings.of(context)
+              .choose('Book details', 'د کتاب په اړه', 'دربارهٔ کتاب'),
           maxLines: 2,
         ),
         actions: [
-          IconButton(
-            tooltip: AppStrings.of(context).readingPreferences,
+          ShelfFontButton(
             key: const Key('collection-font-chooser'),
             onPressed: () =>
                 showReadingPreferences(context, widget.readerSettings),
-            icon: const Icon(Icons.text_fields_rounded),
           ),
         ],
       ),
@@ -147,12 +147,14 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                                   : samples.first,
                               resume: true,
                             ),
-                      icon: const Icon(Icons.menu_book_outlined),
+                      icon: const ShelfActionIcon('read-sample'),
                       label: Text(
                         widget.ownedMode
-                            ? (AppStrings.of(context).isEnglish
-                                  ? 'Read book'
-                                  : 'کتاب ولولئ')
+                            ? (AppStrings.of(context).choose(
+                                'Read book',
+                                'کتاب ولولئ',
+                                'خواندن کتاب',
+                              ))
                             : AppStrings.of(context).readSample,
                       ),
                     ),
@@ -207,17 +209,23 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                           LibraryScope.of(context) == null
                               ? AppStrings.of(context).buySoon
                               : LibraryScope.of(context)!.owns(book.id)
-                              ? (AppStrings.of(context).isEnglish
-                                    ? 'Open owned book'
-                                    : 'پېرودل شوی کتاب پرانیزئ')
+                              ? (AppStrings.of(context).choose(
+                                  'Open owned book',
+                                  'پېرودل شوی کتاب پرانیزئ',
+                                  'باز کردن کتاب خریداری‌شده',
+                                ))
                               : LibraryScope.of(context)!.checkoutAvailable !=
                                     true
-                              ? (AppStrings.of(context).isEnglish
-                                    ? 'Purchases unavailable'
-                                    : 'پېرودنه اوس نشته')
-                              : (AppStrings.of(context).isEnglish
-                                    ? 'Buy book'
-                                    : 'کتاب وپېرئ'),
+                              ? (AppStrings.of(context).choose(
+                                  'Purchases unavailable',
+                                  'پېرودنه اوس نشته',
+                                  'خرید در دسترس نیست',
+                                ))
+                              : (AppStrings.of(context).choose(
+                                  'Buy book',
+                                  'کتاب وپېرئ',
+                                  'خرید کتاب',
+                                )),
                         ),
                       ),
                   ],
@@ -476,13 +484,15 @@ class _PoemTile extends StatelessWidget {
                   ? const Key('owner-preview-poem-status')
                   : null,
             ),
-      trailing: Icon(
-        (ownerPreviewMode ? !poem.isFreeSample : poem.locked)
-            ? Icons.lock_outline_rounded
-            : Icons.menu_book_rounded,
-        semanticLabel: (ownerPreviewMode ? !poem.isFreeSample : poem.locked)
+      trailing: Semantics(
+        label: (ownerPreviewMode ? !poem.isFreeSample : poem.locked)
             ? AppStrings.of(context).locked
             : AppStrings.of(context).free,
+        child: ShelfActionIcon(
+          (ownerPreviewMode ? !poem.isFreeSample : poem.locked)
+              ? 'locked'
+              : 'read-sample',
+        ),
       ),
     ),
   );

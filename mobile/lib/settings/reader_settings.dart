@@ -23,7 +23,7 @@ class ReaderSettings extends ChangeNotifier {
   static const _fontKey = 'reader.font';
   static const _fontSizeKey = 'reader.font_size';
   static const defaultFontSize = 16.0;
-  static const minimumFontSize = 18.0;
+  static const minimumFontSize = 16.0;
   static const maximumFontSize = 38.0;
 
   final SharedPreferences _preferences;

@@ -105,7 +105,7 @@ class PoemCardWidget extends StatelessWidget {
                           style: TextStyle(
                             color: palette.foreground,
                             fontFamily: request.fontFamily,
-                            fontSize: 20,
+                            fontSize: request.fontSize,
                             height: 2,
                           ),
                         ),

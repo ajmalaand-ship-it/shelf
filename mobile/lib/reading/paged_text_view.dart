@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
+import '../widgets/shelf_assets.dart';
 import '../settings/reader_palette_colors.dart';
 import 'text_pages.dart';
 
@@ -72,7 +73,6 @@ class _PagedTextViewState extends State<PagedTextView> {
 
   @override
   Widget build(BuildContext context) {
-    final english = AppStrings.of(context).isEnglish;
     return Directionality(
       textDirection: widget.direction,
       child: Column(
@@ -141,120 +141,132 @@ class _PagedTextViewState extends State<PagedTextView> {
           ),
           ConstrainedBox(
             constraints: BoxConstraints(maxHeight: widget.footerLimit),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.boundary != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        widget.boundary!,
-                        key: const Key('reading-boundary'),
-                        style: TextStyle(
-                          color: widget.colors.muted,
-                          fontFamily: 'Vazirmatn',
-                          fontSize: 14,
-                          height: 1.5,
+            child: ColoredBox(
+              color: widget.colors.foreground.withValues(alpha: .055),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.boundary != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          widget.boundary!,
+                          key: const Key('reading-boundary'),
+                          style: TextStyle(
+                            color: widget.colors.muted,
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            key: const Key('page-previous'),
+                            constraints: const BoxConstraints(
+                              minWidth: 48,
+                              minHeight: 48,
+                            ),
+                            tooltip: AppStrings.of(context).choose(
+                              'Previous page',
+                              'مخکینۍ پاڼه',
+                              'صفحهٔ قبلی',
+                            ),
+                            color: widget.colors.foreground,
+                            onPressed: index > 0 || widget.previousItem != null
+                                ? () => turn(-1)
+                                : null,
+                            icon: ShelfActionIcon(
+                              'back',
+                              directional: true,
+                              dark:
+                                  widget.colors.background.computeLuminance() <
+                                  .3,
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (index > 0)
+                                  Text(
+                                    index == 0
+                                        ? ''
+                                        : '$index / ${widget.pages.length}',
+                                    key: const Key('item-page-number'),
+                                    textDirection: index == 0
+                                        ? widget.direction
+                                        : TextDirection.ltr,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: widget.colors.muted,
+                                      fontFamily: 'Vazirmatn',
+                                      fontSize: 13,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                TextButton(
+                                  key: const Key('reader-contents'),
+                                  onPressed: widget.onContents,
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: widget.colors.foreground,
+                                    minimumSize: const Size(48, 48),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 8,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    AppStrings.of(context).contents,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontFamily: 'Vazirmatn',
+                                      fontSize: 14,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            key: const Key('page-next'),
+                            constraints: const BoxConstraints(
+                              minWidth: 48,
+                              minHeight: 48,
+                            ),
+                            tooltip: AppStrings.of(context)
+                                .choose('Next page', 'بله پاڼه', 'صفحهٔ بعدی'),
+                            color: widget.colors.foreground,
+                            onPressed:
+                                index < widget.pages.length ||
+                                    widget.nextItem != null
+                                ? () => turn(1)
+                                : null,
+                            icon: ShelfActionIcon(
+                              'back',
+                              directional: true,
+                              reverse: true,
+                              dark:
+                                  widget.colors.background.computeLuminance() <
+                                  .3,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          key: const Key('page-previous'),
-                          constraints: const BoxConstraints(
-                            minWidth: 48,
-                            minHeight: 48,
-                          ),
-                          tooltip: english ? 'Previous page' : 'مخکینۍ پاڼه',
-                          color: widget.colors.foreground,
-                          onPressed: index > 0 || widget.previousItem != null
-                              ? () => turn(-1)
-                              : null,
-                          icon: Icon(
-                            widget.direction == TextDirection.rtl
-                                ? Icons.chevron_right
-                                : Icons.chevron_left,
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                index == 0
-                                    ? (english
-                                          ? 'Book details'
-                                          : 'د کتاب په اړه')
-                                    : '$index / ${widget.pages.length}',
-                                key: const Key('item-page-number'),
-                                textDirection: index == 0
-                                    ? widget.direction
-                                    : TextDirection.ltr,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: widget.colors.muted,
-                                  fontFamily: 'Vazirmatn',
-                                  fontSize: 13,
-                                  height: 1.5,
-                                ),
-                              ),
-                              TextButton(
-                                key: const Key('reader-contents'),
-                                onPressed: widget.onContents,
-                                style: TextButton.styleFrom(
-                                  foregroundColor: widget.colors.foreground,
-                                  minimumSize: const Size(48, 48),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 8,
-                                  ),
-                                ),
-                                child: Text(
-                                  AppStrings.of(context).contents,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontFamily: 'Vazirmatn',
-                                    fontSize: 14,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          key: const Key('page-next'),
-                          constraints: const BoxConstraints(
-                            minWidth: 48,
-                            minHeight: 48,
-                          ),
-                          tooltip: english ? 'Next page' : 'بله پاڼه',
-                          color: widget.colors.foreground,
-                          onPressed:
-                              index < widget.pages.length ||
-                                  widget.nextItem != null
-                              ? () => turn(1)
-                              : null,
-                          icon: Icon(
-                            widget.direction == TextDirection.rtl
-                                ? Icons.chevron_left
-                                : Icons.chevron_right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

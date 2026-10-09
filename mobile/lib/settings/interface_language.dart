@@ -1,7 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum InterfaceLanguage { ps, en }
+enum InterfaceLanguage { ps, en, dari }
+
+extension InterfaceLanguageName on InterfaceLanguage {
+  String get label => switch (this) {
+    InterfaceLanguage.ps => "پښتو",
+    InterfaceLanguage.dari => "دری",
+    InterfaceLanguage.en => "English",
+  };
+  String get localeTag => this == InterfaceLanguage.dari ? "fa-AF" : name;
+}
 
 /// Interface preference only: book language and source text are never changed.
 class InterfaceLanguageSettings extends ChangeNotifier {

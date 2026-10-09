@@ -572,12 +572,65 @@ build, deployment, purchase, provider setting change or release.
 | D12 | Refund handling                       | Open — Step 4                                                                                                                                                                                   |
 | D13 | Offline limits and storage clearing   | Open — Step 3/4. Current state: browsing the catalogue needs internet, so withdrawn or unpublished books are never shown from old saved data.                                                   |
 | D14 | Account deletion and data retention   | Deletion/log/backup policy approved 7 October; financial policy approved 8 October: three years after relevant tax-return filing, scoped exceptions and minimum proof for continuing recovery rights. Financial expiry NOT IMPLEMENTED — Step 5                                                                                                                                                                                   |
-| D15 | App interface languages and wording   | Open — Step 3                                                                                                                                                                                   |
+| D15 | App interface languages and wording | **Decided 9 Oct Review 3:** پښتو، دری، English; Afghan Dari interface implemented in isolation; real-phone wording/layout acceptance pending. Existing account/purchase English policy retained. |
 | D16 | Launch catalogue                      | All six books IDs 3–8 selected; owner-confirmed sale rights including covers/any included audio in approved 174 regions; USD 2.99 starting prices — Step 5                                                                                                                                                                                   |
 | D17 | Samples                               | **Decided 27 Sep:** admin chooses each book’s free part; no fixed amount.                                                                                                                       |
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## Shelf Review 3 — isolated implementation, 9 October 2026
+
+**Owner-approved scope:** continue latest isolated Review 2 branch, including
+pagination c211167, pinned reading preview 6c9ef45 and build-17 records 29dd095.
+Use the supplied original bilingual logo/action assets and written requirements;
+Figma board 15:8 was accessible and inspected as a visual reference. No placeholder
+prices, book text/covers or logo were copied. ZIP integrity evidence was reused.
+
+**Implemented:** proportion-preserving light/dark Shelf / شیلف Store header;
+supplied action/inactive-navigation icons, directional RTL/LTR page controls and
+local-script font glyph with localized label; persisted interface choices
+پښتو، دری، English, with Afghan Dari bookstore/reader/settings/sharing translations.
+Source text and book direction stay independent of interface language. Existing
+owner-approved English/LTR account and purchase flows remain English/LTR.
+Font names use only the interface language, including نوی شهرزاد; minimum reading
+size is 16, preserving valid saved sizes; Pashto Settings is سیټینګ. Contents has
+a subtly distinct reader-footer background without the repeated Book details
+caption; real Book details remain reachable. Duplicate empty-search instruction
+removed. Both Review 2 pagination/anchors and pinned reading preview retained.
+Sharing preview remains above scrolling controls, updates font/size/colors/lines
+immediately, offers expanded viewing and keeps attribution and existing limits.
+Small-screen/enlarged-text export buttons use full width.
+
+**Private account avatar:** authenticated own-account upload/replacement/removal,
+private storage and no public URL/profile. Server validates JPEG/PNG/WebP up to
+2 MB/4096 pixels, re-encodes bounded JPEG without source metadata, removes replaced
+files and erases avatar files after confirmed account deletion. Resident photo
+clears on sign-out; late requests cannot repopulate another account. Reversible
+avatar-path migration is prepared in git, NOT applied live. Android picker uses
+the existing native channel pattern without broad media permissions. Proposed
+second/cover photo is PENDING PURPOSE CLARIFICATION, not implemented.
+
+**Evidence:** focused scripts/run_tests.sh --mobile, review-3 scope and temporary
+ReaderAvatarTest database: 97 Flutter checks plus 1 staging-identity check;
+4 avatar API tests / 35 assertions. Covers all three UI languages, dark/inactive
+assets, RTL/LTR arrows, 320-width text scales 1/2/3, short landscape, pinned live
+preview updates, original-font reflow/pagination/positions/access regressions,
+private cross-account denial, invalid uploads, replacement/removal and confirmed
+deletion. Flutter analysis: no errors; 58 existing style/warning notices remain
+(nonfatal policy). PHP syntax and git diff --check passed. Log:
+/home/shelf/tmp/shelf-review3-checks.log; synthetic local renders:
+/home/shelf/tmp/shelf-review3-renders/. These are not real-phone acceptance.
+
+**Remaining/boundaries:** Android native picker/device and all new UI phone review
+pending; iOS native avatar picker/build/device readiness NOT VERIFIED. Existing
+installed Shelf Test 1.0.8 (17) does not contain Review 3. No production deployment,
+live migration, release build, store upload, real transaction or main merge/push.
+Checkout OFF, pricing sync DEFERRED/disabled, second-phone restore owner-deferred
+and Android/iOS joint launch preserved. Newer records/unrelated edits retained.
+Next phone-review step requires separately authorized private staging of the
+avatar backend and a fresh separate Shelf Test APK; then review languages/logo,
+font names/16-size, both pinned previews, pagination/Contents and photo lifecycle.
 
 ## Paginated-reader Shelf Test update — 9 October 2026
 
@@ -1806,6 +1859,16 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 
 # Part 11 — Decision log
 
+- **9 October 2026 — owner-approved Shelf Review 3:** supplied original logo/icons,
+  Afghan Dari interface alongside پښتو and English, pinned live sharing controls,
+  Contents-only footer label, localized font names/minimum 16, سیټینګ, private
+  account avatar replacement/removal and removal of repeated search instruction.
+  This supersedes earlier two-language interface scope; account/purchase English
+  policy is retained. Second photo/cover purpose remains undecided. Isolated
+  implementation and focused checks/records only; no production deployment,
+  live migration, release build/upload or real transaction. Joint launch and
+  existing checkout/pricing/restore deferrals remain binding.
+
 - **8 October 2026 owner approval; implementation continued 9 October:** Figma
   Review 2, file NVSrbPa6eJJVUfIK3vdUeJ, board 7:5, approved at the URL above.
   Authorized shared Flutter implementation of Store, Book details, My Library,
@@ -1955,7 +2018,7 @@ These decisions remain binding except where superseded by later dated owner amen
 | D11 | Readers who bought a book keep it forever, even if the book is later withdrawn. New readers cannot buy a withdrawn book. |
 | D12 | All sales are final; Shelf gives no refunds except accidental duplicate purchases or a book that does not work (owner decides in the admin). Google Play's own 48-hour refund window cannot be disabled: if Google refunds, access is removed. Before buying, the reader ticks: "Read the free sample first. All sales are final. I agree." The admin shows refunds per reader and can block a reader from buying. |
 | D13 | Bought books can be downloaded and read offline. The app checks ownership with the server whenever it is online. An offline copy stays readable for at most 30 days without a successful check; after that the reader must go online once. A refunded or revoked book, and its downloaded copy, is removed at the next check. |
-| D15 | App interface languages: Pashto and English (Farsi later). Default Pashto, or English if the phone is set to English. Visible compact language dropdown in the Store header, a one-time choice on first launch, and the same option in Settings. English changes only the app's own words; books (reader, text, titles, author names, descriptions, contents, share cards) always stay right-to-left and unchanged. All account and purchase screens are always English and left-to-right. |
+| D15 | App interface languages and wording | **Decided 9 Oct Review 3:** پښتو، دری، English; Afghan Dari interface implemented in isolation; real-phone wording/layout acceptance pending. Existing account/purchase English policy retained. |
 | UX | Every screen must be friendly and clear for non-technical readers: obvious primary action, large touch targets, clear hierarchy, short plain text, helpful empty/error/loading states, no mixed-direction punctuation or clipped text, consistent with the Shelf look. |
 | Dev | Failing tests or build errors in Codex's own work-in-progress are normal development and are fixed without stopping. Codex stops and reports only when something fails on the live server or database, data could be lost or changed unexpectedly, a backup or rollback fails, or a fix would go beyond the approved task. |
 | Test app | Owner test builds are delivered the proven way: Codex builds an owner-preview APK with a fresh 7-day token and gives one scp download command. |

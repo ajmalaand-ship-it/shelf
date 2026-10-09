@@ -175,12 +175,12 @@ void main() {
             Offset(direction == TextDirection.ltr ? -1000 : 1000, 0),
           );
           await tester.pumpAndSettle();
-          expect(settings.fontSize, 18);
+          expect(settings.fontSize, 16);
           expectLivePreview();
           final restored = await ReaderSettings.load(prefs);
           expect(restored.font, ReaderFont.literary);
           expect(restored.palette, ReaderPalette.dark);
-          expect(restored.fontSize, 18);
+          expect(restored.fontSize, 16);
           // Close stays reachable even after scrolling to the final controls.
           await tester.ensureVisible(find.byKey(const Key('theme-dark')));
           await tester.pumpAndSettle();

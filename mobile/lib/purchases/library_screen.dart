@@ -1,3 +1,5 @@
+import '../widgets/shelf_assets.dart';
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
@@ -59,7 +61,7 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
     }
   }
 
-  String _t(String en, String ps) => AppStrings.of(context).isEnglish ? en : ps;
+  String _t(String en, String ps) => AppStrings.of(context).phrase(en, ps);
   @override
   Widget build(BuildContext context) {
     final c = LibraryScope.of(context)!;
@@ -75,7 +77,7 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
           padding: const EdgeInsets.all(20),
           children: [
             if (c.readerId == null) ...[
-              const Icon(Icons.local_library_outlined, size: 56),
+              const ShelfActionIcon('library', size: 56),
               Text(
                 AppStrings.of(context).libraryAccountMessage,
                 textAlign: TextAlign.center,
@@ -86,7 +88,9 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                   minimumSize: const Size.fromHeight(52),
                 ),
                 onPressed: () => openAccount(context),
-                child: const Text('Sign in / Create account'),
+                child: Text(
+                  '${AppStrings.of(context).signIn} / ${AppStrings.of(context).createAccount}',
+                ),
               ),
             ] else ...[
               Row(
@@ -119,7 +123,7 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                             c.refresh,
                             _t('Library refreshed.', 'کتابتون تازه شو.'),
                           ),
-                    icon: const Icon(Icons.refresh),
+                    icon: const ShelfActionIcon('refresh'),
                   ),
                 ],
               ),
@@ -156,11 +160,14 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
               if (message != null && !c.refreshFailed) Text(message!),
               if (c.message != null)
                 Text(
-                  _t(
+                  AppStrings.of(context).choose(
                     c.message!,
                     c.refreshFailed
                         ? 'کتابتون تازه نه شو. انټرنېټ ته وصل شئ او بیا هڅه وکړئ. کتاب بیا مه پېرئ.'
                         : 'د کتابونو د مالکیت کتلو لپاره انټرنېټ ته وصل شئ. لغوه شوي کتابونه او کاپۍ لرې کېږي.',
+                    c.refreshFailed
+                        ? 'کتابخانه تازه نشد. به انترنت وصل شوید و دوباره کوشش کنید. دوباره کتاب را نخرید.'
+                        : 'برای بررسی مالکیت کتاب‌ها به انترنت وصل شوید. کتاب‌ها و دانلودهای لغوشده حذف می‌شوند.',
                   ),
                 ),
               if (c.books.isEmpty && c.initialized)
@@ -233,7 +240,7 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                           ),
                           if (!c.downloaded.contains(book.id))
                             OutlinedButton.icon(
-                              icon: const Icon(Icons.download_outlined),
+                              icon: const ShelfActionIcon('download'),
                               onPressed: busy
                                   ? null
                                   : () => _perform(
@@ -254,7 +261,7 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                             ),
                           if (c.downloaded.contains(book.id))
                             TextButton.icon(
-                              icon: const Icon(Icons.delete_outline),
+                              icon: const ShelfActionIcon('remove-download'),
                               onPressed: busy
                                   ? null
                                   : () => _perform(

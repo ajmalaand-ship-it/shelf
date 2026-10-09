@@ -15,7 +15,7 @@ void main() {
   test(
     'saved font sizes, including the former default, are preserved',
     () async {
-      for (final savedSize in [18.0, 24.0, 32.0, 38.0]) {
+      for (final savedSize in [16.0, 17.0, 18.0, 24.0, 32.0, 38.0]) {
         SharedPreferences.setMockInitialValues({'reader.font_size': savedSize});
         final preferences = await SharedPreferences.getInstance();
         final settings = await ReaderSettings.load(preferences);
@@ -65,11 +65,11 @@ void main() {
     await settings.setFontSize(100);
     expect(settings.fontSize, 38);
     await settings.setFontSize(5);
-    expect(settings.fontSize, 18);
+    expect(settings.fontSize, 16);
   });
 
-  test('adjustable font-size range remains the established 18 to 38', () {
-    expect(ReaderSettings.minimumFontSize, 18);
+  test('adjustable font-size range remains the approved 16 to 38', () {
+    expect(ReaderSettings.minimumFontSize, 16);
     expect(ReaderSettings.maximumFontSize, 38);
   });
 }

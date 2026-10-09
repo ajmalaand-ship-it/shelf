@@ -49,11 +49,11 @@ void main() {
         expect(find.byType(NavigationBar), findsNothing);
         await tester.tap(
           find.byKey(
-            Key(
-              choice == InterfaceLanguage.en
-                  ? 'choose-english'
-                  : 'choose-pashto',
-            ),
+            Key(switch (choice) {
+              InterfaceLanguage.en => 'choose-english',
+              InterfaceLanguage.dari => 'choose-dari',
+              InterfaceLanguage.ps => 'choose-pashto',
+            }),
           ),
         );
         await tester.pumpAndSettle();
@@ -103,9 +103,9 @@ void main() {
         Directionality.of(tester.element(find.byType(NavigationBar))),
         TextDirection.ltr,
       );
-      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await tester.tap(find.byType(NavigationDestination).at(3));
       await tester.pumpAndSettle();
-      expect(find.text('English'), findsOneWidget);
+      expect(find.text('English'), findsWidgets);
       await tester.tap(find.text('Reading preferences'));
       await tester.pumpAndSettle();
       expect(find.text('Text size'), findsOneWidget);
@@ -125,7 +125,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      await tester.tap(find.byIcon(Icons.storefront_outlined));
+      await tester.tap(find.byType(NavigationDestination).at(0));
       await tester.pumpAndSettle();
       expect(find.text(AppStrings.allBooks), findsOneWidget);
       expect(header.hitTestable(), findsOneWidget);
@@ -153,10 +153,10 @@ void main() {
         find.text('Search by book title, subtitle or author.'),
         findsOneWidget,
       );
-      await tester.tap(find.byIcon(Icons.local_library_outlined));
+      await tester.tap(find.byType(NavigationDestination).at(2));
       await tester.pumpAndSettle();
       expect(find.text('Sign in'), findsOneWidget);
-      await tester.tap(find.byIcon(Icons.storefront_outlined));
+      await tester.tap(find.byType(NavigationDestination).at(0));
       await tester.pumpAndSettle();
       expect(find.text(collectionJson['title']! as String), findsOneWidget);
       await tester.tap(find.text(collectionJson['title']! as String));

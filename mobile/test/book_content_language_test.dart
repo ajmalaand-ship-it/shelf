@@ -133,6 +133,7 @@ void main() {
         expectSource(tester, find.text(subtitle), subtitle);
         expectSource(tester, find.text(name), name);
       }
+      await switchLanguage(tester, InterfaceLanguage.en);
       await tester.scrollUntilVisible(find.text('About the book'), 200);
       await tester.tap(find.text('About the book'));
       await tester.pumpAndSettle();

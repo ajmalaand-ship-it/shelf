@@ -74,7 +74,13 @@ if "$run_mobile"; then
     cd -- "$run_dir/mobile"
     echo "Running Flutter tests (--mobile requested)"
     mobile_args=()
-    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "purchases" ]]; then
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3" ]]; then
+        mobile_args=(test/review_3_test.dart test/avatar_account_test.dart test/interface_language_test.dart
+            test/reader_settings_test.dart test/reading_preferences_pinned_test.dart
+            test/text_pages_test.dart test/paginated_reader_test.dart test/book_content_language_test.dart
+            test/share_card_entry_test.dart test/share_card_widget_test.dart test/share_card_render_test.dart test/share_card_screen_test.dart test/share_card_paginator_test.dart)
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "purchases" ]]; then
         mobile_args=(test/book_purchases_test.dart test/library_ux_test.dart test/staging_identity_test.dart)
     elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "privacy-support" ]]; then
         mobile_args=(test/privacy_support_test.dart test/interface_language_test.dart)

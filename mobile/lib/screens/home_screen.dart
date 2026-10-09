@@ -1,3 +1,4 @@
+import '../widgets/shelf_assets.dart';
 import '../settings/privacy_support.dart';
 import '../accounts/account_controller.dart';
 import '../accounts/account_screen.dart';
@@ -115,35 +116,29 @@ class _HomeScreenState extends State<HomeScreen> {
     animation: widget.readerSettings,
     builder: (context, _) => Scaffold(
       appBar: AppBar(
-        title: Text(
-          [
-            AppStrings.of(context).appName,
-            AppStrings.of(context).search,
-            AppStrings.of(context).library,
-            AppStrings.of(context).settings,
-          ][_tab],
-        ),
+        title: _tab == 0
+            ? const ShelfLogo()
+            : Text(
+                [
+                  AppStrings.of(context).appName,
+                  AppStrings.of(context).search,
+                  AppStrings.of(context).library,
+                  AppStrings.of(context).settings,
+                ][_tab],
+              ),
         actions: [
           IconButton(
             key: const Key('store-account'),
             tooltip: AccountScope.of(context)?.user == null
-                ? 'Sign in / Create account'
-                : 'Signed in',
+                ? '${AppStrings.of(context).signIn} / ${AppStrings.of(context).createAccount}'
+                : AppStrings.of(context).account,
             onPressed: () => openAccount(context),
-            icon: Icon(
-              AccountScope.of(context)?.user == null
-                  ? Icons.person_outline
-                  : Icons.account_circle,
-            ),
+            icon: const ShelfActionIcon('account'),
           ),
-          if (_tab == 0)
-            const LanguageButton(key: Key('store-language-toggle')),
-          IconButton(
+          ShelfFontButton(
             key: const Key('home-font-chooser'),
-            tooltip: AppStrings.of(context).readingPreferences,
             onPressed: () =>
                 showReadingPreferences(context, widget.readerSettings),
-            icon: const Icon(Icons.text_fields_rounded),
           ),
         ],
       ),
@@ -152,19 +147,23 @@ class _HomeScreenState extends State<HomeScreen> {
         onDestinationSelected: (index) => setState(() => _tab = index),
         destinations: [
           NavigationDestination(
-            icon: Icon(Icons.storefront_outlined),
+            icon: ShelfActionIcon('store', inactive: true),
+            selectedIcon: ShelfActionIcon('store'),
             label: AppStrings.of(context).store,
           ),
           NavigationDestination(
-            icon: Icon(Icons.search),
+            icon: ShelfActionIcon('search', inactive: true),
+            selectedIcon: ShelfActionIcon('search'),
             label: AppStrings.of(context).search,
           ),
           NavigationDestination(
-            icon: Icon(Icons.local_library_outlined),
+            icon: ShelfActionIcon('library', inactive: true),
+            selectedIcon: ShelfActionIcon('library'),
             label: AppStrings.of(context).library,
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
+            icon: ShelfActionIcon('settings', inactive: true),
+            selectedIcon: ShelfActionIcon('settings'),
             label: AppStrings.of(context).settings,
           ),
         ],
@@ -216,6 +215,10 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(20),
         children: [
+          const Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: LanguageButton(key: Key('store-language-toggle')),
+          ),
           Text(
             snapshot.config.slogan,
             textAlign: TextAlign.start,
@@ -229,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
               alignment: AlignmentDirectional.centerStart,
             ),
             onPressed: () => setState(() => _tab = 1),
-            icon: const Icon(Icons.search),
+            icon: const ShelfActionIcon('search'),
             label: Text(AppStrings.of(context).searchHint),
           ),
           const SizedBox(height: 16),
@@ -347,7 +350,7 @@ class LibraryScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.local_library_outlined, size: 56),
+          ShelfActionIcon('library', size: 56),
           SizedBox(height: 20),
           Text(
             AccountScope.of(context)?.user == null
@@ -368,7 +371,7 @@ class LibraryScreen extends StatelessWidget {
             ),
             child: Text(
               AccountScope.of(context)?.user == null
-                  ? 'Sign in / Create account'
+                  ? '${AppStrings.of(context).signIn} / ${AppStrings.of(context).createAccount}'
                   : AppStrings.of(context).account,
             ),
           ),
@@ -387,7 +390,7 @@ class SettingsScreen extends StatelessWidget {
     children: [
       ListTile(
         key: const Key('settings-account'),
-        leading: const Icon(Icons.person_outline),
+        leading: const ShelfActionIcon('account'),
         title: Text(AppStrings.of(context).account),
         subtitle: Text(
           AccountScope.of(context)?.user?.email ??
@@ -398,17 +401,16 @@ class SettingsScreen extends StatelessWidget {
       ListTile(
         title: Text(AppStrings.of(context).interfaceLanguage),
         subtitle: Text(
-          InterfaceLanguageScope.of(context)?.isEnglish == true
-              ? AppStrings.english
-              : AppStrings.pashto,
+          (InterfaceLanguageScope.of(context)?.language ?? InterfaceLanguage.ps)
+              .label,
         ),
         trailing: const LanguageButton(key: Key('settings-language-toggle')),
       ),
       const PrivacySupportEntries(),
       ListTile(
-        leading: const Icon(Icons.menu_book_outlined),
+        leading: const ShelfActionIcon('read-sample'),
         title: Text(AppStrings.of(context).readingPreferences),
-        trailing: const Icon(Icons.chevron_left),
+        trailing: const ShelfActionIcon('back', directional: true),
         onTap: () => showReadingPreferences(context, settings),
       ),
     ],

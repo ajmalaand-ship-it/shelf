@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import 'account_controller.dart';
 import 'account_service.dart';
+import 'avatar_picker.dart';
 
 enum _AccountForm { login, register, forgot, password }
 
@@ -13,7 +14,11 @@ void openAccount(BuildContext context) =>
         .push(MaterialPageRoute<void>(builder: (_) => const AccountScreen()));
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+  const AccountScreen({
+    super.key,
+    this.avatarPicker = const PlatformAvatarPicker(),
+  });
+  final AvatarPicker avatarPicker;
   @override
   State<AccountScreen> createState() => _AccountScreenState();
 }
@@ -54,6 +59,7 @@ class _AccountScreenState extends State<AccountScreen>
   Future<void> _perform(
     Future<void> Function() action, {
     String? success,
+    String? failure,
   }) async {
     if (_loading) return;
     setState(() {
@@ -69,9 +75,9 @@ class _AccountScreenState extends State<AccountScreen>
     } on AccountFailure catch (error) {
       if (mounted)
         setState(
-          () =>
-              _message = const BookstoreStrings(true)
-                  .accountError(error.status),
+          () => _message =
+              failure ??
+              const BookstoreStrings(true).accountError(error.status),
         );
     } catch (_) {
       if (mounted)
@@ -126,6 +132,53 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
               if (blocked) const LinearProgressIndicator(),
               if (c.user case final user?) ...[
+                Center(
+                  child: SizedBox.square(
+                    dimension: 80,
+                    child: ClipOval(
+                      child: c.avatar == null
+                          ? const Icon(Icons.account_circle, size: 80)
+                          : Image.memory(
+                              c.avatar!,
+                              fit: BoxFit.cover,
+                              gaplessPlayback: false,
+                              errorBuilder: (_, _, _) =>
+                                  const Icon(Icons.account_circle, size: 80),
+                            ),
+                    ),
+                  ),
+                ),
+                TextButton.icon(
+                  key: const Key('avatar-choose'),
+                  onPressed: blocked
+                      ? null
+                      : () => _perform(
+                          () async {
+                            final reader = c.user?.id;
+                            final photo = await widget.avatarPicker.pick();
+                            if (reader != c.user?.id) return;
+                            if (photo != null) await c.replaceAvatar(photo);
+                          },
+                          failure: 'Choose a readable JPEG, PNG or WebP photo up to 2 MB.',
+                        ),
+                  icon: const Icon(Icons.add_a_photo_outlined),
+                  label: Text(user.hasAvatar ? 'Replace photo' : 'Add photo'),
+                ),
+                if (user.hasAvatar)
+                  TextButton(
+                    key: const Key('avatar-remove'),
+                    onPressed: blocked
+                        ? null
+                        : () => _perform(
+                            () => c.replaceAvatar(null),
+                            success: 'Photo removed.',
+                          ),
+                    child: const Text('Remove photo'),
+                  ),
+                const Text(
+                  'Private account photo. JPEG, PNG or WebP, up to 2 MB.',
+                ),
+
                 Text(
                   user.name ?? user.email,
                   key: const Key('account-identity'),
