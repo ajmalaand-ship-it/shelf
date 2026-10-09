@@ -579,6 +579,60 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Owner reading-settings feedback and pinned preview — 9 October 2026
+
+**Owner phone evidence, limited acceptance:** owner confirms installing Shelf
+Test 1.0.7 (16), reports the design looks better, and confirms font-size and
+light/dark theme controls work. Record only these observations. No acceptance
+of every screen, all fonts/sepia, purchases, offline/account isolation, privacy,
+all reading/import checks or iOS is inferred. That installed artifact is from
+c0e4561; the pinned-preview change below has not been packaged or phone-tested.
+
+**Authorized and implemented:** keep live preview and close control pinned while
+reading settings scroll. Shared Flutter source commit
+`6c9ef455b5224321ebc7e5cfe06b517a928723d2`, continuing latest Review 2 branch
+9b1937c/c0e4561 without discarding completed work or unrelated edits. Header and
+preview are outside the controls' scroll view. Preview immediately observes
+ReaderSettings family/size/palette notifications; existing preference keys, font
+choices and reader/source behavior remain unchanged. Compact single-line preview
+can pan horizontally; exceptionally tall text can pan vertically within a region
+capped at 30% of available panel height. No reduction of selected font size or
+accessibility scaling. Close remains in the pinned header; safe-area handling
+and compact heading retain usable controls on narrow/short screens.
+
+**Verification:** scripts/run_tests.sh --mobile, pinned-preview scope, passed
+30 focused Flutter tests plus 1 required staging-identity test and the required
+PrivacySupportTest smoke (1 test / 17 assertions). Scoped Flutter analysis of
+the changed panel/new tests found no issues; git diff --check passed. Checks
+load actual bundled fonts and exercise RTL/LTR at 320×568, 390×844 and 568×240,
+text scales 1.0/2.0, maximum selected size 38, pinned offsets while settings
+scroll, all font/palette choices, immediate preview updates, size buttons/slider,
+persistence, settings reachability and closing from the bottom of the settings.
+Existing reader sample/locked/source-format/artwork/font behavior regressions
+passed. Initial test incorrectly required scrolling when every control fitted;
+corrected to allow zero scroll extent while preserving the pinned-offset checks.
+Evidence: `/home/shelf/tmp/shelf-figma-review-2/pinned-preview-checks.log`.
+
+**Next approved reader task — recorded, not implemented:** optional book-style
+paginated reading, page controls/swipes through the book, retained Contents,
+reflow for font/size/viewport changes, exact poetry line/stanza preservation,
+stable text-location position (not page number), sample/paid/offline/account
+boundaries and book-direction navigation. Current reader was inspected; native
+Flutter layout/range pagination, ordered item context and account-scoped anchors
+are proposed in [the concrete next-batch plan](PAGINATED_READER_PLAN.md).
+The card-export paginator rewrites spacing/newlines and must not be reused for
+book text. No owner decision blocks the current-book core: retain scrolling by
+default and front matter in Book details; owner inclusion of front matter as
+pages is optional. Unknown book languages require explicit direction metadata.
+
+**Remaining:** new pinned-preview Android phone acceptance and iOS validation
+are pending. Owner's above feedback does not close all Review 2 phone checks.
+No app rebuild, upload, backend deployment, real-money transaction, reading
+engine or dependency in this batch. Checkout OFF, pricing sync DEFERRED,
+second-phone restore owner-deferred/not a new blocker, and joint Android/iOS
+launch preserved. No main merge/push or production app-source change.
+
+
 ## Review 2 Android phone-review artifacts — 9 October 2026 UTC / 9 October local
 
 Owner authorized artifact preparation from completed shared Review 2, including

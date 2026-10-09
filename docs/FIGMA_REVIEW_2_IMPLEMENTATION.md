@@ -182,3 +182,31 @@ Play-installed Shelf cannot be updated with the upload certificate; separate
 Shelf Test leaves it and its data in place. No Play upload/backend deployment.
 Android phone acceptance remains pending; iOS unverified, checkout OFF, pricing
 sync and second-phone restore deferred, joint launch preserved.
+
+
+## Owner phone feedback and pinned preferences preview — 9 October 2026
+
+Owner confirms Shelf Test 1.0.7 (16) installed on Android, says the design looks
+better and confirms font-size and light/dark controls work. This is partial
+owner-confirmed acceptance only; other phone checks/iOS remain unverified.
+
+New shared Flutter source 6c9ef455b5224321ebc7e5cfe06b517a928723d2 pins the close
+control and live preview outside the settings scroll area. Existing preferences,
+all font choices and actual reader/source behavior are preserved. Family, size
+and palette changes update the pinned preview immediately. The compact one-line
+sample pans horizontally; very tall selected text can pan vertically within a
+30%-height cap, without shrinking font size or accessibility scale.
+
+Focused runner evidence: 30 Flutter tests + 1 required staging-identity test,
+required PHP smoke 1 test / 17 assertions; scoped analysis found no issues.
+Actual bundled fonts, RTL/LTR, 320×568/390×844/568×240 and 1×/2× text scaling,
+max size 38, all choices, immediate updates, persistence, controls scrolling
+and pinned close reachability passed. Log: pinned-preview-checks.log in the
+isolated checkout. No artifact rebuilt; installed build 16 does not contain this
+new change, whose Android acceptance is pending. iOS validation remains pending.
+
+Optional paginated book reading is the next approved reader task, recorded only
+in [the concrete implementation plan](PAGINATED_READER_PLAN.md) and Master Record.
+No new reading engine/dependency or pagination implemented now. No store upload,
+backend deployment or transaction; checkout OFF, pricing sync deferred,
+second-phone restore deferred and joint Android/iOS launch unchanged.
