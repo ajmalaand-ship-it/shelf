@@ -100,3 +100,27 @@ Only this plan is recorded now. No pagination, position store, reading engine,
 dependency, backend/schema/provider change, build or deployment was introduced
 by the pinned-preview fix. Checkout OFF, pricing sync deferred, second-phone
 restore owner-deferred and joint Android/iOS launch remain binding.
+
+## Implementation follow-up — 9 October 2026
+
+The owner subsequently authorized implementation. The historical proposal above
+remains as the scope record; its “not implemented” wording describes the earlier
+pinned-preview batch. Optional pagination is now implemented in shared Flutter
+source c2111672957cb14cca9dc3c51bf05f87de31cadd. Scroll remains the default;
+front matter stays in Book details. Source ranges/grapheme boundaries use native
+TextPainter and preserve every original character, with stanza/line preferences
+and vertical fallback for oversized lines. Section metadata/media/audio have a
+scrollable details page. Controls/swipes use book direction and existing order,
+Contents remains direct navigation and Read resumes local account/book-scoped
+item/offset/fingerprint anchors. Existing access-scoped repositories remain the
+only text source; locked neighbors are not fetched, and account/lease/clock and
+stale-result checks deny invalid content. No engine or dependency was introduced.
+
+Focused runner: 52 Flutter tests + 1 staging-identity test, required PHP smoke
+1 test / 17 assertions, scoped analysis with no issues and diff check passed.
+Evidence: /home/shelf/tmp/shelf-pagination-checks.log; full implementation and
+remaining acceptance are recorded in current Master Record Part 10. Android
+phone and iOS acceptance are pending; no artifact build/upload/deployment or
+transaction. Checkout OFF, pricing sync and second-phone restore deferred and
+joint Android/iOS launch remain preserved. No cloud position sync, progress
+percentage or extra-language direction claim.

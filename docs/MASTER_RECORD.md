@@ -579,6 +579,87 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Optional paginated book reader — implemented 9 October 2026
+
+**Owner authorization and source:** owner authorized the planned shared Flutter
+reader as one implementation batch. Source commit
+`c2111672957cb14cca9dc3c51bf05f87de31cadd` on `ui/figma-review-2`, isolated at
+`/home/shelf/tmp/shelf-figma-review-2`, continues 320231c and pinned preview
+6c9ef45, retaining Review 2 correction c0e4561 and subsequent records. No older
+branch replaced current source/docs; production mobile source remains unchanged.
+
+**Implemented:** optional Scroll / Pages in existing reading preferences;
+scrolling remains the default. The pinned live preview/close control and all
+existing fonts, sizes and palettes remain. Book context supplies canonical ID,
+language and server-ordered Contents. Large previous/next controls and swipes
+follow Pashto/Dari RTL and English LTR, with continuous lazy navigation through
+adjacent accessible sections. Contents returns to the real book list for direct
+item jumps; those start the selected item, while Read resumes the book's saved
+accessible section. Loading/error/access states retain Contents and settings.
+
+Native TextPainter measures the exact original string with the selected font,
+text scaler and available viewport. Pages are contiguous UTF-16 ranges snapped
+to grapheme boundaries: no normalization, trimming, source rewriting or card
+export pagination. Fitting stanza/explicit-line boundaries are preferred;
+oversized stanzas split into exact ranges, and a line taller than the viewport
+can scroll without shrinking or losing text. Metadata/title/credits/date,
+artwork and audio remain reachable on each section's scrollable details page;
+sharing remains available through the existing reader entry. Extreme short
+viewports can scroll the navigation footer rather than clip its controls.
+
+Local positions contain item ID, source offset, exact-text SHA-256 and a details
+flag, never page number or book text. Keys isolate environment, account/guest
+and book. Reflow for family/size/text scaler/viewport or reopening selects the
+page containing that location; vertically panned oversized pages also update
+and restore a text location. Scrolling mode uses the same text anchor. Changed
+text safely restarts the same section with a notice; storage failure is visible.
+Positions never grant access or extend a lease. No cross-device sync was added.
+
+Navigation uses existing repositories, with no new protected-text cache or
+prefetch of locked neighbors. Public partial samples retain only the approved
+response; unexpected unlocked paid responses are rejected. Owned reading
+continues through OwnedBookRepository/LibraryController.copy checks. Account
+changes, revocation/download removal, lease expiry and failed clock checks deny
+resident pages; stale in-flight responses are rejected. Pause discards resident
+content and resume rechecks through the repository. Existing server protection,
+offline/account isolation, audio/session behavior and checkout remain authoritative.
+
+**Focused verification:** `SHELF_PHP_TEST_FILTER=PrivacySupportTest
+SHELF_MOBILE_TEST_SCOPE=paginated-reader bash scripts/run_tests.sh --mobile`
+passed: 52 focused Flutter tests, 1 required staging-identity test and the
+required PHP smoke (1 test / 17 assertions). Scoped Flutter analysis found no
+issues; git diff --check passed. Evidence:
+`/home/shelf/tmp/shelf-pagination-checks.log`. Tests prove exact range
+reconstruction/no missing or duplicated passages across all three bundled
+fonts, CRLF/blank lines, combining/emoji graphemes, RTL/LTR and narrow/large-text
+layouts; logical controls/swipes across items; reflow/reopen/changed-source
+resume; actual Contents jump and Read resume; optional-mode and pinned-preview
+interaction; approved sample/locked/contradictory paid-response denial;
+account sign-out with an in-flight result; owned offline navigation, lease expiry,
+clock rollback and revocation. Oversized pages preserve vertical text offsets;
+320×360 at 3× and 568×240 at 3× remain usable in widget checks. Existing reader,
+content-language, audio/share and pinned-preview regressions passed. Regression
+tap was corrected to scroll to a font control now below the mode selector;
+Contents integration test scrolls lazy list items into view. These are automated
+code/layout checks, not Android phone acceptance or iOS validation.
+
+**Remaining and deliberately omitted:** Android phone acceptance of pagination
+and the pinned preview, iOS validation and broader outstanding Review 2 phone
+checks remain pending. Installed Shelf Test 1.0.7 (16) is still c0e4561; owner
+acceptance remains limited to better design, font size and light/dark controls.
+Front matter stays in Book details; no progress percentage, cloud position sync,
+new engine/dependency or direction support claim for unknown configured languages.
+A later owner decision is needed to establish direction for additional languages.
+
+**Constitution/boundaries:** authorized isolated shared UI, focused verification
+and additive records only. No APK/AAB rebuild, store upload, backend deployment,
+main merge/push, database/content/media/date or production-setting changes and
+no transaction. Checkout OFF, pricing sync DEFERRED/disabled, second-phone
+restore owner-deferred/not a new launch blocker, and joint Android/iOS launch
+remain preserved. The production Master Record received this additive entry;
+unrelated/newer edits were retained. Next single owner action: authorize a fresh
+separate Shelf Test APK build for targeted pinned-preview/pagination phone review.
+
 ## Owner reading-settings feedback and pinned preview — 9 October 2026
 
 **Owner phone evidence, limited acceptance:** owner confirms installing Shelf

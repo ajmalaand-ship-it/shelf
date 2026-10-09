@@ -210,3 +210,44 @@ in [the concrete implementation plan](PAGINATED_READER_PLAN.md) and Master Recor
 No new reading engine/dependency or pagination implemented now. No store upload,
 backend deployment or transaction; checkout OFF, pricing sync deferred,
 second-phone restore deferred and joint Android/iOS launch unchanged.
+
+
+## Optional paginated reader — implemented 9 October 2026
+
+Owner authorized the recorded next reader batch. Shared source
+c2111672957cb14cca9dc3c51bf05f87de31cadd retains pinned preview 6c9ef45 and
+all completed Review 2 changes. Preferences now offer optional Scroll / Pages;
+scroll remains default. Native Flutter measurements create contiguous exact
+source/grapheme ranges, reflow for font/size/text scaler/viewport, prefer fitting
+poetry stanza/line boundaries and retain scrollable oversized lines without
+rewriting, shrinking or losing text. Section titles/credits/date/artwork/audio
+remain on a reachable scrollable details page; sharing is retained. Large
+controls and swipes follow book direction and existing ordered accessible
+sections. Contents returns to the real list for direct jumps; Read resumes a
+local environment/account/book-isolated item/source-offset/hash anchor. Even
+vertical scrolling inside an oversized page preserves a stable text location.
+Changed text restarts its section with a notice; position-write failures are
+visible. No page number, book text or entitlement is stored in the position.
+
+Existing access-scoped repositories remain authoritative: no locked-neighbor
+fetch, unauthorized-text prefetch or new protected cache. Partial samples stay
+at the approved response boundary. Paid-response contradictions fail closed;
+account changes, stale responses, revocation/download removal and offline
+lease/clock failures deny resident pages. Pause/resume rechecks access.
+
+Verification: 52 focused Flutter tests + 1 staging-identity test, required PHP
+smoke 1 test / 17 assertions; scoped analysis no issues, git diff --check passed.
+Evidence /home/shelf/tmp/shelf-pagination-checks.log covers original text
+continuity/CRLF/graphemes/stanzas and all bundled fonts, RTL/LTR item turns,
+reflow/reopen/changed-text resume, actual Contents jumps/Read resume, optional
+mode, pinned preview, sample/paid boundaries, account/stale-result isolation,
+offline expiry/rollback/revocation and oversized/large-text/short-layout handling.
+Existing reader/content-language/audio/share regressions passed.
+
+Android phone acceptance and iOS validation remain pending. Installed Test
+1.0.7 (16) remains c0e4561; limited owner feedback is unchanged. Front matter
+stays in Book details; no cloud sync, progress percentage or new dependency.
+Additional language direction needs explicit metadata/decision. No artifact
+rebuild, store upload, backend deployment, transaction or main merge/push.
+Checkout OFF, pricing sync deferred, second-phone restore owner-deferred and
+joint launch preserved. See Master Record Part 10 for the full implementation.
