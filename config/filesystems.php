@@ -70,6 +70,14 @@ return [
             'throw' => true,
         ],
 
+        'reader_avatars' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/reader-avatars'),
+            'visibility' => 'private',
+            'serve' => false,
+            'throw' => true,
+        ],
+
         'author_images' => [
             'driver' => 'local',
             'root' => storage_path('app/private/authors'),
