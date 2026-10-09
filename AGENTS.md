@@ -163,6 +163,13 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-09: Owner authorized Review 3 staging-only backend deployment and a
+  compatible separate Shelf Test APK. Staged 9a748ef; avatar migration applied
+  only to shelf_staging after verified backup. Shelf Test 1.0.9 (18) verified,
+  same staging package/signer, no uninstall/data clearing. Phone acceptance pending.
+  No production deploy/build/migration/upload; existing gates/deferrals/joint launch
+  preserved. Second/cover-photo purpose pending. Exact evidence in Master Record.
+
 - 2026-10-09: Shelf Review 3 authorized on latest isolated Review 2 branch:
   supplied bilingual logo/action icons; interface languages پښتو، دری، English;
   pinned live share preview; Contents footer; localized font names/minimum 16;

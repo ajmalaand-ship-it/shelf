@@ -579,6 +579,78 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Review 3 staging and Shelf Test phone-review APK — 9 October 2026
+
+Owner authorized staging-only preparation and a compatible separate Shelf Test
+update, retaining completed Review 3 c2f4025/c25e230 and all newer records.
+Immutable deployed/build source: **9a748ef2022ef274eddcf1941269e35bafa8fb14** (9a748ef),
+which adds only the focused staging gate to completed Review 3. Mobile source
+remains **c25e23010a77fcf87618ee8bb0be68c6fa1b08b2**. Existing pagination/pinned
+reading preview and unrelated edits retained; no main merge/push.
+
+**Staging preflight and deployment:** actual connected database **shelf_staging**,
+canonical storage **/home/shelf/staging-runtime/storage**, separate from production;
+mail log, queue null, purchases/production checkout/pricing sync false. Only pending
+migration was 2026_10_09_120000_add_private_reader_avatar.php. Established workflow
+made and verified SQL/media/checksum backup
+**/home/shelf/backups/shelf-staging/20261009-224852/** before migration/deployment.
+Avatar column is now present on staging; production shelf_app has no avatar column.
+Production deployed revision remains 34799b8 and source/settings/data untouched.
+Reversible migration/code rollback requires reviewing intervening staging activity;
+prior release and verified staging backup retained. No catalogue refresh.
+
+**Staging evidence:** focused ReaderAvatarTest **4 tests / 35 assertions** passed
+at the deployed commit; private storage/session/cache/database isolation, logged
+mail/disabled queue, blocked sync, real HTTPS gate/noindex/TEST COPY/catalogue/
+locked paid content/account/private-file/webhook checks passed. A separate direct
+staged API probe used synthetic accounts/tokens in a rolled-back transaction and
+real staging-only avatar storage: upload/read/no-store, cross-account denial,
+replacement deleting old file and removal deleting current file passed. Synthetic
+accounts/tokens rolled back and task-created photo directories removed. Initial
+rapid probe failed its last request; subsequent probe respected the existing
+five-per-minute account-path limit and passed, without clearing/changing limits.
+Completed unchanged Flutter evidence (97 focused tests plus staging-identity test)
+was reused; no unrelated suite repeated. State records passing staging checks at
+2026-10-09 22:49:03 UTC, scope review-3-avatar-backend; staged-check log SHA-256
+48f8e1472cccf6d8a77becd87fa7c91a37efc4128796ca9f6550efed929058b8.
+
+**Phone artifact:** **Shelf Test 1.0.9 (18)**, package services.shelf.app.staging,
+API https://staging.shelf.services/api/. Version 18 is next after retained staging
+APK manifests 12/13/16/17. Build arguments supply version; source/pubspec/lockfile
+unchanged. APK path:
+`/home/shelf/staging-runtime/storage/app/private/test-apks/shelf-review-3-test-1.0.9-18-9a748ef-20261009-225653.apk`
+SHA-256: `f25b21ca3d640e9c4bcb43e4606a3bccfb66d32153690e7a4dc8074d9f38370b`; **62134954 bytes**, private mode 0600,
+matching private JSON evidence. APK signature verified; same upload certificate
+SHA-256 2065572ecb0f174a9e669602232ffcea31335303d3ff011caaeb7216fdb69e77
+(SHA-1 DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB)
+as prior Shelf Test 1.0.8 (17). Same package/signature and increasing version permit
+an in-place update: no uninstall or data clearing requested. Actual installed data
+retention remains pending phone observation. Play-installed Shelf stays separate.
+
+**Artifact verification:** compiled version/package/Shelf Test label/non-debuggable
+manifest, release signature, ZIP CRC, staging endpoint in every libapp.so, visible
+TEST COPY — Shelf Test banner, pagination/pinned reading and sharing-preview
+markers/Dari choice, native Android avatar-picker channel and all three original
+font families passed. All **84 supplied logo/action PNGs** match staging-source
+bytes, including density/light/dark/inactive variants. Native picker compiled;
+actual chooser/permission/photo lifecycle on phone remains unverified. Initial
+banner verifier looked for ASCII; corrected to the actual UTF-16 string and passed
+on the same artifact, no rebuild. Task build workspace cleaned; recreated Gradle
+registry cache removed. Logs/scripts: /home/shelf/tmp/shelf-review3-apk-20261009/
+(staging-deploy.log, preflight.json, staged-avatar.log, build-test.log, verify-test.py,
+verify-test.log). No secrets printed/committed.
+
+**Pending and boundaries:** owner install/update and Review 3 Android phone
+acceptance PENDING. Review three interface languages/logo/icons, localized fonts
+and size 16, enlarged text/small-screen controls, both pinned previews, page turns/
+Contents/resume and private photo add/replace/remove/sign-out/relogin. iOS native
+picker/build/device validation NOT VERIFIED. Proposed second/cover-photo purpose
+still PENDING CLARIFICATION, no public profile. No production build/upload/deploy,
+live production migration/account/data change or real-money transaction. Checkout
+OFF, pricing sync DEFERRED/disabled, second-phone restore owner-deferred and joint
+Android/iOS launch unchanged. Next action: download this private APK on Windows
+into Downloads\Shelf-Review-3 and update Shelf Test in place for review.
+
 ## Shelf Review 3 — isolated implementation, 9 October 2026
 
 **Owner-approved scope:** continue latest isolated Review 2 branch, including
@@ -1858,6 +1930,14 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 | Open items                                        | SSH config file owned by the wrong user (server fix by root, not urgent). Repeated failed root login attempts (server security, later). Original poet of لمر ګلی unknown. Other projects also fill /tmp.                                                   |
 
 # Part 11 — Decision log
+
+- **9 October 2026 — owner authorized Review 3 staging and phone-review build:**
+  staged 9a748ef with verified staging backup and reversible avatar migration only
+  on shelf_staging; produced compatible Shelf Test 1.0.9 (18), same package/signer,
+  staging endpoint/Test identity. No production deployment/build/migration/upload.
+  Focused staging/avatar and artifact evidence passed; owner phone acceptance
+  pending. Cover-photo purpose, iOS readiness and all existing deferrals/joint
+  launch remain unchanged. See Part 10 for exact private APK path/evidence.
 
 - **9 October 2026 — owner-approved Shelf Review 3:** supplied original logo/icons,
   Afghan Dari interface alongside پښتو and English, pinned live sharing controls,
