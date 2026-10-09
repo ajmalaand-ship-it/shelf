@@ -166,3 +166,19 @@ PNGs reviewed visually. No broad purchase/backend audit or release build.
 Android phone acceptance and iOS validation remain pending. Checkout OFF,
 pricing sync deferred, second-phone restore owner-deferred, joint Android/iOS
 launch preserved. These remain synthetic test renders, not phone acceptance.
+
+
+## Authorized Android artifact preparation — 9 October 2026
+
+Owner separately authorized release artifact preparation and selected Shelf Test
+side-by-side installation using staging and a separate test account. Version
+1.0.7 (16), immutable source c0e4561b41c87f6f56cb2ffb58eedce9a46af178.
+APK: `/home/shelf/apps/shelf/storage/app/private/owner-apks/shelf-review-2-test-1.0.7-16-c0e4561-20261009-044635.apk`.
+SHA-256: `6dfc7839ea9ffe13f99b527def3391ffb3ba34cab1b40e91dadddef7b90a6933`.
+Release signature, distinct services.shelf.app.staging package, non-debuggable
+manifest, staging endpoint, Review 2 marker and original fonts verified. Production
+AAB also prepared and verified; full evidence in Master Record Part 10. Existing
+Play-installed Shelf cannot be updated with the upload certificate; separate
+Shelf Test leaves it and its data in place. No Play upload/backend deployment.
+Android phone acceptance remains pending; iOS unverified, checkout OFF, pricing
+sync and second-phone restore deferred, joint launch preserved.

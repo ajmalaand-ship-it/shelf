@@ -579,6 +579,81 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Review 2 Android phone-review artifacts — 9 October 2026 UTC / 9 October local
+
+Owner authorized artifact preparation from completed shared Review 2, including
+correction c0e4561, with no Play upload or backend deployment. Owner selected a
+separate Shelf Test APK beside the existing Play-installed Shelf, using the
+existing staging catalogue and separate test account. No uninstall/data migration.
+
+Immutable build source: **c0e4561b41c87f6f56cb2ffb58eedce9a46af178**, branch ui/figma-review-2,
+including Store, Book details, My Library, Search, Reader and reading preferences,
+the readable brown chip correction and diagnosed/fixed render fixture. Real book
+text and intentional poetry formatting were unchanged. Origin main was checked
+read-only at 72cabf0; no newer mobile source was omitted. Current governing
+amendments/unrelated edits are preserved; no old documentation snapshot replaced
+the current record. Source was exported with git archive and built in disposable
+workspaces. Version chosen only through build arguments: **1.0.7 (16)**;
+no mobile source, dependency lockfile or pubspec version edit in this build task.
+
+**Selected phone artifact:** release APK, label **Shelf Test**, package
+`services.shelf.app.staging`, API `https://staging.shelf.services/api/`.
+Path: `/home/shelf/apps/shelf/storage/app/private/owner-apks/shelf-review-2-test-1.0.7-16-c0e4561-20261009-044635.apk`
+SHA-256: `6dfc7839ea9ffe13f99b527def3391ffb3ba34cab1b40e91dadddef7b90a6933`
+Size: 61058570 bytes. Private mode 0600; matching private JSON evidence.
+Built with established staging flavor/private access defines, JDK 17/Flutter/SDK
+and existing Shelf upload signing properties. No owner-preview token generated.
+Separate staging account/data; production reader account/purchases are not copied.
+This verifies shared UI on a phone, not production-account or Play-signed behavior.
+
+**Production artifact retained, not phone-installable:** release AAB,
+package `services.shelf.app`, version **1.0.7 (16)**, production endpoint,
+with internal-test checkout opt-in omitted.
+Path: `/home/shelf/apps/shelf/storage/app/private/owner-aabs/shelf-review-2-production-1.0.7-16-c0e4561-20261009-044332.aab`
+SHA-256: `e251545cb97fb5ea1f63d0ee38707accdca4602f9c16c1730a92a5933eff8789`
+Size: 61899366 bytes. Private mode 0600; matching private JSON evidence.
+No Play upload, rollout or launch. Preserved prior approved 1.0.6 (15).
+
+**Installation compatibility:** actual APK signer matches the recorded Shelf
+upload certificate: SHA-1 DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB;
+SHA-256 20:65:57:2E:CB:0F:17:4A:9E:66:96:02:23:2F:FC:EA:31:33:53:03:D3:FF:01:1C:AA:EB:72:16:FD:B6:9E:77.
+Existing Play Shelf uses owner-confirmed Play signing SHA-1
+BE:61:2C:CD:0B:79:68:E3:AA:1E:2A:C7:E6:CF:B8:CB:61:8F:DE:24.
+A locally upload-signed APK cannot update the Play-signed production package;
+[Android requires compatible signing for updates](https://developer.android.com/studio/publish/app-signing).
+The chosen separate package leaves Play Shelf and its local data in place.
+Shelf Test also uses the same upload certificate as its earlier documented APK,
+with a higher version code. Actual installation on the owner's phone is not claimed.
+A production update would require a separately authorized Play-signed test update.
+
+**Verification:** both release builds completed. APK signature/certificate,
+compiled package/version/label/non-debuggable manifest, ZIP CRC, staging endpoint
+in every libapp.so, Review 2 preferences marker and all three original bundled
+reader font families passed. AAB ZIP CRC, compiled production manifest/version,
+non-debuggable mode, JAR signature/upload certificate and production endpoint in
+every libapp.so passed. Reused completed Review 2 focused 64-test evidence and
+correction 20-test evidence, plus their identity/PHP smoke checks; no unrelated
+suite or accepted purchase/backend test rerun. Build/verification scripts/logs:
+`/home/shelf/tmp/shelf-review2-android-20261009`. AAB trap cleanup initially returned nonzero after verified artifact
+save because a temporary Gradle directory was recreated; task-only leftover was
+removed and its absence confirmed. No artifact rebuild was needed. An independent
+APK verification initially lacked Java on PATH; setting the established JDK PATH
+fixed the check. No app/source change was required.
+
+Read-only runtime checks: production real checkout false, pricing sync false;
+staging purchases false, production checkout false and pricing sync false.
+Staging and production backend source remain deployed at 34799b8; no backend
+change, migration, deployment, account/provider/configuration edit or transaction.
+**Android phone installation/acceptance PENDING** until owner installs Shelf Test
+and reviews the result. **iOS validation NOT VERIFIED**. Checkout OFF, pricing sync
+DEFERRED, second-phone restore owner-deferred (not a new launch blocker), and
+joint Android/iOS launch unchanged. This build does not approve public release.
+
+**Single next owner action — Windows PC, PowerShell:** download the selected
+Shelf Test APK into the Windows Downloads/Shelf-Review-2 folder. The subsequent
+phone review uses Shelf Test beside Shelf and the separate existing test account.
+
+
 ## Figma Review 2 implementation — 9 October 2026
 
 Owner approved [Figma Review 2](https://www.figma.com/design/NVSrbPa6eJJVUfIK3vdUeJ?node-id=7-5)
