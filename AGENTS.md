@@ -37,7 +37,9 @@ automatic sync is DEFERRED and disabled. Do not investigate/retry the 403.
 Production verification and release-mode source support are deployed at 340634b;
 real checkout remains OFF. Existing RevenueCat webhook now receives Both
 Production and Sandbox; actual production delivery remains unverified.
-D14 policy approved 7 October 2026; financial expiry remains unresolved. See
+D14 policy approved 7 October 2026; financial policy approved 8 October: three
+years after relevant tax-return filing, scoped legal/dispute/unpaid-balance exceptions
+and minimum proof while recovery rights continue. Financial expiry NOT IMPLEMENTED. See
 `docs/D14_DATA_POLICY.md` and the latest Master Record for implementation/evidence.
 Step 5 OneDrive encrypted upload/download and isolated
 recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
@@ -49,15 +51,15 @@ rechecked on D14 resume without rerunning recovery. D14 implementation e387b36
 is staged and promoted. Owner granted existing V2 Customer information Read only;
 one metadata GET passed HTTP 200 at 8 October 00:13:34 UTC (7 October local).
 No eligible cleanup jobs exist; actual provider erasure remains unverified,
-financial expiry unresolved and D14 not fully complete.
+financial expiry unimplemented and D14 not fully complete.
 Step 5 / 6.11 repair deployed at c887f91: absolute MariaDB daemon path,
 safe failure stages and original-error preservation on alert failure. See the
 runbook for controlled scheduled verification; future unattended success must
 be recorded separately. Actual alert delivery and replacement-host recovery
 remain unverified; recovery key
 is owner-confirmed on an unencrypted USB, preserved unchanged.
-Second-phone restore is deferred to the pre-release checklist, not passed and
-not requested now. Prioritize construction; automate necessary checks and request
+Second-phone restore remains owner-deferred, not passed, not requested now and
+not a launch blocker without a later owner decision. Prioritize construction; automate necessary checks and request
 phone checks only for a concrete essential risk. No broad test rerun for status-only
 reconciliation. The owner confirmed refund/download removal, locked paid text with
 sample retained, declined payment locked, and successful repurchase on 2 October.
@@ -160,6 +162,26 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+
+- 2026-10-08 authorization, implementation continued 9 October: Owner approved
+  Figma Review 2 https://www.figma.com/design/NVSrbPa6eJJVUfIK3vdUeJ?node-id=7-5.
+  Shared Flutter Store, Book details, My Library, Search, Reader and Reading
+  preferences implemented in isolation with focused checks and project records.
+  Preserve original content, working controls and actual store/access behavior;
+  no guessed progress/daily recommendation. Android phone acceptance pending,
+  iOS validation separate; joint launch retained. No deployment/build/upload/
+  transaction/settings/backend change. Checkout OFF, sync DEFERRED,
+  second-phone restore owner-deferred, not a new launch blocker.
+
+- 2026-10-08: Owner approved accounting/tax-supporting retention for three years
+  after relevant tax-return filing; affected records retained longer for applicable
+  legal requirements, unresolved disputes or unpaid author balances. Keep only
+  minimum purchase proof while recovery rights continue; expiry must not break
+  those rights. Seven-year proposal and one-year alternative NOT APPROVED. Policy
+  recorded and scoped plan prepared; financial automatic expiry NOT IMPLEMENTED.
+  No deletion/production changes/rebuild/deploy; checkout OFF, sync DEFERRED,
+  second-phone restore deferred, not a launch blocker without later owner decision.
+
 - 2026-10-08: Owner authorized dedicated ordinary Google Play reviewer email/password
   access to six launch books through audited complimentary grants, no purchases/
   income/admin rights. Normal reader API focused checks and private credentials;

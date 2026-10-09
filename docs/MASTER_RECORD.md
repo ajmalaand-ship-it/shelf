@@ -4,6 +4,8 @@ The single governing document for building Shelf
 
 Version 2.3 — Approved — 28 September 2026
 
+Binding owner amendment — 8 October 2026: Android and iOS joint launch
+
 Owner: Ajmal Aand   •   Prepared with Claude
 
 **How to use this document**
@@ -18,7 +20,7 @@ Codex (the coding assistant on the server) follows **AGENTS.md** in the Shelf co
 
 **Status of this version**
 
-Master Record v2.0 was approved on 25 September 2026 and amended in v2.1 on 27 September 2026. This version 2.2 restored every v2.0 requirement and clarified R3 and staging. This version 2.3 (28 September 2026) records the new way of working approved by Ajmal (Codex runs server commands after Ajmal’s approval; Claude makes technical decisions; Ajmal is asked owner questions only) and closes **Step 2**. Current construction: **Step 4 — Accounts and purchases (test mode)**; the current status reconciliation in Part 10 supersedes the historical 28 September snapshot. Outstanding Step 3 acceptance and pre-release checks are kept separate.
+Master Record v2.0 was approved on 25 September 2026 and amended in v2.1 on 27 September 2026. This version 2.2 restored every v2.0 requirement and clarified R3 and staging. This version 2.3 (28 September 2026) records the new way of working approved by Ajmal (Codex runs server commands after Ajmal’s approval; Claude makes technical decisions; Ajmal is asked owner questions only) and closes **Step 2**. **Current direction (owner-approved 8 October 2026):** four work areas and Android/iOS joint launch, following the five practical batches in Part 7. The single remaining-work list at the start of Part 10 governs priorities. Steps 0–2 remain completed; Steps 3–5 remain partly completed; Step 6 has not started. Further Google Play preparation is paused until final release needs it. Build 1.0.6 (15) is owner-confirmed approved for closed testing. Earlier status entries remain historical evidence.
 
 **Contents**
 
@@ -77,7 +79,7 @@ This document gives full detail so that future work can be guided by it. Claude�
 
 ## 2.1 The product
 
-Shelf is a free-download Android app that works as a **Pashto and Farsi digital bookstore and personal library**. Readers discover books from many authors, read a free sample, buy an individual book, and then find it in **My Library**. Downloading the app is free; this does not mean every book is free.
+Shelf has free-download Android and iOS apps that work as a **Pashto and Farsi digital bookstore and personal library**. Readers discover books from many authors, read a free sample, buy an individual book, and then find it in **My Library**. Downloading the app is free; this does not mean every book is free.
 
 | Item           | Decided                                                        |
 |----------------|----------------------------------------------------------------|
@@ -96,12 +98,28 @@ The following are outside Version 1 unless Ajmal later approves a change:
 
 - subscriptions or an all-books pass;
 - author accounts, author uploads, author dashboards or an author marketplace;
-- automatic payouts to authors (Version 1 keeps accounting records only);
-- an iPhone (iOS) app — Version 1 is Android.
+- automatic payouts to authors (Version 1 keeps accounting records only).
+
+**Owner amendment — 8 October 2026:** iOS is included in Version 1. Android and
+iOS must launch together. Neither may release publicly until both are complete,
+accepted and ready, with final owner launch approval. This supersedes the former
+Android-only Version 1 scope and all earlier “iOS later” release instructions.
+No Apple account, build access, signing, purchase or store readiness is claimed.
 
 ## 2.4 Shelf is its own product
 
 Shelf is not part of the Ajmal Aand Professional Platform, System C, Career Command or the Private Assistant. Their documents, roadmaps and approvals do not govern Shelf. The old poetry app (Pitswal) is Shelf’s **technical starting point**, but its name, identity, old roadmap and old approvals do not carry over.
+
+## 2.5 Four work areas
+
+1. Admin/backend.
+2. Android app.
+3. iOS app.
+4. Shared app design and UX/UI.
+
+Reuse shared Flutter code and passed evidence. Agree shared design and UX/UI
+improvements before platform completion. Optional improvements remain outside
+release scope. Maintain one remaining-work list under these four areas in Part 10.
 
 # Part 3 — Where we start and where Shelf lives
 
@@ -181,7 +199,7 @@ These rules apply in every step. They can only be changed by an approved amendme
 
 **R10 — No whole-catalogue unlock.** The old unlock-all purchase must never give access to Shelf books. Every Shelf purchase is for one book.
 
-**R11 — Proof before “done”.** Nothing is finished without evidence. Reading and layout are accepted only after testing on a real Android phone.
+**R11 — Proof before “done”.** Nothing is finished without evidence. Reading and layout are accepted only after testing on real Android and iOS phones for the respective apps. Reuse passed evidence without inferring platform-specific acceptance.
 
 **R12 — No silent decisions.** If something is not covered by this document, Claude and Codex ask Ajmal instead of choosing.
 
@@ -213,7 +231,7 @@ These rules apply in every step. They can only be changed by an approved amendme
 
 ## 5.3 How Claude gives instructions
 
-- One step at a time.
+- Work in complete practical batches following Part 7, with clear dependencies, shared code and reused passed evidence.
 - Every reply starts with one line showing where we are, for example: *Step 2 · Task 5 of 9 · Books*.
 - When Ajmal must type anything himself, every block says exactly **where** to run it and includes every line from the start: PC PowerShell; server as root (ssh root@157.250.199.106); server as shelf (then su - shelf); or inside Codex.
 - Commands and prompts are given in the chat, ready to copy, not as attached files.
@@ -309,7 +327,7 @@ store price. No Play product creation/change is authorized in this task.
 
 ## 6.6 Pashto and Farsi reading
 
-- Both languages are first-class: correct right-to-left layout, suitable fonts, readable spacing, correct Unicode.
+- Both languages are first-class on Android and iOS: correct right-to-left layout, suitable fonts, readable spacing, correct Unicode.
 - Mixed English text, numbers and punctuation stay readable.
 - Font and text-size controls remember the reader’s choice.
 - Poetry and prose are tested on real phones. Source layout is preserved; poetry is not automatically restructured.
@@ -373,7 +391,26 @@ store price. No Play product creation/change is authorized in this task.
 
 # Part 7 — The steps from today to public release
 
-Work happens one step at a time. A step closes only when its evidence exists **and** Ajmal accepts it.
+The numbered steps retain completed milestones and project history. A step closes
+only when its evidence exists **and** Ajmal accepts it. The owner-approved
+8 October 2026 order supersedes earlier sequential/Android-only priorities:
+
+1. **Inspect iOS readiness:** existing Flutter code, Apple account, Mac/build access,
+   signing and purchases. Record verified readiness and missing dependencies.
+2. **Agree and improve shared app design and UX/UI.** Agree concrete reader-facing
+   changes and reuse shared code; optional improvements remain outside release scope.
+3. **Complete iOS and remaining admin/backend work**, using readiness findings and
+   agreed design while preserving completed functionality and passed evidence.
+4. **Accept both apps together and fix demonstrated issues**, with targeted checks
+   and existing evidence; preserve owner deferrals.
+5. **Complete both store reviews and coordinate public launch**, with final owner
+   approval only after both apps are complete, accepted and ready.
+
+Work in complete practical batches using the one four-area list in Part 10.
+Google Play preparation has progressed sufficiently: build 1.0.6 (15) is
+owner-confirmed approved for closed testing. Pause further Play preparation until
+needed for final release. This documentation task authorizes no implementation,
+build, deployment, purchase, provider setting change or release.
 
 ## Step 0 — Approve the Master Record ✓ done 25 September 2026
 
@@ -433,11 +470,11 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 ## Step 3 — Catalogue and reading (in progress)
 
-**Goal:** A reader can browse, search and read samples properly in Pashto and Farsi on a real phone.
+**Goal:** A reader can browse, search and read samples properly in Pashto and Farsi on Android and iOS, using the agreed shared design.
 
 **Work:**
 
-- Android SDK set up so test builds can be installed on Ajmal’s phone.
+- Retain completed Android SDK/build setup; inspect and establish iOS build/signing readiness through the first approved batch.
 - Word import accepted with a real Pashto Word document read on the phone (6.12).
 - Catalogue: authors, categories, search, book pages.
 - Samples and the sample/full-book difference.
@@ -447,7 +484,7 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 **The step is finished when:**
 
-- Ajmal tests several authors and books on a real phone and accepts reading quality.
+- Ajmal accepts reading quality with several authors/books on real Android and iOS phones, reusing passed evidence and checking remaining platform-specific risks.
 
 **Not allowed in this step:** real payments, public release.
 
@@ -458,13 +495,13 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 **Work:**
 
 - Reader accounts (D7).
-- Shelf’s own RevenueCat project and Google Play test products, one per book.
+- Shelf’s own RevenueCat project and per-book store purchases: retain completed Google Play setup and inspect/complete App Store purchase integration for iOS.
 - Server-side confirmation, My Library, restore, failed payments, refunds.
 - Sales and author-share records.
 
 **The step is finished when:**
 
-- All purchase cases work in sandbox, including restore on another phone and a refund.
+- Required purchase cases work in sandbox on both platforms, including verified restore and refunds. Second-phone restore remains owner-deferred, not passed and not a launch blocker without a later owner decision.
 - Access protection is tested with direct requests.
 - Decisions D8–D12 made.
 
@@ -476,7 +513,7 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 **Work:**
 
-- Production Google Play listing and RevenueCat setup.
+- Google Play and App Store listing, signing and RevenueCat setup/reviews for joint launch. Preserve approved closed-test build 1.0.6 (15); further Play preparation pauses until needed for final release.
 - Privacy policy, support, account deletion, retention (D14).
 - Staging copy in place before the first real reader other than Ajmal or the first real payment (6.11).
 - Off-server backup and a tested restore; simple operating instructions for Ajmal.
@@ -485,37 +522,37 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 **The step is finished when:**
 
-- Ajmal tests the real app and admin end to end and accepts them.
+- Ajmal accepts both apps together and the admin/backend end to end; both platforms are complete and ready for coordinated release.
 
 **Not allowed in this step:** public release without Ajmal’s approval.
 
 ## Step 6 — Public release
 
-**Goal:** Shelf is live on Google Play.
+**Goal:** Shelf launches publicly on Google Play and the App Store together.
 
 **Work:**
 
-- Release after Ajmal’s approval.
+- Release neither app publicly until both are complete, accepted and ready, both store reviews are complete, and Ajmal gives final joint-launch approval.
 - Check a live purchase and support, as approved.
 - Watch for failures in the first days; keep a recovery path ready.
 
 **The step is finished when:**
 
-- Shelf is live and real purchases and restores work.
+- Both apps are publicly live together and approved real-purchase/restore checks work on both platforms.
 
 **Not allowed in this step:** deleting the old app’s baseline.
 
 # Part 8 — When Version 1 is done
 
-- The app is fully Shelf: name, app ID services.shelf.app, domain shelf.services, own RevenueCat project and store products.
+- Both apps are fully Shelf: name, Android app ID services.shelf.app, domain shelf.services, own RevenueCat project and per-book store products. iOS identity/signing details are established through readiness work, not guessed.
 - The multi-author catalogue works; each book for sale has a price and a working sample.
 - Accounts, single-book purchases, My Library and restore work, including refunds and failed payments.
-- Pashto and Farsi reading accepted on a real phone; optional audio works where supplied.
+- Pashto and Farsi reading accepted on real Android and iOS phones; optional audio works where supplied.
 - The admin is usable and owner-only; sales and author-share records are traceable.
 - Access protection verified with direct requests; offline and deletion rules agreed and working.
 - Backups on and off the server, with a tested restore.
 - No critical defects or open release-blocking decisions.
-- Ajmal accepts the real Android experience and authorises launch.
+- Ajmal accepts both apps together; both are complete and ready, both store reviews are complete, and final owner approval authorises coordinated public launch.
 
 # Part 9 — Decisions (made and open)
 
@@ -528,19 +565,230 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 | D5  | Translated book included              | **Decided 27 Sep:** credits recorded (author پروین پژواک, translator اجمل اند). Publication follows R9. |
 | D6  | App name and Android ID               | **Decided 27 Sep:** Shelf, services.shelf.app; slogan کتاب مو ژوند بدلوي.                                                                           |
 | D7  | Reader sign-in methods                | Open — Step 4                                                                                                                                                                                   |
-| D8  | Payment channels and territories      | Open — Step 4                                                                                                                                                                                   |
+| D8  | Payment channels and territories | **Amended 8 Oct:** Google Play for Android and App Store for iOS using Shelf’s own RevenueCat project; both platforms launch together. Existing Android 174-region approval retained; iOS availability/readiness must be established, not assumed. |
 | D9  | Prices and currencies                 | **Amended 7 Oct:** manual Play Console products/prices for first 100 books; automatic sync DEFERRED, not completed. USD 2.99 starting launch price approved for books 3–8; historical test approval preserved.                                                                                                                                                                                   |
 | D10 | Author and rights-holder agreements   | Decided 1 October 2026: owner sets per-book shares in admin; all six current books 100% net received to اجمل اند. See the addendum for book 6 permission and immutable agreement versions. |
 | D11 | Withdrawn books already bought        | Open — Step 4                                                                                                                                                                                   |
 | D12 | Refund handling                       | Open — Step 4                                                                                                                                                                                   |
 | D13 | Offline limits and storage clearing   | Open — Step 3/4. Current state: browsing the catalogue needs internet, so withdrawn or unpublished books are never shown from old saved data.                                                   |
-| D14 | Account deletion and data retention   | Policy approved 7 October; implementation/tested source below; financial expiry unresolved — Step 5                                                                                                                                                                                   |
+| D14 | Account deletion and data retention   | Deletion/log/backup policy approved 7 October; financial policy approved 8 October: three years after relevant tax-return filing, scoped exceptions and minimum proof for continuing recovery rights. Financial expiry NOT IMPLEMENTED — Step 5                                                                                                                                                                                   |
 | D15 | App interface languages and wording   | Open — Step 3                                                                                                                                                                                   |
 | D16 | Launch catalogue                      | All six books IDs 3–8 selected; owner-confirmed sale rights including covers/any included audio in approved 174 regions; USD 2.99 starting prices — Step 5                                                                                                                                                                                   |
 | D17 | Samples                               | **Decided 27 Sep:** admin chooses each book’s free part; no fixed amount.                                                                                                                       |
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## Figma Review 2 implementation — 9 October 2026
+
+Owner approved [Figma Review 2](https://www.figma.com/design/NVSrbPa6eJJVUfIK3vdUeJ?node-id=7-5)
+and authorized one shared Flutter design batch: Store, Book details, My Library,
+Search, Reader and Reading preferences, focused verification and project records.
+Actual Figma context/screenshots were inspected; no design guessed from blocked access.
+Implementation is isolated on ui/figma-review-2 from current 72cabf0 source,
+whose baseline mobile tree matches deployed reviewer release 34799b8.
+Newer working governing amendments and unrelated production edits are preserved.
+
+Implemented shared cream/brown styling, flexible book rows, outlined search,
+clear navigation/filters/touch targets, original dynamic cover presentation,
+persistent sample/owned/purchase-status actions, Library download/restore controls,
+reader heading/Contents and visual persisted font/size/light/sepia/dark preferences.
+Existing source text/credits, metadata/front matter/contents, loading/error/offline
+states, account/language/privacy/support, purchases/restore, audio/sharing and
+server-controlled access remain. No placeholders, fixed store price or mock progress
+shipped. Progress/resume is absent: retain Read book and omit percentage/Continue
+reading claim. No daily-feature selection or unsupported reader arrows/author-filter
+API invented. See [implementation and evidence](FIGMA_REVIEW_2_IMPLEMENTATION.md).
+
+Final focused checks passed: 64 Flutter tests,
+1 staging-identity test, required PHP smoke 1 test / 17 assertions.
+Flutter analysis: zero errors; three pre-existing warnings and 61 style notices
+retained (strict default reports them; nonfatal-warning/info run succeeds).
+Rendered RTL/LTR screens at 320×568/390×844, text scales 1.0/1.8, and Library
+states were inspected; synthetic fixtures are not real-phone acceptance.
+Android phone acceptance remains PENDING until owner review and separately
+authorized build/device checks. iOS build/device/provider validation is not
+established by shared Flutter checks. Android/iOS joint launch remains binding.
+Checkout OFF; pricing sync DEFERRED; second-phone restore owner-deferred, not a
+new launch blocker. No deploy/build/upload, transaction, settings/schema/data or
+backend/admin changes. Next single owner action: review the rendered shared UI.
+
+## Joint-launch direction and single remaining-work list — 8 October 2026
+
+**Owner-approved amendment:** four work areas: Admin/backend, Android app, iOS app,
+shared app design and UX/UI. Android and iOS must launch together. Neither may
+release publicly until both are complete, accepted and ready, both store reviews
+are complete, and final owner launch approval is given. This supersedes Android-only
+Version 1, “iOS later”, one-platform release criteria and previous next-task priorities.
+Completed work and historical evidence remain intact.
+
+**Current work order:** inspect iOS readiness → agree/improve shared design and
+UX/UI → complete iOS and remaining admin/backend → accept both apps together and
+fix demonstrated issues → complete both store reviews and coordinate launch.
+Use complete practical batches, shared Flutter code and passed evidence.
+
+**Google Play:** 1.0.6 (15) is OWNER-CONFIRMED APPROVED for Closed testing – Alpha.
+The earlier “Changes in review” / approval-pending snapshot below is historical;
+no independent Console read, tester availability or phone acceptance is claimed.
+Further Google Play preparation pauses until needed for final release. Preserve
+builds 14/15, approved assets, reviewer access, products/mappings and evidence.
+The prior Android pause does not authorize fresh Android work now; shared-design
+or demonstrated-issue changes follow the new work order and specific task approval.
+
+**Preserved controls:** checkout OFF; manual Play pricing for the first 100 books;
+automatic pricing sync DEFERRED/disabled, no 403 retries; second-phone restore
+DEFERRED/not passed and not a launch blocker without a later owner decision.
+Financial policy: three years after the relevant tax return is filed, affected
+records held longer for applicable legal requirements, unresolved disputes or
+unpaid author balances, and minimum proof while recovery rights continue.
+Automatic financial expiry is NOT IMPLEMENTED. Seven-year/one-year alternatives
+remain unapproved. Optional improvements stay outside release scope.
+
+### One active remaining-work list under four areas
+
+Use this list for current priorities. Earlier lists and next-action paragraphs
+below and in supporting records are historical, not parallel active work queues.
+Assign cross-cutting work once; other areas depend on that result.
+
+| Area | Remaining work and type | Dependency / boundary |
+| --- | --- | --- |
+| **1. Admin/backend** | **Construction:** tax-return filing/mapping, scoped exception holds, minimum recovery-proof separation and owner-only financial-retention dry-run; reviewed preservation/disposal design before later expiry; align privacy/deletion wording with policy and actual behavior. | Batch 3 after readiness/design planning. Preserve built accounts, purchase verification, accounting, deletion/recovery and backups. Expiry OFF; deletion/schema/data changes need separately approved preservation, staging and backup plans. |
+| **1. Admin/backend** | **Evidence/external dependencies:** RevenueCat onward integrations, hosting/mail and Microsoft terms, Apache/statistics retention, remaining diagnostic/identifier handling and applicable audience safeguards. Actual provider metadata erasure unverified, conditional on genuine approved deletion work; no eligible job to drain. | Reuse existing evidence; no blanket sharing assertion or manufactured reader deletion. Store-specific reconciliation when final review needs it; owner handles rating questionnaire, assistant poem review stays cancelled. |
+| **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
+| **2. Android app** | **Acceptance:** remaining build-15 Play-signed Google sign-in, reviewer Library/full-book access, native Privacy/Support links/fallbacks; unpassed reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and UX checks. Fix demonstrated issues in agreed shared-design/acceptance batches. | Batch 4 joint acceptance. Reuse passed refund/decline/repurchase and automated evidence; second-phone restore deferred. Further Play preparation paused. |
+| **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
+| **3. iOS app** | **Readiness inspection first:** existing Flutter/shared code and platform gaps, Apple account, Mac/build access, signing and purchases. Record verified, missing and unavailable items without inventing account/access/credential readiness. | Batch 1, next practical task. Inspection first; later concrete tasks authorize setup/build/implementation. |
+| **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
+| **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
+| **4. Shared app design and UX/UI** | **Agreement/construction:** review existing screens/flows, agree release-scoped design/UX/UI improvements and implement the agreed complete batch with shared components/code where practical. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
+| **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
+
+**Next practical task:** read-only iOS readiness inspection covering Flutter code,
+Apple account, Mac/build access, signing and purchases. Financial-retention dry-run
+work remains in the backend list; it is no longer the immediate next-task priority.
+This amendment authorizes documentation only: no features/settings, rebuild,
+deployment, purchase, store submission or release; no commit/push in this task.
+
+**Summary reconciliation still needed:** AGENTS.md §§1–3 retain Android-only/current
+Step 4 scope, §4.11 has Android-only phone acceptance, §6 has small-step instructions,
+and §8 contains “App Store later with iOS”. Those active instructions need alignment
+with this amendment while preserving historical entries and unrelated edits.
+This task changes only the requested Master Record. The explicit owner amendment
+takes precedence over conflicting summary instructions.
+
+### Historical status and recommendations below
+
+Earlier entries, including old platform/review/next-task statements, remain dated
+history and do not supersede this amendment or the single active list above.
+
+
+## Financial retention approved — 8 October 2026
+
+Owner-approved policy (owner chat, not a claim of a universal statutory period):
+- Retain accounting and tax-supporting records for **three years after the relevant
+  tax return is filed**. The clock is the actual filing date, not purchase date,
+  account deletion, year-end, release date or the date this policy was approved.
+- Retain affected records longer where an applicable legal requirement, unresolved
+  dispute or unpaid author balance requires it. Exceptions apply to affected evidence,
+  not automatically to every record; document the basis and release condition.
+- Keep **only the minimum purchase proof needed while purchased-book recovery rights
+  continue**. The three-year period must not break those rights, including approved
+  support-assisted recovery after account deletion and refund/revocation checks.
+- The **seven-year proposal and one-year alternative are NOT APPROVED**. No blanket
+  permanent accounting archive or three-year post-rights period is approved here.
+
+**Approved policy versus implemented behavior:** policy decided; financial expiry
+NOT IMPLEMENTED. Existing accounting, tax-supporting and purchase/recovery records
+remain retained without automatic financial expiry. Current 03:45 maintenance covers
+approved log/backup retention and provider metadata retries, not financial records.
+There is no tax-return filing-date registry or approved financial eligibility job.
+Public policy still describes financial retention as under review; aligning deployed
+wording is a later scoped change, not performed by this documentation task. Earlier
+“financial expiry unresolved” entries remain historical; the policy is now approved,
+while implementation remains outstanding. D14 is not declared fully complete.
+
+Checkout **OFF**, pricing sync **DEFERRED / disabled**, reviewer access and completed
+work preserved. **Second-phone restore remains owner-deferred, not passed, not
+requested and not a launch blocker without a later owner decision.** No record
+expiry/deletion, production setting change, migration, rebuild or deployment here.
+
+Implementation plan: [D14_DATA_POLICY.md](D14_DATA_POLICY.md), scoped to filing-date
+mapping, holds, recovery-proof separation and dry-run eligibility before any later
+expiry authorization. No implementation or data deletion in this task.
+
+
+## Closed testing Alpha submitted — 8 October 2026 (owner-confirmed)
+
+Owner reports Shelf **1.0.6 (15)** uploaded to **Closed testing – Alpha**;
+countries and tester email lists configured; release notes saved with **en-US**
+language tags. Advertising ID declaration set to **No** after read-only inspection
+of the final AAB's compiled merged manifest and actual SDK usage. AD_ID permission
+is absent. Embedded dependencies include RevenueCat purchases 10.22.1,
+purchases-hybrid-common 19.3.1 and play-services-ads-identifier 17.0.1; Advertising
+ID capability is bundled, but Shelf invokes no identifier-collection/attribution
+calls (their channel markers absent in all three compiled Flutter architectures).
+Do not interpret the bundled library as an active Advertising ID collection flow.
+Final artifact/hash/source evidence remains in the build-15 entry below.
+
+Owner submitted the changes. Play Console shows **“Changes in review”**, with
+quick checks running. This records owner chat confirmation, not an independent
+Console read or Google approval. **Google approval, tester availability and build
+15 phone acceptance remain PENDING.** No exact tester emails/country list or review
+completion time invented. Submission does not certify every pending Data safety
+provider fact or constitute public-launch/real-payment approval. Earlier statements
+that no upload/submission occurred describe those earlier tasks and are superseded
+for current release status only.
+
+Checkout remains **OFF**; automatic Play pricing sync remains **DEFERRED / disabled**.
+Preserve reviewer access, approved books/rights/prices/product mappings, completed
+construction and test evidence, build 14 and the cPanel handler. This update changes
+records only: no feature work, rebuild/upload/deploy, production settings or data
+change. No broad tests or completed checks repeated.
+
+### Unfinished work before public launch — implementation/evidence reconciliation
+
+**1. Can progress while Play review is pending (separate authorization as needed):**
+- D14 financial policy is now approved: prepare filing mapping/holds and dry-run
+  implementation, then align disclosures in a later approved task. Automatic financial
+  expiry is not built. Existing deletion/recovery/log/backup construction is retained.
+- Close remaining provider/privacy evidence: RevenueCat dashboard onward integrations,
+  hosting/mail and Microsoft service-provider terms, Apache/statistics retention,
+  remaining provider diagnostic/identifier handling and applicable audience safeguards.
+  Reconcile submitted declarations against those facts; no blanket sharing conclusion
+  or guessed IARC answers. Owner handles the actual rating questionnaire; assistant
+  poem review remains cancelled. Submitted listing/declarations are not reopened
+  merely because older preparation documents said they were not submitted.
+- Obtain outstanding actual backup-alert delivery and replacement-host recovery/cutover
+  acceptance under a separately approved isolated drill/operating plan. Reuse already
+  passed encrypted upload/download/restore and scheduled-backup evidence.
+- Resolve recorded confirmation of removal of four temporary account-level Play grants,
+  preserving app-level access; plan separately approved old-app retirement without
+  accessing or changing the old account in this task.
+
+**2. Requires the approved/available Play build:**
+- Google approval and actual tester opt-in/install availability; then build 15 phone
+  acceptance: Play-signed Google sign-in, reviewer Library/full-book access, native
+  Privacy/Support links and copyable fallbacks, remaining account/reader UX acceptance.
+- Finish only unpassed real-phone Pashto/Farsi poetry/prose/mixed-text/font/sample
+  and real Word-import reading checks; remaining offline expiry/account isolation/
+  sign-out/withdrawal checks. Second-phone restore remains owner-deferred, NOT PASSED;
+  it is not a launch blocker without a later owner decision.
+  Preserve the owner's passed refund/decline/repurchase results; no broad repeat.
+- Actual production purchase/event delivery, SDK acknowledgement and production refund/
+  restore acceptance require the Play build **and separate explicit owner real-money/
+  controlled gate authorization**. Closed-test approval alone cannot enable checkout.
+- Owner final end-to-end acceptance, explicit public-launch approval and approved
+  launch rollout are still required. Review/tester availability is not public release.
+
+Actual provider erasure remains unverified, conditional on genuine approved deletion
+work; there is no eligible job to drain. Do not create/delete a real reader solely
+for evidence or mark D14 fully complete. No new generic purchase/accounting/recovery
+code defect established. Automatic price sync remains outside the launch work queue.
+
+**Next scoped task proposed:** filing-date mapping, exception metadata and owner-only
+financial-retention dry-run reporting, with expiry OFF, as planned in D14_DATA_POLICY.md.
+Financial policy has been approved; no implementation or deletion authorized here.
+
 
 ## Updated closed-testing Android AAB — 8 October 2026
 
@@ -1293,6 +1541,39 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 
 # Part 11 — Decision log
 
+- **8 October 2026 owner approval; implementation continued 9 October:** Figma
+  Review 2, file NVSrbPa6eJJVUfIK3vdUeJ, board 7:5, approved at the URL above.
+  Authorized shared Flutter implementation of Store, Book details, My Library,
+  Search, Reader and Reading preferences, focused checks and project records.
+  Preserve working features, original content/credits, store localized prices,
+  access rules and new governing records. No production changes/deployment,
+  store upload, real transaction or checkout activation. Android phone acceptance
+  pending; iOS validation separate; joint launch and existing deferrals preserved.
+
+- **8 October 2026 — owner-approved joint-launch/work-order amendment:** four areas:
+  Admin/backend, Android, iOS, shared design/UX/UI. Android and iOS launch together
+  only after both are complete, accepted and ready, both store reviews complete,
+  and final owner launch approval. Supersedes Android-only Version 1 / “iOS later”.
+  Order: inspect iOS readiness (Flutter, Apple account, Mac/build access, signing,
+  purchases); agree/improve shared design; complete iOS and remaining backend;
+  accept both apps/fix demonstrated issues; complete both reviews/coordinated launch.
+  Complete practical batches, shared code/passed evidence, one four-area remaining
+  list; optional improvements outside release scope. Play 1.0.6 (15) owner-confirmed
+  approved for closed testing; further Play preparation paused until final release
+  needs it. Checkout OFF, three-year filing-based financial policy/continuing recovery
+  proof retained, automatic expiry absent, pricing-sync/second-phone deferrals retained.
+  Documentation only; no implementation/build/deployment/purchase/release or commit/push.
+
+
+- **8 October 2026 — financial-retention owner approval:** accounting and tax-supporting
+  records retained three years after the relevant tax return is filed; affected records
+  held longer for applicable legal requirements, unresolved disputes or unpaid author
+  balances. Minimum purchase proof retained while purchased-book recovery rights continue;
+  three-year expiry must not break recovery. Seven-year proposal and one-year alternative
+  NOT APPROVED. Documentation/implementation plan only; automatic financial expiry absent.
+  Checkout OFF, sync DEFERRED, second-phone restore deferred and not a launch blocker
+  without later owner decision. No deletion/production changes/rebuild/deployment.
+
 - **7 October 2026, production construction:** Owner approved constructing production-mode purchase verification behind disabled controls, with existing RevenueCat/Google Play integration. Real transactions require authenticated provider-event environment and independent server REST is_sandbox evidence to agree, with the exact reader, book, permanent entitlement and unique purchase-time match. Unknown, malformed, ambiguous or failed evidence never grants access or renews an offline lease. Test transactions remain excluded from real income. Production acceptance defaults OFF and is forced OFF on staging; no real payment or public release is authorized. Preserves manual first-100-book pricing, acknowledgement, refunds and accounting. Owner authorized focused tests, staging/backed-up promotion and commit/push; no real-sale activation.
 
 - **7 October 2026:** For Shelf’s first 100 books, the owner creates and manages Google Play products, prices and availability manually in Play Console. Automatic admin-to-Play product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled. Stop 403 investigations, calculations, retries and support follow-ups unless the owner explicitly reopens automatic sync. Existing product mappings, credentials, app-level access, verification, acknowledgements, entitlements, refunds, accounting and historical records are preserved. Admin USD prices are approved reference values; saving does not update Play. Checkout uses Google’s localized store price. No Play product creation/change is authorized in this task.
@@ -1377,7 +1658,7 @@ Separate /api/owner-preview path, signed temporary access and isolated caches, k
 |--------------------|------------------------------------------------------------------------------------------------------|
 | Backend            | The server part (Laravel). Stores books, accounts and purchases and decides who can read what.       |
 | Filament           | The owner admin panel where Ajmal manages authors, books, prices and publishing.                     |
-| Flutter app        | The Android app readers install.                                                                     |
+| Flutter app        | The shared-code Android and iOS apps readers install.                                                                     |
 | Codex              | The coding assistant that works inside the shelf account on the server.                              |
 | AGENTS.md          | The short rule file in the code that Codex reads every time; the summary of this document.           |
 | cPanel account     | A separate user on the server with its own files, database, domain and settings. Shelf’s is “shelf”. |
@@ -1394,7 +1675,7 @@ Separate /api/owner-preview path, signed temporary access and isolated caches, k
 
 # Addendum — owner decisions after v2.3 (29 September–2 October 2026)
 
-These decisions are binding and will be folded into the next full version. Where they differ from the text above, this addendum wins.
+These decisions remain binding except where superseded by later dated owner amendments. The 8 October 2026 joint-launch amendment in Parts 2, 7–10 and 11 supersedes “App Store later with an iOS version” and Android-only release scope. Original rows below remain historical evidence; other unsuperseded decisions continue to apply.
 
 | ID | Decision |
 |---|---|
