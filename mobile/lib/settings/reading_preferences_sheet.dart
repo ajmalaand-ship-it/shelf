@@ -103,6 +103,37 @@ class ReadingPreferences extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
+                          strings.isEnglish ? 'Reading mode' : 'د لوست بڼه',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final mode in ReadingMode.values)
+                              ChoiceChip(
+                                key: Key('reading-mode-${mode.name}'),
+                                selected: settings.readingMode == mode,
+                                label: Text(
+                                  mode == ReadingMode.scroll
+                                      ? (strings.isEnglish
+                                            ? 'Scroll'
+                                            : 'پرله‌پسې لوست')
+                                      : (strings.isEnglish ? 'Pages' : 'پاڼې'),
+                                ),
+                                labelStyle: TextStyle(
+                                  color: settings.readingMode == mode
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context).colorScheme.primary,
+                                ),
+                                onSelected: (_) =>
+                                    settings.setReadingMode(mode),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
                           strings.fontSize,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),

@@ -194,6 +194,9 @@ void main() {
       await tester.tap(find.byKey(const Key('collection-font-chooser')));
       await tester.pumpAndSettle();
       expect(find.byType(RadioListTile<ReaderFont>), findsExactly(3));
+      await tester.ensureVisible(
+        find.byKey(const Key('font-choice-noto-nastaliq')),
+      );
       await tester.tap(find.byKey(const Key('font-choice-noto-nastaliq')));
       await tester.pumpAndSettle();
       expect(readerSettings.font, ReaderFont.literary);

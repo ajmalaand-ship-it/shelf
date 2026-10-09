@@ -100,24 +100,29 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
           final samples = bundle.poems.where(
             (p) => p.isFreeSample && !p.locked,
           );
-          void openItem(PoemSummary poem) => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => Directionality(
-                textDirection: TextDirection.rtl,
-                child: PoemReaderScreen(
-                  poemId: poem.id,
-                  contentVersion: widget.contentVersion,
-                  repository: widget.repository,
-                  settings: widget.readerSettings,
-                  collectionTitle: book.title,
-                  audioController:
-                      widget.audioController ?? InactiveAudioController(),
-                  entitlements: widget.entitlements,
-                  ownerPreviewMode: widget.ownerPreviewMode,
+          void openItem(PoemSummary poem, {bool resume = false}) =>
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: PoemReaderScreen(
+                      poemId: poem.id,
+                      contentVersion: widget.contentVersion,
+                      repository: widget.repository,
+                      settings: widget.readerSettings,
+                      collectionTitle: book.title,
+                      collection: book,
+                      contents: bundle.poems,
+                      ownedMode: widget.ownedMode,
+                      resume: resume,
+                      audioController:
+                          widget.audioController ?? InactiveAudioController(),
+                      entitlements: widget.entitlements,
+                      ownerPreviewMode: widget.ownerPreviewMode,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
+              );
 
           return Scaffold(
             bottomNavigationBar: SafeArea(
@@ -140,6 +145,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                               widget.ownedMode
                                   ? bundle.poems.first
                                   : samples.first,
+                              resume: true,
                             ),
                       icon: const Icon(Icons.menu_book_outlined),
                       label: Text(

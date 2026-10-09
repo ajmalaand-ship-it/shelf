@@ -90,12 +90,23 @@ if "$run_mobile"; then
     elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "pinned-preview" ]]; then
         mobile_args=(test/reading_preferences_pinned_test.dart test/reader_settings_test.dart
             test/reader_widget_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "paginated-reader" ]]; then
+        mobile_args=(test/text_pages_test.dart test/paginated_reader_test.dart
+            test/reader_settings_test.dart test/reader_widget_test.dart
+            test/reading_preferences_pinned_test.dart test/book_content_language_test.dart
+            test/audio_player_widget_test.dart test/share_card_entry_test.dart)
     elif [[ -n "${SHELF_MOBILE_TEST_SCOPE:-}" ]]; then
         echo "Unknown mobile test scope" >&2; exit 2
     fi
     if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "pinned-preview" ]]; then
         "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings \
             lib/settings/reading_preferences_sheet.dart test/reading_preferences_pinned_test.dart
+    fi
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "paginated-reader" ]]; then
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings \
+            lib/reading lib/screens/poem_reader_screen.dart lib/screens/collection_detail_screen.dart \
+            lib/widgets/poetry_text.dart lib/settings/reader_settings.dart lib/settings/reading_preferences_sheet.dart \
+            test/text_pages_test.dart test/paginated_reader_test.dart
     fi
     "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test "${mobile_args[@]}" --reporter expanded --concurrency=2
     "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test test/staging_identity_test.dart --reporter expanded \
