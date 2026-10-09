@@ -293,6 +293,10 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Book 1'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('owner-preview-collection-detail-status')),
+        150,
+      );
       expect(
         find.byKey(const Key('owner-preview-collection-detail-status')),
         findsOneWidget,

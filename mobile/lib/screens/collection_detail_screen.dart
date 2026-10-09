@@ -62,13 +62,19 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
     animation: widget.readerSettings,
     builder: (context, _) => Scaffold(
       appBar: AppBar(
+        toolbarHeight:
+            56 * MediaQuery.textScalerOf(context).scale(1).clamp(1, 2),
+        title: Text(
+          AppStrings.of(context).isEnglish ? 'Book details' : 'د کتاب په اړه',
+          maxLines: 2,
+        ),
         actions: [
-          TextButton.icon(
+          IconButton(
+            tooltip: AppStrings.of(context).readingPreferences,
             key: const Key('collection-font-chooser'),
             onPressed: () =>
                 showReadingPreferences(context, widget.readerSettings),
             icon: const Icon(Icons.text_fields_rounded),
-            label: Text(AppStrings.of(context).font),
           ),
         ],
       ),
@@ -113,108 +119,16 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
             ),
           );
 
-          return CustomScrollView(
-            slivers: [
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
-                sliver: SliverList.list(
+          return Scaffold(
+            bottomNavigationBar: SafeArea(
+              top: false,
+              child: Container(
+                color: Theme.of(context).colorScheme.surface,
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Center(
-                      child: BookCover(
-                        url: book.coverUrl,
-                        width: 180,
-                        height: 245,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      bundle.collection.title,
-                      key: const Key('collection-detail-title'),
-                      textDirection: TextDirection.rtl,
-                      textAlign: TextAlign.right,
-                      style: Theme.of(context).textTheme.headlineLarge
-                          ?.copyWith(
-                            fontFamily: widget.readerSettings.fontFamily,
-                          ),
-                    ),
-                    if (book.subtitle?.isNotEmpty == true)
-                      Text(
-                        book.subtitle!,
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                      ),
-                    if (book.authors.any((a) => a.role == 'author'))
-                      Wrap(
-                        alignment: WrapAlignment.start,
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          for (final author in book.authors.where(
-                            (a) => a.role == 'author',
-                          ))
-                            TextButton(
-                              onPressed: () =>
-                                  navigation.openAuthor(context, author.slug),
-                              child: Text(
-                                author.name,
-                                textDirection: TextDirection.rtl,
-                                textAlign: TextAlign.right,
-                              ),
-                            ),
-                        ],
-                      )
-                    else if (book.creditedAuthors case final author?)
-                      Text(
-                        author,
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                      ),
-                    if (bundle.collection.creditedTranslators != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        AppStrings.of(context).translation(
-                          book.authors
-                              .where((a) => a.role == 'translator')
-                              .map((a) => a.name)
-                              .join('، '),
-                        ),
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                      ),
-                    ],
-                    if (widget.ownerPreviewMode) ...[
-                      const SizedBox(height: 10),
-                      Center(
-                        child: Chip(
-                          key: const Key(
-                            'owner-preview-collection-detail-status',
-                          ),
-                          label: Text(
-                            AppStrings.of(context).status(book.displayStatus),
-                          ),
-                        ),
-                      ),
-                    ],
-                    Wrap(
-                      alignment: WrapAlignment.start,
-                      textDirection: TextDirection.rtl,
-                      spacing: 8,
-                      children: [
-                        if (book.language case final language?)
-                          Chip(
-                            label: Text(
-                              AppStrings.of(context).languageName(language),
-                            ),
-                          ),
-                        Chip(
-                          label: Text(
-                            AppStrings.of(context).typeName(book.bookType),
-                          ),
-                        ),
-                        for (final category in book.categories)
-                          Chip(label: Text(category.name)),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
                     FilledButton.icon(
                       key: const Key('read-sample'),
                       onPressed:
@@ -290,67 +204,187 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                               ? (AppStrings.of(context).isEnglish
                                     ? 'Open owned book'
                                     : 'پېرودل شوی کتاب پرانیزئ')
+                              : LibraryScope.of(context)!.checkoutAvailable !=
+                                    true
+                              ? (AppStrings.of(context).isEnglish
+                                    ? 'Purchases unavailable'
+                                    : 'پېرودنه اوس نشته')
                               : (AppStrings.of(context).isEnglish
                                     ? 'Buy book'
                                     : 'کتاب وپېرئ'),
                         ),
                       ),
-                    if (book.description?.isNotEmpty == true)
-                      _FrontMatter(
-                        title: AppStrings.of(context).description,
-                        body: book.description!,
-                      ),
-                    if (bundle.collection.publicationInfo case final info?)
-                      _FrontMatter(
-                        title: AppStrings.of(context).publicationInfo,
-                        body: info,
-                      ),
-                    if (bundle.collection.dedication case final dedication?)
-                      _FrontMatter(
-                        title: AppStrings.of(context).dedication,
-                        body: dedication,
-                      ),
-                    if (bundle.collection.introduction case final introduction?)
-                      _FrontMatter(
-                        title: AppStrings.of(context).introduction,
-                        body: introduction,
-                      ),
-                    if (bundle.collection.foreword case final foreword?)
-                      _FrontMatter(
-                        title:
-                            bundle.collection.forewordAuthor ??
-                            AppStrings.of(context).foreword,
-                        body: foreword,
-                      ),
-                    const SizedBox(height: 28),
-                    Text(
-                      AppStrings.of(context).contents,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 10),
-                    if (bundle.poems.isEmpty)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 30),
-                        child: Text(AppStrings.of(context).noContent),
-                      )
-                    else
-                      ...bundle.poems.map(
-                        (poem) => _PoemTile(
-                          poem: poem,
-                          fontFamily: widget.readerSettings.fontFamily,
-                          ownerPreviewMode: widget.ownerPreviewMode,
-                          onTap:
-                              widget.ownedMode ||
-                                  widget.ownerPreviewMode ||
-                                  (poem.isFreeSample && !poem.locked)
-                              ? () => openItem(poem)
-                              : null,
-                        ),
-                      ),
                   ],
                 ),
               ),
-            ],
+            ),
+            body: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+                  sliver: SliverList.list(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: BookCover(
+                            url: book.coverUrl,
+                            width: 140,
+                            height: 207,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        bundle.collection.title,
+                        key: const Key('collection-detail-title'),
+                        textDirection: TextDirection.rtl,
+                        textAlign: TextAlign.right,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      if (book.subtitle?.isNotEmpty == true)
+                        Text(
+                          book.subtitle!,
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.right,
+                        ),
+                      if (book.authors.any((a) => a.role == 'author'))
+                        Wrap(
+                          alignment: WrapAlignment.start,
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            for (final author in book.authors.where(
+                              (a) => a.role == 'author',
+                            ))
+                              TextButton(
+                                onPressed: () =>
+                                    navigation.openAuthor(context, author.slug),
+                                child: Text(
+                                  author.name,
+                                  textDirection: TextDirection.rtl,
+                                  textAlign: TextAlign.right,
+                                ),
+                              ),
+                          ],
+                        )
+                      else if (book.creditedAuthors case final author?)
+                        Text(
+                          author,
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.right,
+                        ),
+                      if (bundle.collection.creditedTranslators != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          AppStrings.of(context).translation(
+                            book.authors
+                                .where((a) => a.role == 'translator')
+                                .map((a) => a.name)
+                                .join('، '),
+                          ),
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.right,
+                        ),
+                      ],
+                      if (widget.ownerPreviewMode) ...[
+                        const SizedBox(height: 10),
+                        Center(
+                          child: Chip(
+                            key: const Key(
+                              'owner-preview-collection-detail-status',
+                            ),
+                            label: Text(
+                              AppStrings.of(context).status(book.displayStatus),
+                            ),
+                          ),
+                        ),
+                      ],
+                      Wrap(
+                        alignment: WrapAlignment.start,
+                        textDirection: TextDirection.rtl,
+                        spacing: 8,
+                        children: [
+                          if (book.language case final language?)
+                            Chip(
+                              label: Text(
+                                AppStrings.of(context).languageName(language),
+                              ),
+                            ),
+                          Chip(
+                            label: Text(
+                              AppStrings.of(context).typeName(book.bookType),
+                            ),
+                          ),
+                          for (final category in book.categories)
+                            Chip(label: Text(category.name)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if (book.description?.isNotEmpty == true)
+                        _FrontMatter(
+                          title: AppStrings.of(context).description,
+                          body: book.description!,
+                        ),
+                      if (bundle.collection.publicationInfo case final info?)
+                        _FrontMatter(
+                          title: AppStrings.of(context).publicationInfo,
+                          body: info,
+                        ),
+                      if (bundle.collection.dedication case final dedication?)
+                        _FrontMatter(
+                          title: AppStrings.of(context).dedication,
+                          body: dedication,
+                        ),
+                      if (bundle.collection.introduction
+                          case final introduction?)
+                        _FrontMatter(
+                          title: AppStrings.of(context).introduction,
+                          body: introduction,
+                        ),
+                      if (bundle.collection.foreword case final foreword?)
+                        _FrontMatter(
+                          title:
+                              bundle.collection.forewordAuthor ??
+                              AppStrings.of(context).foreword,
+                          body: foreword,
+                        ),
+                      const SizedBox(height: 28),
+                      Text(
+                        AppStrings.of(context).contents,
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      const SizedBox(height: 10),
+                      if (bundle.poems.isEmpty)
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 30),
+                          child: Text(AppStrings.of(context).noContent),
+                        )
+                      else
+                        ...bundle.poems.map(
+                          (poem) => _PoemTile(
+                            poem: poem,
+                            fontFamily: widget.readerSettings.fontFamily,
+                            ownerPreviewMode: widget.ownerPreviewMode,
+                            onTap:
+                                widget.ownedMode ||
+                                    widget.ownerPreviewMode ||
+                                    (poem.isFreeSample && !poem.locked)
+                                ? () => openItem(poem)
+                                : null,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

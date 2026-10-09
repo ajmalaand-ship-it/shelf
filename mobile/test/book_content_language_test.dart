@@ -119,7 +119,9 @@ void main() {
       await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
       expectSource(tester, tile, title);
-      expect(tester.getRect(tile), bounds);
+      // Shared navigation mirrors in English; source direction and available
+      // title width remain unchanged.
+      expect(tester.getRect(tile).size, bounds.size);
       await tester.tap(tile);
       await tester.pumpAndSettle();
       final heading = find.byKey(const Key('collection-detail-title'));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'reader_settings.dart';
+import 'reader_palette_colors.dart';
 import '../l10n/app_strings.dart';
 
 Future<void> showReadingPreferences(
@@ -10,46 +11,118 @@ Future<void> showReadingPreferences(
   context: context,
   showDragHandle: true,
   isScrollControlled: true,
-  builder: (_) => AnimatedBuilder(
+  useSafeArea: true,
+  builder: (_) => ReadingPreferences(settings: settings),
+);
+
+class ReadingPreferences extends StatelessWidget {
+  const ReadingPreferences({required this.settings, super.key});
+  final ReaderSettings settings;
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
     animation: settings,
-    builder: (context, _) => SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
+    builder: (context, _) {
+      final strings = AppStrings.of(context);
+      final colors = ReaderPaletteColors.forPalette(settings.palette);
+      return SafeArea(
+        top: false,
+        child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      strings.readingPreferences,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  IconButton(
+                    key: const Key('reading-preferences-close'),
+                    tooltip: MaterialLocalizations.of(context)
+                        .closeButtonTooltip,
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                key: const Key('reading-live-preview'),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.background,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  strings.isEnglish
+                      ? 'Books change your life'
+                      : 'کتاب مو ژوند بدلوي',
+                  style: TextStyle(
+                    fontFamily: settings.fontFamily,
+                    fontSize: settings.fontSize,
+                    height: 1.75,
+                    color: colors.foreground,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               Text(
-                AppStrings.of(context).fontSize,
+                strings.fontSize,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               Row(
                 children: [
-                  const Icon(Icons.text_decrease_rounded),
+                  IconButton.filledTonal(
+                    key: const Key('font-size-decrease'),
+                    tooltip: strings.isEnglish ? 'Smaller text' : 'کوچنۍ لیکنه',
+                    onPressed:
+                        settings.fontSize <= ReaderSettings.minimumFontSize
+                        ? null
+                        : () => settings.setFontSize(settings.fontSize - 2),
+                    icon: const Icon(Icons.text_decrease),
+                  ),
                   Expanded(
-                    child: Slider(
-                      key: const Key('font-size-slider'),
-                      min: ReaderSettings.minimumFontSize,
-                      max: ReaderSettings.maximumFontSize,
-                      divisions: 11,
-                      value: settings.fontSize.clamp(
-                        ReaderSettings.minimumFontSize,
-                        ReaderSettings.maximumFontSize,
+                    child: Center(
+                      child: Text(
+                        settings.fontSize.round().toString(),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      label: settings.fontSize.round().toString(),
-                      onChanged: settings.setFontSize,
                     ),
                   ),
-                  const Icon(Icons.text_increase_rounded),
+                  IconButton.filledTonal(
+                    key: const Key('font-size-increase'),
+                    tooltip: strings.isEnglish ? 'Larger text' : 'لویه لیکنه',
+                    onPressed:
+                        settings.fontSize >= ReaderSettings.maximumFontSize
+                        ? null
+                        : () => settings.setFontSize(settings.fontSize + 2),
+                    icon: const Icon(Icons.text_increase),
+                  ),
                 ],
               ),
-              const SizedBox(height: 8),
+              Slider(
+                key: const Key('font-size-slider'),
+                min: ReaderSettings.minimumFontSize,
+                max: ReaderSettings.maximumFontSize,
+                divisions: 11,
+                value: settings.fontSize.clamp(
+                  ReaderSettings.minimumFontSize,
+                  ReaderSettings.maximumFontSize,
+                ),
+                label: settings.fontSize.round().toString(),
+                onChanged: settings.setFontSize,
+              ),
               Text(
-                AppStrings.of(context).readingFont,
+                strings.readingFont,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 12),
               RadioGroup<ReaderFont>(
                 key: const Key('reading-font-selector'),
                 groupValue: settings.font,
@@ -58,54 +131,107 @@ Future<void> showReadingPreferences(
                 },
                 child: Column(
                   children: [
-                    RadioListTile<ReaderFont>(
-                      key: Key('font-choice-vazirmatn'),
-                      value: ReaderFont.vazirmatn,
-                      title: Text(AppStrings.of(context).vazirmatnName),
-                      subtitle: Text(
-                        AppStrings.of(context).defaultFontDescription,
+                    for (final font in ReaderFont.values)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Card(
+                          color: settings.font == font
+                              ? Theme.of(context).colorScheme.primaryContainer
+                              : Colors.white,
+                          child: RadioListTile<ReaderFont>(
+                            key: Key(switch (font) {
+                              ReaderFont.vazirmatn => 'font-choice-vazirmatn',
+                              ReaderFont.naskh => 'font-choice-scheherazade',
+                              ReaderFont.literary =>
+                                'font-choice-noto-nastaliq',
+                            }),
+                            value: font,
+                            title: Text(switch (font) {
+                              ReaderFont.vazirmatn => strings.vazirmatnName,
+                              ReaderFont.naskh => strings.scheherazadeName,
+                              ReaderFont.literary => strings.nastaliqName,
+                            }),
+                            subtitle: Text(switch (font) {
+                              ReaderFont.vazirmatn =>
+                                strings.defaultFontDescription,
+                              ReaderFont.naskh => strings.naskhDescription,
+                              ReaderFont.literary =>
+                                strings.nastaliqDescription,
+                            }),
+                          ),
+                        ),
                       ),
-                    ),
-                    RadioListTile<ReaderFont>(
-                      key: Key('font-choice-scheherazade'),
-                      value: ReaderFont.naskh,
-                      title: Text(AppStrings.of(context).scheherazadeName),
-                      subtitle: Text(AppStrings.of(context).naskhDescription),
-                    ),
-                    RadioListTile<ReaderFont>(
-                      key: Key('font-choice-noto-nastaliq'),
-                      value: ReaderFont.literary,
-                      title: Text(AppStrings.of(context).nastaliqName),
-                      subtitle: Text(
-                        AppStrings.of(context).nastaliqDescription,
-                      ),
-                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
-              SegmentedButton<ReaderPalette>(
-                segments: [
-                  ButtonSegment(
-                    value: ReaderPalette.light,
-                    label: Text(AppStrings.of(context).lightPalette),
-                  ),
-                  ButtonSegment(
-                    value: ReaderPalette.sepia,
-                    label: Text(AppStrings.of(context).sepiaPalette),
-                  ),
-                  ButtonSegment(
-                    value: ReaderPalette.dark,
-                    label: Text(AppStrings.of(context).darkPalette),
-                  ),
-                ],
-                selected: {settings.palette},
-                onSelectionChanged: (value) => settings.setPalette(value.first),
+              Text(
+                strings.isEnglish ? 'Page color' : 'د پاڼې رنګ',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 12),
+              LayoutBuilder(
+                builder: (context, constraints) => Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    for (final palette in ReaderPalette.values)
+                      SizedBox(
+                        width: constraints.maxWidth < 280
+                            ? constraints.maxWidth
+                            : (constraints.maxWidth - 24) / 3,
+                        child: _ThemeSwatch(
+                          palette: palette,
+                          settings: settings,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
+      );
+    },
+  );
+}
+
+class _ThemeSwatch extends StatelessWidget {
+  const _ThemeSwatch({required this.palette, required this.settings});
+  final ReaderPalette palette;
+  final ReaderSettings settings;
+  @override
+  Widget build(BuildContext context) {
+    final colors = ReaderPaletteColors.forPalette(palette);
+    final s = AppStrings.of(context);
+    final label = switch (palette) {
+      ReaderPalette.light => s.lightPalette,
+      ReaderPalette.sepia => s.sepiaPalette,
+      ReaderPalette.dark => s.darkPalette,
+    };
+    return Semantics(
+      selected: settings.palette == palette,
+      child: OutlinedButton(
+        key: Key('theme-${palette.name}'),
+        onPressed: () => settings.setPalette(palette),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: colors.background,
+          foregroundColor: colors.foreground,
+          side: BorderSide(
+            color: settings.palette == palette
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outlineVariant,
+            width: settings.palette == palette ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Aa', style: TextStyle(fontSize: 24)),
+            Text(label, textAlign: TextAlign.center),
+            if (settings.palette == palette) const Icon(Icons.check, size: 18),
+          ],
+        ),
       ),
-    ),
-  ),
-);
+    );
+  }
+}

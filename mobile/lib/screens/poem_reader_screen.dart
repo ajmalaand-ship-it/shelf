@@ -1,7 +1,11 @@
 import 'dart:io';
+
 import '../services/api_config.dart';
 
 import 'package:flutter/material.dart';
+
+import '../l10n/app_strings.dart';
+import '../settings/reader_palette_colors.dart';
 
 import '../audio/audio_playback_controller.dart';
 import '../models/poem.dart';
@@ -63,7 +67,7 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: widget.settings,
     builder: (context, _) {
-      final colors = _ReaderColors.forPalette(widget.settings.palette);
+      final colors = ReaderPaletteColors.forPalette(widget.settings.palette);
       return Scaffold(
         backgroundColor: colors.background,
         appBar: AppBar(
@@ -73,8 +77,15 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
           surfaceTintColor: colors.background,
           shadowColor: Colors.transparent,
           scrolledUnderElevation: 0,
+          title: _loadedPoem?.isFreeSample == true
+              ? Text(
+                  AppStrings.of(context).sample,
+                  style: TextStyle(fontSize: 13, color: colors.muted),
+                )
+              : null,
           actions: [
-            TextButton.icon(
+            IconButton(
+              tooltip: AppStrings.of(context).isEnglish ? 'Share' : 'شریکول',
               key: const Key('reader-share'),
               onPressed:
                   _loadedPoem == null ||
@@ -90,15 +101,25 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
                       ),
                     ),
               icon: const Icon(Icons.ios_share_rounded),
-              label: const Text('شریکول'),
             ),
-            TextButton.icon(
+            IconButton(
+              tooltip: AppStrings.of(context).readingPreferences,
               key: const Key('reader-font-chooser'),
               onPressed: () => showReadingPreferences(context, widget.settings),
               icon: const Icon(Icons.text_fields_rounded),
-              label: const Text('لیکبڼه'),
             ),
           ],
+        ),
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: TextButton(
+              style: TextButton.styleFrom(foregroundColor: colors.foreground),
+              onPressed: () => Navigator.maybePop(context),
+              child: Text(AppStrings.of(context).contents),
+            ),
+          ),
         ),
         body: ClipRect(
           key: const Key('reader-body-clip'),
@@ -126,6 +147,7 @@ class _PoemReaderScreenState extends State<PoemReaderScreen> {
                 audioController:
                     widget.audioController ?? InactiveAudioController(),
                 ownerPreviewMode: widget.ownerPreviewMode,
+                collectionTitle: widget.collectionTitle,
               );
             },
           ),
@@ -142,13 +164,15 @@ class _PoemBody extends StatelessWidget {
     required this.colors,
     required this.audioController,
     required this.ownerPreviewMode,
+    this.collectionTitle,
   });
 
   final PoemDetail poem;
   final ReaderSettings settings;
-  final _ReaderColors colors;
+  final ReaderPaletteColors colors;
   final AudioPlaybackController audioController;
   final bool ownerPreviewMode;
+  final String? collectionTitle;
 
   @override
   Widget build(BuildContext context) => Directionality(
@@ -159,13 +183,23 @@ class _PoemBody extends StatelessWidget {
         child: SingleChildScrollView(
           key: const Key('poem-scroll-view'),
           clipBehavior: Clip.hardEdge,
-          padding: const EdgeInsets.fromLTRB(12, 24, 12, 72),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (collectionTitle != null) ...[
+                    Text(
+                      collectionTitle!,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(color: colors.muted, fontSize: 13),
+                    ),
+                    const SizedBox(height: 16),
+                    Divider(color: colors.muted.withValues(alpha: .25)),
+                    const SizedBox(height: 16),
+                  ],
                   if (!poem.isUntitled)
                     Text(
                       poem.title!,
@@ -193,7 +227,10 @@ class _PoemBody extends StatelessWidget {
                         image: poem.artworkUrl?.scheme == 'file'
                             ? FileImage(File.fromUri(poem.artworkUrl!))
                                   as ImageProvider
-                            : NetworkImage(poem.artworkUrl.toString(), headers: shelfTestHeaders(poem.artworkUrl!)),
+                            : NetworkImage(
+                                poem.artworkUrl.toString(),
+                                headers: shelfTestHeaders(poem.artworkUrl!),
+                              ),
                         key: const Key('poem-artwork'),
                         fit: BoxFit.contain,
                         alignment: Alignment.center,
@@ -285,7 +322,7 @@ class _AudioPlayerPanel extends StatelessWidget {
 
   final PoemDetail poem;
   final AudioPlaybackController controller;
-  final _ReaderColors colors;
+  final ReaderPaletteColors colors;
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -455,29 +492,4 @@ class _ReaderError extends StatelessWidget {
       ],
     ),
   );
-}
-
-class _ReaderColors {
-  const _ReaderColors(this.background, this.foreground, this.muted);
-  final Color background;
-  final Color foreground;
-  final Color muted;
-
-  static _ReaderColors forPalette(ReaderPalette palette) => switch (palette) {
-    ReaderPalette.light => const _ReaderColors(
-      Color(0xfffffdf8),
-      Color(0xff211d18),
-      Color(0xff6a6258),
-    ),
-    ReaderPalette.sepia => const _ReaderColors(
-      Color(0xfff1e3c7),
-      Color(0xff3e2f20),
-      Color(0xff765f47),
-    ),
-    ReaderPalette.dark => const _ReaderColors(
-      Color(0xff171512),
-      Color(0xfff2e9db),
-      Color(0xffbcb0a1),
-    ),
-  };
 }

@@ -78,6 +78,13 @@ if "$run_mobile"; then
         mobile_args=(test/book_purchases_test.dart test/library_ux_test.dart test/staging_identity_test.dart)
     elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "privacy-support" ]]; then
         mobile_args=(test/privacy_support_test.dart test/interface_language_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-2" ]]; then
+        mobile_args=(test/bookstore_screens_test.dart test/home_collections_test.dart
+            test/interface_language_test.dart test/book_content_language_test.dart
+            test/library_ux_test.dart test/reader_widget_test.dart
+            test/reader_settings_test.dart test/typography_layout_test.dart
+            test/audio_player_widget_test.dart test/share_card_entry_test.dart
+            test/privacy_support_test.dart test/review_2_layout_test.dart)
     elif [[ -n "${SHELF_MOBILE_TEST_SCOPE:-}" ]]; then
         echo "Unknown mobile test scope" >&2; exit 2
     fi

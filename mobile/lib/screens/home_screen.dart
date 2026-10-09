@@ -47,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<BookCategory> _categories = [];
   bool _failed = false;
   int _tab = 0;
+  String? _storeType;
   @override
   void initState() {
     super.initState();
@@ -116,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           [
-            AppStrings.of(context).store,
+            AppStrings.of(context).appName,
             AppStrings.of(context).search,
             AppStrings.of(context).library,
             AppStrings.of(context).settings,
@@ -137,12 +138,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (_tab == 0)
             const LanguageButton(key: Key('store-language-toggle')),
-          TextButton.icon(
+          IconButton(
             key: const Key('home-font-chooser'),
+            tooltip: AppStrings.of(context).readingPreferences,
             onPressed: () =>
                 showReadingPreferences(context, widget.readerSettings),
             icon: const Icon(Icons.text_fields_rounded),
-            label: Text(AppStrings.of(context).font),
           ),
         ],
       ),
@@ -194,7 +195,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return _failed
           ? BookstoreError(onRetry: _load)
           : const Center(child: CircularProgressIndicator());
-    final books = snapshot.collections;
+    final books = snapshot.collections
+        .where((book) => _storeType == null || book.bookType == _storeType)
+        .toList();
     final populated = _categories
         .where(
           (c) => books.any((b) => b.categories.any((bc) => bc.slug == c.slug)),
@@ -214,15 +217,43 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            AppStrings.of(context).appName,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
-          const SizedBox(height: 10),
-          Text(
             snapshot.config.slogan,
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            key: const Key('store-search-entry'),
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.white,
+              alignment: AlignmentDirectional.centerStart,
+            ),
+            onPressed: () => setState(() => _tab = 1),
+            icon: const Icon(Icons.search),
+            label: Text(AppStrings.of(context).searchHint),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final type in [null, 'poetry', 'prose'])
+                ChoiceChip(
+                  selected: _storeType == type,
+                  label: Text(
+                    type == null
+                        ? AppStrings.of(context).all
+                        : AppStrings.of(context).typeName(type),
+                  ),
+                  labelStyle: TextStyle(
+                    fontFamily: 'Vazirmatn',
+                    color: _storeType == type
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.primary,
+                  ),
+                  onSelected: (_) => setState(() => _storeType = type),
+                ),
+            ],
           ),
           if (widget.qaMode)
             Padding(
@@ -239,10 +270,10 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           else if (populated.isEmpty) ...[
             SectionTitle(AppStrings.of(context).allBooks),
-            BookGrid(
+            BookList(
               books: books,
-              ownerPreview: widget.ownerPreviewMode,
               fontFamily: widget.readerSettings.fontFamily,
+              ownerPreview: widget.ownerPreviewMode,
               onTap: (b) => _navigation.openBook(context, b.slug),
             ),
           ] else ...[

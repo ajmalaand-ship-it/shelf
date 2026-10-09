@@ -65,7 +65,9 @@ void main() {
         );
         expect(
           Directionality.of(tester.element(find.byType(NavigationBar))),
-          TextDirection.rtl,
+          choice == InterfaceLanguage.en
+              ? TextDirection.ltr
+              : TextDirection.rtl,
         );
         language = InterfaceLanguageSettings.load(preferences);
         await launch(tester, key: const ValueKey('restart'));
@@ -99,7 +101,7 @@ void main() {
       expect(find.text('All books'), findsOneWidget);
       expect(
         Directionality.of(tester.element(find.byType(NavigationBar))),
-        TextDirection.rtl,
+        TextDirection.ltr,
       );
       await tester.tap(find.byIcon(Icons.settings_outlined));
       await tester.pumpAndSettle();
@@ -181,7 +183,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         Directionality.of(tester.element(find.byType(ShareCardScreen))),
-        TextDirection.rtl,
+        TextDirection.ltr,
       );
     },
   );

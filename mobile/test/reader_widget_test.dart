@@ -105,7 +105,7 @@ void main() {
       final appBar = tester.widget<AppBar>(
         find.byKey(const Key('reader-app-bar')),
       );
-      expect(appBar.title, isNull);
+      expect(appBar.title, isA<Text>());
       expect(appBar.backgroundColor!.a, 1);
       expect(appBar.scrolledUnderElevation, 0);
 
@@ -131,7 +131,7 @@ void main() {
   );
 
   testWidgets(
-    'small Android reader defaults to 16 and exposes 336px body width',
+    'small Android reader defaults to 16 and exposes 320px body width',
     (tester) async {
       tester.view.physicalSize = const Size(360, 640);
       tester.view.devicePixelRatio = 1;
@@ -154,7 +154,7 @@ void main() {
         find.byKey(const Key('poem-body')),
       );
       expect(body.style!.fontSize, 16);
-      expect(tester.getSize(find.byKey(const Key('poem-body'))).width, 336);
+      expect(tester.getSize(find.byKey(const Key('poem-body'))).width, 320);
       expect(tester.takeException(), isNull);
     },
   );
@@ -222,16 +222,18 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('شریکول'), findsOneWidget);
-    expect(find.text('لیکبڼه'), findsOneWidget);
+    expect(find.byKey(const Key('reader-share')), findsOneWidget);
+    expect(find.byKey(const Key('reader-font-chooser')), findsOneWidget);
     await tester.tap(find.byKey(const Key('reader-font-chooser')));
     await tester.pumpAndSettle();
 
     expect(find.byType(RadioListTile<ReaderFont>), findsExactly(3));
     await tester.tap(find.byKey(const Key('font-choice-scheherazade')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('تياره'));
+    await tester.ensureVisible(find.byKey(const Key('theme-dark')));
+    await tester.tap(find.byKey(const Key('theme-dark')));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('font-size-slider')));
     await tester.drag(
       find.byKey(const Key('font-size-slider')),
       const Offset(80, 0),
@@ -508,7 +510,7 @@ void main() {
       expect(find.textContaining('لنډه برخه'), findsNothing);
       expect(
         tester
-            .widget<TextButton>(find.byKey(const Key('reader-share')))
+            .widget<IconButton>(find.byKey(const Key('reader-share')))
             .onPressed,
         isNull,
       );

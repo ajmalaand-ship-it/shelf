@@ -7,6 +7,136 @@ import '../l10n/app_strings.dart';
 import '../models/book_author.dart';
 import '../models/poetry_collection.dart';
 import '../services/api_config.dart';
+import '../purchases/purchase_screen.dart';
+
+/// Content-sized presentation shared by discovery, search and owned books.
+class BookPresentation extends StatelessWidget {
+  const BookPresentation({
+    required this.book,
+    required this.cover,
+    this.trailing,
+    this.fontFamily,
+    super.key,
+  });
+  final PoetryCollection book;
+  final Widget cover;
+  final Widget? trailing;
+  final String? fontFamily;
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, size) {
+      final information = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            book.title,
+            key: Key('collection-title-${book.slug}'),
+            textDirection: book.language == 'en'
+                ? TextDirection.ltr
+                : TextDirection.rtl,
+            textAlign: book.language == 'en' ? TextAlign.left : TextAlign.right,
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontFamily: fontFamily),
+          ),
+          if (book.creditedAuthors case final author?) ...[
+            const SizedBox(height: 4),
+            Text(
+              author,
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+          if (book.creditedTranslators case final translator?) ...[
+            const SizedBox(height: 4),
+            Text(
+              AppStrings.of(context).translation(translator),
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
+            ),
+          ],
+          const SizedBox(height: 8),
+          ?trailing,
+        ],
+      );
+      if (size.maxWidth < 240) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(child: cover),
+            const SizedBox(height: 12),
+            information,
+          ],
+        );
+      }
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          cover,
+          const SizedBox(width: 16),
+          Expanded(child: information),
+        ],
+      );
+    },
+  );
+}
+
+class BookList extends StatelessWidget {
+  const BookList({
+    required this.books,
+    required this.onTap,
+    this.ownerPreview = false,
+    this.fontFamily,
+    super.key,
+  });
+  final List<PoetryCollection> books;
+  final ValueChanged<PoetryCollection> onTap;
+  final bool ownerPreview;
+  final String? fontFamily;
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      for (final book in books)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Card(
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () => onTap(book),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: BookPresentation(
+                  book: book,
+                  fontFamily: fontFamily,
+                  cover: BookCover(url: book.coverUrl, width: 92, height: 136),
+                  trailing: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppStrings.of(context).typeName(book.bookType),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      if (ownerPreview)
+                        Text(
+                          AppStrings.of(context).status(book.displayStatus),
+                          key: const Key('owner-preview-collection-status'),
+                        )
+                      else
+                        BookPriceLabel(book: book),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+    ],
+  );
+}
 
 class BookCover extends StatelessWidget {
   const BookCover({this.url, this.width = 112, this.height = 156, super.key});
@@ -190,22 +320,11 @@ class BookRow extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       SectionTitle(title),
-      SizedBox(
-        height: 292 * MediaQuery.textScalerOf(context).scale(1).clamp(1, 1.6),
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: books.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 8),
-          itemBuilder: (context, index) => SizedBox(
-            width: 176,
-            child: BookTile(
-              book: books[index],
-              onTap: () => onTap(books[index]),
-              ownerPreview: ownerPreview,
-              fontFamily: fontFamily,
-            ),
-          ),
-        ),
+      BookList(
+        books: books,
+        onTap: onTap,
+        ownerPreview: ownerPreview,
+        fontFamily: fontFamily,
       ),
     ],
   );

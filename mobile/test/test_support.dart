@@ -117,7 +117,9 @@ PoetryRepository fixtureRepository({
           {...collectionJson, if (!includeCover) 'cover_url': null},
         ],
       },
-      '/api/collections/hendaray-aw-chine' => {'data': collectionJson},
+      '/api/collections/hendaray-aw-chine' => {
+        'data': {...collectionJson, if (!includeCover) 'cover_url': null},
+      },
       '/api/collections/hendaray-aw-chine/poems' => {
         'data': [poemSummaryJson, translationSummaryJson],
       },

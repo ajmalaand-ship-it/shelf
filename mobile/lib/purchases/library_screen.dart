@@ -36,6 +36,7 @@ class PurchasedLibraryScreen extends StatefulWidget {
 class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
   String? message;
   bool busy = false;
+  bool downloadedOnly = false;
   Future<void> _perform(Future<void> Function() action, String success) async {
     if (busy) return;
     setState(() {
@@ -123,6 +124,35 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                 ],
               ),
               if (busy || !c.initialized) const LinearProgressIndicator(),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: Text(AppStrings.of(context).all),
+                    labelStyle: TextStyle(
+                      fontFamily: 'Vazirmatn',
+                      color: !downloadedOnly
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                    selected: !downloadedOnly,
+                    onSelected: (_) => setState(() => downloadedOnly = false),
+                  ),
+                  ChoiceChip(
+                    label: Text(_t('Downloads', 'کښته شوي کتابونه')),
+                    labelStyle: TextStyle(
+                      fontFamily: 'Vazirmatn',
+                      color: downloadedOnly
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                    selected: downloadedOnly,
+                    onSelected: (_) => setState(() => downloadedOnly = true),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
               if (message != null && !c.refreshFailed) Text(message!),
               if (c.message != null)
                 Text(
@@ -143,91 +173,120 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                     ),
                   ),
                 ),
-              for (final book in c.books)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Center(
-                          child: OwnedBookCover(
-                            key: ValueKey(
-                              '${c.readerId}/${book.id}/${c.downloaded.contains(book.id)}',
-                            ),
-                            book: book,
-                            library: c,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          book.title,
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        if (c.downloaded.contains(book.id))
-                          Row(
-                            key: const Key('library-downloaded'),
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(_t('Downloaded', 'کښته شوی')),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.check, size: 18),
-                            ],
-                          )
-                        else
-                          Text(_t('Owned', 'پېرودل شوی')),
-                        FilledButton(
-                          onPressed: busy
-                              ? null
-                              : () => openOwnedBook(
-                                  context,
-                                  c,
-                                  book,
-                                  widget.settings,
-                                ),
-                          child: Text(_t('Read book', 'کتاب ولولئ')),
-                        ),
-                        if (!c.downloaded.contains(book.id))
-                          OutlinedButton(
-                            onPressed: busy
-                                ? null
-                                : () => _perform(
-                                    () async {
-                                      await c.download(book);
-                                    },
-                                    _t(
-                                      'Downloaded. Go online at least once every 30 days.',
-                                      'کښته شو. لږ تر لږه هر ۳۰ ورځې یو ځل انټرنېټ ته وصل شئ.',
-                                    ),
-                                  ),
-                            child: Text(
-                              _t(
-                                'Download for offline reading',
-                                'له انټرنېټ پرته لوستلو لپاره کښته کړئ',
-                              ),
-                            ),
-                          ),
-                        if (c.downloaded.contains(book.id))
-                          TextButton(
-                            onPressed: busy
-                                ? null
-                                : () => _perform(
-                                    () => c.removeDownload(book.id!),
-                                    _t(
-                                      'Download removed. You still own the book.',
-                                      'کاپي لرې شوه. کتاب لا هم ستاسو دی.',
-                                    ),
-                                  ),
-                            child: Text(
-                              _t('Remove download', 'کښته شوې کاپي لرې کړئ'),
-                            ),
-                          ),
-                      ],
+              if (downloadedOnly &&
+                  c.books.isNotEmpty &&
+                  !c.books.any((b) => c.downloaded.contains(b.id)))
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Text(
+                    _t(
+                      'No downloaded books. Download a book from All to read offline.',
+                      'کښته شوي کتابونه نشته. له ټولو کتابونو څخه یو کتاب کښته کړئ.',
                     ),
                   ),
                 ),
+              for (final book in c.books.where(
+                (b) => !downloadedOnly || c.downloaded.contains(b.id),
+              ))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          BookPresentation(
+                            book: book,
+                            fontFamily: widget.settings.fontFamily,
+                            cover: OwnedBookCover(
+                              key: ValueKey(
+                                '${c.readerId}/${book.id}/${c.downloaded.contains(book.id)}',
+                              ),
+                              book: book,
+                              library: c,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          if (c.downloaded.contains(book.id))
+                            Row(
+                              key: const Key('library-downloaded'),
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(_t('Downloaded', 'کښته شوی')),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.check, size: 18),
+                              ],
+                            )
+                          else
+                            Text(_t('Owned', 'پېرودل شوی')),
+                          FilledButton(
+                            onPressed: busy
+                                ? null
+                                : () => openOwnedBook(
+                                    context,
+                                    c,
+                                    book,
+                                    widget.settings,
+                                  ),
+                            child: Text(_t('Read book', 'کتاب ولولئ')),
+                          ),
+                          if (!c.downloaded.contains(book.id))
+                            OutlinedButton.icon(
+                              icon: const Icon(Icons.download_outlined),
+                              onPressed: busy
+                                  ? null
+                                  : () => _perform(
+                                      () async {
+                                        await c.download(book);
+                                      },
+                                      _t(
+                                        'Downloaded. Go online at least once every 30 days.',
+                                        'کښته شو. لږ تر لږه هر ۳۰ ورځې یو ځل انټرنېټ ته وصل شئ.',
+                                      ),
+                                    ),
+                              label: Text(
+                                _t(
+                                  'Download for offline reading',
+                                  'له انټرنېټ پرته لوستلو لپاره کښته کړئ',
+                                ),
+                              ),
+                            ),
+                          if (c.downloaded.contains(book.id))
+                            TextButton.icon(
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: busy
+                                  ? null
+                                  : () => _perform(
+                                      () => c.removeDownload(book.id!),
+                                      _t(
+                                        'Download removed. You still own the book.',
+                                        'کاپي لرې شوه. کتاب لا هم ستاسو دی.',
+                                      ),
+                                    ),
+                              label: Text(
+                                _t('Remove download', 'کښته شوې کاپي لرې کړئ'),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _t(
+                    'Download your books to read offline. Go online at least once every 30 days.',
+                    'خپل کتابونه له انټرنېټ پرته لوستلو لپاره کښته کړئ. لږ تر لږه هر ۳۰ ورځې یو ځل انټرنېټ ته وصل شئ.',
+                  ),
+                ),
+              ),
             ],
           ],
         ),
