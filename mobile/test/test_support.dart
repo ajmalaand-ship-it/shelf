@@ -105,6 +105,7 @@ Map<String, dynamic> poemDetailJson({
 PoetryRepository fixtureRepository({
   bool failNetwork = false,
   bool includeCover = true,
+  String? readerBody,
 }) {
   final client = MockClient((request) async {
     if (failNetwork) throw http.ClientException('offline');
@@ -123,7 +124,11 @@ PoetryRepository fixtureRepository({
       '/api/collections/hendaray-aw-chine/poems' => {
         'data': [poemSummaryJson, translationSummaryJson],
       },
-      '/api/poems/301' => {'data': poemDetailJson()},
+      '/api/poems/301' => {
+        'data': readerBody == null
+            ? poemDetailJson()
+            : poemDetailJson(body: readerBody),
+      },
       _ => {'message': 'Not found'},
     };
     final status = path == '/unknown' ? 404 : 200;

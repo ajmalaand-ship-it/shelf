@@ -121,3 +121,48 @@ Any later artifact build/deployment follows a separate authorized task and the
 staging-first identical-commit workflow; do not merge an old docs snapshot over
 newer records. Undo by reverting this isolated branch's UI commits; no runtime
 or database rollback is needed because no deployment occurred.
+
+
+## Owner render corrections — 9 October 2026
+
+Owner authorized only the chip contrast, reader fixture diagnosis, enlarged-text
+scroll checks and affected render regeneration; no deployment/upload/release build.
+Changes remain on the isolated ui/figma-review-2 branch; newer production records
+and unrelated edits were not replaced.
+
+Confirmed chip issue: unselected detail/category Chips inherited a white label
+on cream. Shared ChipTheme now explicitly uses brand brown #80501D on #F0E5D3
+(5.47:1 contrast). Selected ChoiceChips retain their existing explicit white
+foreground on brown. No layout or access behavior changed.
+
+Confirmed reader artifact cause: test_support.dart's default glyph-coverage body
+starts with `ټ ډ ړ ږ ښ ڼ ې ۍ`. Exact code points are U+067C, U+0020,
+U+0689, U+0020, U+0693, U+0020, U+0696, U+0020, U+069A, U+0020,
+U+06BC, U+0020, U+06D0, U+0020, U+06CD: seven ordinary spaces, no ZWJ/ZWNJ.
+These are intentionally isolated glyphs, not joined prose. Compared with baseline
+72cabf0, the existing PoetryText RTL/start alignment, saved Vazirmatn/default
+16-point font and 2.2 line height are unchanged; neither specifies letterSpacing.
+Joined words render normally in the regenerated light and enlarged dark renders.
+No demonstrated font/shaping/layout regression required an app reader change.
+Render tests now request the explicitly synthetic body
+`لومړۍ کرښه\nدويمه کرښه\n\nنوی بند` via an optional fixture-only argument.
+The original glyph fixture remains for other tests. Real book text, intentional
+spaces, stanza breaks, typography and font choices are untouched.
+
+Enlarged details: the initial screenshot was at the top of a scrollable page.
+Focused checks at 320×568 and 390×844, scales 1.0/1.8, Pashto RTL and English
+LTR reveal the complete title, each expanded publication/dedication/introduction
+body and the complete final contents ListTile, asserting their bounds above the
+persistent sample action and below the toolbar. All passed. Scaffold already
+reserves the action area's height; existing 28-point bottom padding is sufficient.
+No bottom padding/scroll code change. details-large.png now shows the scrolled
+complete title; added metadata/contents snapshots document subsequent positions.
+
+Verification: scripts/run_tests.sh --mobile with review-2-corrections scope:
+20 focused Flutter layout/reader tests, 1 required staging-identity test and
+1 required PrivacySupportTest smoke / 17 assertions passed. Evidence:
+/home/shelf/tmp/shelf-figma-review-2/correction-checks.log. Regenerated selected
+PNGs reviewed visually. No broad purchase/backend audit or release build.
+Android phone acceptance and iOS validation remain pending. Checkout OFF,
+pricing sync deferred, second-phone restore owner-deferred, joint Android/iOS
+launch preserved. These remain synthetic test renders, not phone acceptance.

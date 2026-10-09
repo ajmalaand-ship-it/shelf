@@ -82,6 +82,7 @@ class AppTheme {
         labelStyle: const TextStyle(
           fontFamily: AppTypography.uiFont,
           fontSize: 13,
+          color: seed,
         ),
         padding: const EdgeInsets.all(8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

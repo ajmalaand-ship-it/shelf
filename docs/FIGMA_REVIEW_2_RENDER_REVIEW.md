@@ -31,7 +31,11 @@ release build was made. [Implementation evidence](FIGMA_REVIEW_2_IMPLEMENTATION.
 
 ## Small screen with enlarged text
 
-![Book details with enlarged text](review-2/details-large.png)
+![Book details with enlarged text, scrolled complete title](review-2/details-large.png)
+
+![Expanded metadata above actions](review-2/details-large-metadata.png)
+
+![Final contents entry above actions](review-2/details-large-contents.png)
 
 ![Dark reader with enlarged text](review-2/reader-dark-large.png)
 

@@ -85,6 +85,8 @@ if "$run_mobile"; then
             test/reader_settings_test.dart test/typography_layout_test.dart
             test/audio_player_widget_test.dart test/share_card_entry_test.dart
             test/privacy_support_test.dart test/review_2_layout_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-2-corrections" ]]; then
+        mobile_args=(test/review_2_layout_test.dart test/reader_widget_test.dart)
     elif [[ -n "${SHELF_MOBILE_TEST_SCOPE:-}" ]]; then
         echo "Unknown mobile test scope" >&2; exit 2
     fi

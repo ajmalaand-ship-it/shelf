@@ -7,10 +7,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shelf/app.dart';
+import 'package:shelf/l10n/app_strings.dart';
 import 'package:shelf/settings/interface_language.dart';
 import 'package:shelf/settings/reader_settings.dart';
 
 import 'test_support.dart';
+
+// Synthetic joined words for visual evidence, never catalogue/source text.
+const reviewReaderBody = 'لومړۍ کرښه\nدويمه کرښه\n\nنوی بند';
 
 void main() {
   setUpAll(() async {
@@ -60,7 +64,10 @@ void main() {
               child: MediaQuery(
                 data: MediaQueryData(textScaler: TextScaler.linear(scale)),
                 child: ShelfApp(
-                  repository: fixtureRepository(includeCover: false),
+                  repository: fixtureRepository(
+                    includeCover: false,
+                    readerBody: reviewReaderBody,
+                  ),
                   readerSettings: settings,
                   languageSettings: InterfaceLanguageSettings.load(prefs),
                 ),
@@ -119,11 +126,77 @@ void main() {
           await tester.pumpAndSettle();
           await tester.tap(title);
           await tester.pumpAndSettle();
+          final chips = tester.widgetList<Chip>(find.byType(Chip));
+          for (final chip in chips) {
+            final context = tester.element(find.byWidget(chip));
+            expect(
+              Theme.of(context).chipTheme.labelStyle!.color,
+              Theme.of(context).colorScheme.primary,
+            );
+          }
           await capture('details');
+          final detailsScroll = find.byType(Scrollable).first;
+          final detailsTitle = find.byKey(const Key('collection-detail-title'));
+          final persistentTop = tester
+              .getTopLeft(find.byKey(const Key('read-sample')))
+              .dy;
+          Future<void> reveal(Finder target) async {
+            await tester.scrollUntilVisible(
+              target,
+              120,
+              scrollable: detailsScroll,
+            );
+            await Scrollable.ensureVisible(
+              tester.element(target),
+              alignment: 0,
+            );
+            await tester.pumpAndSettle();
+            expect(tester.getBottomLeft(target).dy, lessThan(persistentTop));
+            expect(tester.getTopLeft(target).dy, greaterThanOrEqualTo(56));
+          }
+
+          await reveal(detailsTitle);
+          await capture('details-title-scroll');
+          final strings = AppStrings.of(tester.element(detailsTitle));
+          for (final section in [
+            (strings.publicationInfo, collectionJson['publication_info']!),
+            (strings.dedication, collectionJson['dedication']!),
+            (strings.introduction, collectionJson['introduction']!),
+          ]) {
+            final heading = find.text(section.$1);
+            await reveal(heading);
+            await tester.tap(heading);
+            await tester.pumpAndSettle();
+            final body = find.byWidgetPredicate(
+              (widget) => widget is SelectableText && widget.data == section.$2,
+            );
+            await reveal(body);
+            await capture(
+              'details-metadata-${section.$1 == strings.publicationInfo
+                  ? 'publication'
+                  : section.$1 == strings.dedication
+                  ? 'dedication'
+                  : 'introduction'}',
+            );
+          }
+          final lastContent = find.ancestor(
+            of: find.byKey(const Key('poem-list-title-302')),
+            matching: find.byType(ListTile),
+          );
+          await reveal(lastContent);
+          await capture('details-contents-scroll');
           final action = find.byKey(const Key('read-sample'));
           expect(tester.getSize(action).height, greaterThanOrEqualTo(48));
           await tester.tap(action);
           await tester.pumpAndSettle();
+          final readerText = tester.widget<SelectableText>(
+            find.byKey(const Key('poem-body')),
+          );
+          expect(readerText.data, reviewReaderBody);
+          expect(readerText.textDirection, TextDirection.rtl);
+          expect(readerText.style!.fontFamily, 'Vazirmatn');
+          expect(readerText.style!.letterSpacing, isNull);
+          expect(readerText.style!.height, 2.2);
           await capture('reader');
           await tester.tap(find.byKey(const Key('reader-font-chooser')));
           await tester.pumpAndSettle();
