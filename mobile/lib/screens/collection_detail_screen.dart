@@ -1,3 +1,4 @@
+import '../widgets/untitled_poem_marker.dart';
 import '../widgets/shelf_assets.dart';
 import '../accounts/account_controller.dart';
 import '../accounts/account_screen.dart';
@@ -445,22 +446,29 @@ class _PoemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     button: onTap != null,
-    label: poem.isUntitled
-        ? AppStrings.of(context).untitled
-        : poem.displayTitle,
+    explicitChildNodes: true,
+    label: poem.isUntitled ? null : poem.title,
     child: ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
       onTap: onTap,
-      leading: CircleAvatar(child: Text('${poem.sortOrder}')),
-      title: Text(
-        poem.displayTitle.isEmpty
-            ? AppStrings.of(context).untitled
-            : poem.displayTitle,
-        key: Key('poem-list-title-${poem.id}'),
-        textDirection: TextDirection.rtl,
-        textAlign: TextAlign.right,
-        style: TextStyle(fontFamily: fontFamily),
+      leading: CircleAvatar(
+        child: Text(AppStrings.of(context).number(poem.sortOrder)),
       ),
+      title: poem.isUntitled
+          ? Align(
+              alignment: Alignment.centerRight,
+              child: UntitledPoemMarker(
+                key: Key('poem-list-title-${poem.id}'),
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            )
+          : Text(
+              poem.title!,
+              key: Key('poem-list-title-${poem.id}'),
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
+              style: TextStyle(fontFamily: fontFamily),
+            ),
       subtitle:
           [
             if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)

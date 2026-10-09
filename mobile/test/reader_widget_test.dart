@@ -11,7 +11,7 @@ import 'package:shelf/screens/collection_detail_screen.dart';
 import 'package:shelf/screens/poem_reader_screen.dart';
 import 'package:shelf/services/api_client.dart';
 import 'package:shelf/settings/reader_settings.dart';
-import 'package:shelf/widgets/untitled_poem_marker.dart';
+import 'package:shelf/widgets/shelf_assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'test_support.dart';
@@ -34,7 +34,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Shelf'), findsWidgets);
+    expect(find.byType(ShelfLogo), findsOneWidget);
     expect(find.text('اجمل اند بشپړه شاعري'), findsOneWidget);
     expect(find.text('ټول کتابونه'), findsOneWidget);
     expect(find.byType(NavigationDestination), findsExactly(4));
@@ -175,7 +175,8 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.scrollUntilVisible(find.text('ژمى'), 250);
-      expect(find.text('د لومړۍ کرښې پېژندنه'), findsOneWidget);
+      expect(find.text('د لومړۍ کرښې پېژندنه'), findsNothing);
+      expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
       expect(find.text('بې سرليکه'), findsNothing);
       expect(find.text('ژمى'), findsOneWidget);
       expect(find.textContaining('اصلي لیکوال: پروین پژواک'), findsOneWidget);
@@ -186,7 +187,7 @@ void main() {
           .readerSettings;
       expect(
         tester
-            .widget<Text>(find.byKey(const Key('poem-list-title-301')))
+            .widget<Text>(find.byKey(const Key('poem-list-title-302')))
             .style!
             .fontFamily,
         'Vazirmatn',
@@ -202,7 +203,7 @@ void main() {
       expect(readerSettings.font, ReaderFont.literary);
       expect(
         tester
-            .widget<Text>(find.byKey(const Key('poem-list-title-301')))
+            .widget<Text>(find.byKey(const Key('poem-list-title-302')))
             .style!
             .fontFamily,
         'NotoNastaliqUrdu',
@@ -264,10 +265,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
-      final marker = tester.widget<CustomPaint>(
+      final marker = tester.widget<ShelfActionIcon>(
         find.byKey(const Key('untitled-poem-indicator')),
       );
-      expect(marker.painter, isA<ManuscriptPageQuillPainter>());
+      expect(marker.name, 'poetry');
       expect(
         find.descendant(
           of: find.byKey(const Key('untitled-poem-indicator')),
@@ -300,10 +301,7 @@ void main() {
       await readerSettings.setPalette(palette);
       await tester.pump();
       expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
-      expect(
-        find.bySemanticsLabel('بې نومه شعر؛ اصلي سرليک نه لري'),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel('بې سرلیکه شعر'), findsOneWidget);
       expect(find.text('بې سرليکه'), findsNothing);
       expect(tester.takeException(), isNull, reason: palette.name);
     }

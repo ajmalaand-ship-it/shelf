@@ -53,7 +53,7 @@ abstract final class AppStrings {
   static const librarySoon = 'ستاسو کتابتون — ډېر ژر';
   static const libraryMessage =
       'دلته به ستاسو پېرودل شوي کتابونه خوندي وي. د حساب او پېرود اسانتیاوې ډېر ژر راځي.';
-  static const readingPreferences = 'د لوست امستنې';
+  static const readingPreferences = 'د لوست سیټینګ';
   static const font = 'لیکبڼه';
   static const error = 'منځپانګه ترلاسه نه شوه.';
   static const retry = 'بيا هڅه وکړئ';
@@ -89,6 +89,13 @@ class BookstoreStrings {
       ? dari
       : ps;
   final bool isEnglish;
+  String number(int value) => isEnglish
+      ? '$value'
+      : '$value'.replaceAllMapped(
+          RegExp(r'[0-9]'),
+          (m) => '۰۱۲۳۴۵۶۷۸۹'[int.parse(m[0]!)],
+        );
+
   String phrase(String en, String ps) => choose(en, ps, _dariPhrases[en] ?? en);
   static const _dariPhrases = {
     'Purchases checked for this account.': 'خریدهای این حساب بررسی شدند.',
