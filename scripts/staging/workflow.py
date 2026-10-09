@@ -263,6 +263,32 @@ def https_checks():
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    avatar_scope = {'app/Http/Controllers/Account/AvatarController.php', 'app/Models/Reader.php',
+        'app/Services/Accounts/AccountActions.php', 'app/Services/Accounts/ReaderAvatar.php',
+        'bootstrap/app.php', 'config/filesystems.php', 'routes/api.php',
+        'database/migrations/2026_10_09_120000_add_private_reader_avatar.php',
+        'tests/Feature/ReaderAvatarTest.php', 'scripts/run_tests.sh', 'scripts/staging/workflow.py'}
+    backend_changes = {path for path in changes if not path.startswith(('docs/', 'mobile/')) and path != 'AGENTS.md'}
+    if backend_changes and backend_changes <= avatar_scope and 'tests/Feature/ReaderAvatarTest.php' in backend_changes:
+        # Review 3 phone preparation reuses completed shared Flutter evidence.
+        # This gate checks the newly deployed avatar backend and staging isolation.
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'ReaderAvatarTest'
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+                stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Staged avatar checks failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+            'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+            'scope':'review-3-avatar-backend', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: focused private-avatar lifecycle and staging isolation; existing mobile evidence reused separately.', flush=True)
+        return
     reviewer_scope = {'app/Services/BookAccessService.php', 'app/Http/Controllers/LibraryController.php',
         'app/Services/Purchases/PurchaseService.php',
         'database/migrations/2026_10_08_070000_create_reviewer_book_grants.php',
