@@ -251,3 +251,24 @@ Additional language direction needs explicit metadata/decision. No artifact
 rebuild, store upload, backend deployment, transaction or main merge/push.
 Checkout OFF, pricing sync deferred, second-phone restore owner-deferred and
 joint launch preserved. See Master Record Part 10 for the full implementation.
+
+
+## Paginated-reader Android Test artifact — 9 October 2026
+
+Owner authorized a separate Shelf Test APK only. Immutable source 8862202
+(mobile c211167, including pinned preview 6c9ef45) built as **1.0.8 (17)**,
+package services.shelf.app.staging, staging endpoint. Release signature matched
+the prior installed-version artifact 1.0.7 (16); same package/certificate and
+higher code verify in-place update compatibility without uninstall/data clearing.
+APK: `/home/shelf/apps/shelf/storage/app/private/owner-apks/shelf-review-2-test-1.0.8-17-c211167-20261009-065639.apk`.
+SHA-256: `b2d10c611a27c228ba794e698bdd9af645e4b405c6fb144a7ae8fd2ee3881bf0`.
+Signature, compiled package/version/label/non-debuggable manifest, ZIP CRC,
+staging endpoint, compiled pagination/pinned-preview markers and original fonts
+passed. Completed 52-test reader evidence plus identity/PHP smoke and clean
+analysis reused; no source edits or extra suite. Full build evidence and update
+comparison are in Master Record Part 10 and the private APK JSON.
+
+New phone installation/pagination/pinned-preview acceptance remains pending;
+iOS unverified. No production AAB, store upload, backend deployment, transaction
+or main merge/push. Checkout OFF, pricing sync/second-phone restore deferred and
+joint Android/iOS launch remain preserved.

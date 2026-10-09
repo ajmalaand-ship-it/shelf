@@ -579,6 +579,61 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Paginated-reader Shelf Test update — 9 October 2026
+
+Owner authorized **only a fresh separate Shelf Test APK**, updating installed
+Shelf Test 1.0.7 (16) without uninstalling/clearing data. Completed immutable
+source **886220203a990b638af456913f65095d9fb596cc** (8862202 records), mobile implementation
+**c2111672957cb14cca9dc3c51bf05f87de31cadd**, includes pinned preview 6c9ef45
+and latest completed Review 2. Exported with git archive; mobile source,
+pubspec/dependencies and production checkout were not edited. Version supplied
+only through build arguments. No older branch/document replaced newer work.
+
+**Built artifact:** release APK **Shelf Test 1.0.8 (17)**,
+`services.shelf.app.staging`, API `https://staging.shelf.services/api/`.
+Next unused version code 17 was checked against retained staging APK manifests
+(12, 13, 16) and existing build records/artifacts through 16.
+Path: `/home/shelf/apps/shelf/storage/app/private/owner-apks/shelf-review-2-test-1.0.8-17-c211167-20261009-065639.apk`
+SHA-256: `b2d10c611a27c228ba794e698bdd9af645e4b405c6fb144a7ae8fd2ee3881bf0`
+Size: 61206058 bytes; private mode 0600, matching private JSON evidence.
+Build completed successfully with the established staging flavor/private access
+defines, JDK 17/Flutter/SDK and existing Shelf upload signing properties. No
+production AAB was built; all previous artifacts are retained.
+
+**Update compatibility verified:** apksigner verified both prior build-16 and
+new build-17 APKs. Same package and identical signer SHA-256
+`2065572ecb0f174a9e669602232ffcea31335303d3ff011caaeb7216fdb69e77`
+(SHA-1 DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB),
+with version code 16 → 17. This is compatible with an in-place Shelf Test
+update preserving its existing app data/account; no uninstall, data clearing or
+migration is required. Actual phone installation/data retention not yet observed.
+The separate Play-installed production Shelf remains untouched.
+
+**Artifact verification:** release signature/certificate, compiled package,
+version 1.0.8 (17), Shelf Test label, non-debuggable manifest, ZIP CRC, staging
+endpoint in every libapp.so, pagination controls and pinned-preview markers,
+and all three original font families passed. Build/verification evidence:
+`/home/shelf/tmp/shelf-pagination-apk-20261009/build-test.log` and
+`verify-test.py`, plus the private APK JSON. Disposable build workspace removed.
+Reused completed unchanged-source evidence: 52 focused Flutter tests + 1 required
+staging-identity test, PHP smoke 1 test / 17 assertions and scoped analysis with
+no issues. No repeated suite or accepted purchase/backend tests.
+
+**Pending:** owner installs this APK over Shelf Test and reviews pinned preview,
+Pages mode, direction/turns, font/size/viewport reflow, Contents and resume with
+real books. Android phone acceptance for these changes remains PENDING; iOS
+validation remains NOT VERIFIED. Earlier acceptance stays limited to improved
+design, font size and light/dark on build 16.
+
+**Boundaries preserved:** no production AAB, store upload, backend deployment,
+production settings/provider/database/account change or real-money transaction.
+Checkout OFF; pricing sync DEFERRED/disabled; second-phone restore owner-deferred,
+not passed or a newly imposed launch blocker; Android/iOS must launch together.
+No main merge/push. Current Master Record updated additively; unrelated edits kept.
+Next owner action: run the supplied Windows PowerShell download command on the
+Windows PC, then open the APK on the Android phone and update **Shelf Test** in
+place for review. Keep the existing apps and their data.
+
 ## Optional paginated book reader — implemented 9 October 2026
 
 **Owner authorization and source:** owner authorized the planned shared Flutter
