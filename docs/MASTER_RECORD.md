@@ -20,7 +20,7 @@ Codex (the coding assistant on the server) follows **AGENTS.md** in the Shelf co
 
 **Status of this version**
 
-Master Record v2.0 was approved on 25 September 2026 and amended in v2.1 on 27 September 2026. This version 2.2 restored every v2.0 requirement and clarified R3 and staging. This version 2.3 (28 September 2026) records the new way of working approved by Ajmal (Codex runs server commands after Ajmal’s approval; Claude makes technical decisions; Ajmal is asked owner questions only) and closes **Step 2**. **Current direction (owner-approved 8 October 2026):** four work areas and Android/iOS joint launch, following the five practical batches in Part 7. The single remaining-work list at the start of Part 10 governs priorities. Steps 0–2 remain completed; Steps 3–5 remain partly completed; Step 6 has not started. Further Google Play preparation is paused until final release needs it. Build 1.0.6 (15) is owner-confirmed approved for closed testing. Earlier status entries remain historical evidence.
+Master Record v2.0 was approved on 25 September 2026 and amended in v2.1 on 27 September 2026. This version 2.2 restored every v2.0 requirement and clarified R3 and staging. This version 2.3 (28 September 2026) records the new way of working approved by Ajmal (Codex runs server commands after Ajmal’s approval; Claude makes technical decisions; Ajmal is asked owner questions only) and closes **Step 2**. **Current direction (owner-approved 8 October 2026):** four work areas and Android/iOS joint launch, following the five practical batches in Part 7. The single remaining-work list at the start of Part 10 governs priorities. Steps 0–2 remain completed; Steps 3–5 remain partly completed; Step 6 has not started. Owner-approved next sequence (9 October): corrected phone review, then Google Play test-track update; public Android release remains held for joint iOS launch. Build 1.0.6 (15) is owner-confirmed approved for closed testing. Earlier status entries remain historical evidence.
 
 **Contents**
 
@@ -578,6 +578,53 @@ build, deployment, purchase, provider setting change or release.
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## Review 3 focused owner-feedback correction — 9 October 2026
+
+Owner authorized four source-only corrections, continuing latest development
+208f544 and completed Review 3 c2f4025/c25e230 without discarding newer records.
+**Source commit: 340142b43cd42047e7bd76c0718ce1904ca87768 (340142b), ui/figma-review-2.**
+
+- Exact Pashto reading-settings title/entry/tooltips now **د لوست سیټینګ** through
+  the shared localization string; no remaining old phrase in mobile/lib.
+- Original shelf-icon-pack.zip Android launcher resources applied: density PNGs,
+  adaptive/round/monochrome layers (27 resources byte-identical to the supplied
+  pack). Shelf Test composes the same mark with a red T badge; existing Shelf Test
+  label/banner, staging package suffix, production ID and signing remain unchanged.
+- Genuinely untitled poems (null/blank stored title) show the supplied shelf-poetry
+  glyph in Contents and reader; localized accessibility labels identify an untitled
+  poem in Pashto/Dari/English. Actual titles remain source text, with no first line
+  promoted to a title. Independent icon semantics prevent list-row label merging.
+- Contents/list order numbers render **۰۱۲۳۴۵۶۷۸۹** in Pashto/Dari and ASCII
+  **0123456789** in English. Display-only conversion; no ID, sort order, stored
+  title/text, content mutation, migration or model serialization change.
+
+**Focused evidence:** scripts/run_tests.sh --mobile, review-3-correction scope:
+**39 Flutter tests + 1 staging-identity test**, required PHP PrivacySupportTest
+**1 test / 17 assertions**. Exact pinned settings heading, three-language list
+numbers/untitled semantics/real titled entry, native source package/signing/Test
+identity checks, original reader source/locked behavior and pinned settings
+regressions passed. Scoped Flutter analysis **no issues**; XML parsing, original
+launcher-resource byte checks and git diff --check passed. Initial semantics
+expectations failed; independent icon nodes and a semantics-enabled test frame
+corrected the issue before final passing run. Log:
+/home/shelf/tmp/shelf-review3-correction-checks.log. Static identity/resource checks
+are not a newly built artifact or launcher acceptance on a phone.
+
+**Preserved:** pagination engine and saved positions, sharing, avatars and access
+controls unchanged. Prior installed/available Shelf Test 1.0.9 (18) from 9a748ef
+has these corrections NOT PACKAGED; staging stays at 9a748ef, production at
+34799b8. No new APK/AAB build, deployment, live database change or store upload.
+Current governing records updated additively, preserving unrelated/newer edits.
+Checkout OFF; pricing sync DEFERRED/disabled; second-phone restore owner-deferred;
+second/cover-photo purpose pending clarification; iOS acceptance still unverified.
+
+**Owner-approved next sequence:** corrected phone review (a separately authorized
+fresh compatible Shelf Test build is needed), then Google Play **test-track**
+update. No test-track upload authorized in this correction task. Public Android
+release remains held until iOS is complete/accepted/ready and the owner approves
+joint Android/iOS launch. Phone acceptance of the corrected wording, launcher,
+untitled glyphs and numbering remains PENDING.
 
 ## Review 3 staging and Shelf Test phone-review APK — 9 October 2026
 
@@ -1930,6 +1977,13 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 | Open items                                        | SSH config file owned by the wrong user (server fix by root, not urgent). Repeated failed root login attempts (server security, later). Original poet of لمر ګلی unknown. Other projects also fill /tmp.                                                   |
 
 # Part 11 — Decision log
+
+- **9 October 2026 — Review 3 owner feedback:** exact د لوست سیټینګ wording;
+  supplied launcher mark with distinct Shelf Test badge; supplied poetry icon for
+  genuinely untitled poems and localized accessibility; Pashto/Dari list digits
+  ۰۱۲۳۴۵۶۷۸۹ with English ASCII. Source 340142b, focused checks passed. Next:
+  corrected phone review, then Google Play test-track update; public Android
+  release held for joint iOS launch. No build/deploy/upload in this correction.
 
 - **9 October 2026 — owner authorized Review 3 staging and phone-review build:**
   staged 9a748ef with verified staging backup and reversible avatar migration only

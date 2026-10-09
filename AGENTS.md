@@ -163,6 +163,14 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-09: Owner feedback correction source 340142b: د لوست سیټینګ,
+  supplied launcher mark/distinct Shelf Test badge, supplied poetry glyph only for
+  genuinely untitled poems with localized accessibility, Pashto/Dari display digits
+  ۰۱۲۳۴۵۶۷۸۹. No content/order/ID change. Focused checks and additive records only;
+  no build/deploy/upload. Next: corrected phone review, then Play test-track update;
+  public Android release held for joint iOS launch. Existing gates/deferrals and
+  pending second/cover-photo purpose preserved.
+
 - 2026-10-09: Owner authorized Review 3 staging-only backend deployment and a
   compatible separate Shelf Test APK. Staged 9a748ef; avatar migration applied
   only to shelf_staging after verified backup. Shelf Test 1.0.9 (18) verified,
