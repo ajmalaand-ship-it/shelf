@@ -267,14 +267,16 @@ def checked(app, commit, initial=False):
         'app/Services/Accounts/AccountActions.php', 'app/Services/Accounts/ReaderAvatar.php',
         'bootstrap/app.php', 'config/filesystems.php', 'routes/api.php',
         'database/migrations/2026_10_09_120000_add_private_reader_avatar.php',
-        'tests/Feature/ReaderAvatarTest.php', 'scripts/run_tests.sh', 'scripts/staging/workflow.py'}
+        'tests/Feature/ReaderAvatarTest.php', 'scripts/run_tests.sh', 'scripts/staging/workflow.py',
+        'app/Models/Poem.php', 'app/Http/Resources/PoemSummaryResource.php',
+        'tests/Feature/CatalogueFirstLineTest.php'}
     backend_changes = {path for path in changes if not path.startswith(('docs/', 'mobile/')) and path != 'AGENTS.md'}
     if backend_changes and backend_changes <= avatar_scope and 'tests/Feature/ReaderAvatarTest.php' in backend_changes:
         # Review 3 phone preparation reuses completed shared Flutter evidence.
         # This gate checks the newly deployed avatar backend and staging isolation.
         log = RUNTIME / ('checks-' + commit + '.log')
         test_env = os.environ.copy()
-        test_env['SHELF_PHP_TEST_FILTER'] = 'ReaderAvatarTest'
+        test_env['SHELF_PHP_TEST_FILTER'] = 'ReaderAvatarTest|CatalogueFirstLineTest|PrivacySupportTest'
         with log.open('w') as output:
             result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
                 stdout=output, stderr=subprocess.STDOUT, env=test_env)
@@ -285,9 +287,9 @@ def checked(app, commit, initial=False):
         state = current_state()
         state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
             'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
-            'scope':'review-3-avatar-backend', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+            'scope':'review-3-backend-dependencies', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
         save_state(state)
-        print('PASS: focused private-avatar lifecycle and staging isolation; existing mobile evidence reused separately.', flush=True)
+        print('PASS: focused private-avatar lifecycle, protected first-line catalogue and staging isolation; completed mobile/AAB evidence reused.', flush=True)
         return
     reviewer_scope = {'app/Services/BookAccessService.php', 'app/Http/Controllers/LibraryController.php',
         'app/Services/Purchases/PurchaseService.php',
@@ -577,7 +579,11 @@ $out=[];
 foreach (['readers','reader_account_actions','personal_access_tokens','purchases','purchase_events','sales_ledger','book_entitlements','purchase_consents','author_share_agreements','accounting_entries','accounting_shares'] as $table) {
  $q=Illuminate\Support\Facades\DB::table($table)->orderBy('id');
  if ($table==='author_share_agreements' && $argv[2]!=='all') {$q->where('id','<=',(int)$argv[2]);}
- $rows=Illuminate\Support\Facades\Schema::hasTable($table) ? $q->get() : collect();$out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
+ $rows=Illuminate\Support\Facades\Schema::hasTable($table) ? $q->get() : collect();
+ // Adding a nullable avatar column changes schema, not existing reader values.
+ // Omit only null avatar_path; any non-null/new value still changes the fingerprint.
+ if ($table==='readers') {$rows->each(function ($row) {if (property_exists($row,'avatar_path') && $row->avatar_path===null) {unset($row->avatar_path);}});}
+ $out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
 }
 $out['agreement_limit']=$argv[2]==='all' ? (int)Illuminate\Support\Facades\DB::table('author_share_agreements')->max('id') : (int)$argv[2];
 echo json_encode($out,JSON_THROW_ON_ERROR);''','all' if agreement_limit is None else agreement_limit))
