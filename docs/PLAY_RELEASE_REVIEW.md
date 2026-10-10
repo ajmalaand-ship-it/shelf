@@ -1,5 +1,24 @@
 # Play release preparation — 8 October 2026
 
+> **Financial policy update — 8 October 2026:** owner approved three years after
+> relevant tax-return filing, scoped legal/dispute/unpaid-author-balance exceptions,
+> and minimum proof while recovery rights continue. Seven-year/one-year options
+> not approved. Automatic financial expiry is NOT IMPLEMENTED; deployed privacy
+> wording is unchanged. See D14_DATA_POLICY.md for the scoped implementation plan.
+> Earlier financial-policy decision requests below are historical and superseded.
+
+
+> **Current release status — 8 October 2026, owner-confirmed:** Shelf 1.0.6 (15)
+> uploaded to Closed testing – Alpha; countries/tester email lists configured;
+> en-US-tagged release notes saved; Advertising ID declaration No based on final
+> AAB/SDK usage inspection. Owner submitted changes: “Changes in review”, quick
+> checks running. Google approval, tester availability and build 15 phone acceptance
+> PENDING. Checkout OFF; automatic pricing sync DEFERRED. Earlier preparation-only/
+> build-14 statements below are historical. Current unfinished launch work and the
+> recommended next task are recorded in Master Record Part 10. Completed privacy/
+> support, rights, products and signing configuration are not reopened.
+
+
 Preparation only, not submitted or deployed. Checkout OFF; no upload/public release.
 Preserve verified AAB 1.0.5 (14), source 2c8d763 and existing checksum. Six books,
 owner-confirmed rights, USD 2.99 starting prices and existing 174 regions approved;
