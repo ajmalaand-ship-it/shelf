@@ -126,6 +126,17 @@ class Poem extends Model
         return '';
     }
 
+    public function catalogueFirstLine(): ?string
+    {
+        foreach (preg_split('/\r\n|\r|\n/u', $this->body ?? '') as $line) {
+            if (trim($line) !== '') {
+                return $line;
+            }
+        }
+
+        return null;
+    }
+
     public function sampleText(): ?string
     {
         return match ($this->sample_mode) {

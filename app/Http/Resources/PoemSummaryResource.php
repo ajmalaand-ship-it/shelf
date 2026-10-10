@@ -16,6 +16,7 @@ class PoemSummaryResource extends JsonResource
             'id' => $this->id,
             'slug' => $this->slug,
             'title' => $this->title,
+            'first_line' => blank($this->title) ? $this->resource->catalogueFirstLine() : null,
             'work_type' => $this->work_type,
             'original_author' => $this->original_author,
             'translator' => $this->translator,
