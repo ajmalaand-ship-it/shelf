@@ -1,3 +1,5 @@
+import '../l10n/app_strings.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -47,7 +49,7 @@ class CollectionCard extends StatelessWidget {
                       ),
                       if (collection.creditedAuthors case final author?) ...[
                         const SizedBox(height: 8),
-                        Text(author),
+                        Text(author, style: const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                       if (collection.creditedTranslators
                           case final translators?) ...[
@@ -56,7 +58,13 @@ class CollectionCard extends StatelessWidget {
                       ],
                       if (collection.poemCount case final count?) ...[
                         const SizedBox(height: 8),
-                        Text('$count شعرونه'),
+                        Text(
+                          AppStrings.of(context).choose(
+                            '${AppStrings.of(context).number(count)} poems',
+                            '${AppStrings.of(context).number(count)} شعرونه',
+                            '${AppStrings.of(context).number(count)} شعر',
+                          ),
+                        ),
                       ],
                       if (ownerPreviewMode) ...[
                         const SizedBox(height: 8),

@@ -8,8 +8,6 @@ import 'package:shelf/screens/collection_detail_screen.dart';
 import 'package:shelf/settings/interface_language.dart';
 import 'package:shelf/settings/reader_settings.dart';
 import 'package:shelf/settings/reading_preferences_sheet.dart';
-import 'package:shelf/widgets/shelf_assets.dart';
-import 'package:shelf/widgets/untitled_poem_marker.dart';
 
 import 'test_support.dart';
 
@@ -53,8 +51,7 @@ void main() {
         find.byKey(const Key('poem-list-title-301')),
         200,
       );
-      expect(find.byType(UntitledPoemMarker), findsOneWidget);
-      expect(find.text('د لومړۍ کرښې پېژندنه'), findsNothing);
+      expect(find.text('د لومړۍ کرښې پېژندنه'), findsOneWidget);
       expect(find.text('ژمى'), findsOneWidget);
       expect(
         find.text(language == InterfaceLanguage.en ? '1' : '۱'),
@@ -64,21 +61,6 @@ void main() {
         find.text(language == InterfaceLanguage.en ? '2' : '۲'),
         findsOneWidget,
       );
-      final semantics = t.ensureSemantics();
-      await t.pump();
-      expect(
-        find.bySemanticsLabel(switch (language) {
-          InterfaceLanguage.en => 'Untitled poem',
-          InterfaceLanguage.ps => 'بې سرلیکه شعر',
-          InterfaceLanguage.dari => 'شعر بدون عنوان',
-        }),
-        findsOneWidget,
-      );
-      semantics.dispose();
-      final marker = t.widget<ShelfActionIcon>(
-        find.byKey(const Key('untitled-poem-indicator')),
-      );
-      expect(marker.name, 'poetry');
       expect(poemSummaryJson['id'], 301);
       expect(poemSummaryJson['sort_order'], 1);
       expect(t.takeException(), isNull);

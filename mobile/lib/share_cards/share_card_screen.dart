@@ -42,6 +42,7 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
   ShareCardScope _scope = ShareCardScope.selection;
   ShareLineSelection? _selection;
   bool _working = false;
+  bool _includeTitle = false;
   late String _fontFamily = widget.fontFamily;
   double _fontSize = 20;
   final PageController _previewController = PageController();
@@ -67,6 +68,9 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
     theme: _theme,
     fontFamily: _fontFamily,
     fontSize: _fontSize,
+    includeTitle: _includeTitle,
+    isEnglish: AppStrings.of(context).isEnglish,
+    isDari: AppStrings.of(context).isDari,
   );
 
   List<ShareCardPage> get _pages => _cardText.trim().isEmpty
@@ -95,7 +99,9 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppStrings.of(context).choose('Share', 'شریکول', 'اشتراک‌گذاری'),
+          AppStrings.of(context)
+              .choose('Create card', 'کارت جوړول', 'ساختن کارت'),
+          style: const TextStyle(fontSize: 18),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -149,20 +155,24 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
             children: [
               if (pages.isNotEmpty)
                 SizedBox(
-                  height: constraints.maxHeight * .32,
+                  height: (constraints.maxHeight * .52).clamp(110, 450),
                   child: PageView.builder(
                     key: const Key('card-preview'),
                     controller: _previewController,
                     itemCount: pages.length,
-                    itemBuilder: (context, index) => Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: RepaintBoundary(
-                          key: _previewKeys[index],
-                          child: MediaQuery.withNoTextScaling(
-                            child: PoemCardWidget(
-                              request: _request,
-                              page: pages[index],
+                    itemBuilder: (context, index) => SingleChildScrollView(
+                      child: SizedBox(
+                        width: constraints.maxWidth,
+                        height: constraints.maxWidth * 1.25,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: RepaintBoundary(
+                            key: _previewKeys[index],
+                            child: MediaQuery.withNoTextScaling(
+                              child: PoemCardWidget(
+                                request: _request,
+                                page: pages[index],
+                              ),
                             ),
                           ),
                         ),
@@ -176,6 +186,23 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
                   key: const Key('share-controls-scroll'),
                   padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
                   children: [
+                    if (!widget.poem.isUntitled)
+                      CheckboxListTile(
+                        key: const Key('share-include-title'),
+                        value: _includeTitle,
+                        title: Text(widget.poem.title!),
+                        subtitle: Text(
+                          AppStrings.of(context).choose(
+                            'Include poem title',
+                            'د شعر سرلیک ورزیات کړئ',
+                            'افزودن عنوان شعر',
+                          ),
+                        ),
+                        onChanged: _working
+                            ? null
+                            : (value) =>
+                                  _updatePreview(() => _includeTitle = value!),
+                      ),
                     SegmentedButton<ShareCardScope>(
                       key: const Key('card-scope'),
                       segments: [
@@ -221,7 +248,9 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
                               ),
                             ),
                           ),
-                          Text('${_selection?.count ?? 0}/۴'),
+                          Text(
+                            '${AppStrings.of(context).number(_selection?.count ?? 0)}/${AppStrings.of(context).number(4)}',
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -294,7 +323,7 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
                                 _updatePreview(() => _fontFamily = value!),
                     ),
                     Text(
-                      '${AppStrings.of(context).fontSize}: ${_fontSize.round()}',
+                      '${AppStrings.of(context).fontSize}: ${AppStrings.of(context).number(_fontSize.round())}',
                     ),
                     Slider(
                       key: const Key('share-font-size'),
@@ -302,7 +331,8 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
                       max: 32,
                       divisions: 16,
                       value: _fontSize,
-                      label: '${_fontSize.round()}',
+                      label:
+                          '${AppStrings.of(context).number(_fontSize.round())}',
                       onChanged: _working
                           ? null
                           : (value) => _updatePreview(() => _fontSize = value),
@@ -452,9 +482,9 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
           content: Text(
             save
                 ? AppStrings.of(context).choose(
-                    '${rendered.length} cards saved.',
-                    '${rendered.length} کارتونه وساتل شول.',
-                    '${rendered.length} کارت ذخیره شد.',
+                    '${AppStrings.of(context).number(rendered.length)} cards saved.',
+                    '${AppStrings.of(context).number(rendered.length)} کارتونه وساتل شول.',
+                    '${AppStrings.of(context).number(rendered.length)} کارت ذخیره شد.',
                   )
                 : AppStrings.of(context).choose(
                     'Cards ready to share.',
@@ -511,6 +541,9 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
     if (_previewController.hasClients) {
       _previewController.jumpToPage(index);
     }
+    // Logo decoding must finish before the exported repaint boundary is captured.
+    await precacheImage(AssetImage('assets/brand/shelf_header_${_theme == ShareCardTheme.dark ? "light" : "dark"}.png'), context);
+    if (!mounted) return null;
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted || index >= _previewKeys.length) return null;
     final renderObject = _previewKeys[index].currentContext?.findRenderObject();

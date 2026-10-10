@@ -13,6 +13,9 @@ class ShareCardRequest {
     required this.theme,
     this.fontFamily = 'Vazirmatn',
     this.fontSize = 20,
+    this.includeTitle = false,
+    this.isEnglish = false,
+    this.isDari = false,
   });
 
   final PoemDetail poem;
@@ -22,6 +25,7 @@ class ShareCardRequest {
   final ShareCardTheme theme;
   final String fontFamily;
   final double fontSize;
+  final bool includeTitle, isEnglish, isDari;
 }
 
 class ShareCardPage {

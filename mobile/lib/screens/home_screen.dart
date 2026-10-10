@@ -322,6 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 8),
                           Text(
                             author.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                             maxLines: 2,
                             textDirection: TextDirection.rtl,
                             textAlign: TextAlign.right,

@@ -1,4 +1,5 @@
-import 'dart:math' as math;
+import '../widgets/shelf_assets.dart';
+import '../l10n/app_strings.dart';
 
 import 'package:flutter/material.dart';
 
@@ -28,54 +29,18 @@ class PoemCardWidget extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               CustomPaint(painter: _CardMotifPainter(request.theme, palette)),
-              Positioned(
-                left: 20,
-                bottom: 62,
-                child: Transform.rotate(
-                  angle: -math.pi / 2,
-                  child: Text(
-                    'Shelf',
-                    style: TextStyle(
-                      color: palette.watermark,
-                      fontFamily: 'Vazirmatn',
-                      fontSize: 11,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(34, 28, 34, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Shelf',
-                            style: TextStyle(
-                              color: palette.accent,
-                              fontFamily: 'Vazirmatn',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 20,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          'Shelf',
-                          textDirection: TextDirection.ltr,
-                          style: TextStyle(
-                            color: palette.muted,
-                            fontFamily: 'Vazirmatn',
-                            fontSize: 9,
-                            letterSpacing: 1.4,
-                          ),
-                        ),
-                      ],
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ShelfLogo(
+                        dark: request.theme == ShareCardTheme.dark,
+                      ),
                     ),
-                    if (!request.poem.isUntitled) ...[
+                    if (request.includeTitle && !request.poem.isUntitled) ...[
                       const SizedBox(height: 4),
                       Text(
                         request.poem.title!,
@@ -131,6 +96,7 @@ class PoemCardWidget extends StatelessWidget {
                           color: palette.muted,
                           fontFamily: request.fontFamily,
                           fontSize: 13,
+                          fontWeight: FontWeight.bold,
                           height: 1.5,
                         ),
                       ),
@@ -151,7 +117,7 @@ class PoemCardWidget extends StatelessWidget {
                         ),
                         if (page.pageCount > 1)
                           Text(
-                            '${page.pageNumber}/${page.pageCount}',
+                            '${BookstoreStrings(request.isEnglish, isDari: request.isDari).number(page.pageNumber)}/${BookstoreStrings(request.isEnglish, isDari: request.isDari).number(page.pageCount)}',
                             textDirection: TextDirection.ltr,
                             style: TextStyle(
                               color: palette.muted,

@@ -175,8 +175,8 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.scrollUntilVisible(find.text('ژمى'), 250);
-      expect(find.text('د لومړۍ کرښې پېژندنه'), findsNothing);
-      expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
+      expect(find.text('د لومړۍ کرښې پېژندنه'), findsOneWidget);
+      expect(find.byKey(const Key('untitled-poem-indicator')), findsNothing);
       expect(find.text('بې سرليکه'), findsNothing);
       expect(find.text('ژمى'), findsOneWidget);
       expect(find.textContaining('اصلي لیکوال: پروین پژواک'), findsOneWidget);

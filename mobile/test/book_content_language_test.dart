@@ -219,6 +219,7 @@ void main() {
         scope: ShareCardScope.accessiblePoem,
         text: body,
         theme: ShareCardTheme.parchment,
+        includeTitle: true,
       );
       await tester.pumpWidget(
         InterfaceLanguageScope(

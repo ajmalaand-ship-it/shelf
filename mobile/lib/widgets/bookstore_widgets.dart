@@ -46,6 +46,7 @@ class BookPresentation extends StatelessWidget {
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
@@ -244,6 +245,7 @@ class BookTile extends StatelessWidget {
             if (book.creditedAuthors case final author?)
               Text(
                 author,
+                style: const TextStyle(fontWeight: FontWeight.bold),
                 textDirection: TextDirection.rtl,
                 textAlign: TextAlign.right,
                 maxLines: 1,

@@ -189,9 +189,9 @@ class _SearchScreenState extends State<SearchScreen> {
         if (_hasQuery && !_loading && !_failed && _results.isNotEmpty)
           SectionTitle(
             AppStrings.of(context).choose(
-              'Search results (${_results.length})',
-              'د لټون پایلې (${_results.length})',
-              'نتایج جستجو (${_results.length})',
+              'Search results (${AppStrings.of(context).number(_results.length)})',
+              'د لټون پایلې (${AppStrings.of(context).number(_results.length)})',
+              'نتایج جستجو (${AppStrings.of(context).number(_results.length)})',
             ),
           ),
         if (_loading)

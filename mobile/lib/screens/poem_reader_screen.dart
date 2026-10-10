@@ -438,7 +438,7 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
           poem.hasMore && !widget.ownedMode && !widget.ownerPreviewMode
           ? (AppStrings.of(context).choose(
               'Sample — full section locked',
-              'نمونه — بشپړه برخه تړلې ده',
+              'بېلګه — بشپړه برخه تړلې ده',
               'نمونه — بخش کامل قفل است',
             ))
           : next != null && !_canEnter(next)
@@ -555,10 +555,7 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
                         ),
                       ),
                     ),
-              icon: ShelfActionIcon(
-                'share',
-                dark: widget.settings.palette == ReaderPalette.dark,
-              ),
+              icon: const Icon(Icons.ios_share_rounded),
             ),
             ShelfFontButton(
               key: const Key('reader-font-chooser'),
@@ -584,7 +581,8 @@ class _PoemReaderScreenState extends State<PoemReaderScreen>
                     child: TextButton(
                       key: const Key('reader-contents'),
                       style: TextButton.styleFrom(
-                        foregroundColor: colors.foreground,
+                        foregroundColor: colors.muted,
+                        textStyle: const TextStyle(fontSize: 13, fontFamily: 'Vazirmatn'),
                       ),
                       onPressed: () {
                         unawaited(_save());
@@ -778,8 +776,7 @@ class _PoemBody extends StatelessWidget {
                   if (poem.isTranslation) ...[
                     const SizedBox(height: 18),
                     Text(
-                      'اصلي شاعر: ${poem.originalAuthor ?? '—'}\n'
-                      'پښتو ژباړه: ${poem.translator ?? '—'}',
+                      '${AppStrings.of(context).originalAuthor(poem.originalAuthor ?? '—')}\n${AppStrings.of(context).translation(poem.translator ?? '—')}',
                       textAlign: direction == TextDirection.rtl
                           ? TextAlign.right
                           : TextAlign.left,
@@ -809,13 +806,13 @@ class _PoemBody extends StatelessWidget {
                   const SizedBox(height: 28),
                   if (!ownerPreviewMode && poem.isFreeSample && !poem.locked)
                     Text(
-                      'Sample — نمونه',
+                      AppStrings.of(context).sample,
                       key: const Key('sample-label'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: colors.muted),
+                      style: TextStyle(color: colors.muted, fontSize: 13),
                     ),
                   if (!ownerPreviewMode && (poem.locked || poem.hasMore))
-                    _LockedNotice(color: colors.foreground),
+                    _LockedNotice(color: colors.muted),
                   if (showText)
                     KeyedSubtree(
                       key: textKey,
@@ -985,7 +982,7 @@ class _AudioPlayerPanel extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          '${_durationText(position)} / ${_durationText(duration)}',
+                          '${_durationText(context, position)} / ${_durationText(context, duration)}',
                           key: const Key('audio-time'),
                           textDirection: TextDirection.ltr,
                           style: TextStyle(color: colors.muted),
@@ -996,7 +993,7 @@ class _AudioPlayerPanel extends StatelessWidget {
                           controller.cacheProgress! >= 1
                               ? AppStrings.of(context)
                                     .choose('Saved', 'ساتل شوی', 'ذخیره‌شده')
-                              : '${(controller.cacheProgress! * 100).round()}٪',
+                              : '${AppStrings.of(context).number((controller.cacheProgress! * 100).round())}%',
                           key: const Key('audio-cache-status'),
                           style: TextStyle(color: colors.muted),
                         ),
@@ -1011,11 +1008,11 @@ class _AudioPlayerPanel extends StatelessWidget {
     },
   );
 
-  static String _durationText(Duration? duration) {
+  static String _durationText(BuildContext context, Duration? duration) {
     if (duration == null) return '--:--';
     final minutes = duration.inMinutes;
     final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+    return '${AppStrings.of(context).number(minutes)}:${AppStrings.of(context).number(int.parse(seconds)).padLeft(2, AppStrings.of(context).number(0))}';
   }
 }
 
@@ -1027,10 +1024,14 @@ class _LockedNotice extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 18),
     child: Text(
-      'دا برخه د بشپړ کتاب برخه ده.\nComing soon — ډېر ژر',
+      AppStrings.of(context).choose(
+        'This section is part of the full book.\nComing soon',
+        'دا برخه د بشپړ کتاب برخه ده.\nډېر ژر',
+        'این بخش از کتاب کامل است.\nبه‌زودی',
+      ),
       key: const Key('book-coming-soon'),
       textAlign: TextAlign.center,
-      style: TextStyle(color: color, height: 1.6),
+      style: TextStyle(color: color, fontSize: 13, height: 1.6),
     ),
   );
 }

@@ -176,7 +176,7 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                   child: Text(
                     _t(
                       'Books you buy will appear here. Browse the Store and read a free sample first.',
-                      'ستاسو پېرودل شوي کتابونه دلته ښکاري. لومړی په پلورنځي کې وړیا نمونه ولولئ.',
+                      'ستاسو پېرودل شوي کتابونه دلته ښکاري. لومړی په پلورنځي کې وړیا بېلګه ولولئ.',
                     ),
                   ),
                 ),

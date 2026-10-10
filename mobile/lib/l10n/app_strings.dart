@@ -42,8 +42,8 @@ abstract final class AppStrings {
   static const introduction = 'سريزه';
   static const foreword = 'مخکنۍ خبرې';
   static const publicationInfo = 'د چاپ معلومات';
-  static const readSample = 'نمونه ولولئ';
-  static const sample = 'نمونه';
+  static const readSample = 'بېلګه ولولئ';
+  static const sample = 'بېلګه';
   static const buySoon = 'پېرود — ډېر ژر';
   static const locked = 'تړلی';
   static const free = 'وړيا';
@@ -608,12 +608,12 @@ class BookstoreStrings {
       ? 'دیدن کتاب‌ها و خواندن نمونه‌ها رایگان است. خرید کتاب به‌زودی فعال می‌شود.'
       : isEnglish
       ? 'Browsing and samples are free. Book purchases are coming soon.'
-      : 'د کتابونو کتل او نمونې وړیا دي. د کتابونو پېرودل به ژر راشي.';
+      : 'د کتابونو کتل او بېلګې وړیا دي. د کتابونو پېرودل به ژر راشي.';
   String get accountsUnavailable => isDari
       ? 'حساب‌ها موقتاً در دسترس نیستند. هنوز می‌توانید کتاب‌ها و نمونه‌ها را بخوانید.'
       : isEnglish
       ? 'Accounts are temporarily unavailable. You can still browse and read samples.'
-      : 'حسابونه اوس نه شته. کتابونه او نمونې لا هم لوستلی شئ.';
+      : 'حسابونه اوس نه شته. کتابونه او بېلګې لا هم لوستلی شئ.';
   String get ownerAccountTesting => isDari
       ? 'آزمایش مالک: فعلاً تنها مالک می‌تواند حساب بسازد.'
       : isEnglish

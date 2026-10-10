@@ -172,7 +172,8 @@ class ReadingPreferences extends StatelessWidget {
                             Expanded(
                               child: Center(
                                 child: Text(
-                                  settings.fontSize.round().toString(),
+                                  AppStrings.of(context)
+                                      .number(settings.fontSize.round()),
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium,
@@ -206,7 +207,8 @@ class ReadingPreferences extends StatelessWidget {
                             ReaderSettings.minimumFontSize,
                             ReaderSettings.maximumFontSize,
                           ),
-                          label: settings.fontSize.round().toString(),
+                          label: AppStrings.of(context)
+                              .number(settings.fontSize.round()),
                           onChanged: settings.setFontSize,
                         ),
                         Text(

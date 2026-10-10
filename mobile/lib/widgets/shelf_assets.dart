@@ -58,32 +58,15 @@ class ShelfActionIcon extends StatelessWidget {
   }
 }
 
-/// Short visible font label, with a bounded toolbar width at large text scales.
+/// Icon-only toolbar control with localized accessibility and tooltip.
 class ShelfFontButton extends StatelessWidget {
   const ShelfFontButton({super.key, required this.onPressed, this.dark});
   final VoidCallback onPressed;
   final bool? dark;
   @override
-  Widget build(BuildContext context) => Tooltip(
-    message: AppStrings.of(context).readingPreferences,
-    child: SizedBox(
-      width: (MediaQuery.sizeOf(context).width * .35).clamp(96, 168),
-      child: TextButton(
-        onPressed: onPressed,
-        child: Row(
-          children: [
-            ShelfActionIcon('font', dark: dark),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                AppStrings.of(context).font,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
+  Widget build(BuildContext context) => IconButton(
+    tooltip: AppStrings.of(context).readingPreferences,
+    onPressed: onPressed,
+    icon: ShelfActionIcon('font', dark: dark),
   );
 }

@@ -74,7 +74,15 @@ if "$run_mobile"; then
     cd -- "$run_dir/mobile"
     echo "Running Flutter tests (--mobile requested)"
     mobile_args=()
-    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-correction" ]]; then
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-final-render" ]]; then
+        mobile_args=(test/review_3_final_test.dart test/reader_widget_test.dart test/paginated_reader_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-final" ]]; then
+        mobile_args=(test/review_3_final_test.dart test/review_3_correction_test.dart test/review_3_test.dart
+            test/share_card_entry_test.dart test/share_card_widget_test.dart test/share_card_render_test.dart
+            test/share_card_screen_test.dart test/share_card_paginator_test.dart test/reader_widget_test.dart
+            test/paginated_reader_test.dart test/book_content_language_test.dart test/reading_preferences_pinned_test.dart)
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-correction" ]]; then
         mobile_args=(test/review_3_correction_test.dart test/reader_widget_test.dart
             test/book_content_language_test.dart test/reading_preferences_pinned_test.dart)
         "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings \

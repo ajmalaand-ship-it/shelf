@@ -200,7 +200,7 @@ class _PagedTextViewState extends State<PagedTextView> {
                                   Text(
                                     index == 0
                                         ? ''
-                                        : '$index / ${widget.pages.length}',
+                                        : '${AppStrings.of(context).number(index)} / ${AppStrings.of(context).number(widget.pages.length)}',
                                     key: const Key('item-page-number'),
                                     textDirection: index == 0
                                         ? widget.direction
