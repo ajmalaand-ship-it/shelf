@@ -7,6 +7,8 @@ workflows:
     max_build_duration: 45
     working_directory: mobile
     environment:
+      groups:
+        - shelf_ios_foundation
       flutter: 3.47.2
       xcode: latest
       cocoapods: default

@@ -579,6 +579,46 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Codemagic environment-group correction — 10 October 2026
+
+Owner confirms Codemagic is connected to **ajmalaand-ship-it/shelf** and has
+found root **codemagic.yaml** on **ios/foundation**. Connection/discovery is
+OWNER-CONFIRMED, not an independently inspected cloud configuration or build.
+Owner authorized this isolated YAML correction, records, commit and branch push.
+Continued clean existing checkout **/home/shelf/tmp/shelf-ios-foundation** at
+**49a1d53855b6cd05e5c67207aefc38fbafb14baf**; no branch recreation/main update.
+
+Added only **shelf_ios_foundation** to
+**workflows.ios-foundation.environment.groups**. Codemagic UI variables must
+belong to a group explicitly imported by the YAML workflow; discovery alone
+never imports them. Preserved every other parsed configuration value, including
+Flutter 3.47.2, Xcode latest, CocoaPods default, mobile working directory,
+manual-only unsigned compilation, API guard, artifacts and both false flags.
+PyYAML parsing and exact before/after mapping comparison passed; git diff --check
+passed. Only codemagic.yaml and this additive Master Record reconciliation
+changed. No completed Flutter tests repeated and no native build performed.
+
+**Readiness:** the source configuration now imports the intended variable group
+for a first separately authorized unsigned cloud compilation. In the Shelf
+application's Codemagic Environment variables, save **SHELF_API_BASE_URL** as
+**https://shelf.services/api/** (trailing slash) in **shelf_ios_foundation**.
+No other custom variable or Apple signing credential is required by this workflow.
+Dashboard variable existence/value/group membership has NOT been inspected or
+owner-confirmed. Refresh YAML discovery at the pushed revision and confirm these
+settings before any later approved build. Compilation/CocoaPods resolution and
+actual cloud toolchain compatibility remain unverified; unsigned .app is neither
+an installable signed IPA nor iPhone/App Store acceptance.
+
+**Next practical task:** confirm the dashboard variable/group and refreshed
+workflow, then obtain separate owner authorization for the first unsigned cloud
+compilation. This supersedes the earlier repository-connection next action only.
+No cloud build, paid activation, signing, store upload, deployment, Android rebuild,
+provider/secret/production edit or transaction. Checkout **OFF**, automatic pricing
+sync **DEFERRED/disabled**, second-phone restore **owner-deferred/not passed**,
+financial expiry unimplemented and joint Android/iOS public-launch hold preserved.
+Other iOS login/purchase/device and backend work retains its recorded limitations.
+Rollback is a normal revert on this isolated branch; no live rollback required.
+
 ## iOS foundation interruption reconciliation — 10 October 2026
 
 **Foundation source verification complete; native iOS acceptance remains pending.**
@@ -1671,7 +1711,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** owner connects the private Shelf repository and ios/foundation branch to Codemagic for YAML discovery only; no build or paid activation. Follow the latest iOS foundation entry. Financial-retention dry-run
+**Next practical task:** confirm the Codemagic dashboard API variable/group and refreshed ios/foundation workflow, then separately authorize the first unsigned cloud compilation. Repository connection/YAML discovery are owner-confirmed; follow the latest Codemagic correction entry. No build or paid activation in this task. Financial-retention dry-run
 work remains in the backend list; it is no longer the immediate next-task priority.
 This amendment authorizes documentation only: no features/settings, rebuild,
 deployment, purchase, store submission or release; no commit/push in this task.
