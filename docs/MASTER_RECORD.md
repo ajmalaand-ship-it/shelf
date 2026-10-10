@@ -579,6 +579,46 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## iOS foundation interruption reconciliation — 10 October 2026
+
+**Foundation source verification complete; native iOS acceptance remains pending.**
+Resumed the existing **/home/shelf/tmp/shelf-ios-foundation**, branch
+**ios/foundation**, without recreating the branch or repeating implementation.
+Initial HEAD and actual GitHub refs/heads/ios/foundation both matched exactly
+**d7f0a4ca10a687ffff989f9e524c0ab62387901e**, containing implementation
+**d8d42fbd2fe7652af769df065eb28761baac6070**. Initial isolated git status was
+clean; git diff --check and scripts/check_ios_foundation.py passed again.
+Remote main remains **72cabf07a953ff41b2191a3b67f7d18accdd6055**; no main update.
+Host process names and accessible working directories showed no process using
+this iOS checkout or template and no Flutter/Dart/Git foundation operation.
+Other existing agent/server processes were left untouched.
+
+Reused the completed scripts/run_tests.sh --mobile evidence above, independently
+rechecking its exact SHA-256 **587101f9b3e7e01d9462cc60e6c052c8b0484ca9a0e6f9f4f3792ebb4001eb4e**.
+No broad tests or successful shared checks repeated. Removed only
+**/home/shelf/tmp/shelf-ios-template** after confirming a non-symlink disposable
+Flutter scaffold: no Git repository, stock counter demo/native delegate, generated
+project metadata at the documented Flutter revision and only template files.
+Removal confirmed; retained the real checkout, source and passing test log.
+
+This additive records-only follow-up leaves native implementation unchanged.
+macOS/Xcode compilation, CocoaPods resolution/lock, signing, Apple/Google login,
+App Store products/RevenueCat/server verification, sandbox restore/refund,
+privacy declarations and real-iPhone reading/native/offline acceptance remain
+unfinished as detailed below. No cloud connection/build, paid activation, store
+upload, deployment, Android rebuild or production checkout edit performed.
+Checkout **OFF**, pricing sync **DEFERRED/disabled**, second-phone restore
+**owner-deferred/not passed**, financial expiry unimplemented and joint public-launch
+hold preserved. Existing production working records/cPanel handler remain untouched.
+
+**Next owner action:** Codemagic → Add application → connect GitHub with access
+limited to **ajmalaand-ship-it/shelf** → select **ios/foundation** → discover the
+root **codemagic.yaml**, workflow **ios-foundation**, Flutter directory **mobile**.
+Stop after configuration discovery: no Start new build, billing activation,
+automatic triggers/publishing or signing-key upload. Connection success is still
+pending owner evidence. This completes the interrupted server foundation task,
+not the iOS app or joint-launch readiness.
+
 ## iOS foundation implementation — 10 October 2026
 
 Owner authorized isolated iOS foundation construction from accepted Shelf source,
