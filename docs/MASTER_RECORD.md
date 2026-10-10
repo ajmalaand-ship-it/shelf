@@ -579,6 +579,83 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Review 3 signed production AAB — 10 October 2026
+
+**BUILD AND RELEASE CHECKS PASSED.** Owner-authorized corrections completed from
+latest Review 3 development, with sample wording incorporated before building:
+**بېلګه / نمونه / Sample**, selected interface language only. Blank wording issue
+is **RESOLVED**. “Live” means a **Google Play test-track update**, not public release;
+joint Android/iOS public-launch hold remains. No Play upload/Test APK/deployment.
+
+**Immutable AAB source:** 94c0ca014d0d9074bb8bf08714777db8b4202886, including mobile
+**a019b00d3429f8e8440056cfc2b510026594cba9**, all completed Review 2/3/pagination/
+avatar work and latest records. Backend-only final protection commit
+**5821c42ba4cc75eb96fd36a0172847dafe29c9aa** followed artifact preparation:
+first-line catalogue preview is bounded to 240 source characters; a sole paid
+nonempty line is withheld because it would expose the complete paid body (localized
+Untitled fallback remains). Multiline first-line preview and source bytes unchanged.
+No mobile tree difference from immutable build source, independently confirmed;
+no rebuild needed for this backend-only correction, which is NOT deployed.
+
+**Artifact:** production flavor **Shelf 1.0.11 (20)**, services.shelf.app,
+https://shelf.services/api/. Next unused code 20 after retained shared artifact
+codes 14–19; version set through build arguments, pubspec/lockfile unchanged.
+Exact private path:
+`/home/shelf/apps/shelf/storage/app/private/owner-aabs/shelf-review-3-production-1.0.11-20-20261010-040052.aab`
+SHA-256 **5afef9e0eb3228e8e7df8ea81164f4cb0445fbf49df7e8229759bae1475f60d6**;
+**63,122,418 bytes**, mode 0600, matching private JSON sidecar. Saved
+10 October 2026 04:00:52 UTC / 00:00:52 local. Existing upload certificate retained:
+SHA-1 DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB;
+SHA-256 2065572ecb0f174a9e669602232ffcea31335303d3ff011caaeb7216fdb69e77.
+No package/signing/OAuth/credential change; separate staging Test badge remains
+in source, production launcher references only unbadged supplied Shelf assets.
+
+**Packaged verification:** compiled manifest version/package/Shelf label/non-debuggable;
+ZIP CRC; jarsigner verification; independent verified read of **all 528 payload
+entries** using JarFile against the exact recorded upload certificate; production
+endpoint in all native app libraries; no staging endpoint/Test label/banner/access
+marker; no Test launcher resources in AAB; all **84 supplied logo/action PNGs** and
+three original fonts exact. **20 packaged launcher PNGs** match alpha/visible pixels;
+adaptive and legacy **circle/rounded-square/squircle** renders inspected from actual
+packaged resources, no white surround. No internal-test checkout opt-in/build token.
+Jarsigner warnings retained: self-signed/untrusted chain, missing timestamp, POSIX
+attributes and streaming archive-order/manifest ordering. JarFile payload verification
+passed independently; no repacking/signature replacement or Google approval inferred.
+Verifier initially assumed source density paths without Android-added -v4; corrected
+and passed on this same AAB, no rebuild. Task build workspace cleaned; recreated
+task-only Gradle registry removed and absence confirmed; archived source/logs retained.
+
+**Focused evidence:** 104 Flutter checks + identity check and final 31 reader/render
+checks + identity; PHP final **7 tests / 77 assertions**, including full single-line
+paid-body denial and bounded preview. Renderer-generated **1080×1350** light/sepia/
+dark cards inspected (correct contrasting supplied logo, title when selected,
+bold author, localized page digits). Reader/Contents/sharing three-language/narrow/
+short renders inspected, with real bundled fonts/icons; no duplicate bilingual
+Sample/Coming soon labels. Initial harness/fixture failures fixed; no live repair.
+Final backend log /home/shelf/tmp/shelf-review3-backend-final-checks.log SHA-256
+8d8d3e538787239f3cf9932ff053f1adf2fd06e43616445baa0d8e7f8ee54275.
+AAB logs/scripts and packaged masks: /home/shelf/tmp/shelf-review3-aab-20261009/;
+verify-production.log SHA-256 f744eed9e8694c3ccd7ad0222c9962275a6210204f8f48a655d14080c2b0ee6d;
+packaged-launcher-masks.png SHA-256 af0b9bb8d720a48877f70ab8007ccb75078ad9fd1a015b0b947b722659f1df2a.
+Earlier correction/render log hashes and preserved completed evidence remain below.
+
+**Required before test-track rollout:** separately authorize staging verification
+and identical tested-commit production promotion of existing private-avatar routes/
+2026_10_09_120000 reversible migration plus new protected first_line metadata and
+single-line guard, with verified backup. Production remains **34799b8**: actual
+avatar routes=0, avatar column absent and first-line method absent. Staging remains
+**9a748ef**, avatar column present; new first-line addition not staged. Current
+production responses parse compatibly but cannot supply locked first-line titles
+or support avatar add/remove; do not roll out as though those features are deployed.
+Synthetic/packaged checks do not establish Android phone or iOS acceptance.
+Real phone review remains pending; second/cover-photo purpose still unresolved.
+No new wording decision needed. Checkout OFF; manual first-100-book pricing,
+automatic sync DEFERRED/disabled, second-phone restore owner-deferred/not a new
+blocker, financial expiry absent and joint public-launch hold preserved. No main
+merge/push, provider edits, production setting/database/content changes or transaction.
+Next: owner downloads the AAB to Windows Downloads\Shelf-Review-3. Backend promotion
+and later Play test-track upload require separate authorized tasks; no upload now.
+
 ## Review 3 final corrections and production AAB authorization — 9 October 2026
 
 Owner authorized continuing latest development 1e193b4, preserving all completed
