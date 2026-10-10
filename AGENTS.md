@@ -163,6 +163,26 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-10: Owner authorized isolated iOS foundation from accepted 5f5c8f6,
+  branch ios/foundation: registered services.shelf.app, Team YSLWJQDH8B, supplied
+  icons/shared fonts/native channels and manual-only unsigned Codemagic YAML.
+  Active Apple membership, primary Apple-sign-in ID and Shelf - شیلف / Prepare
+  for Submission owner-confirmed. Source checks passed; macOS/signing/iPhone,
+  Apple login and App Store purchases unfinished. No paid activation/cloud build/
+  upload/deployment/Android rebuild; accepted Android/UI unchanged. Checkout OFF,
+  deferrals and joint launch retained. Next: connect private GitHub repository
+  and ios/foundation for YAML discovery only. See latest Master Record.
+
+- 2026-10-10: Owner approved exact tested Review 3 backend promotion 5f5c8f6.
+  Production and staging now match; nullable private-avatar migration batch 26 and
+  protected bounded first-line metadata including 5821c42 deployed after two
+  verified backups and record/cPanel checkpoint. Production access/health/history
+  checks passed; backend ready for existing 1.0.11 (20) test-track update. AAB
+  unchanged, no rebuild/upload/public release. Checkout OFF, pricing-sync and
+  second-phone-restore deferrals and Android/iOS joint-launch hold preserved.
+  Exact backup/check evidence and prior rollback target are in Master Record.
+
+
 - 2026-10-09: Owner feedback correction source 340142b: د لوست سیټینګ,
   supplied launcher mark/distinct Shelf Test badge, supplied poetry glyph only for
   genuinely untitled poems with localized accessibility, Pashto/Dari display digits
