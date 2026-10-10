@@ -128,13 +128,16 @@ class Poem extends Model
 
     public function catalogueFirstLine(): ?string
     {
-        foreach (preg_split('/\r\n|\r|\n/u', $this->body ?? '') as $line) {
-            if (trim($line) !== '') {
-                return $line;
-            }
+        $lines = array_values(array_filter(
+            preg_split('/\r\n|\r|\n/u', $this->body ?? ''),
+            fn (string $line): bool => trim($line) !== '',
+        ));
+        // A sole paid line is the complete body, not a safe catalogue preview.
+        if ($lines === [] || (! $this->hasSample() && count($lines) === 1)) {
+            return null;
         }
 
-        return null;
+        return mb_substr($lines[0], 0, 240);
     }
 
     public function sampleText(): ?string

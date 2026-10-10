@@ -28,4 +28,18 @@ class CatalogueFirstLineTest extends TestCase
         $book->changeStatus('draft');
         $this->getJson('/api/collections/'.$book->slug.'/poems')->assertNotFound();
     }
+    public function test_catalogue_preview_is_bounded_and_never_discloses_a_complete_single_line_paid_body(): void
+    {
+        $book = Collection::create(['title' => 'Synthetic edge cases', 'status' => 'published']);
+        $poem = $book->poems()->create(['body' => 'Single paid line', 'excerpt' => 'Private', 'title' => null, 'is_active' => true, 'sample_mode' => 'none']);
+        $this->getJson('/api/collections/'.$book->slug.'/poems')->assertOk()
+            ->assertJsonPath('data.0.first_line', null)->assertJsonPath('data.0.excerpt', null)
+            ->assertJsonMissingPath('data.0.body')->assertDontSee('Single paid line');
+        $poem->update(['body' => str_repeat('a', 300)."\nPrivate remainder"]);
+        $this->getJson('/api/collections/'.$book->slug.'/poems')->assertJsonPath('data.0.first_line', str_repeat('a', 240))
+            ->assertDontSee('Private remainder');
+        $poem->update(['body' => 'Single free line', 'sample_mode' => 'full']);
+        $this->getJson('/api/collections/'.$book->slug.'/poems')->assertJsonPath('data.0.first_line', 'Single free line');
+    }
+
 }
