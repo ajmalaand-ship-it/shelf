@@ -579,6 +579,76 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Review 3 final corrections and production AAB authorization — 9 October 2026
+
+Owner authorized continuing latest development 1e193b4, preserving all completed
+Review 2/3/pagination/avatar work. Backend source **3a787ee** adds catalogue-only
+`first_line` for null/blank titles. UI source **a019b00** corrects launcher legacy
+resources, icon-only font control, sharing editor, counters, Contents and author
+weight. All source/title/ID/order/access rules remain unchanged.
+
+**Owner clarification is binding before build:** Pashto **بېلګه**, Dari **نمونه**,
+English **Sample**, including related phrases and partial-sample notices, selected
+interface language only. Previously blank requested sample wording is **RESOLVED**.
+Exact **د لوست سیټینګ** retained. “Live” means **Google Play test-track update**,
+not public release; joint Android/iOS public-launch hold remains binding. No new
+launch confirmation needed for this clarification; final joint-launch approval
+still required before any public rollout. Second/cover-photo purpose remains pending.
+
+**Implemented:** supplied opaque square legacy launcher assets replace transparent
+rounded/circle resources (xxhdpi derived from supplied square at required density);
+supplied adaptive foreground/background/monochrome preserved. Staging adaptive
+icon retains the same mark and red T badge; package/signing identities unchanged.
+Six local launcher mask simulations (circle/rounded square/squircle, adaptive and
+legacy) checked opaque brown rims/no white surround. Actual OS/phone acceptance
+is pending. Top font control contains only supplied ب ب glyph, localized tooltip/
+accessibility retained. Sharing uses smaller localized Create card heading, preview
+at full available width in pinned scrollable viewport (52% height), expanded view
+retained, independent initially unchecked title and supplied contrasting logo.
+Exporter waits for logo decoding before raster capture. Previous reader share icon
+Icons.ios_share_rounded restored; improved editor retained. Four-consecutive-line/
+approved-readable-text export limits and attribution unchanged. Both sides of line/
+page counters, font sizes, search/book counts and audio time/progress localize digits.
+Untitled Contents uses exact first nonempty line as display fallback; reader retains
+poetry glyph. Actual titles/stored text are not changed. Quiet 13px Sample/Contents/
+locked notices, single-language Coming soon/credit labels and bold displayed authors.
+
+**Focused checks:** scripts/run_tests.sh --mobile: 104 Flutter + 1 required identity
+check; then 31 reader/render + 1 identity checks for final Contents bundled-font
+correction. Temporary-database CatalogueFirstLineTest/ReaderAvatarTest/PrivacySupportTest:
+6 tests / 69 assertions. Draft/hidden/paid-body denial, only necessary first-line
+metadata, original stored bytes, title selection, small/short screens at 2x,
+pagination/source/access regressions and actual 1080×1350 exported PNGs passed.
+Full scoped analysis had no errors; 58 pre-existing notices plus one subsequently
+removed interpolation notice. PHP syntax and git diff --check passed. Initial
+synthetic-fixture, outdated-expectation and render-harness failures fixed before
+passing runs; no live failure/data repair. Logs: /home/shelf/tmp/shelf-review3-final-checks.log
+SHA-256 c9484165d331765e2ffb349ae1fc2c8e042eee0df144d04d29f9175d3547fda7;
+/home/shelf/tmp/shelf-review3-final-render-checks.log
+SHA-256 6c659a5d2777c3a79df4626bed22238ea83e650335fb70b5cc68831364c2037c.
+Renders inspected: /home/shelf/tmp/shelf-review3-final-renders/ (three interface
+languages, reader/Contents, narrow/short sharing, three exported palettes, masks).
+These synthetic renders do not establish real-phone or iOS acceptance. Unrelated
+completed purchase/backup/provider evidence reused.
+
+**Production compatibility / rollout dependency:** release state read-only remains
+production **34799b8**, staging **9a748ef**. Actual production has zero avatar routes,
+no readers.avatar_path column and no catalogueFirstLine method. Existing catalogue
+responses parse compatibly; missing first_line falls back to approved excerpt or
+localized Untitled, and avatar features cannot function fully until promotion.
+Before test-track rollout, separately authorize staging verification/promotion of
+these backend additions plus existing reversible 2026_10_09_120000 avatar migration,
+with verified production backup and identical tested commit. No production deploy,
+migration or data change in this task, no staging deployment silently performed.
+Production real checkout=false, play_sync.enabled=false, deferred=true.
+
+**Authorized artifact preparation now:** production flavor, services.shelf.app,
+existing Shelf upload certificate, https://shelf.services/api/, next unused shared
+version **1.0.11 (20)** after retained codes 14–19; version via build arguments only.
+No Test APK, Google Play upload, production deployment or checkout enablement.
+Exact AAB path/hash and packaged verification will be added after successful build.
+All existing pricing-sync/second-phone/financial-expiry deferrals and joint hold retained.
+
 ## Corrected Review 3 Shelf Test phone APK — 9 October 2026
 
 Owner authorized build-only preparation from latest clean development source
