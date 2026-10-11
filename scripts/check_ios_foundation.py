@@ -43,7 +43,9 @@ changed = subprocess.check_output(['git', 'diff', '5f5c8f6', '--name-only', '--'
 assert not changed, changed
 config = (root / 'codemagic.yaml').read_text()
 assert '\n    triggering:' not in config
-assert '\n    publishing:' not in config
+# Signing/upload belongs only to the separate, manually started internal workflow.
+unsigned_config = config.split('\n  ios-testflight-internal:', 1)[0]
+assert '\n    publishing:' not in unsigned_config
 assert 'flutter build ios --release --no-codesign' in config
 assert '--dart-define=SHELF_INTERNAL_TEST_PURCHASES=false' in config
 assert '--enforce-lockfile' in config

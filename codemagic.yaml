@@ -1,5 +1,5 @@
-# Connection/configuration only in this task. A build needs separate owner authorization.
-# No triggering or publishing sections: manual-only, no store upload/distribution.
+# Manual starts only. Signed build/upload requires separate owner authorization.
+# ios-foundation remains unsigned; ios-testflight-internal has no automatic trigger.
 workflows:
   ios-foundation:
     name: Shelf iOS foundation — unsigned compile only
@@ -40,3 +40,82 @@ workflows:
     artifacts:
       - mobile/build/ios/iphoneos/*.app
       - mobile/build/ios/iphoneos/*.app.dSYM
+
+  ios-testflight-internal:
+    name: Shelf iOS — signed internal TestFlight only
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+    working_directory: mobile
+    integrations:
+      app_store_connect: shelf_app_store_connect
+    environment:
+      groups:
+        - shelf_ios_foundation
+        - shelf_ios_testflight
+      flutter: 3.47.2
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        certificates:
+          - shelf_ios_distribution
+        provisioning_profiles:
+          - shelf_ios_app_store
+    scripts:
+      - name: Require approved API and explicit unused iOS build number
+        script: |
+          set -eu
+          : "${SHELF_API_BASE_URL:?Retain the approved production API in shelf_ios_foundation}"
+          test "$SHELF_API_BASE_URL" = "https://shelf.services/api/"
+          : "${SHELF_IOS_BUILD_NUMBER:?Set an unused positive iOS build number in shelf_ios_testflight}"
+          case "$SHELF_IOS_BUILD_NUMBER" in ''|*[!0-9]*|0*) exit 1 ;; esac
+      - name: Resolve locked Flutter dependencies
+        script: flutter pub get --enforce-lockfile
+      - name: Generate native Flutter configuration
+        script: flutter build ios --config-only --release --no-codesign --no-pub
+      - name: Install native plugins
+        script: |
+          set -eu
+          cd ios
+          pod install
+      - name: Apply stored signing identities and internal-only export
+        script: |
+          set -eu
+          xcode-project use-profiles \
+            --custom-export-options='{"testFlightInternalTestingOnly":true,"manageAppVersionAndBuildNumber":false}'
+          python3 -c 'import os,plistlib; p=plistlib.load(open(os.path.expanduser("~/export_options.plist"),"rb")); assert p["testFlightInternalTestingOnly"] is True; assert p["manageAppVersionAndBuildNumber"] is False; assert p["teamID"] == "YSLWJQDH8B"; assert p["method"] in ("app-store", "app-store-connect")'
+      - name: Build signed internal TestFlight IPA with checkout OFF
+        script: |
+          set -eu
+          flutter build ipa --release --no-pub \
+            --build-name=1.0.0 --build-number="$SHELF_IOS_BUILD_NUMBER" \
+            --export-options-plist="$HOME/export_options.plist" \
+            --dart-define="SHELF_API_BASE_URL=$SHELF_API_BASE_URL" \
+            --dart-define=SHELF_TEST_MODE=false \
+            --dart-define=SHELF_INTERNAL_TEST_PURCHASES=false
+      - name: Verify exported signing identity and preserve native dependency evidence
+        script: |
+          set -eu
+          mkdir -p build/ios-testflight-evidence
+          python3 -c 'import glob,os,pathlib,plistlib,zipfile; files=glob.glob("build/ios/ipa/*.ipa"); assert len(files)==1; z=zipfile.ZipFile(files[0]); names=[n for n in z.namelist() if n.startswith("Payload/") and n.count("/")==2 and n.endswith(".app/Info.plist")]; assert len(names)==1; p=plistlib.loads(z.read(names[0])); assert p["CFBundleIdentifier"]=="services.shelf.app"; assert p["CFBundleShortVersionString"]=="1.0.0"; assert p["CFBundleVersion"]==os.environ["SHELF_IOS_BUILD_NUMBER"]; assert not z.testzip(); out=pathlib.Path("build/ios-testflight-evidence/exported"); out.mkdir(exist_ok=True); z.extractall(out)'
+          app_path=$(find build/ios-testflight-evidence/exported/Payload -maxdepth 1 -name '*.app' -type d)
+          test -n "$app_path"
+          codesign --verify --deep --strict "$app_path"
+          codesign -d --entitlements :- "$app_path" > build/ios-testflight-evidence/entitlements.plist 2>/dev/null
+          python3 -c 'import plistlib; p=plistlib.load(open("build/ios-testflight-evidence/entitlements.plist","rb")); assert p["com.apple.developer.team-identifier"]=="YSLWJQDH8B"; assert p["application-identifier"]=="YSLWJQDH8B.services.shelf.app"; assert p.get("get-task-allow",False) is False; assert p["com.apple.developer.applesignin"]==["Default"]'
+          cp ios/Podfile.lock build/ios-testflight-evidence/Podfile.lock
+          cp "$HOME/export_options.plist" build/ios-testflight-evidence/export-options.plist
+          git rev-parse HEAD > build/ios-testflight-evidence/source-commit.txt
+          find "$app_path" -name PrivacyInfo.xcprivacy -print > build/ios-testflight-evidence/privacy-manifest-paths.txt
+    artifacts:
+      - mobile/build/ios/ipa/*.ipa
+      - mobile/build/ios/archive/*.xcarchive/dSYMs/*.dSYM
+      - mobile/build/ios-testflight-evidence/*.plist
+      - mobile/build/ios-testflight-evidence/*.txt
+      - mobile/build/ios-testflight-evidence/Podfile.lock
+    publishing:
+      app_store_connect:
+        auth: integration
+        # Upload on a separately authorized manual run; assign owner internally in ASC.
+        submit_to_testflight: false
+        submit_to_app_store: false
+        release_type: MANUAL

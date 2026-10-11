@@ -163,6 +163,16 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-10: iOS unsigned Codemagic build 6acad0a1546ce6236ced5f95 at
+  869ebde owner-confirmed finished/green on Mac mini M2; execution 4m25s,
+  compilation 2m03s, preceding queue delay separate/unquantified. Separate manual
+  ios-testflight-internal workflow/signing guide prepared; signing credentials,
+  signed build/upload/processing/device/provider acceptance remain unverified.
+  No credential creation/build/upload in preparation. Preserve GitHub fallback,
+  unmerged draft PR, checkout OFF, existing deferrals and joint public-launch hold.
+  Next: protected owner signing setup under separate authorization; see Master Record.
+
+
 - 2026-10-10: Owner authorized isolated iOS foundation from accepted 5f5c8f6,
   branch ios/foundation: registered services.shelf.app, Team YSLWJQDH8B, supplied
   icons/shared fonts/native channels and manual-only unsigned Codemagic YAML.

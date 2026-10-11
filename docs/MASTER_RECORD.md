@@ -579,6 +579,107 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Successful unsigned iOS build and signed internal TestFlight preparation — 10 October 2026
+
+**UNSIGNED NATIVE COMPILATION: OWNER-CONFIRMED SUCCESS.** Owner supplied Codemagic
+build **6acad0a1546ce6236ced5f95**, status **finished / green success**, source
+**869ebde**, **ios/foundation**, **Mac mini M2**. Execution duration **4m25s**;
+unsigned iOS compilation **2m03s**, included in that execution duration. Preceding
+queue delay is separate, duration not supplied; never count it as execution.
+No successful compilation or passed shared/source suite repeated. Logs/artifact/
+Podfile.lock/exact resolved Xcode version have not been independently retrieved.
+This verifies compilation by owner evidence; it does not verify signing, TestFlight
+upload/processing, Apple/Google login, purchases or any iPhone behavior.
+
+**Apple setup retained, owner-confirmed:** active Individual membership,
+**Team YSLWJQDH8B**, explicit **services.shelf.app**, existing **Shelf - شیلف**
+App Store Connect record. No account, app or identifier recreated.
+
+Owner authorized preparation only in existing isolated checkout, initially
+**93ec31262c0d8fffece1ad76ae9084c829050ba4**, with records/commit/push to
+**ios/foundation**. Added separate **ios-testflight-internal** Codemagic workflow.
+Original unsigned workflow parsed mapping unchanged; GitHub fallback and mobile
+source unchanged. Same M2/Flutter 3.47.2/Xcode latest/CocoaPods default and locked
+pub resolution. No trigger: pushes do not launch either Codemagic workflow.
+Draft PR preserved/unmerged; default branch/main and production untouched.
+
+Signed workflow references protected integration **shelf_app_store_connect**,
+stored certificate **shelf_ios_distribution**, stored App Store profile
+**shelf_ios_app_store**. It never creates signing credentials during execution.
+Requires existing **shelf_ios_foundation** API variable exactly
+**https://shelf.services/api/** and an explicit positive unused iOS-only
+**SHELF_IOS_BUILD_NUMBER** in **shelf_ios_testflight**. Marketing version **1.0.0**
+via build arguments; no source version bump/Android change. Both purchase flags
+remain false. It configures **testFlightInternalTestingOnly=true**, prevents Xcode
+from changing the supplied version/build number, and builds signed IPA. Prior to
+publishing, checks export method/team/internal flag, IPA CRC/package/version,
+code signature and team/application/Apple entitlement/get-task-allow. Records
+source SHA, Podfile.lock, export options, entitlements and privacy-manifest paths.
+No private signing file is an artifact.
+
+A later separately authorized manual run uploads through **auth: integration**.
+**submit_to_testflight=false** avoids beta-review submission;
+**submit_to_app_store=false**, **release_type=MANUAL**, internal-only export and
+no beta_groups prevent automatic external/public distribution or tester assignment.
+Owner later assigns the processed build to an owner-only internal group manually.
+Neither compilation-green nor publishing-green proves installation/acceptance.
+
+**Focused preparation validation passed:** YAML parse, exact unsigned before/after
+mapping and toolchain comparison, manual-only trigger/false flags/internal-only
+export/no-credential-creation/publishing invariants, bash syntax for every new step,
+embedded Python syntax, mobile/fallback unchanged and git diff --check. Existing
+source verifier's no-publishing assertion now scopes to the unsigned workflow;
+no weakened unsigned requirement. No broad PHP/Flutter tests/native build repeated.
+These are static checks; signed archive/export/upload validation has not run.
+
+**Source inspection for limited first iPhone test:** no additional compile-source
+blocker established for Store/search/free samples/reader/native UX, supported only
+by the owner-confirmed compilation. Actual signing inputs and Apple processing
+acceptance are unverified prerequisites. Apple login not implemented. Google
+provider supplies only serverClientId; no iOS client/callback URL configuration
+present; shared UI may display Google under server config. Do not exercise Google
+in this limited test; it remains unfinished, not passed. RevenueCat accepts goog_
+keys and backend verification remains Play-specific: App Store products/Apple
+provider credentials/receipt verification/restore/refund are unfinished. Checkout
+OFF is preserved, no Apple purchase/real-money transaction authorized.
+Email/password/Library, Keychain isolation/sign-out/offline, photos/save/share/audio,
+RTL/fonts/accessibility and reading require actual iPhone evidence. Native dependency
+lock/privacy review and truthful Apple export-compliance answers remain pending;
+no guessed exemption or privacy declaration added. Missing Compliance/Apple upload
+errors must be recorded separately if they arise in a later authorized run.
+
+**Complete owner setup guide:** docs/IOS_FOUNDATION.md, section "Owner signing
+setup guide", checked against current official sources 10 October. Exact websites,
+fields, button labels and success indicators for API access/key, Codemagic
+integration, stored distribution certificate, App Store provisioning profile,
+variable groups/build number and later owner-only installation. API access request:
+Account Holder; team key generation: Account Holder/Admin; Codemagic publishing
+key minimum **App Manager**; profile website minimum Admin (existing Individual
+owner is Account Holder); Codemagic identity management requires team admin.
+No password/private key requested in chat or placed in git.
+
+Official sources:
+- https://developer.apple.com/help/app-store-connect/get-started/app-store-connect-api/
+- https://developer.apple.com/help/account/provisioning-profiles/create-an-app-store-provisioning-profile/
+- https://developer.apple.com/help/app-store-connect/test-a-beta-version/add-internal-testers
+- https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance/
+- https://docs.codemagic.io/yaml-code-signing/signing-ios/
+- https://docs.codemagic.io/yaml-quick-start/first-signed-build/
+- https://docs.codemagic.io/yaml-quick-start/building-a-flutter-app/
+- https://docs.codemagic.io/yaml-publishing/app-store-connect/
+
+**Stopping point / next:** protected Apple signing integration, distribution
+certificate and App Store profile must be set up by the owner in the existing
+accounts under a later separately authorized credential step, following that
+single guide; then verify saved references/API group/unused build number before
+separately authorizing the manual signed build/upload. No credential created,
+signed build started, TestFlight upload/tester invite/public submission, paid
+activation, production deployment, Android change or transaction in this task.
+Checkout OFF, pricing-sync DEFERRED/disabled, second-phone restore owner-deferred/
+not passed/not a new blocker, financial expiry unimplemented and joint public-launch
+hold retained. Rollback is a normal isolated-branch revert, no live rollback.
+Prior fallback account-access limitations/visibility evidence remain unchanged.
+
 ## GitHub Actions unsigned iOS fallback preparation — 10 October 2026
 
 Owner authorized continuing the existing isolated ios/foundation checkout,
@@ -1767,13 +1868,13 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Foundation source prepared 10 Oct:** iOS project/identity/icons/native channels and manual unsigned Codemagic configuration. Apple membership/identity/App Store record owner-confirmed; macOS compilation, signing and device/provider checks not passed. | Batch 1, next practical task. Inspection first; later concrete tasks authorize setup/build/implementation. |
+| **3. iOS app** | **Unsigned build owner-confirmed successful 10 Oct:** Codemagic 6acad0a1546ce6236ced5f95 / 869ebde, execution 4m25s, compilation 2m03s. Separate manual signed internal-TestFlight workflow prepared; signing integration/credentials, upload/processing and device/provider checks remain unverified. | Batch 1, next practical task. Inspection first; later concrete tasks authorize setup/build/implementation. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** confirm the Codemagic dashboard API variable/group and refreshed ios/foundation workflow, then separately authorize the first unsigned cloud compilation. Repository connection/YAML discovery are owner-confirmed; follow the latest Codemagic correction entry. No build or paid activation in this task. Financial-retention dry-run
+**Next practical task:** owner protected Apple signing setup for the prepared ios-testflight-internal workflow, following the complete IOS_FOUNDATION.md guide under separate authorization; then separately authorize signed build/upload. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
 work remains in the backend list; it is no longer the immediate next-task priority.
 This amendment authorizes documentation only: no features/settings, rebuild,
 deployment, purchase, store submission or release; no commit/push in this task.
