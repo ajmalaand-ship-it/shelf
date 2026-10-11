@@ -579,6 +579,77 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Explicit Codemagic artifact collection correction — 11 October 2026
+
+New OWNER-PROVIDED evidence for **6acb2794546ce6236ced6c44 / 456ec75**:
+Flutter log **Built IPA to build/ios/ipa (31.1MB)**, version **1.0.0**, build
+**1**, bundle **services.shelf.app**. Verification panel shows only **0** after
+hiding the command, no diagnostic output available. Publishing still reports
+**No artifacts were found**. This supersedes absence of export-log evidence:
+Flutter-reported IPA export is now evidenced, but independent file inspection,
+verification execution details, collection/upload/Apple receipt remain unverified.
+A panel value 0 alone is not proof of the full expected verification script.
+
+Parsed exact committed **git show 456ec75:codemagic.yaml** with YAML parser:
+**working_directory, scripts, artifacts, publishing** are sibling workflow keys;
+artifacts is a list, correctly under **ios-testflight-internal**, not nested in a
+script. Existing IPA pattern **mobile/build/ios/ipa/*.ipa**, evidence and archive
+patterns match expected clone-root output. Current official documentation checked
+again: scripts use workflow **mobile** directory; artifact patterns are relative
+to clone directory, with absolute paths/environment-variable patterns supported.
+Thus no confirmed doubled-mobile/indentation/path-resolution cause. Source YAML
+is inspected; actual service-evaluated YAML and collector runtime not accessible.
+Root cause of this run's collector miss remains **UNCONFIRMED**. No claim that
+the previous ZIP extraction defect explains the collector message.
+
+Prepared reliable explicit collection in **codemagic.yaml**:
+- Build and verification steps require **CM_BUILD_DIR**, explicitly cd to
+  **$CM_BUILD_DIR/mobile** and print working directory.
+- Mandatory existing ZIP identity/version/CRC, strict codesign and team/app/debug/
+  Apple-entitlement checks remain unchanged. **ditto -x -k** fix from **72e29ca**
+  retained. No signing verification weakened or ignored.
+- New final script requires exactly one nonempty IPA at
+  **$CM_BUILD_DIR/mobile/build/ios/ipa**, and all five expected verification
+  evidence files. Privacy-manifest listing may legitimately be empty; other
+  evidence must be nonempty. Missing files fail with explicit paths.
+- After successful mandatory verification, copies only that IPA and approved
+  non-secret evidence to **$CM_BUILD_DIR/shelf-ios-artifacts**. Rejects stale
+  staging directory; confirms copied IPA byte count/SHA-256. Prints source/output
+  paths, size/hash/source commit and success. Writes collection-manifest.json.
+- Artifact patterns now absolute **$CM_BUILD_DIR/shelf-ios-artifacts/*.ipa**,
+  **.../evidence/*** and **.../collection-manifest.json**; optional dSYMs retain
+  native archive location with explicit **$CM_BUILD_DIR/mobile/...** prefix.
+  Avoids collecting decoded app/profile/private signing files.
+- Publishing/integration/signing refs/groups/toolchain/build flags/internal-only
+  export/manual assignment and automatic-trigger absence unchanged. Unsigned
+  Codemagic workflow, GitHub workflows/helper/main registration/mobile unchanged.
+
+Focused checks passed: parsed before/after comparison restricted to two explicit
+working-directory additions, new staging script and artifact patterns; every
+shell block and staging Python syntax; preserved signing checks/extraction.
+Synthetic filesystem checks under /home/shelf/tmp: staging success and every
+required collector pattern matches; missing IPA, zero-length IPA, missing
+verification evidence and stale output directory fail closed; copied bytes match.
+Fixtures cleaned. These are path/staging checks, not a native artifact/signing
+or provider collection test. git diff --check passed. No completed Flutter tests,
+native build/upload or production check repeated.
+
+Existing run recovery remains unresolved: prior API request HTTP 401/no available
+Codemagic authentication still applies. Owner must inspect existing run Artifacts
+or any still-active remote session/support recovery before recommending another
+build. No build recommended/launched here. To establish collector root cause,
+obtain service-used YAML/workflow and full artifact-gathering searched-path log
+for this exact run; a hidden command/green badge does not substitute for it.
+Future separately authorized run can use explicit staging diagnostics, but no
+run/upload authorized by this correction. Build 1 cannot be presumed unused;
+Codemagic run completed, not confirmed cancelled before upload.
+
+Master Record updated, commit/push **ios/foundation** only. No main/source merge,
+Android/production/payment/credential/paid activation. Checkout OFF, pricing-sync
+and second-phone-restore deferrals and joint public-launch hold preserved.
+Rollback: normal isolated-branch revert of the narrow YAML correction.
+Reference checked: https://docs.codemagic.io/yaml-basic-configuration/yaml-getting-started/
+
 ## Codemagic green run with no collected artifacts — 11 October 2026
 
 Owner reports signed run **6acb2794546ce6236ced6c44**, source **456ec75**,
