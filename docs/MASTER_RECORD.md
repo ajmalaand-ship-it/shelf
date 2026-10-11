@@ -579,6 +579,48 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Internal TestFlight Codemagic validation correction — 10 October 2026
+
+Owner reports Codemagic validation error at
+**ios-testflight-internal → publishing → app_store_connect → release_type**:
+“App Store review submission is required for release_type.” Owner authorized
+removing that inapplicable setting only, focused YAML/diff validation, records,
+commit and push on existing **ios/foundation**, initially **260a32c**.
+
+Removed **release_type: MANUAL** from the internal workflow. Current official
+Codemagic publishing documentation places release_type under App Store release
+configuration, separately from internal-only TestFlight export. Retained
+**auth: integration**, **submit_to_testflight=false** (no beta-review submission),
+**submit_to_app_store=false**, internal-only export, no automatic trigger or
+beta_groups, and manual owner tester assignment. No store review enabled.
+All signing references, environment groups, build commands/flags, unsigned
+workflow, GitHub fallback and mobile source unchanged. Rollback: ordinary
+isolated-branch revert; no live rollback or database change.
+Reference checked: https://docs.codemagic.io/yaml-publishing/app-store-connect/
+
+**Owner-confirmed setup:** required Apple/Codemagic signing setup completed;
+**SHELF_IOS_BUILD_NUMBER=1** saved in **shelf_ios_testflight**. This is owner
+confirmation, not an independently inspected credential, certificate/profile or
+unused-build-number check. Expected integration **shelf_app_store_connect**,
+certificate **shelf_ios_distribution**, profile **shelf_ios_app_store** and groups
+**shelf_ios_foundation / shelf_ios_testflight** retained. No secret printed/read
+or committed. Actual signing, signed archive/export, upload/Apple processing and
+iPhone acceptance remain **UNVERIFIED**. Existing unsigned success evidence reused.
+Apple/Google login and App Store purchases remain unfinished.
+
+Focused validation: YAML parse and exact parsed before/after comparison removing
+only release_type, publishing/trigger/internal-export/false-flag assertions,
+unchanged mobile/fallback and git diff --check passed. Provider-side revalidation
+awaits owner refresh of branch YAML; no remote validation success invented.
+No Flutter tests or unsigned compilation repeated; no build/upload/deployment,
+Android change, credential creation, paid activation, transaction or PR merge.
+Checkout OFF, pricing-sync DEFERRED/disabled, second-phone restore owner-deferred/
+not passed/not a new blocker and joint public-launch hold preserved.
+
+**Next:** refresh Codemagic YAML on ios/foundation and confirm validation clears;
+do not start the signed build/upload without separate authorization. This
+supersedes the earlier credential-setup next action, not its setup guide.
+
 ## Successful unsigned iOS build and signed internal TestFlight preparation — 10 October 2026
 
 **UNSIGNED NATIVE COMPILATION: OWNER-CONFIRMED SUCCESS.** Owner supplied Codemagic
@@ -1874,7 +1916,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** owner protected Apple signing setup for the prepared ios-testflight-internal workflow, following the complete IOS_FOUNDATION.md guide under separate authorization; then separately authorize signed build/upload. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
+**Next practical task:** refresh corrected ios-testflight-internal YAML and confirm provider validation clears; owner confirms signing setup and SHELF_IOS_BUILD_NUMBER=1 saved. Actual signing/upload remain unverified and require separate authorization. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
 work remains in the backend list; it is no longer the immediate next-task priority.
 This amendment authorizes documentation only: no features/settings, rebuild,
 deployment, purchase, store submission or release; no commit/push in this task.

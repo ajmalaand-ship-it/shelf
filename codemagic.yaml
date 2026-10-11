@@ -118,4 +118,3 @@ workflows:
         # Upload on a separately authorized manual run; assign owner internally in ASC.
         submit_to_testflight: false
         submit_to_app_store: false
-        release_type: MANUAL
