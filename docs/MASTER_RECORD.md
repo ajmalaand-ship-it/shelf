@@ -579,6 +579,74 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Manual text-only Codemagic collection diagnostic prepared — 11 October 2026
+
+Owner authorized the smallest collection diagnostic, not another Shelf build or
+support referral. Reused supplied run **6acb2794546ce6236ced6c44 / 456ec75** logs:
+IPA export **31.1MB / 1.0.0 / build 1 / services.shelf.app**; verification panel
+only **0**; complete Publishing output only **Gathering artifacts / No artifacts
+were found**. No same-log request. Actual service-used configuration/verification
+execution/collector paths remain unobserved; metadata request HTTP 401 persists.
+**7967746** is explicit staging/diagnostics, NOT a confirmed root-cause fix.
+Prior suggestion of full rebuild/support referral is superseded by this narrow
+text-only diagnostic. No confirmed cause or old-IPA recovery claimed.
+
+Added separate workflow ID **artifact-collection-diagnostic**, display name
+**Shelf artifact collection diagnostic — text only** in codemagic.yaml.
+**working_directory: mobile**, existing **mac_mini_m2**, max duration **5 minutes**.
+Only shell/file operations; no environment groups, Apple integration/signing,
+Flutter/Xcode/software selection/install, compilation, publishing, caching,
+network upload, paid-service activation or automatic triggering. Hosted machine
+has preinstalled tools; diagnostic invokes no SDK or app build. No Apple
+credentials or build numbers are required or changed.
+
+Two scripts visibly emit **SHELF_ARTIFACT_DIAGNOSTIC_STEP_1_STARTED/COMPLETED** and
+**SHELF_ARTIFACT_DIAGNOSTIC_STEP_2_STARTED/COMPLETED**. Both print physical working
+directory and check it equals **$CM_BUILD_DIR/mobile**. First also prints clone
+directory and source SHA, rejects a preexisting probe directory and creates two
+harmless plain-text probes at
+**mobile/build/ios/ipa/shelf-artifact-diagnostic/**. Both check nonempty files.
+Second prints original and resolved collection paths, file presence/ls/content,
+and appends its execution marker to each file. No environment dump or secret
+content. Diagnostic probes are isolated from .ipa/app/evidence patterns.
+
+Collection patterns are distinct so results are attributable (no overlap):
+**mobile/build/ios/ipa/shelf-artifact-diagnostic/clone-relative-*.txt** and
+**$CM_BUILD_DIR/mobile/build/ios/ipa/shelf-artifact-diagnostic/explicit-path-*.txt**.
+Both files are in the same output directory; only collector path form and filename
+differ. Codemagic collects ordinary text in its downloadable artifacts ZIP;
+inspect filenames/content there, not only separate artifact cards.
+
+Local focused validation passed: YAML parse, diagnostic-only new key, original
+YAML retained as exact byte prefix and both existing workflows parsed unchanged,
+absence of environment/integration/publishing/triggers, shell syntax; sequential
+scripts in isolated /home/shelf/tmp fixture show all four execution markers,
+correct directories/files, each pattern matches exactly its intended file.
+Incorrect working directory and missing file fail; temporary fixtures cleaned.
+No native/Flutter tests or provider run repeated. git diff --check passed.
+
+Later authorized diagnostic outcomes:
+- Both probe files collected: both path forms work for text in that new run.
+- Only one collected with both scripts/files confirmed: isolates path-form
+  discrepancy for that run; does not retroactively prove the old IPA cause.
+- Neither collected despite both completed markers/existence: reproduces a
+  collection/configuration issue independent of Flutter/export/signing.
+- Missing completion marker: execution failed/was skipped/wrong effective
+  configuration; distinguish from collector failure using its named step.
+No result proves original verification ran, old IPA recoverability, IPA-specific
+handling, signing validity, Apple receipt, login/purchases or TestFlight success.
+No dummy IPA, no Apple publishing. A harmless diagnostic is sufficient to test
+path collection; another full Shelf compilation is not necessary for this test.
+
+**Next:** under separate diagnostic-run authorization only, choose
+**ios/foundation → artifact-collection-diagnostic** in Codemagic and run once;
+inspect both step markers and the artifacts ZIP for the two named text probes.
+Preparation does NOT start it. No support referral, full build or upload requested.
+Commit/push ios/foundation only, existing app workflows/GitHub/mobile untouched.
+Checkout OFF, pricing-sync and second-phone-restore deferrals and joint
+public-launch hold preserved. Rollback is ordinary isolated-branch revert of
+only this diagnostic addition/record. No deployment, Android or credential change.
+
 ## Explicit Codemagic artifact collection correction — 11 October 2026
 
 New OWNER-PROVIDED evidence for **6acb2794546ce6236ced6c44 / 456ec75**:
@@ -2225,7 +2293,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** inspect the exact build/export, verification and artifact-gathering logs of completed Codemagic run 6acb2794546ce6236ced6c44 and check existing-output recovery before recommending another build. Actual export/upload/Apple receipt remain unverified. GitHub secrets are owner-confirmed saved and workflow-only main registration complete (3188020); no signed dispatch authorized here. Existing signing setup and Codemagic saved number 1 are owner-confirmed; cancellation, actual signing/upload remain unverified. Do not assume number 1 reusable. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
+**Next practical task:** separately authorize one manual artifact-collection-diagnostic run (harmless text only) on ios/foundation; inspect visible script markers and both probe filenames in the artifacts ZIP. No full Shelf build/upload or repeated-log/support request. Original collector cause, verification execution and old-IPA recovery remain unresolved; 7967746 is diagnostics, not a confirmed root-cause fix. GitHub secrets owner-confirmed saved and workflow-only main registration complete (3188020). Existing signing setup and Codemagic saved number 1 are owner-confirmed; cancellation, actual signing/upload remain unverified. Do not assume number 1 reusable. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
 work remains in the backend list; it is no longer the immediate next-task priority.
 This amendment authorizes documentation only: no features/settings, rebuild,
 deployment, purchase, store submission or release; no commit/push in this task.

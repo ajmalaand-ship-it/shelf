@@ -170,3 +170,56 @@ workflows:
         # Upload on a separately authorized manual run; assign owner internally in ASC.
         submit_to_testflight: false
         submit_to_app_store: false
+
+  artifact-collection-diagnostic:
+    name: Shelf artifact collection diagnostic — text only
+    instance_type: mac_mini_m2
+    max_build_duration: 5
+    working_directory: mobile
+    # Manual only; no environment groups, tool installs, signing or publishing.
+    scripts:
+      - name: Diagnostic 1 — create harmless collection probes
+        script: |
+          set -eu
+          echo 'SHELF_ARTIFACT_DIAGNOSTIC_STEP_1_STARTED'
+          : "${CM_BUILD_DIR:?Codemagic clone directory required}"
+          printf 'Script 1 working directory: %s\n' "$(pwd -P)"
+          printf 'CM_BUILD_DIR: %s\n' "$CM_BUILD_DIR"
+          printf 'Source commit: %s\n' "$(git rev-parse HEAD)"
+          expected=$(cd "$CM_BUILD_DIR/mobile" && pwd -P)
+          test "$(pwd -P)" = "$expected"
+          probe_dir=build/ios/ipa/shelf-artifact-diagnostic
+          test ! -e "$probe_dir"
+          mkdir -p "$probe_dir"
+          printf 'Harmless clone-relative probe; script 1 executed.\n' > "$probe_dir/clone-relative-probe.txt"
+          printf 'Harmless explicit-path probe; script 1 executed.\n' > "$probe_dir/explicit-path-probe.txt"
+          for name in clone-relative-probe.txt explicit-path-probe.txt; do
+            file="$CM_BUILD_DIR/mobile/$probe_dir/$name"
+            test -s "$file"
+            printf 'EXISTS: %s\n' "$file"
+          done
+          echo 'SHELF_ARTIFACT_DIAGNOSTIC_STEP_1_COMPLETED'
+      - name: Diagnostic 2 — prove execution and inspect collection paths
+        script: |
+          set -eu
+          echo 'SHELF_ARTIFACT_DIAGNOSTIC_STEP_2_STARTED'
+          : "${CM_BUILD_DIR:?Codemagic clone directory required}"
+          printf 'Script 2 working directory: %s\n' "$(pwd -P)"
+          expected=$(cd "$CM_BUILD_DIR/mobile" && pwd -P)
+          test "$(pwd -P)" = "$expected"
+          probe_dir="$CM_BUILD_DIR/mobile/build/ios/ipa/shelf-artifact-diagnostic"
+          echo 'Clone-relative pattern: mobile/build/ios/ipa/shelf-artifact-diagnostic/clone-relative-*.txt'
+          printf 'Resolved clone-relative pattern: %s/mobile/build/ios/ipa/shelf-artifact-diagnostic/clone-relative-*.txt\n' "$CM_BUILD_DIR"
+          printf 'Explicit pattern: %s/explicit-path-*.txt\n' "$probe_dir"
+          for name in clone-relative-probe.txt explicit-path-probe.txt; do
+            file="$probe_dir/$name"
+            test -s "$file"
+            printf 'Script 2 executed and confirmed file existence.\n' >> "$file"
+            printf 'EXISTS: %s\n' "$file"
+            ls -l "$file"
+            cat "$file"
+          done
+          echo 'SHELF_ARTIFACT_DIAGNOSTIC_STEP_2_COMPLETED'
+    artifacts:
+      - mobile/build/ios/ipa/shelf-artifact-diagnostic/clone-relative-*.txt
+      - $CM_BUILD_DIR/mobile/build/ios/ipa/shelf-artifact-diagnostic/explicit-path-*.txt
