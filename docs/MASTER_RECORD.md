@@ -579,6 +579,47 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Completed Codemagic collection diagnostic — 11 October 2026
+
+**Owner-reported completed diagnostic at source commit 2d0f0dc.** Both diagnostic
+scripts completed in **/Users/builder/clone/mobile**. Both probe files existed,
+confirmed by both logs. Publishing produced **shelf_1_artifacts.zip**; owner
+inspection of that ZIP found only **explicit-path-probe.txt**.
+**clone-relative-probe.txt was absent**.
+
+This confirms that the explicit **$CM_BUILD_DIR** artifact pattern collected its
+file in this diagnostic, while the tested relative pattern did not. It supports
+the existing explicit-path correction **7967746**, but does not prove every
+detail of the old run's failure, original verification execution, old-IPA
+recoverability, IPA-specific collection, signing or Apple receipt.
+
+Read-only inspection at **2d0f0dc** confirms **ios-testflight-internal** already
+uses the successful explicit-path format:
+**$CM_BUILD_DIR/shelf-ios-artifacts/*.ipa**,
+**$CM_BUILD_DIR/shelf-ios-artifacts/evidence/*** and
+**$CM_BUILD_DIR/shelf-ios-artifacts/collection-manifest.json**.
+Its mandatory staging step copies exactly one nonempty verified IPA, checks
+identical size/SHA-256, and requires the verification evidence before collection.
+The **publishing.app_store_connect** block is a sibling of **artifacts** in that
+same workflow, with **auth: integration**: the collected staged IPA is the IPA
+provided to publishing. This confirms configuration wiring, not an observed IPA
+upload. **submit_to_testflight: false** and **submit_to_app_store: false** remain;
+internal-only export (**testFlightInternalTestingOnly: true**), disabled automatic
+version/build-number management, **ditto -x -k** extraction and all mandatory
+bundle/version/team/entitlement/codesign checks are preserved. No configuration
+change was needed or made.
+
+**Readiness:** artifact-path preparation is ready for one separately authorized
+manual signed **ios-testflight-internal** Codemagic run on **ios/foundation**.
+Use an explicitly confirmed unused positive build number; the old saved number
+**1** is not assumed reusable. Actual signing, collected IPA, Apple upload/
+processing and internal TestFlight/device acceptance remain unverified.
+No tests repeated, diagnostic rerun, build/upload started, credentials/build
+numbers changed or deployment performed. Documentation-only commit/push to
+**ios/foundation**; checkout **OFF**, pricing-sync and second-phone-restore
+deferrals and the joint Android/iOS public-launch hold remain unchanged.
+Rollback is an ordinary revert of this record change; no runtime/data change.
+
 ## Manual text-only Codemagic collection diagnostic prepared — 11 October 2026
 
 Owner authorized the smallest collection diagnostic, not another Shelf build or
@@ -2293,10 +2334,22 @@ Assign cross-cutting work once; other areas depend on that result.
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** separately authorize one manual artifact-collection-diagnostic run (harmless text only) on ios/foundation; inspect visible script markers and both probe filenames in the artifacts ZIP. No full Shelf build/upload or repeated-log/support request. Original collector cause, verification execution and old-IPA recovery remain unresolved; 7967746 is diagnostics, not a confirmed root-cause fix. GitHub secrets owner-confirmed saved and workflow-only main registration complete (3188020). Existing signing setup and Codemagic saved number 1 are owner-confirmed; cancellation, actual signing/upload remain unverified. Do not assume number 1 reusable. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
-work remains in the backend list; it is no longer the immediate next-task priority.
-This amendment authorizes documentation only: no features/settings, rebuild,
-deployment, purchase, store submission or release; no commit/push in this task.
+**Next practical task:** one separately authorized manual signed
+**ios-testflight-internal** Codemagic run on **ios/foundation**, using an explicitly
+confirmed unused positive build number. Completed text diagnostic at **2d0f0dc**
+collected only the explicit-path probe despite both scripts/files being confirmed;
+this supports the existing correction, without proving every detail of the old
+failure. The signed workflow's staged IPA/evidence already use the same explicit
+**$CM_BUILD_DIR** format and publishing receives the collected IPA by configuration.
+No further diagnostic or repeated unsigned compilation is needed. Actual signing,
+IPA collection/upload/Apple processing and device/provider acceptance remain
+unverified; do not assume saved number **1** reusable. GitHub secrets are
+owner-confirmed saved and workflow-only main registration complete (**3188020**).
+Financial-retention dry-run remains in the backend list. This task records evidence
+only, with commit/push to **ios/foundation**; no tests, build/upload, credential or
+build-number changes, deployment, purchase, store submission or public release.
+Checkout OFF, pricing-sync/second-phone-restore deferrals and joint launch hold
+remain binding.
 
 **Summary reconciliation still needed:** AGENTS.md §§1–3 retain Android-only/current
 Step 4 scope, §4.11 has Android-only phone acceptance, §6 has small-step instructions,
