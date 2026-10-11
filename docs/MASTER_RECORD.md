@@ -579,6 +579,115 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Primary signed GitHub iOS route preparation — 11 October 2026
+
+Owner switched primary signed iOS/TestFlight route to GitHub because the signed
+Codemagic attempt remains queued. Preparation authorized only: existing isolated
+**ios/foundation**, initial **754ded70f6415ea3e515675c4f11c1ff599e5262**;
+workflow/helper/guide/records/commit/push. Codemagic YAML and its queued attempt
+left unchanged; no cancellation is assumed or performed.
+
+**Passed GitHub unsigned evidence reused, not repeated:** public GitHub API
+GET actions/runs status=success and jobs records **run 38102154478**, workflow
+**Shelf iOS unsigned foundation**, source **93ec31262c0d8fffece1ad76ae9084c829050ba4**,
+conclusion **success**, job **114360123124**, label **macos-15**. Job started
+**2026-10-11 01:32:13 UTC**, completed **01:40:08 UTC**. This is independent
+run/job metadata, not downloaded native logs or an exact resolved Xcode-version
+claim. Build link: https://github.com/ajmalaand-ship-it/shelf/actions/runs/38102154478
+Original owner-confirmed Codemagic unsigned success/durations remain preserved.
+
+Prepared **.github/workflows/ios-testflight.yml**, name **Shelf signed iOS internal
+TestFlight**, plus **scripts/ios/github_testflight.py**. Manual **workflow_dispatch
+only**: no ordinary push/PR/pull_request_target trigger, least **contents: read**,
+serialized signed jobs without cancelling another run. Uses passed **macos-15**,
+Flutter **3.47.2**, checkout **11bd719...** and artifact **ea165f8...** pins,
+same locked pub/config-only/pod commands. No unsigned compilation or completed
+app tests repeated. Hosted image version can change; exact native version remains
+unobserved. Owner selects a full immutable SHA; checkout equality and ancestry in
+**origin/ios/foundation** enforced. Only dispatch from **ios/foundation** can run
+signed job. Main/synthetic merged app code is never built. Runner-only signing
+adaptation changes three Runner configurations, leaving RunnerTests/source assets
+untouched; no persistent mobile source changes.
+
+**Explicit workflow_dispatch resolution:** GitHub requires the workflow file on
+the default branch. Current prepared file is pushed only to **ios/foundation**.
+The complete guide supplies a later **workflow-file-only registration on main**:
+copy this exact .github/workflows/ios-testflight.yml through the GitHub browser,
+no helper/app/source merge, no default-branch change. Then Actions **Run workflow**
+can select **ios/foundation** and the exact source_sha input. Registration is
+**NOT PERFORMED** in this task; default-branch workflow absence is a remaining
+execution prerequisite, not bypassed by CLI/API assertions. Main protection must
+be respected; if it blocks direct one-file registration, report it for a separate
+workflow-only task, never merge the iOS draft PR or relax protection. No PR merge
+or main push in preparation. The registration file has no automatic triggers.
+
+**Existing signing reused through six exact GitHub repository secrets:**
+SHELF_IOS_DISTRIBUTION_P12_BASE64, SHELF_IOS_DISTRIBUTION_P12_PASSWORD,
+SHELF_IOS_APP_STORE_PROFILE_BASE64, SHELF_APP_STORE_CONNECT_KEY_ID,
+SHELF_APP_STORE_CONNECT_ISSUER_ID, SHELF_APP_STORE_CONNECT_PRIVATE_KEY.
+No new Apple certificate/profile/API key or account. Existing Codemagic setup is
+owner-confirmed; transfer to GitHub and validity remain unverified here.
+Signing helper uses protected temporary files/keychain, validates explicit App
+Store profile/team/expiry/certificate/private identity and existing Apple
+entitlement. Signs **services.shelf.app / YSLWJQDH8B**, production API
+**https://shelf.services/api/**, both purchase flags false, marketing **1.0.0**,
+explicit build number. Manual export **testFlightInternalTestingOnly=true**,
+manageAppVersionAndBuildNumber=false. Before upload: IPA CRC, strict signatures,
+package/version/team/debug/Apple entitlements, embedded profile UUID and signer
+certificate matching supplied identity; Apple binary validation. No beta review,
+public release or tester assignment calls; owner assigns internal testers later.
+No private files/profile/keys/passwords in artifacts; source SHA/signature/hash,
+export options, IPA and native Podfile.lock evidence retained seven days.
+
+**Build-number safety:** no default and no automatic reuse of saved Codemagic 1.
+Requires owner confirmation Apple has not received the selected number. **1 is
+blocked unless Codemagic cancellation BEFORE upload is explicitly confirmed**.
+Cancellation/Apple received-number state remain **UNVERIFIED**, not assumed.
+Helper queries the existing Shelf app and all received builds with Apple team-key
+JWT, before compilation and again immediately before upload; duplicate/denied/
+unavailable/ambiguous evidence fails closed. Serializes GitHub jobs, not Codemagic;
+owner must reconcile that competing attempt before choosing 1. Upload error or
+missing processed listing does not prove no received upload. No queued build
+cancelled, credentials/API queries with private keys or transactions here.
+
+**Cleanup:** finally/handled signal and separate always() retry restore original
+keychain search list, remove this run's installed profiles from both supported
+Xcode locations and private keychain/p12/p8/decoded workspace. Secret values are
+removed from child environments; private subprocess arguments/output withheld.
+Cleanup failure fails job/preserves original failure; GitHub-hosted VM disposal is
+additional protection for abrupt runner loss. No unrelated profile/keychain deleted.
+
+**Focused preparation checks passed:** YAML parse/manual-only inputs/false-default
+cancellation/no default build number, source/action/runner/permissions/concurrency/
+cleanup gates, Python and every shell block syntax, internal-only export/false
+purchase flags and validate-before-upload construction. In-memory adaptation of
+current pbxproj proves exactly three Runner configurations become manual and
+RunnerTests remain automatic, with no actual native source mutation. Existing
+mobile, unsigned GitHub workflow and Codemagic bytes unchanged; git diff --check.
+No credential creation, native build, upload, app tests or production check repeated.
+Actual signed archive/export/validation/upload/Apple processing/iPhone behavior
+remain unverified; Apple/Google login and App Store purchases still unfinished.
+
+**Single complete Windows/browser setup guide:** docs/IOS_FOUNDATION.md →
+“Complete Windows/browser setup guide for the GitHub primary route”. Exact URLs,
+six secret names, clipboard-only PowerShell Base64 for existing .p12/profile, raw
+.p8 PEM, password/ID browser fields and every Add/Update/Commit button; explicit
+workflow-only registration, build-number proof and later manual dispatch. Secrets
+must never be pasted into chat, git, logs or server configuration. Setup/registration
+and later build authorization remain separate from this preparation task.
+Current official GitHub manual-dispatch/secrets/signing-cleanup and Apple API/
+upload/internal-testing references are linked there. Prior account usage/Actions
+permission limitations preserved; no paid usage/capacity assumed or activated.
+
+**Next:** owner credential transfer and workflow-only default-branch registration
+using that single guide, reconcile Codemagic cancellation/Apple received builds,
+then separately authorize deliberate signed dispatch. No build/upload/cancellation,
+new signing credentials, paid activation, main merge/deployment/Android changes.
+Checkout OFF, pricing-sync DEFERRED/disabled, second-phone restore owner-deferred/
+not passed/not a new blocker, financial expiry unimplemented and joint public-launch
+hold unchanged. Rollback: normal isolated-branch revert; later registration rollback
+removes only the one workflow file, not application code/data/signing identities.
+
 ## Internal TestFlight Codemagic validation correction — 10 October 2026
 
 Owner reports Codemagic validation error at
@@ -1910,13 +2019,13 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Unsigned build owner-confirmed successful 10 Oct:** Codemagic 6acad0a1546ce6236ced5f95 / 869ebde, execution 4m25s, compilation 2m03s. Separate manual signed internal-TestFlight workflow prepared; signing integration/credentials, upload/processing and device/provider checks remain unverified. | Batch 1, next practical task. Inspection first; later concrete tasks authorize setup/build/implementation. |
+| **3. iOS app** | **Unsigned builds successful:** owner-confirmed Codemagic 6acad0a1546ce6236ced5f95 / 869ebde (execution 4m25s, compilation 2m03s); GitHub run 38102154478 / 93ec312 independently confirmed success on macos-15. GitHub primary manual signed internal route prepared; GitHub credential transfer/default-branch registration, Codemagic cancellation/build-number proof, actual signing/upload/processing and device/provider checks remain unverified. | Batch 1, next practical task. Inspection first; later concrete tasks authorize setup/build/implementation. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** refresh corrected ios-testflight-internal YAML and confirm provider validation clears; owner confirms signing setup and SHELF_IOS_BUILD_NUMBER=1 saved. Actual signing/upload remain unverified and require separate authorization. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
+**Next practical task:** prepare GitHub primary-route credentials and workflow-file-only default-branch registration using IOS_FOUNDATION.md, reconcile Codemagic cancellation/Apple received build-number state, then separately authorize manual signed dispatch. Existing signing setup and Codemagic saved number 1 are owner-confirmed; cancellation, actual signing/upload remain unverified. Do not assume number 1 reusable. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
 work remains in the backend list; it is no longer the immediate next-task priority.
 This amendment authorizes documentation only: no features/settings, rebuild,
 deployment, purchase, store submission or release; no commit/push in this task.

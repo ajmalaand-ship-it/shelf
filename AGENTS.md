@@ -163,6 +163,18 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-11: Owner selects GitHub as primary signed iOS/TestFlight route while
+  Codemagic signed build remains queued; cancellation NOT confirmed. GitHub
+  unsigned run 38102154478 / 93ec312 passed on macos-15, reused without rerun.
+  Manual signed workflow/helper and complete Windows/browser guide prepared;
+  no secret transfer/default-branch registration/build/upload yet. Later copy
+  only the manual workflow file to main for workflow_dispatch registration;
+  never merge iOS source into old main/change default branch/use PR target.
+  Number 1 requires confirmed Codemagic cancellation before upload and no Apple
+  receipt; no default/reuse assumed. Existing signing identities reused, checkout
+  OFF, deferrals/joint launch hold preserved. See current Master Record.
+
+
 - 2026-10-10: iOS unsigned Codemagic build 6acad0a1546ce6236ced5f95 at
   869ebde owner-confirmed finished/green on Mac mini M2; execution 4m25s,
   compilation 2m03s, preceding queue delay separate/unquantified. Separate manual

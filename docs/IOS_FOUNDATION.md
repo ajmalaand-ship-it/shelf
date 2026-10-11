@@ -1,5 +1,7 @@
 # Shelf iOS foundation
 
+Current primary signed route: see **Primary signed route: GitHub Actions — 11 October 2026** and its complete Windows/browser guide below. Codemagic sections remain historical setup evidence.
+
 See the authoritative 10 October iOS entry in MASTER_RECORD.md for source,
 owner-confirmed setup, evidence, boundaries and unfinished work.
 
@@ -205,3 +207,212 @@ review) and submit_to_app_store=false; owner chooses an internal build manually.
 Checkout OFF; pricing sync and second-phone restore deferred; joint public-launch
 hold retained. No production deployment, Android changes, signed build, upload,
 credential creation or paid activation performed by this task.
+
+## Primary signed route: GitHub Actions — 11 October 2026
+
+Prepared `.github/workflows/ios-testflight.yml`, workflow **Shelf signed iOS
+internal TestFlight**, with helper `scripts/ios/github_testflight.py`. It starts
+only by **workflow_dispatch**, accepts a full selected `ios/foundation` source
+SHA and an explicit unused iOS build number, and checks out that exact commit.
+It never uses a PR merge tree or `pull_request_target`. It reuses the passed
+GitHub `macos-15` / Flutter 3.47.2 setup and pinned checkout/artifact actions.
+Native hosted image versions can change; no unobserved Xcode version is invented.
+The unsigned workflow and Codemagic configuration remain preserved.
+
+Existing Apple Distribution certificate, explicit App Store profile and App Store
+Connect team API key are supplied through the six secrets below. No new credential
+is created. The helper removes secrets from child-process environments, imports
+the identity into a temporary keychain, checks the profile/team/expiry/certificate,
+and alters signing settings only in Runner configurations in the ephemeral runner
+checkout. It exports internal-only with no automatic version rewriting, verifies
+IPA CRC/signatures/package/version/team/entitlements/profile/signer, and calls
+Apple binary validation before upload. API build-number checks before compilation
+and immediately before upload fail closed on unavailable or duplicate evidence.
+No API for review, release, certificate creation or tester assignment is called.
+
+Cleanup runs in Python finally (including handled cancellation) and an independent
+GitHub always() step, restores the original keychain search list and removes only
+this run's imported profiles/keychain/p12/p8/decoded files. Cleanup failures fail
+the job; an abrupt runner loss is additionally covered by GitHub-hosted VM disposal.
+Artifacts contain IPA and non-secret verification/export/Podfile.lock evidence;
+private credentials and decoded profiles are not artifact paths.
+
+GitHub is now the prepared primary signed route because the owner reports the
+signed Codemagic attempt remains queued. **No cancellation is confirmed**, and
+no Apple received-build state has been inspected using owner credentials here.
+The saved Codemagic build number 1 is not imported as a GitHub default. The helper
+rejects **1** unless the owner explicitly confirms Codemagic cancellation before
+upload AND Apple has not received 1; it also checks Apple's API. Any other number
+must also be owner-confirmed unused and pass the API check. No build is started
+or cancelled in preparation. An upload error/timeout is not proof of no upload;
+inspect Apple before choosing any number or rerunning.
+
+### Complete Windows/browser setup guide for the GitHub primary route
+
+**Current boundary:** this guide is ready for owner setup. Preparation has not
+registered the workflow on main, saved GitHub secrets, cancelled Codemagic, started
+a build or uploaded anything. Use existing accounts/files; no new Apple credential,
+app or paid-service activation is needed. Steps 1–5 prepare access/configuration;
+step 6 is a later separately authorized build, not an instruction to start now.
+
+1. **Resolve Codemagic and Apple build-number state first.**
+   In [Codemagic](https://codemagic.io/), open the existing Shelf signed attempt.
+   Under a separately authorized cancellation step, use its **Cancel build**
+   control, confirm **Cancel** if shown, then wait for a terminal **cancelled**
+   status. Inspect the attempt's steps/publishing log: cancellation must have
+   happened before upload to permit reusing number 1. This task has not cancelled
+   it; a queued screenshot or cancel click alone is not confirmation.
+   In [App Store Connect](https://appstoreconnect.apple.com/), open **Apps →
+   Shelf - شیلف → TestFlight → iOS** and check all received builds, including
+   Processing and failed/invalid uploads. Use **1 only when both cancellation
+   before upload and no received 1 are confirmed**. Otherwise choose a fresh
+   positive number greater than the received iOS build numbers; do not assume
+   cancellation or derive a number from Android. Keep this decision until step 6.
+
+2. **Locate the existing signing files on Windows.**
+   Use the already downloaded **Apple Distribution .p12**, its saved certificate
+   password, the **services.shelf.app App Store .mobileprovision**, and the existing
+   App Store Connect **AuthKey_… .p8**, **Key ID** and **Issuer ID** from the prior
+   owner setup. The .p12 must contain the private signing key, not just a public
+   .cer. Team is **YSLWJQDH8B**. Profile must match that certificate, be unexpired,
+   App Store type and retain Sign In with Apple. Existing API key role is
+   **App Manager**, as required by Codemagic's upload configuration.
+   If a file/password is unavailable, stop and identify which item is missing;
+   do not create/revoke certificates or keys as a workaround. Keep values local.
+
+3. **Create exactly six GitHub repository secrets.**
+   Open [Shelf Actions secrets](https://github.com/ajmalaand-ship-it/shelf/settings/secrets/actions):
+   **Shelf repository → Settings → Secrets and variables → Actions → Secrets**.
+   For each row below, click **New repository secret**, enter the exact **Name**,
+   put the corresponding value in **Secret**, then click **Add secret**. If the
+   exact name already exists, use its edit/pencil control and **Update secret**.
+   Do not enter these under Variables. Success is a saved secret-name row; GitHub
+   does not reveal its value again. Never paste secret values into chat.
+
+   | Exact GitHub secret Name | Value to put privately in Secret |
+   | --- | --- |
+   | `SHELF_IOS_DISTRIBUTION_P12_BASE64` | Base64 of the existing .p12 file |
+   | `SHELF_IOS_DISTRIBUTION_P12_PASSWORD` | The password protecting that .p12; enter directly in the browser |
+   | `SHELF_IOS_APP_STORE_PROFILE_BASE64` | Base64 of the existing .mobileprovision file |
+   | `SHELF_APP_STORE_CONNECT_KEY_ID` | Existing Apple Key ID, entered directly |
+   | `SHELF_APP_STORE_CONNECT_ISSUER_ID` | Existing Apple Issuer ID, entered directly |
+   | `SHELF_APP_STORE_CONNECT_PRIVATE_KEY` | Entire existing .p8 PEM text, including BEGIN/END lines; not Base64 |
+
+   **Windows PowerShell — .p12 preparation, clipboard only:**
+
+   ```powershell
+   $shelfP12Path = Read-Host 'Full path to the existing Apple Distribution .p12'
+   $shelfP12Encoded = [Convert]::ToBase64String([IO.File]::ReadAllBytes($shelfP12Path))
+   if ($shelfP12Encoded.Length -gt 48000) { throw 'Encoded certificate exceeds the prepared secret size limit; stop here.' }
+   Set-Clipboard -Value $shelfP12Encoded
+   Remove-Variable shelfP12Encoded
+   ```
+
+   Paste into `SHELF_IOS_DISTRIBUTION_P12_BASE64` → **Add secret**.
+   Enter the certificate password directly in the browser's **Secret** field
+   for `SHELF_IOS_DISTRIBUTION_P12_PASSWORD` → **Add secret**. Do not type that
+   password in PowerShell or use the Apple-account password in its place.
+
+   **Windows PowerShell — provisioning profile, clipboard only:**
+
+   ```powershell
+   $shelfProfilePath = Read-Host 'Full path to the existing App Store .mobileprovision'
+   $shelfProfileEncoded = [Convert]::ToBase64String([IO.File]::ReadAllBytes($shelfProfilePath))
+   if ($shelfProfileEncoded.Length -gt 48000) { throw 'Encoded profile exceeds the prepared secret size limit; stop here.' }
+   Set-Clipboard -Value $shelfProfileEncoded
+   Remove-Variable shelfProfileEncoded
+   ```
+
+   Paste into `SHELF_IOS_APP_STORE_PROFILE_BASE64` → **Add secret**.
+
+   **Windows PowerShell — existing .p8, clipboard only:**
+
+   ```powershell
+   $shelfP8Path = Read-Host 'Full path to the existing App Store Connect .p8'
+   Set-Clipboard -Value ([IO.File]::ReadAllText($shelfP8Path))
+   ```
+
+   Paste into `SHELF_APP_STORE_CONNECT_PRIVATE_KEY` → **Add secret**. Add the
+   existing Key ID and Issuer ID in their respective rows → **Add secret** each.
+   Finish with `Set-Clipboard -Value ''`. These commands print no file contents,
+   create no encoded files and do not upload anything by themselves. Base64 is an
+   encoding, not encryption; keep clipboard history/sharing private.
+   No keychain-password secret is needed: the runner generates an ephemeral one.
+
+   **Success:** all six exact names are listed under Repository secrets. Secret
+   presence is not proof of credential validity; future signing checks that.
+
+4. **Register only the manual workflow file on the existing default branch.**
+   GitHub requires workflow_dispatch to exist on the default branch. The prepared
+   file currently lives on **ios/foundation**; pushing it there does not satisfy
+   registration and cannot provide a reliable Run workflow button alone.
+   Do not change the default branch or merge ios/foundation into old main.
+
+   Under the later authorized workflow-registration step, open
+   [the prepared signed workflow](https://github.com/ajmalaand-ship-it/shelf/blob/ios/foundation/.github/workflows/ios-testflight.yml),
+   use **Raw / Copy raw file** to copy the complete non-secret YAML. Open the
+   [repository](https://github.com/ajmalaand-ship-it/shelf), select **main** in the
+   branch selector → **Add file → Create new file**. Enter filename
+   **.github/workflows/ios-testflight.yml**, paste the exact prepared YAML,
+   **Commit changes…**. Message: **Register manual Shelf iOS TestFlight workflow**.
+   Select **Commit directly to main**, then **Commit changes**.
+   If main protection blocks that action, stop for a workflow-only registration
+   task; do not merge the existing iOS PR or relax protection. If the file already
+   exists on main, review it against the prepared file instead of overwriting it
+   blindly. No helper/mobile/source/main merge is needed: the workflow checks out
+   the selected iOS source before using its helper. The YAML has no push/PR trigger,
+   so this one-file registration does not start a build.
+
+   **Success:** main contains exactly this manual workflow file; GitHub **Actions**
+   lists **Shelf signed iOS internal TestFlight** with **Run workflow** available.
+   main's application source remains untouched. Registration has not been performed
+   by this preparation task. Keep the iOS draft PR unmerged.
+
+5. **Check access and select the exact source without starting it.**
+   Repository write access is required to dispatch. In **Settings → Actions →
+   General**, check existing Actions and allowed-action policy permits the two
+   pinned GitHub actions. Do not enable paid billing, buy minutes, relax security
+   policy or change GITHUB_TOKEN to write. Account usage/policy remains unavailable
+   to this agent's authenticated API; no entitlement/capacity is assumed.
+   The workflow uses **contents: read** only. The prepared workflow uses the six
+   repository secrets; it does not use Codemagic integration/reference names.
+   Obtain the full **40-character SHA** of the reviewed preparation commit or a
+   reviewed later ios/foundation commit containing both new files. Copy it from
+   **Code → ios/foundation → commit details → Copy full SHA**. Older unsigned-only
+   commits do not contain the signed helper. The workflow verifies HEAD equality
+   and that the selected commit belongs to ios/foundation.
+   **Stop here:** credentials and manual registration are prepared. No build
+   or upload is authorized in this preparation task.
+
+6. **Later, separately authorized execution and confirmation.**
+   In **Actions → Shelf signed iOS internal TestFlight → Run workflow**, choose
+   **Use workflow from: ios/foundation** (not main). Enter:
+   - **source_sha:** reviewed full SHA from step 5.
+   - **build_number:** explicit unused positive number from step 1; no default.
+   - **apple_build_number_unused:** true only after Apple received-build check.
+   - **codemagic_cancelled_before_upload:** true only after terminal cancellation
+     before upload is confirmed. Required for number 1; never preselect on assumption.
+   The final **Run workflow** click deliberately starts signing/build/upload and
+   is not part of this preparation. Selecting main skips the signed job by design.
+   API number checks fail closed if Apple access is denied, unavailable or duplicate.
+   After a later authorized run, verify the artifact's source SHA/build number and
+   signature report, cleanup result, Apple upload result, and then App Store Connect
+   **Shelf - شیلف → TestFlight** shows that same build marked **internal**.
+   Apple processing/export-compliance and owner installation are separate checks;
+   green compilation alone does not establish them. Assign the owner manually
+   using the internal-group steps already documented above; no automatic tester
+   invitation, beta review or public release. Login/purchases/iPhone acceptance
+   remain unfinished.
+
+Official references checked 11 October:
+- [GitHub manual dispatch/default-branch requirement](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)
+- [GitHub Apple certificate/profile and cleanup guidance](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications)
+- [GitHub secrets and browser Add secret fields](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets)
+- [Apple API authentication](https://developer.apple.com/documentation/appstoreconnectapi/generating-tokens-for-api-requests)
+- [Apple build listing](https://developer.apple.com/documentation/appstoreconnectapi/get-v1-builds)
+- [Apple upload requirements](https://developer.apple.com/help/app-store-connect/manage-builds/upload-builds/)
+- [Apple internal-only tester limits](https://developer.apple.com/help/app-store-connect/test-a-beta-version/add-internal-testers)
+
+Checkout OFF; pricing-sync and second-phone restore deferrals and joint public-launch
+hold preserved. No new certificate, build, upload, production deployment, Android
+change or paid activation in this task.
