@@ -579,6 +579,96 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Codemagic green run with no collected artifacts — 11 October 2026
+
+Owner reports signed run **6acb2794546ce6236ced6c44**, source **456ec75**,
+finished green in **8m52s**. Publishing reports **Gathering artifacts / No
+artifacts were found**. Status/duration are OWNER-CONFIRMED; queue delay is
+separate and unspecified. This is NOT evidence of successful signed IPA export,
+artifact collection, upload or Apple processing. Earlier queued status is now
+superseded for this reported attempt; it finished, not confirmed cancelled.
+Do not claim number 1 reusable or Codemagic cancellation before upload.
+
+Inspected committed **ios-testflight-internal** configuration: workflow working
+directory **mobile**; each script starts there; the pod step's **cd ios** is
+local to that script. Flutter **build ipa** output expected at
+**$CM_BUILD_DIR/mobile/build/ios/ipa/*.ipa**. Verification uses relative
+**build/ios/ipa/*.ipa** from mobile, requires exactly one IPA, checks ZIP/bundle/
+version and signatures, then creates **mobile/build/ios-testflight-evidence**.
+Codemagic documentation states artifact patterns are relative to clone directory,
+NOT workflow working_directory. Therefore **mobile/build/ios/ipa/*.ipa** and
+existing evidence/archive paths are correct; no doubled-mobile path defect was
+confirmed. No speculative artifact-path/publishing changes made.
+
+Publishing **auth: integration**, integration **shelf_app_store_connect**, flags
+**submit_to_testflight=false / submit_to_app_store=false** are correct for upload
+without beta/store review; false does not disable binary upload if an IPA is
+collected. Internal-only export, signing references/groups, checkout OFF and
+manual tester assignment retained. No publishing change or review enabled.
+
+**Confirmed independent verification defect fixed:** Python **ZipFile.extractall**
+writes ordinary files without restoring ZIP executable modes/framework symlinks
+before codesign. Replaced extraction with macOS **ditto -x -k**, preserving native
+bundle metadata, after existing one-IPA/identity/CRC checks. Inspected Python
+extraction implementation confirms missing mode restoration. This defect could
+break strict signature verification; it is NOT established as the explanation
+for green status/no artifacts. The existing mandatory IPA verification should
+fail on missing IPA; successful execution of the committed step would also leave
+collectible evidence files. Actual run YAML/workflow/step execution and collector
+behavior must be reconciled from logs before a root cause can be concluded.
+
+**Exact access limitation:** no Codemagic connector or Codemagic token environment
+available to this agent. Read-only unauthenticated GET
+https://api.codemagic.io/builds/6acb2794546ce6236ced6c44 returned **HTTP 401**
+after network-enabled retry. Build metadata/logs/artifact links and runner files
+cannot be inspected through available authenticated account/API access. No secret
+requested/read/printed. Recovery is not proven impossible or successful.
+
+**Next evidence/recovery check BEFORE any rebuild recommendation:** owner opens
+https://codemagic.io/ → existing Shelf run **6acb2794546ce6236ced6c44**.
+Confirm selected workflow **ios-testflight-internal** and actual source/YAML.
+Open full **Build signed internal TestFlight IPA with checkout OFF** log: include
+archive/export tail, any export error and actual **Built ... .ipa** location.
+Open full **Verify exported signing identity and preserve native dependency
+evidence** log: confirm it existed, executed (not skipped) and exit status.
+Open **Publishing → Gathering artifacts**, including searched paths/warnings and
+any App Store upload log. Share only these non-secret logs, not environment,
+private keys/passwords, signed download URLs or integration/signing-step details.
+These are the exact required steps; build green badge alone is insufficient.
+
+Check the same run's **Artifacts** list for existing IPA or artifact ZIP first;
+download an existing IPA privately if listed (no build/upload). The documented
+Builds API artifact list/download can also recover an already stored artifact
+with owner authentication; lack of artifacts means no normal artifact-download
+link, not proof no IPA ever existed. If an already enabled/connected remote debug
+session is still available for this same run, inspect only
+**$CM_BUILD_DIR/mobile/build/ios/ipa** and
+**$CM_BUILD_DIR/mobile/build/ios/archive** and copy existing output privately,
+without rebuilding, uploading or printing environment. Codemagic requires remote
+access enabled before the run; session availability is time-limited (documentation
+states 10-minute post-finish window). Cannot enable recovery retrospectively by
+starting another run. If no stored artifact/live session, ask Codemagic support
+through the owner account whether this run's output can be recovered; no support
+message sent by agent. Archive alone is not a proven exported IPA. Recovery,
+actual export and Apple receipt remain unresolved; no rebuild recommended here.
+
+Focused checks passed: YAML parse, shell/inline-Python syntax, exact parsed
+comparison allowing only verification extraction change, existing unsigned
+workflow/all other signed scripts/environment/artifact/publishing settings
+unchanged, root-relative path resolution, git diff --check. No completed Flutter
+suite/native compilation or signed run repeated. GitHub workflows/helper/main
+registration and unrelated source preserved. Commit/push ios/foundation only.
+No build/upload/production/Android/payment/paid activation. Checkout OFF,
+pricing-sync and second-phone-restore deferrals and joint public-launch hold
+preserved. Rollback is a normal isolated-branch revert of this narrow change.
+
+References checked:
+https://docs.codemagic.io/yaml-basic-configuration/yaml-getting-started/
+https://docs.codemagic.io/yaml-publishing/app-store-connect/
+https://docs.codemagic.io/rest-api/builds/
+https://docs.codemagic.io/rest-api/artifacts/
+https://docs.codemagic.io/troubleshooting/accessing-builder-machine-via-ssh/
+
 ## GitHub signed workflow registered on main — 11 October 2026
 
 Owner confirms all six GitHub signing repository secrets are saved. This is
@@ -2064,7 +2154,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** GitHub secrets are owner-confirmed saved and workflow-file-only main registration is complete (3188020). Reconcile Codemagic cancellation/Apple received build-number state, then separately authorize manual signed dispatch using source 9e013e6af172b6d6ed8999b5ac6edf1ca5da7922 on ios/foundation. Existing signing setup and Codemagic saved number 1 are owner-confirmed; cancellation, actual signing/upload remain unverified. Do not assume number 1 reusable. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
+**Next practical task:** inspect the exact build/export, verification and artifact-gathering logs of completed Codemagic run 6acb2794546ce6236ced6c44 and check existing-output recovery before recommending another build. Actual export/upload/Apple receipt remain unverified. GitHub secrets are owner-confirmed saved and workflow-only main registration complete (3188020); no signed dispatch authorized here. Existing signing setup and Codemagic saved number 1 are owner-confirmed; cancellation, actual signing/upload remain unverified. Do not assume number 1 reusable. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
 work remains in the backend list; it is no longer the immediate next-task priority.
 This amendment authorizes documentation only: no features/settings, rebuild,
 deployment, purchase, store submission or release; no commit/push in this task.
