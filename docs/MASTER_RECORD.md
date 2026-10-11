@@ -579,6 +579,45 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## GitHub signed workflow registered on main — 11 October 2026
+
+Owner confirms all six GitHub signing repository secrets are saved. This is
+**OWNER-CONFIRMED**, not agent inspection of secret values or credential validity.
+No values were read/printed; actual signing/upload remain unverified.
+
+Owner authorized workflow-only main registration in an isolated checkout.
+Fetched main **72cabf07a953ff41b2191a3b67f7d18accdd6055** and ios/foundation
+**9e013e6af172b6d6ed8999b5ac6edf1ca5da7922**. Main had no existing workflow
+under .github/workflows. Created isolated checkout
+**/home/shelf/tmp/shelf-ios-workflow-registration**; copied only
+**.github/workflows/ios-testflight.yml** byte-for-byte from ios/foundation.
+Committed/pushed main registration **3188020**. Parent-to-commit diff contains
+exactly that one added file; no other main file, merge or default-branch change.
+Existing iOS draft PR remains unmerged; production checkout untouched.
+
+Focused checks: YAML parsed; sole event **workflow_dispatch**, permissions
+contents: read, signed job requires refs/heads/ios/foundation. No push, pull_request
+or pull_request_target trigger. Registration push cannot trigger this workflow.
+Exact file equality, git diff --check, one-file commit scope and clean isolated
+checkout confirmed. No build dispatch, upload, native compilation or app tests.
+
+**Exact source_sha for a later authorized signed build:**
+**9e013e6af172b6d6ed8999b5ac6edf1ca5da7922** on **ios/foundation**.
+This immutable preparation commit contains both workflow and signing helper;
+main's registration commit must not be used as app source. Select workflow branch
+**ios/foundation** in Actions. Credential validity/Apple processing/phone checks
+remain unverified. Build number has no default: number 1 still requires confirmed
+Codemagic cancellation BEFORE upload and confirmation Apple has not received 1.
+Neither cancellation nor Apple number state is newly confirmed in this task.
+
+Default-branch file prerequisite is now complete and secrets are owner-confirmed
+saved; earlier preparation/guide statements of pending registration are historical.
+Next: reconcile Codemagic/Apple build-number state and obtain separate build
+authorization. No build/upload/deployment/Android or paid activation performed.
+Checkout OFF, pricing-sync and second-phone-restore deferrals and joint
+public-launch hold preserved. Rollback: ordinary revert of the one-file main
+registration; no application/data/signing-identity change.
+
 ## Primary signed GitHub iOS route preparation — 11 October 2026
 
 Owner switched primary signed iOS/TestFlight route to GitHub because the signed
@@ -2025,7 +2064,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** prepare GitHub primary-route credentials and workflow-file-only default-branch registration using IOS_FOUNDATION.md, reconcile Codemagic cancellation/Apple received build-number state, then separately authorize manual signed dispatch. Existing signing setup and Codemagic saved number 1 are owner-confirmed; cancellation, actual signing/upload remain unverified. Do not assume number 1 reusable. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
+**Next practical task:** GitHub secrets are owner-confirmed saved and workflow-file-only main registration is complete (3188020). Reconcile Codemagic cancellation/Apple received build-number state, then separately authorize manual signed dispatch using source 9e013e6af172b6d6ed8999b5ac6edf1ca5da7922 on ios/foundation. Existing signing setup and Codemagic saved number 1 are owner-confirmed; cancellation, actual signing/upload remain unverified. Do not assume number 1 reusable. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
 work remains in the backend list; it is no longer the immediate next-task priority.
 This amendment authorizes documentation only: no features/settings, rebuild,
 deployment, purchase, store submission or release; no commit/push in this task.
