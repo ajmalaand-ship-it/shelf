@@ -37,7 +37,9 @@ automatic sync is DEFERRED and disabled. Do not investigate/retry the 403.
 Production verification and release-mode source support are deployed at 340634b;
 real checkout remains OFF. Existing RevenueCat webhook now receives Both
 Production and Sandbox; actual production delivery remains unverified.
-D14 policy approved 7 October 2026; financial expiry remains unresolved. See
+D14 policy approved 7 October 2026; financial policy approved 8 October: three
+years after relevant tax-return filing, scoped legal/dispute/unpaid-balance exceptions
+and minimum proof while recovery rights continue. Financial expiry NOT IMPLEMENTED. See
 `docs/D14_DATA_POLICY.md` and the latest Master Record for implementation/evidence.
 Step 5 OneDrive encrypted upload/download and isolated
 recovery passed; daily 03:30 AST (UTC−04:00) offsite schedule installed,
@@ -49,15 +51,15 @@ rechecked on D14 resume without rerunning recovery. D14 implementation e387b36
 is staged and promoted. Owner granted existing V2 Customer information Read only;
 one metadata GET passed HTTP 200 at 8 October 00:13:34 UTC (7 October local).
 No eligible cleanup jobs exist; actual provider erasure remains unverified,
-financial expiry unresolved and D14 not fully complete.
+financial expiry unimplemented and D14 not fully complete.
 Step 5 / 6.11 repair deployed at c887f91: absolute MariaDB daemon path,
 safe failure stages and original-error preservation on alert failure. See the
 runbook for controlled scheduled verification; future unattended success must
 be recorded separately. Actual alert delivery and replacement-host recovery
 remain unverified; recovery key
 is owner-confirmed on an unencrypted USB, preserved unchanged.
-Second-phone restore is deferred to the pre-release checklist, not passed and
-not requested now. Prioritize construction; automate necessary checks and request
+Second-phone restore remains owner-deferred, not passed, not requested now and
+not a launch blocker without a later owner decision. Prioritize construction; automate necessary checks and request
 phone checks only for a concrete essential risk. No broad test rerun for status-only
 reconciliation. The owner confirmed refund/download removal, locked paid text with
 sample retained, declined payment locked, and successful repurchase on 2 October.
@@ -160,6 +162,81 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 - Git remote: git@github.com:ajmalaand-ship-it/shelf.git (private).
 
 ## 8. Owner decisions
+
+- 2026-10-10: iOS unsigned Codemagic build 6acad0a1546ce6236ced5f95 at
+  869ebde owner-confirmed finished/green on Mac mini M2; execution 4m25s,
+  compilation 2m03s, preceding queue delay separate/unquantified. Separate manual
+  ios-testflight-internal workflow/signing guide prepared; signing credentials,
+  signed build/upload/processing/device/provider acceptance remain unverified.
+  No credential creation/build/upload in preparation. Preserve GitHub fallback,
+  unmerged draft PR, checkout OFF, existing deferrals and joint public-launch hold.
+  Next: protected owner signing setup under separate authorization; see Master Record.
+
+
+- 2026-10-10: Owner authorized isolated iOS foundation from accepted 5f5c8f6,
+  branch ios/foundation: registered services.shelf.app, Team YSLWJQDH8B, supplied
+  icons/shared fonts/native channels and manual-only unsigned Codemagic YAML.
+  Active Apple membership, primary Apple-sign-in ID and Shelf - شیلف / Prepare
+  for Submission owner-confirmed. Source checks passed; macOS/signing/iPhone,
+  Apple login and App Store purchases unfinished. No paid activation/cloud build/
+  upload/deployment/Android rebuild; accepted Android/UI unchanged. Checkout OFF,
+  deferrals and joint launch retained. Next: connect private GitHub repository
+  and ios/foundation for YAML discovery only. See latest Master Record.
+
+- 2026-10-10: Owner approved exact tested Review 3 backend promotion 5f5c8f6.
+  Production and staging now match; nullable private-avatar migration batch 26 and
+  protected bounded first-line metadata including 5821c42 deployed after two
+  verified backups and record/cPanel checkpoint. Production access/health/history
+  checks passed; backend ready for existing 1.0.11 (20) test-track update. AAB
+  unchanged, no rebuild/upload/public release. Checkout OFF, pricing-sync and
+  second-phone-restore deferrals and Android/iOS joint-launch hold preserved.
+  Exact backup/check evidence and prior rollback target are in Master Record.
+
+
+- 2026-10-09: Owner feedback correction source 340142b: د لوست سیټینګ,
+  supplied launcher mark/distinct Shelf Test badge, supplied poetry glyph only for
+  genuinely untitled poems with localized accessibility, Pashto/Dari display digits
+  ۰۱۲۳۴۵۶۷۸۹. No content/order/ID change. Focused checks and additive records only;
+  no build/deploy/upload. Next: corrected phone review, then Play test-track update;
+  public Android release held for joint iOS launch. Existing gates/deferrals and
+  pending second/cover-photo purpose preserved.
+
+- 2026-10-09: Owner authorized Review 3 staging-only backend deployment and a
+  compatible separate Shelf Test APK. Staged 9a748ef; avatar migration applied
+  only to shelf_staging after verified backup. Shelf Test 1.0.9 (18) verified,
+  same staging package/signer, no uninstall/data clearing. Phone acceptance pending.
+  No production deploy/build/migration/upload; existing gates/deferrals/joint launch
+  preserved. Second/cover-photo purpose pending. Exact evidence in Master Record.
+
+- 2026-10-09: Shelf Review 3 authorized on latest isolated Review 2 branch:
+  supplied bilingual logo/action icons; interface languages پښتو، دری، English;
+  pinned live share preview; Contents footer; localized font names/minimum 16;
+  سیټینګ; private account-avatar upload/replace/remove; duplicate search hint removal.
+  Existing English/LTR account and purchase policy retained. Cover/second-photo
+  purpose pending clarification; no public profile. Focused checks and records;
+  no production deployment/live migration/release build/store upload/transaction.
+  Checkout OFF, pricing sync and second-phone restore deferred; latest Master
+  Record's binding Android/iOS joint-launch amendment remains authoritative.
+
+- 2026-10-08 authorization, implementation continued 9 October: Owner approved
+  Figma Review 2 https://www.figma.com/design/NVSrbPa6eJJVUfIK3vdUeJ?node-id=7-5.
+  Shared Flutter Store, Book details, My Library, Search, Reader and Reading
+  preferences implemented in isolation with focused checks and project records.
+  Preserve original content, working controls and actual store/access behavior;
+  no guessed progress/daily recommendation. Android phone acceptance pending,
+  iOS validation separate; joint launch retained. No deployment/build/upload/
+  transaction/settings/backend change. Checkout OFF, sync DEFERRED,
+  second-phone restore owner-deferred, not a new launch blocker.
+
+- 2026-10-08: Owner approved accounting/tax-supporting retention for three years
+  after relevant tax-return filing; affected records retained longer for applicable
+  legal requirements, unresolved disputes or unpaid author balances. Keep only
+  minimum purchase proof while recovery rights continue; expiry must not break
+  those rights. Seven-year proposal and one-year alternative NOT APPROVED. Policy
+  recorded and scoped plan prepared; financial automatic expiry NOT IMPLEMENTED.
+  No deletion/production changes/rebuild/deploy; checkout OFF, sync DEFERRED,
+  second-phone restore deferred, not a launch blocker without later owner decision.
+
 - 2026-10-08: Owner authorized dedicated ordinary Google Play reviewer email/password
   access to six launch books through audited complimentary grants, no purchases/
   income/admin rights. Normal reader API focused checks and private credentials;

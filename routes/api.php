@@ -66,6 +66,9 @@ Route::prefix('auth')->middleware([PrivateAccountResponse::class])->group(functi
             Route::post($path, [AuthController::class, $method]);
         }
         Route::middleware(['auth:reader', ReaderAccountAccess::class])->group(function (): void {
+            Route::get('avatar', [App\Http\Controllers\Account\AvatarController::class, 'show']);
+            Route::post('avatar', [App\Http\Controllers\Account\AvatarController::class, 'store']);
+            Route::delete('avatar', [App\Http\Controllers\Account\AvatarController::class, 'destroy']);
             Route::get('me', [AuthController::class, 'me']);
             Route::post('logout', [AuthController::class, 'logout']);
             Route::post('verify/resend', [AuthController::class, 'resend']);

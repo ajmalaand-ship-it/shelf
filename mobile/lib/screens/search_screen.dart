@@ -1,3 +1,5 @@
+import '../widgets/shelf_assets.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -125,7 +127,7 @@ class _SearchScreenState extends State<SearchScreen> {
           onChanged: (_) => _schedule(),
           decoration: InputDecoration(
             labelText: AppStrings.of(context).searchHint,
-            prefixIcon: Icon(Icons.search),
+            prefixIcon: ShelfActionIcon('search'),
           ),
         ),
         const SizedBox(height: 16),
@@ -184,6 +186,14 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
         const SizedBox(height: 24),
+        if (_hasQuery && !_loading && !_failed && _results.isNotEmpty)
+          SectionTitle(
+            AppStrings.of(context).choose(
+              'Search results (${AppStrings.of(context).number(_results.length)})',
+              'د لټون پایلې (${AppStrings.of(context).number(_results.length)})',
+              'نتایج جستجو (${AppStrings.of(context).number(_results.length)})',
+            ),
+          ),
         if (_loading)
           const Center(child: CircularProgressIndicator())
         else if (_failed)
@@ -193,10 +203,10 @@ class _SearchScreenState extends State<SearchScreen> {
         else if (_results.isEmpty)
           Text(AppStrings.of(context).noResults)
         else
-          BookGrid(
+          BookList(
             books: _results,
-            ownerPreview: widget.navigation.ownerPreview,
             fontFamily: widget.navigation.settings.fontFamily,
+            ownerPreview: widget.navigation.ownerPreview,
             onTap: (b) => widget.navigation.openBook(context, b.slug),
           ),
       ],
@@ -209,26 +219,47 @@ class _SearchScreenState extends State<SearchScreen> {
     String? value,
     Map<String, String> options,
     ValueChanged<String?> change,
-  ) => SizedBox(
-    width: 180,
-    child: DropdownButtonFormField<String>(
-      key: ValueKey('$key-${value ?? "all"}'),
-      initialValue: value,
-      isExpanded: true,
-      decoration: InputDecoration(labelText: label),
-      items: [
-        DropdownMenuItem<String>(
-          value: null,
-          child: Text(AppStrings.of(context).all),
-        ),
-        ...options.entries.map(
-          (e) => DropdownMenuItem(
-            value: e.key,
-            child: Text(e.value, overflow: TextOverflow.ellipsis),
+  ) => PopupMenuButton<String>(
+    key: ValueKey('$key-${value ?? "all"}'),
+    tooltip: label,
+    onSelected: (choice) => change(choice == '__all__' ? null : choice),
+    itemBuilder: (context) => [
+      PopupMenuItem(value: '__all__', child: Text(AppStrings.of(context).all)),
+      for (final entry in options.entries)
+        PopupMenuItem(value: entry.key, child: Text(entry.value)),
+    ],
+    child: Container(
+      constraints: const BoxConstraints(
+        minHeight: 44,
+        minWidth: 44,
+        maxWidth: 220,
+      ),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              value == null ? label : options[value] ?? label,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           ),
-        ),
-      ],
-      onChanged: change,
+          const SizedBox(width: 8),
+          Icon(
+            Icons.expand_more,
+            size: 18,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ],
+      ),
     ),
   );
 }

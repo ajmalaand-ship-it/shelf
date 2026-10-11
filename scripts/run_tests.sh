@@ -74,12 +74,58 @@ if "$run_mobile"; then
     cd -- "$run_dir/mobile"
     echo "Running Flutter tests (--mobile requested)"
     mobile_args=()
-    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "purchases" ]]; then
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-final-render" ]]; then
+        mobile_args=(test/review_3_final_test.dart test/reader_widget_test.dart test/paginated_reader_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-final" ]]; then
+        mobile_args=(test/review_3_final_test.dart test/review_3_correction_test.dart test/review_3_test.dart
+            test/share_card_entry_test.dart test/share_card_widget_test.dart test/share_card_render_test.dart
+            test/share_card_screen_test.dart test/share_card_paginator_test.dart test/reader_widget_test.dart
+            test/paginated_reader_test.dart test/book_content_language_test.dart test/reading_preferences_pinned_test.dart)
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-correction" ]]; then
+        mobile_args=(test/review_3_correction_test.dart test/reader_widget_test.dart
+            test/book_content_language_test.dart test/reading_preferences_pinned_test.dart)
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings \
+            lib/widgets/untitled_poem_marker.dart lib/l10n/app_strings.dart lib/screens/collection_detail_screen.dart test/review_3_correction_test.dart
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3" ]]; then
+        mobile_args=(test/review_3_test.dart test/avatar_account_test.dart test/interface_language_test.dart
+            test/reader_settings_test.dart test/reading_preferences_pinned_test.dart
+            test/text_pages_test.dart test/paginated_reader_test.dart test/book_content_language_test.dart
+            test/share_card_entry_test.dart test/share_card_widget_test.dart test/share_card_render_test.dart test/share_card_screen_test.dart test/share_card_paginator_test.dart)
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "purchases" ]]; then
         mobile_args=(test/book_purchases_test.dart test/library_ux_test.dart test/staging_identity_test.dart)
     elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "privacy-support" ]]; then
         mobile_args=(test/privacy_support_test.dart test/interface_language_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-2" ]]; then
+        mobile_args=(test/bookstore_screens_test.dart test/home_collections_test.dart
+            test/interface_language_test.dart test/book_content_language_test.dart
+            test/library_ux_test.dart test/reader_widget_test.dart
+            test/reader_settings_test.dart test/typography_layout_test.dart
+            test/audio_player_widget_test.dart test/share_card_entry_test.dart
+            test/privacy_support_test.dart test/review_2_layout_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-2-corrections" ]]; then
+        mobile_args=(test/review_2_layout_test.dart test/reader_widget_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "pinned-preview" ]]; then
+        mobile_args=(test/reading_preferences_pinned_test.dart test/reader_settings_test.dart
+            test/reader_widget_test.dart)
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "paginated-reader" ]]; then
+        mobile_args=(test/text_pages_test.dart test/paginated_reader_test.dart
+            test/reader_settings_test.dart test/reader_widget_test.dart
+            test/reading_preferences_pinned_test.dart test/book_content_language_test.dart
+            test/audio_player_widget_test.dart test/share_card_entry_test.dart)
     elif [[ -n "${SHELF_MOBILE_TEST_SCOPE:-}" ]]; then
         echo "Unknown mobile test scope" >&2; exit 2
+    fi
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "pinned-preview" ]]; then
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings \
+            lib/settings/reading_preferences_sheet.dart test/reading_preferences_pinned_test.dart
+    fi
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "paginated-reader" ]]; then
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings \
+            lib/reading lib/screens/poem_reader_screen.dart lib/screens/collection_detail_screen.dart \
+            lib/widgets/poetry_text.dart lib/settings/reader_settings.dart lib/settings/reading_preferences_sheet.dart \
+            test/text_pages_test.dart test/paginated_reader_test.dart
     fi
     "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test "${mobile_args[@]}" --reporter expanded --concurrency=2
     "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" test test/staging_identity_test.dart --reporter expanded \

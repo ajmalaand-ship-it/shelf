@@ -16,5 +16,5 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(\App\Http\Middleware\RecoveryBlocked::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'token', 'id_token', 'purchase_token']);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'token', 'id_token', 'purchase_token', 'photo']);
     })->create();

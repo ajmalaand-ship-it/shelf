@@ -4,6 +4,8 @@ The single governing document for building Shelf
 
 Version 2.3 — Approved — 28 September 2026
 
+Binding owner amendment — 8 October 2026: Android and iOS joint launch
+
 Owner: Ajmal Aand   •   Prepared with Claude
 
 **How to use this document**
@@ -18,7 +20,7 @@ Codex (the coding assistant on the server) follows **AGENTS.md** in the Shelf co
 
 **Status of this version**
 
-Master Record v2.0 was approved on 25 September 2026 and amended in v2.1 on 27 September 2026. This version 2.2 restored every v2.0 requirement and clarified R3 and staging. This version 2.3 (28 September 2026) records the new way of working approved by Ajmal (Codex runs server commands after Ajmal’s approval; Claude makes technical decisions; Ajmal is asked owner questions only) and closes **Step 2**. Current construction: **Step 4 — Accounts and purchases (test mode)**; the current status reconciliation in Part 10 supersedes the historical 28 September snapshot. Outstanding Step 3 acceptance and pre-release checks are kept separate.
+Master Record v2.0 was approved on 25 September 2026 and amended in v2.1 on 27 September 2026. This version 2.2 restored every v2.0 requirement and clarified R3 and staging. This version 2.3 (28 September 2026) records the new way of working approved by Ajmal (Codex runs server commands after Ajmal’s approval; Claude makes technical decisions; Ajmal is asked owner questions only) and closes **Step 2**. **Current direction (owner-approved 8 October 2026):** four work areas and Android/iOS joint launch, following the five practical batches in Part 7. The single remaining-work list at the start of Part 10 governs priorities. Steps 0–2 remain completed; Steps 3–5 remain partly completed; Step 6 has not started. Current owner decision (10 October): current Shelf Review 3 work is accepted and further Android/UI changes are paused. Google Play approved 1.0.11 (20) for Closed testing – Alpha; the latest owner-reported screenshot showed “Changes ready to publish” with Managed publishing ON. Publishing completion and Play-installed build-20 phone acceptance are NOT CONFIRMED. Public Android/iOS release remains held for joint launch. Earlier status entries remain historical evidence.
 
 **Contents**
 
@@ -77,7 +79,7 @@ This document gives full detail so that future work can be guided by it. Claude�
 
 ## 2.1 The product
 
-Shelf is a free-download Android app that works as a **Pashto and Farsi digital bookstore and personal library**. Readers discover books from many authors, read a free sample, buy an individual book, and then find it in **My Library**. Downloading the app is free; this does not mean every book is free.
+Shelf has free-download Android and iOS apps that work as a **Pashto and Farsi digital bookstore and personal library**. Readers discover books from many authors, read a free sample, buy an individual book, and then find it in **My Library**. Downloading the app is free; this does not mean every book is free.
 
 | Item           | Decided                                                        |
 |----------------|----------------------------------------------------------------|
@@ -96,12 +98,28 @@ The following are outside Version 1 unless Ajmal later approves a change:
 
 - subscriptions or an all-books pass;
 - author accounts, author uploads, author dashboards or an author marketplace;
-- automatic payouts to authors (Version 1 keeps accounting records only);
-- an iPhone (iOS) app — Version 1 is Android.
+- automatic payouts to authors (Version 1 keeps accounting records only).
+
+**Owner amendment — 8 October 2026:** iOS is included in Version 1. Android and
+iOS must launch together. Neither may release publicly until both are complete,
+accepted and ready, with final owner launch approval. This supersedes the former
+Android-only Version 1 scope and all earlier “iOS later” release instructions.
+No Apple account, build access, signing, purchase or store readiness is claimed.
 
 ## 2.4 Shelf is its own product
 
 Shelf is not part of the Ajmal Aand Professional Platform, System C, Career Command or the Private Assistant. Their documents, roadmaps and approvals do not govern Shelf. The old poetry app (Pitswal) is Shelf’s **technical starting point**, but its name, identity, old roadmap and old approvals do not carry over.
+
+## 2.5 Four work areas
+
+1. Admin/backend.
+2. Android app.
+3. iOS app.
+4. Shared app design and UX/UI.
+
+Reuse shared Flutter code and passed evidence. Agree shared design and UX/UI
+improvements before platform completion. Optional improvements remain outside
+release scope. Maintain one remaining-work list under these four areas in Part 10.
 
 # Part 3 — Where we start and where Shelf lives
 
@@ -181,7 +199,7 @@ These rules apply in every step. They can only be changed by an approved amendme
 
 **R10 — No whole-catalogue unlock.** The old unlock-all purchase must never give access to Shelf books. Every Shelf purchase is for one book.
 
-**R11 — Proof before “done”.** Nothing is finished without evidence. Reading and layout are accepted only after testing on a real Android phone.
+**R11 — Proof before “done”.** Nothing is finished without evidence. Reading and layout are accepted only after testing on real Android and iOS phones for the respective apps. Reuse passed evidence without inferring platform-specific acceptance.
 
 **R12 — No silent decisions.** If something is not covered by this document, Claude and Codex ask Ajmal instead of choosing.
 
@@ -213,7 +231,7 @@ These rules apply in every step. They can only be changed by an approved amendme
 
 ## 5.3 How Claude gives instructions
 
-- One step at a time.
+- Work in complete practical batches following Part 7, with clear dependencies, shared code and reused passed evidence.
 - Every reply starts with one line showing where we are, for example: *Step 2 · Task 5 of 9 · Books*.
 - When Ajmal must type anything himself, every block says exactly **where** to run it and includes every line from the start: PC PowerShell; server as root (ssh root@157.250.199.106); server as shelf (then su - shelf); or inside Codex.
 - Commands and prompts are given in the chat, ready to copy, not as attached files.
@@ -309,7 +327,7 @@ store price. No Play product creation/change is authorized in this task.
 
 ## 6.6 Pashto and Farsi reading
 
-- Both languages are first-class: correct right-to-left layout, suitable fonts, readable spacing, correct Unicode.
+- Both languages are first-class on Android and iOS: correct right-to-left layout, suitable fonts, readable spacing, correct Unicode.
 - Mixed English text, numbers and punctuation stay readable.
 - Font and text-size controls remember the reader’s choice.
 - Poetry and prose are tested on real phones. Source layout is preserved; poetry is not automatically restructured.
@@ -373,7 +391,26 @@ store price. No Play product creation/change is authorized in this task.
 
 # Part 7 — The steps from today to public release
 
-Work happens one step at a time. A step closes only when its evidence exists **and** Ajmal accepts it.
+The numbered steps retain completed milestones and project history. A step closes
+only when its evidence exists **and** Ajmal accepts it. The owner-approved
+8 October 2026 order supersedes earlier sequential/Android-only priorities:
+
+1. **Inspect iOS readiness:** existing Flutter code, Apple account, Mac/build access,
+   signing and purchases. Record verified readiness and missing dependencies.
+2. **Agree and improve shared app design and UX/UI.** Agree concrete reader-facing
+   changes and reuse shared code; optional improvements remain outside release scope.
+3. **Complete iOS and remaining admin/backend work**, using readiness findings and
+   agreed design while preserving completed functionality and passed evidence.
+4. **Accept both apps together and fix demonstrated issues**, with targeted checks
+   and existing evidence; preserve owner deferrals.
+5. **Complete both store reviews and coordinate public launch**, with final owner
+   approval only after both apps are complete, accepted and ready.
+
+Work in complete practical batches using the one four-area list in Part 10.
+Google Play preparation has progressed sufficiently: build 1.0.6 (15) is
+owner-confirmed approved for closed testing. Pause further Play preparation until
+needed for final release. This documentation task authorizes no implementation,
+build, deployment, purchase, provider setting change or release.
 
 ## Step 0 — Approve the Master Record ✓ done 25 September 2026
 
@@ -433,11 +470,11 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 ## Step 3 — Catalogue and reading (in progress)
 
-**Goal:** A reader can browse, search and read samples properly in Pashto and Farsi on a real phone.
+**Goal:** A reader can browse, search and read samples properly in Pashto and Farsi on Android and iOS, using the agreed shared design.
 
 **Work:**
 
-- Android SDK set up so test builds can be installed on Ajmal’s phone.
+- Retain completed Android SDK/build setup; inspect and establish iOS build/signing readiness through the first approved batch.
 - Word import accepted with a real Pashto Word document read on the phone (6.12).
 - Catalogue: authors, categories, search, book pages.
 - Samples and the sample/full-book difference.
@@ -447,7 +484,7 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 **The step is finished when:**
 
-- Ajmal tests several authors and books on a real phone and accepts reading quality.
+- Ajmal accepts reading quality with several authors/books on real Android and iOS phones, reusing passed evidence and checking remaining platform-specific risks.
 
 **Not allowed in this step:** real payments, public release.
 
@@ -458,13 +495,13 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 **Work:**
 
 - Reader accounts (D7).
-- Shelf’s own RevenueCat project and Google Play test products, one per book.
+- Shelf’s own RevenueCat project and per-book store purchases: retain completed Google Play setup and inspect/complete App Store purchase integration for iOS.
 - Server-side confirmation, My Library, restore, failed payments, refunds.
 - Sales and author-share records.
 
 **The step is finished when:**
 
-- All purchase cases work in sandbox, including restore on another phone and a refund.
+- Required purchase cases work in sandbox on both platforms, including verified restore and refunds. Second-phone restore remains owner-deferred, not passed and not a launch blocker without a later owner decision.
 - Access protection is tested with direct requests.
 - Decisions D8–D12 made.
 
@@ -476,7 +513,7 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 **Work:**
 
-- Production Google Play listing and RevenueCat setup.
+- Google Play and App Store listing, signing and RevenueCat setup/reviews for joint launch. Preserve approved closed-test build 1.0.6 (15); further Play preparation pauses until needed for final release.
 - Privacy policy, support, account deletion, retention (D14).
 - Staging copy in place before the first real reader other than Ajmal or the first real payment (6.11).
 - Off-server backup and a tested restore; simple operating instructions for Ajmal.
@@ -485,37 +522,37 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 
 **The step is finished when:**
 
-- Ajmal tests the real app and admin end to end and accepts them.
+- Ajmal accepts both apps together and the admin/backend end to end; both platforms are complete and ready for coordinated release.
 
 **Not allowed in this step:** public release without Ajmal’s approval.
 
 ## Step 6 — Public release
 
-**Goal:** Shelf is live on Google Play.
+**Goal:** Shelf launches publicly on Google Play and the App Store together.
 
 **Work:**
 
-- Release after Ajmal’s approval.
+- Release neither app publicly until both are complete, accepted and ready, both store reviews are complete, and Ajmal gives final joint-launch approval.
 - Check a live purchase and support, as approved.
 - Watch for failures in the first days; keep a recovery path ready.
 
 **The step is finished when:**
 
-- Shelf is live and real purchases and restores work.
+- Both apps are publicly live together and approved real-purchase/restore checks work on both platforms.
 
 **Not allowed in this step:** deleting the old app’s baseline.
 
 # Part 8 — When Version 1 is done
 
-- The app is fully Shelf: name, app ID services.shelf.app, domain shelf.services, own RevenueCat project and store products.
+- Both apps are fully Shelf: name, Android app ID services.shelf.app, domain shelf.services, own RevenueCat project and per-book store products. iOS identity/signing details are established through readiness work, not guessed.
 - The multi-author catalogue works; each book for sale has a price and a working sample.
 - Accounts, single-book purchases, My Library and restore work, including refunds and failed payments.
-- Pashto and Farsi reading accepted on a real phone; optional audio works where supplied.
+- Pashto and Farsi reading accepted on real Android and iOS phones; optional audio works where supplied.
 - The admin is usable and owner-only; sales and author-share records are traceable.
 - Access protection verified with direct requests; offline and deletion rules agreed and working.
 - Backups on and off the server, with a tested restore.
 - No critical defects or open release-blocking decisions.
-- Ajmal accepts the real Android experience and authorises launch.
+- Ajmal accepts both apps together; both are complete and ready, both store reviews are complete, and final owner approval authorises coordinated public launch.
 
 # Part 9 — Decisions (made and open)
 
@@ -528,19 +565,1440 @@ Work happens one step at a time. A step closes only when its evidence exists **a
 | D5  | Translated book included              | **Decided 27 Sep:** credits recorded (author پروین پژواک, translator اجمل اند). Publication follows R9. |
 | D6  | App name and Android ID               | **Decided 27 Sep:** Shelf, services.shelf.app; slogan کتاب مو ژوند بدلوي.                                                                           |
 | D7  | Reader sign-in methods                | Open — Step 4                                                                                                                                                                                   |
-| D8  | Payment channels and territories      | Open — Step 4                                                                                                                                                                                   |
+| D8  | Payment channels and territories | **Amended 8 Oct:** Google Play for Android and App Store for iOS using Shelf’s own RevenueCat project; both platforms launch together. Existing Android 174-region approval retained; iOS availability/readiness must be established, not assumed. |
 | D9  | Prices and currencies                 | **Amended 7 Oct:** manual Play Console products/prices for first 100 books; automatic sync DEFERRED, not completed. USD 2.99 starting launch price approved for books 3–8; historical test approval preserved.                                                                                                                                                                                   |
 | D10 | Author and rights-holder agreements   | Decided 1 October 2026: owner sets per-book shares in admin; all six current books 100% net received to اجمل اند. See the addendum for book 6 permission and immutable agreement versions. |
 | D11 | Withdrawn books already bought        | Open — Step 4                                                                                                                                                                                   |
 | D12 | Refund handling                       | Open — Step 4                                                                                                                                                                                   |
 | D13 | Offline limits and storage clearing   | Open — Step 3/4. Current state: browsing the catalogue needs internet, so withdrawn or unpublished books are never shown from old saved data.                                                   |
-| D14 | Account deletion and data retention   | Policy approved 7 October; implementation/tested source below; financial expiry unresolved — Step 5                                                                                                                                                                                   |
-| D15 | App interface languages and wording   | Open — Step 3                                                                                                                                                                                   |
+| D14 | Account deletion and data retention   | Deletion/log/backup policy approved 7 October; financial policy approved 8 October: three years after relevant tax-return filing, scoped exceptions and minimum proof for continuing recovery rights. Financial expiry NOT IMPLEMENTED — Step 5                                                                                                                                                                                   |
+| D15 | App interface languages and wording | **Decided 9 Oct Review 3:** پښتو، دری، English; Afghan Dari interface implemented in isolation; real-phone wording/layout acceptance pending. Existing account/purchase English policy retained. |
 | D16 | Launch catalogue                      | All six books IDs 3–8 selected; owner-confirmed sale rights including covers/any included audio in approved 174 regions; USD 2.99 starting prices — Step 5                                                                                                                                                                                   |
 | D17 | Samples                               | **Decided 27 Sep:** admin chooses each book’s free part; no fixed amount.                                                                                                                       |
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## Successful unsigned iOS build and signed internal TestFlight preparation — 10 October 2026
+
+**UNSIGNED NATIVE COMPILATION: OWNER-CONFIRMED SUCCESS.** Owner supplied Codemagic
+build **6acad0a1546ce6236ced5f95**, status **finished / green success**, source
+**869ebde**, **ios/foundation**, **Mac mini M2**. Execution duration **4m25s**;
+unsigned iOS compilation **2m03s**, included in that execution duration. Preceding
+queue delay is separate, duration not supplied; never count it as execution.
+No successful compilation or passed shared/source suite repeated. Logs/artifact/
+Podfile.lock/exact resolved Xcode version have not been independently retrieved.
+This verifies compilation by owner evidence; it does not verify signing, TestFlight
+upload/processing, Apple/Google login, purchases or any iPhone behavior.
+
+**Apple setup retained, owner-confirmed:** active Individual membership,
+**Team YSLWJQDH8B**, explicit **services.shelf.app**, existing **Shelf - شیلف**
+App Store Connect record. No account, app or identifier recreated.
+
+Owner authorized preparation only in existing isolated checkout, initially
+**93ec31262c0d8fffece1ad76ae9084c829050ba4**, with records/commit/push to
+**ios/foundation**. Added separate **ios-testflight-internal** Codemagic workflow.
+Original unsigned workflow parsed mapping unchanged; GitHub fallback and mobile
+source unchanged. Same M2/Flutter 3.47.2/Xcode latest/CocoaPods default and locked
+pub resolution. No trigger: pushes do not launch either Codemagic workflow.
+Draft PR preserved/unmerged; default branch/main and production untouched.
+
+Signed workflow references protected integration **shelf_app_store_connect**,
+stored certificate **shelf_ios_distribution**, stored App Store profile
+**shelf_ios_app_store**. It never creates signing credentials during execution.
+Requires existing **shelf_ios_foundation** API variable exactly
+**https://shelf.services/api/** and an explicit positive unused iOS-only
+**SHELF_IOS_BUILD_NUMBER** in **shelf_ios_testflight**. Marketing version **1.0.0**
+via build arguments; no source version bump/Android change. Both purchase flags
+remain false. It configures **testFlightInternalTestingOnly=true**, prevents Xcode
+from changing the supplied version/build number, and builds signed IPA. Prior to
+publishing, checks export method/team/internal flag, IPA CRC/package/version,
+code signature and team/application/Apple entitlement/get-task-allow. Records
+source SHA, Podfile.lock, export options, entitlements and privacy-manifest paths.
+No private signing file is an artifact.
+
+A later separately authorized manual run uploads through **auth: integration**.
+**submit_to_testflight=false** avoids beta-review submission;
+**submit_to_app_store=false**, **release_type=MANUAL**, internal-only export and
+no beta_groups prevent automatic external/public distribution or tester assignment.
+Owner later assigns the processed build to an owner-only internal group manually.
+Neither compilation-green nor publishing-green proves installation/acceptance.
+
+**Focused preparation validation passed:** YAML parse, exact unsigned before/after
+mapping and toolchain comparison, manual-only trigger/false flags/internal-only
+export/no-credential-creation/publishing invariants, bash syntax for every new step,
+embedded Python syntax, mobile/fallback unchanged and git diff --check. Existing
+source verifier's no-publishing assertion now scopes to the unsigned workflow;
+no weakened unsigned requirement. No broad PHP/Flutter tests/native build repeated.
+These are static checks; signed archive/export/upload validation has not run.
+
+**Source inspection for limited first iPhone test:** no additional compile-source
+blocker established for Store/search/free samples/reader/native UX, supported only
+by the owner-confirmed compilation. Actual signing inputs and Apple processing
+acceptance are unverified prerequisites. Apple login not implemented. Google
+provider supplies only serverClientId; no iOS client/callback URL configuration
+present; shared UI may display Google under server config. Do not exercise Google
+in this limited test; it remains unfinished, not passed. RevenueCat accepts goog_
+keys and backend verification remains Play-specific: App Store products/Apple
+provider credentials/receipt verification/restore/refund are unfinished. Checkout
+OFF is preserved, no Apple purchase/real-money transaction authorized.
+Email/password/Library, Keychain isolation/sign-out/offline, photos/save/share/audio,
+RTL/fonts/accessibility and reading require actual iPhone evidence. Native dependency
+lock/privacy review and truthful Apple export-compliance answers remain pending;
+no guessed exemption or privacy declaration added. Missing Compliance/Apple upload
+errors must be recorded separately if they arise in a later authorized run.
+
+**Complete owner setup guide:** docs/IOS_FOUNDATION.md, section "Owner signing
+setup guide", checked against current official sources 10 October. Exact websites,
+fields, button labels and success indicators for API access/key, Codemagic
+integration, stored distribution certificate, App Store provisioning profile,
+variable groups/build number and later owner-only installation. API access request:
+Account Holder; team key generation: Account Holder/Admin; Codemagic publishing
+key minimum **App Manager**; profile website minimum Admin (existing Individual
+owner is Account Holder); Codemagic identity management requires team admin.
+No password/private key requested in chat or placed in git.
+
+Official sources:
+- https://developer.apple.com/help/app-store-connect/get-started/app-store-connect-api/
+- https://developer.apple.com/help/account/provisioning-profiles/create-an-app-store-provisioning-profile/
+- https://developer.apple.com/help/app-store-connect/test-a-beta-version/add-internal-testers
+- https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance/
+- https://docs.codemagic.io/yaml-code-signing/signing-ios/
+- https://docs.codemagic.io/yaml-quick-start/first-signed-build/
+- https://docs.codemagic.io/yaml-quick-start/building-a-flutter-app/
+- https://docs.codemagic.io/yaml-publishing/app-store-connect/
+
+**Stopping point / next:** protected Apple signing integration, distribution
+certificate and App Store profile must be set up by the owner in the existing
+accounts under a later separately authorized credential step, following that
+single guide; then verify saved references/API group/unused build number before
+separately authorizing the manual signed build/upload. No credential created,
+signed build started, TestFlight upload/tester invite/public submission, paid
+activation, production deployment, Android change or transaction in this task.
+Checkout OFF, pricing-sync DEFERRED/disabled, second-phone restore owner-deferred/
+not passed/not a new blocker, financial expiry unimplemented and joint public-launch
+hold retained. Rollback is a normal isolated-branch revert, no live rollback.
+Prior fallback account-access limitations/visibility evidence remain unchanged.
+
+## GitHub Actions unsigned iOS fallback preparation — 10 October 2026
+
+Owner authorized continuing the existing isolated ios/foundation checkout,
+preparing and validating only missing fallback work, account/API inspection,
+trigger resolution and records. Initial local/remote branch was 869ebde;
+no GitHub workflow existed. Added .github/workflows/ios-foundation.yml only;
+existing mobile source and codemagic.yaml are byte-unchanged. Queued Codemagic
+build left unchanged; no cloud build launched or cancelled by this task.
+
+Workflow uses macos-15, existing Flutter 3.47.2, locked pub resolution,
+config-only no-codesign generation, pod install and exactly the existing unsigned
+release compilation command/version. Approved production API build setting
+https://shelf.services/api/ and SHELF_TEST_MODE=false /
+SHELF_INTERNAL_TEST_PURCHASES=false retained. No secrets/signing/publishing,
+IPA export or store upload. Read-only contents token, no persisted checkout
+credentials; unsigned app archive and Podfile.lock/source-SHA evidence retained
+seven days. Actual Xcode/CocoaPods/toolchain compatibility remains UNVERIFIED.
+No passed source/shared tests repeated. Static YAML/trigger/permissions/API/command
+comparison, each run step's bash syntax, unchanged mobile/Codemagic and diff
+whitespace checks passed. No production/Android/database changes.
+
+Trigger resolution: workflow_dispatch requires a default-branch workflow.
+Instead use pull_request types=[opened], base main, guarded to a draft PR from
+this same repository's ios/foundation only. Explicitly check out PR head.sha,
+never the synthetic merged tree. No push, synchronize, schedule or dispatch
+trigger. Creation of the draft PR is the deliberate build action, not a merge;
+subsequent pushes do not launch it. Default branch unchanged; remote main
+72cabf0 is an ancestor of initial iOS HEAD. No outdated-main merge performed.
+Official requirements and conflict caveat:
+https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow
+
+Authentication/access: gh binary absent, no GH_TOKEN/GITHUB_TOKEN environment,
+no ~/.config/gh/hosts.yml, no configured git credential helper. Existing SSH
+repository access passed with ssh -F /dev/null; ordinary SSH system configuration
+failed on /etc/ssh/ssh_config.d/50-redhat.conf permissions, so existing documented
+isolated SSH invocation was used without modifying system files/keys.
+Unauthenticated repository metadata GET passed HTTP 200: default_branch=main,
+private=false, visibility=public, permissions absent. This current API visibility
+contradicts older private-repository records; no visibility/settings change made.
+GET /repos/ajmalaand-ship-it/shelf/actions/permissions returned HTTP 401;
+GET /users/ajmalaand-ship-it/settings/billing/usage returned HTTP 401.
+No accessible authenticated GitHub API/account connector is available here.
+Actions enabled/allowed-action policies, account plan, remaining included usage,
+spending controls and billing eligibility cannot be verified; never assumed.
+No paid activation or account/app recreation. Credentials never printed.
+
+Next exact execution action after preparation is pushed: open
+https://github.com/ajmalaand-ship-it/shelf/compare/main...ios/foundation?expand=1
+and choose Create draft pull request (base main, compare ios/foundation), titled
+"Run unsigned Shelf iOS foundation". This requests the build under existing
+GitHub permissions/usage; if provider policy blocks it, report that exact block,
+without enabling paid billing. Do not merge. No PR/build created in preparation.
+For another run, use the existing run's Re-run jobs after an actual run exists;
+branch updates alone deliberately do not rerun it. Merge conflicts block PR runs;
+current ancestor check establishes no source divergence from remote main.
+
+Rollback: normal branch revert of preparation, no live rollback. Checkout OFF,
+pricing sync DEFERRED/disabled, second-phone restore owner-deferred/not passed,
+financial expiry unimplemented and Android/iOS joint public-launch hold retained.
+Native compilation, signing, provider/device acceptance remain unfinished.
+
+## Codemagic environment-group correction — 10 October 2026
+
+Owner confirms Codemagic is connected to **ajmalaand-ship-it/shelf** and has
+found root **codemagic.yaml** on **ios/foundation**. Connection/discovery is
+OWNER-CONFIRMED, not an independently inspected cloud configuration or build.
+Owner authorized this isolated YAML correction, records, commit and branch push.
+Continued clean existing checkout **/home/shelf/tmp/shelf-ios-foundation** at
+**49a1d53855b6cd05e5c67207aefc38fbafb14baf**; no branch recreation/main update.
+
+Added only **shelf_ios_foundation** to
+**workflows.ios-foundation.environment.groups**. Codemagic UI variables must
+belong to a group explicitly imported by the YAML workflow; discovery alone
+never imports them. Preserved every other parsed configuration value, including
+Flutter 3.47.2, Xcode latest, CocoaPods default, mobile working directory,
+manual-only unsigned compilation, API guard, artifacts and both false flags.
+PyYAML parsing and exact before/after mapping comparison passed; git diff --check
+passed. Only codemagic.yaml and this additive Master Record reconciliation
+changed. No completed Flutter tests repeated and no native build performed.
+
+**Readiness:** the source configuration now imports the intended variable group
+for a first separately authorized unsigned cloud compilation. In the Shelf
+application's Codemagic Environment variables, save **SHELF_API_BASE_URL** as
+**https://shelf.services/api/** (trailing slash) in **shelf_ios_foundation**.
+No other custom variable or Apple signing credential is required by this workflow.
+Dashboard variable existence/value/group membership has NOT been inspected or
+owner-confirmed. Refresh YAML discovery at the pushed revision and confirm these
+settings before any later approved build. Compilation/CocoaPods resolution and
+actual cloud toolchain compatibility remain unverified; unsigned .app is neither
+an installable signed IPA nor iPhone/App Store acceptance.
+
+**Next practical task:** confirm the dashboard variable/group and refreshed
+workflow, then obtain separate owner authorization for the first unsigned cloud
+compilation. This supersedes the earlier repository-connection next action only.
+No cloud build, paid activation, signing, store upload, deployment, Android rebuild,
+provider/secret/production edit or transaction. Checkout **OFF**, automatic pricing
+sync **DEFERRED/disabled**, second-phone restore **owner-deferred/not passed**,
+financial expiry unimplemented and joint Android/iOS public-launch hold preserved.
+Other iOS login/purchase/device and backend work retains its recorded limitations.
+Rollback is a normal revert on this isolated branch; no live rollback required.
+
+## iOS foundation interruption reconciliation — 10 October 2026
+
+**Foundation source verification complete; native iOS acceptance remains pending.**
+Resumed the existing **/home/shelf/tmp/shelf-ios-foundation**, branch
+**ios/foundation**, without recreating the branch or repeating implementation.
+Initial HEAD and actual GitHub refs/heads/ios/foundation both matched exactly
+**d7f0a4ca10a687ffff989f9e524c0ab62387901e**, containing implementation
+**d8d42fbd2fe7652af769df065eb28761baac6070**. Initial isolated git status was
+clean; git diff --check and scripts/check_ios_foundation.py passed again.
+Remote main remains **72cabf07a953ff41b2191a3b67f7d18accdd6055**; no main update.
+Host process names and accessible working directories showed no process using
+this iOS checkout or template and no Flutter/Dart/Git foundation operation.
+Other existing agent/server processes were left untouched.
+
+Reused the completed scripts/run_tests.sh --mobile evidence above, independently
+rechecking its exact SHA-256 **587101f9b3e7e01d9462cc60e6c052c8b0484ca9a0e6f9f4f3792ebb4001eb4e**.
+No broad tests or successful shared checks repeated. Removed only
+**/home/shelf/tmp/shelf-ios-template** after confirming a non-symlink disposable
+Flutter scaffold: no Git repository, stock counter demo/native delegate, generated
+project metadata at the documented Flutter revision and only template files.
+Removal confirmed; retained the real checkout, source and passing test log.
+
+This additive records-only follow-up leaves native implementation unchanged.
+macOS/Xcode compilation, CocoaPods resolution/lock, signing, Apple/Google login,
+App Store products/RevenueCat/server verification, sandbox restore/refund,
+privacy declarations and real-iPhone reading/native/offline acceptance remain
+unfinished as detailed below. No cloud connection/build, paid activation, store
+upload, deployment, Android rebuild or production checkout edit performed.
+Checkout **OFF**, pricing sync **DEFERRED/disabled**, second-phone restore
+**owner-deferred/not passed**, financial expiry unimplemented and joint public-launch
+hold preserved. Existing production working records/cPanel handler remain untouched.
+
+**Next owner action:** Codemagic → Add application → connect GitHub with access
+limited to **ajmalaand-ship-it/shelf** → select **ios/foundation** → discover the
+root **codemagic.yaml**, workflow **ios-foundation**, Flutter directory **mobile**.
+Stop after configuration discovery: no Start new build, billing activation,
+automatic triggers/publishing or signing-key upload. Connection success is still
+pending owner evidence. This completes the interrupted server foundation task,
+not the iOS app or joint-launch readiness.
+
+## iOS foundation implementation — 10 October 2026
+
+Owner authorized isolated iOS foundation construction from accepted Shelf source,
+with no Android/UI redesign, paid-service activation, cloud build, store upload,
+production deployment or Android rebuild. Base **5f5c8f6087d5d908b96558863129b8a09b44fcf8**;
+branch **ios/foundation**, checkout **/home/shelf/tmp/shelf-ios-foundation**.
+Current working AGENTS/Master Record carried forward additively; production
+checkout and its cPanel handler are untouched. Accepted mobile/lib, Android,
+assets/fonts, pubspec and lockfile match the base without changes.
+
+**Owner-confirmed Apple setup (not independently inspected):** Individual Developer
+membership Active; Team **YSLWJQDH8B**; explicit Bundle ID **services.shelf.app**;
+Sign In with Apple selected as primary App ID; App Store Connect record
+**Shelf - شیلف**, **iOS 1.0 — Prepare for Submission**. This does not prove signing,
+login, compilation, purchase or review readiness.
+
+**Prepared:** missing mobile/ios using installed Flutter **3.47.2 / Dart 3.13.2**
+template, Runner workspace/project/shared scheme and UIScene lifecycle; iOS 15.0
+minimum; registered production identity/team in all Runner configurations;
+Apple-sign-in entitlement and app-scoped Keychain group; CocoaPods integration
+alongside Flutter-generated Swift Package integration. No certificate/profile/key
+in git. Original supplied square Shelf mark resized to native icon dimensions
+with opaque RGB output; supplied logo on cream launch screen; existing Flutter
+font declarations/assets unchanged and reused. Background audio and photo-save
+purpose configured, no insecure transport exception. Native avatar PHPicker uses
+single selected image without broad library access, bounded thumbnail/JPEG without
+source metadata; existing external channel opens HTTPS/mailto and returns failure
+for Flutter's existing copyable fallback. No new shared screen or source text.
+
+**Cloud configuration:** root codemagic.yaml, workflow **ios-foundation**, mac_mini_m2,
+Flutter 3.47.2, manual-only, **no triggering or publishing**. Future separately
+approved run resolves locked dependencies, generates native configuration, installs
+pods and compiles **unsigned** release .app with checkout opt-in false. API URL is
+required as a Codemagic variable, not hard-coded in new source. Unsigned output
+cannot install on an iPhone and is not a store-ready IPA. Signing/distribution
+requires a later approved workflow and privately managed credentials. Xcode latest
+selection remains a future cloud-environment check; no build/provider connection
+or credential upload was performed here.
+
+**Server evidence:** scripts/run_tests.sh --mobile, review-3 scope with
+PrivacySupportTest smoke: **1 PHP test / 17 assertions, 97 Flutter tests plus
+1 staging-identity check** passed. Analysis no errors, **59 existing nonfatal
+notices**. scripts/check_ios_foundation.py passes plist/XML, identities/entitlements,
+icon dimensions/opacity, unsigned/manual CI and unchanged accepted source checks;
+git diff --check passes. Log **/home/shelf/tmp/shelf-ios-foundation-checks.log**,
+SHA-256 **587101f9b3e7e01d9462cc60e6c052c8b0484ca9a0e6f9f4f3792ebb4001eb4e**. These are source/shared behavior checks, NOT Swift/Xcode
+compilation, pod resolution, signing or native/iPhone acceptance. Tests use isolated
+temporary storage/database; test workspace cleanup passed. No Android build.
+
+**Unfinished:** Apple login Flutter/native flow, backend Apple token/nonce/audience
+verification and explicit account-linking policy; iOS Google OAuth client/reversed
+URL scheme and native login validation (Android settings are not reused); App Store
+per-book products/agreements/availability, separate appropriate RevenueCat Apple
+configuration, platform-aware server receipt/event verification, restore/refund
+and sandbox acceptance. Existing SDK requires goog_ and server PLAY_STORE:
+App Store payments are NOT implemented, no Apple receipt can grant access through
+this foundation. Email/password is shared source only, not yet iPhone-verified.
+Native photo/save/share/audio, Keychain reinstall/sign-out/account isolation,
+offline protection, RTL/fonts/layout/accessibility and device reading require
+macOS/iPhone checks. Final plugin privacy manifests/required-reason APIs, actual
+collected data, export-compliance declarations and App Store disclosures must be
+reviewed after native dependencies compile; no invented declaration saved.
+Provisioning/signing and TestFlight/App Store review remain unfinished.
+
+**Repository connection:** existing origin is
+**git@github.com:ajmalaand-ship-it/shelf.git** (private), browser repository
+**https://github.com/ajmalaand-ship-it/shelf**, branch **ios/foundation**, Flutter
+project directory **mobile**, root YAML **codemagic.yaml**. Remote main was inspected
+at **72cabf0**, behind the accepted local base; main is not merged/pushed by this task.
+The iOS branch carries the accepted source and newer governing records.
+**Next single owner action:** in Codemagic Add application, connect GitHub with
+access to only this private Shelf repository, select **ios/foundation**, and scan
+for **codemagic.yaml**. Stop after connection/configuration discovery; do not Start
+new build, activate paid billing, enable triggers/publishing or upload Apple keys.
+Connection instructions follow the official Codemagic Flutter YAML guide linked
+in IOS_FOUNDATION.md; cloud UI/connection success remains owner evidence pending.
+
+Checkout **OFF**, automatic pricing sync **DEFERRED/disabled**, second-phone restore
+**owner-deferred/not passed/not a new blocker**, financial expiry unimplemented and
+joint Android/iOS public-launch hold preserved. No staging/backend deployment;
+this native source-only task explicitly authorizes none. Before any later backend
+change/promotion, follow existing staging/identical-commit/backup gates. Rollback
+is discarding this isolated branch or reverting its source commits without touching
+production, Android artifacts, database, provider settings or accepted content.
+
+
+## Review 3 owner acceptance and Android/UI pause — 10 October 2026
+
+**Owner accepts the current Shelf Review 3 work. Further Android/UI changes are paused until separately authorized.** This is acceptance of the current work, not evidence that the owner individually tested every control, not Play-installed build-20 phone acceptance and not completion of all platform or launch requirements.
+
+**Google Play status — owner report:** version **1.0.11 (20)** is approved for **Closed testing – Alpha**. The latest screenshot showed **“Changes ready to publish”** with **Managed publishing ON**. **Publishing completion is NOT CONFIRMED; Play-installed build-20 phone acceptance is NOT CONFIRMED.** Approval/readiness does not establish publication, tester availability, installation or phone acceptance. No independent Console inspection or store action was performed in this documentation task.
+
+**Preserved:** completed exact Review 3 backend promotion **5f5c8f6087d5d908b96558863129b8a09b44fcf8**, backups, nullable avatar migration and completed verification below; existing AAB and implementation unchanged. Checkout remains **OFF**. Automatic pricing sync remains **DEFERRED/disabled**, with no 403 retries. Second-phone restore remains **owner-deferred, NOT PASSED**, and not a new launch blocker without a later owner decision. The **joint Android/iOS public-launch hold** remains binding; closed-testing approval is not public-release authorization. Other unfinished backend/iOS/acceptance requirements retain their recorded status.
+
+**Scope of this update:** Master Record only. No implementation, tests, rebuild, deployment, provider/store change, publication, commit or push. Earlier next-action and pending Review 3 acceptance statements are historical where superseded by this entry; they do not authorize resumed Android/UI work. Publishing completion and Play-installed build-20 acceptance must be recorded only when actual evidence arrives.
+
+## Review 3 backend production promotion completed — 10 October 2026
+
+**BACKEND READY FOR GOOGLE PLAY TEST-TRACK UPDATE.** Owner explicitly approved
+executing the prepared 5f5c8f6 promotion, checkpoint/backups and nullable avatar
+migration. Both production and staging release-state now identify exactly
+**5f5c8f6087d5d908b96558863129b8a09b44fcf8**, including correction 5821c42.
+Production git HEAD is that tested candidate; subsequent record-only changes do
+not substitute a different backend release. Previous code HEAD/rollback target
+**72cabf07a953ff41b2191a3b67f7d18accdd6055** (application release 34799b8).
+The prepared approval-pending entry below is historical and now superseded.
+
+**Preservation and verified backups:** before document preparation, normal
+production backup **/home/shelf/backups/shelf/20261010-050738/** verified SQL,
+media ZIP integrity and SHA-256. Its **working-record-checkpoint/** contains exact
+six-file copies/checksums for the five dirty governing/release documents plus
+pagination plan and cPanel handler, git status/full diff, and private aggregate
+catalogue/history fingerprints (no source/personal rows printed). Only the four
+actually dirty tracked documents were restored to HEAD; the untracked pagination
+plan was moved into that checkpoint. The documented list described these as five
+tracked documents, but pagination was untracked and handled separately. No other
+file cleanup/stash/reset. Promotion's second fresh verified production backup:
+**/home/shelf/backups/shelf/20261010-050852/**, containing promotion-notes.txt and
+previous revision. SQL/ZIP/SHA-256 passed before maintenance/migration.
+
+The exact tested candidate was fast-forwarded through the recorded workflow;
+same-lock staged dependencies copied, caches/autoload/assets refreshed; production
+purchase/accounting/owner-share checks and HTTPS health passed. Maintenance lifted.
+Only new migration **2026_10_09_120000_add_private_reader_avatar**, production
+**batch 26**, adds nullable readers.avatar_path; no backfill or first-line schema
+change. No pending migrations remain. No SQL/media restore, data repair or rollback
+needed. Workflow history fingerprints proved all prior reader, purchase, refund,
+ledger and agreement rows unchanged, with only null new avatar column excluded.
+
+**Production evidence:** actual runtime confirms 3 avatar routes, column/migration/
+first-line method present; staging same. Both real checkout=false,
+play_sync.enabled=false/deferred=true. Direct production HTTPS catalogue verified
+**6 books / 263 returned summaries / 98 bounded previews** against independent
+first-nonempty source-line hashes (first returned page per book, not all 342 works).
+No summary body or locked non-sample excerpt; six separately requested paid details
+remain locked with body/excerpt null and no first_line. Paid sole-line withholding,
+240-character bound and draft/hidden/source-preservation edge cases reuse exact
+candidate's passing staging **7 tests / 77 assertions**; no broad/mobile rerun.
+Production HTTPS avatar anonymous access 401, per-reader-path and public photo paths
+404/403; admin login/privacy 200. No paid detail/media access relaxation.
+
+Live production-kernel route probe uses the actual production configuration,
+DB/storage with two disposable synthetic readers/tokens in a rolled-back transaction;
+no existing account modified, no registration mail or provider transaction. Proved
+own-account upload/read, JPEG/private storage, no-store, stable older profile fields,
+no avatar_path in response, another reader cannot read/delete first reader's photo,
+replacement deletes old file, removal clears pointer/file. All synthetic rows/tokens
+rolled back and task-created photo directories removed. Normal allocation counters
+can advance from rolled-back synthetic inserts; existing IDs/rows/content unchanged.
+Authentication/lifecycle used the production HTTP kernel; anonymous/public-file
+protection also checked over real HTTPS. This does not claim Android phone picker
+or Play-signed sign-in acceptance.
+
+After probes, independent aggregate fingerprints matched EVERY existing collection,
+poem/source text, author, credit, reviewer grant, reader/token/account action,
+purchase/event/entitlement/consent, sales/agreement/accounting row to the pre-promotion
+checkpoint. Exact original cPanel handler SHA-256 unchanged:
+**922984f743b00f460365a2f040db9591ab599911bccba902e952946195f8fa42**.
+D14/Play records and pagination plan match checkpoint bytes; candidate AGENTS is
+verified to retain every original instruction plus prior Review 2 evidence, and
+newer Master Record preparation entry restored before this additive completion.
+Old clients continue explicit profile/catalogue/sample/paid APIs; only optional
+has_avatar/first_line fields added. Current AAB can now use its backend features.
+
+Evidence scripts/logs: **/home/shelf/tmp/shelf-backend-promotion-20261010/**.
+avatar-probe.log SHA-256
+**c828d6c00c1483dd033c39749f0bc7e382d3c11f6ce27fb0a1b7614781fed255**;
+verify-production.log SHA-256
+**130412ca0f9bc1ac4dbc62f327baad20ff232903beb6840e072a1951122f9fcb**;
+final-check.log SHA-256
+**4ee28333542cd2f30d5f3b2f5a3b7464a8be5ad68ec7b19861cba9ed88c19f63**.
+The staging evidence SHA-256 remains 903b061ea32ff1a0a1a7c2a3a57e1fabe33a217c489c6617ca357c1727ffd02e.
+Preparatory helper initially named the credits table incorrectly, then used an
+unavailable Python hashlib.file_digest helper; corrected only the task checker.
+An attempted promotion before preparation completed was refused by the dirty gate
+before backup/maintenance/deployment. Checkpoint completed, then exact promotion
+passed. These were task-helper/gate stops, no live application/data fault or repair.
+
+**Artifact and boundaries:** existing Shelf **1.0.11 (20)** AAB unchanged, checksum
+rechecked **5afef9e0eb3228e8e7df8ea81164f4cb0445fbf49df7e8229759bae1475f60d6**;
+exact private path in signed-AAB entry below. No rebuild, Test APK, Google Play
+upload, provider setting, real payment, main push or public publication. Checkout
+OFF, pricing sync DEFERRED/disabled, second-phone restore owner-deferred/not passed,
+financial expiry unimplemented and joint Android/iOS public-launch hold preserved.
+Phone/iOS acceptance and second/cover-photo purpose remain as previously recorded.
+**Next:** separately authorized Google Play test-track update using the unchanged
+verified AAB; backend dependency resolved. “Live” still means test track only.
+No owner decision is needed to complete this promotion; store upload is separate.
+
+
+## Review 3 backend promotion prepared — 10 October 2026
+
+**READY FOR OWNER PROMOTION APPROVAL; PRODUCTION NOT DEPLOYED.** Owner authorized
+backend preparation/staging verification for existing Shelf 1.0.11 (20), including
+5821c42, and explicitly required stopping before production. No AAB rebuild,
+Play upload, production migration/deployment, account/data or provider changes.
+
+**Revisions:** initial staging 9a748ef2022ef274eddcf1941269e35bafa8fb14;
+production release-state remains **34799b8efc93351767c05ecd516711a5badb6c0c**.
+Production git HEAD remains **72cabf07a953ff41b2191a3b67f7d18accdd6055**;
+the difference from release-state is AGENTS/Master Record documentation only.
+Production application/backend files match 34799b8. Existing dirty AGENTS.md,
+D14_DATA_POLICY.md, MASTER_RECORD.md, PLAY_RELEASE_REVIEW.md and cPanel
+public/.htaccess, plus untracked PAGINATED_READER_PLAN.md, are preserved.
+Latest isolated source continued d68f830 on ui/figma-review-2, never restarted.
+
+**Exact staged/proposed promotion commit:**
+**5f5c8f6087d5d908b96558863129b8a09b44fcf8**. This retains completed mobile source
+without rebuilding/installing an app. Runtime backend delta is ONLY ten files:
+AvatarController, Reader/ReaderAvatar/AccountActions, private filesystem disk,
+authenticated routes, photo exception-log exclusion, reversible avatar migration,
+Poem::catalogueFirstLine and PoemSummaryResource first_line. Composer lock and
+unrelated production backend/purchase/accounting/privacy code unchanged.
+Origins: avatar c2f402546ea019ef1a8bc695df6710b7f6f5f87f;
+first-line 3a787ee; guard **5821c42ba4cc75eb96fd36a0172847dafe29c9aa**;
+focused gate/history safeguard fb51755439de4325c90c79f9080d18aac6c54fdf;
+5f5c8f6 preserves newer production financial-policy/Play-review records that
+were missing from the development branch. Development AGENTS retains all current
+production instructions plus its existing Review 2 evidence entry.
+
+**Staging evidence:** intermediate fb51755 passed, then final exact 5f5c8f6
+passed at **04:59:10 UTC**, review-3-backend-dependencies scope, mobile_tests=false.
+Fresh verified SQL/ZIP/SHA-256 staging backup before final deployment:
+**/home/shelf/backups/shelf-staging/20261010-045855/**; previous staging releases
+retained. Existing avatar migration already applied on staging, no new migration
+there. scripts/run_tests.sh: **7 tests / 77 assertions** (ReaderAvatarTest,
+CatalogueFirstLineTest, PrivacySupportTest), temporary database only. Protected
+paid detail, draft/hidden denial, exact source/title preservation, 240-character
+bound, complete sole-line paid-body denial, private avatar lifecycle/cross-account/
+invalid uploads/deletion and privacy checks passed. Direct staging isolation,
+rolled-back synthetic accounts, private gate/noindex/banner, catalogue/cover,
+locked paid detail, denied webhooks/private files and healthy production passed.
+Check log /home/shelf/staging-runtime/checks-5f5c8f6087d5d908b96558863129b8a09b44fcf8.log
+SHA-256 **903b061ea32ff1a0a1a7c2a3a57e1fabe33a217c489c6617ca357c1727ffd02e**.
+
+Additional actual staging HTTPS: **6 books / 263 summaries / 98 non-null previews**
+from the first returned page per book (not a claim of all 342 works), exact
+first-nonempty-source-line hashes and bounds independently compared; no summary
+body or locked non-sample excerpt. Runtime staging: 3 avatar routes, column and
+migration present, first-line method present. Production: 0 avatar routes, column/
+migration/method absent. Both: checkout=false, sync=false, deferred=true.
+/home/shelf/tmp/shelf-backend-prep-20261010/verify.py and verify.log retained;
+log SHA-256 **69a031a74f2e5cffe176122caf9d1be01c7e1a2f3ac41c43fa26020c3ac02f74**.
+Verifier initially used nonexistent is_free instead of is_free_sample; corrected
+and passed, no server defect or repair. Avatar backend files are byte-identical
+to staging 9a748ef: reuse actual authenticated upload/read/no-store/cross-account/
+replace/remove probe and cleanup evidence from 9 October, rather than repeat
+real database/file mutations. Prior probe log SHA-256
+ecc4fba60ef7a5a1def02ac600b7bfac2261bc7c73175c434f6604f2f75ec0c0.
+Completed mobile/render/AAB, purchase, backup and provider evidence reused.
+
+**Compatibility:** additive optional first_line and has_avatar fields; older app
+versions ignore unknown JSON fields and continue account/sample/paid-access APIs.
+Build 20 accepts absent first_line and defaults absent has_avatar=false, so an
+old backend or code rollback remains parse-compatible but lacks new avatar and
+locked-title features. New first_line is public catalogue-only metadata for blank
+titles, max 240 characters; sole non-sample nonempty paid line withheld. No source
+rewrite, ID/order/title changes or paid detail/media/ownership relaxation. Avatar
+routes require own authenticated reader, private bounded/reencoded JPEG/no-store;
+no public profile/path. Upload/deletion lifecycle requires migration first.
+
+### Concrete production plan — only after separate owner approval
+
+1. Recheck production HEAD/release-state, staging REVISION/check-log SHA-256,
+   migrations and gates. Refuse drift from the revisions above; no refresh or
+   catalogue/data copying. Confirm only avatar migration is pending. Recheck
+   production current file fingerprints against preservation checkpoint.
+2. Before any checkout cleanup, run the normal verified production backup
+   scripts/shelf_daily_backup.py in production; record its actual dated path under
+   /home/shelf/backups/shelf/. Verify SQL, media ZIP and manifest checksums, including
+   private files. Independently save the five dirty governing/release documents,
+   untracked pagination plan, full git status/diff and exact public/.htaccess bytes
+   with checksums in a private preservation subfolder of that backup. Backup script
+   covers DB/media, NOT a substitute for this working-file preservation checkpoint.
+3. After checksum verification only, restore the five tracked document paths to
+   production HEAD and move the untracked pagination plan into that checkpoint
+   (candidate already contains the identical plan). Do not restore/edit .htaccess.
+   No stash/reset of unrelated files. This removes the current documented dirty-gate
+   blocker reversibly; any additional changed path stops the promotion for review.
+4. From /home/shelf/tmp/shelf-figma-review-2 run the existing approved workflow:
+   `python3 -B scripts/staging/workflow.py promote 5f5c8f6087d5d908b96558863129b8a09b44fcf8`
+   It revalidates exact staged evidence/ancestry/cPanel handler, makes a SECOND fresh
+   verified production backup in the same run, then down, fast-forward identical
+   commit, copy tested same-lock dependencies, dump-autoload, optimize:clear,
+   migrate --force, Filament assets, purchase/accounting/history checks; up always
+   in finally; owner-share/HTTPS health and release-state record only after success.
+   NO checkout/config/provider/scheduler changes, main push or store operation.
+5. Only pending migration is
+   **2026_10_09_120000_add_private_reader_avatar.php**: add nullable string
+   readers.avatar_path; no backfill/data edits. Record actual production batch.
+   No schema/migration for first_line. History guard ignores only a null new
+   avatar_path in reader fingerprints; all preexisting reader fields, any non-null
+   avatar and money/access/agreement rows remain checked. This avoids interpreting
+   the additive null column as a reader-data rewrite without weakening other checks.
+6. Reconcile preserved document checkpoint after promotion: D14/Play files already
+   exact in candidate, pagination plan exact; retain candidate AGENTS superset and
+   restore this newer Master Record additively. Verify every unrelated instruction/
+   note and .htaccess checksum. Recheck 3 routes/column/migration, catalogue preview/
+   locked paid-detail denial and checkout OFF/sync OFF, plus ordinary existing app
+   profile/catalogue compatibility. Record production backup/batch/checks before
+   declaring backend ready for a separately authorized Play test-track upload.
+
+### Rollback and stop conditions
+
+Previous production CODE checkout **72cabf07a953ff41b2191a3b67f7d18accdd6055**
+(application release 34799b8), not an older historical backend. Preserve checkpoint
+and both verified backups. If backup/checkpoint fails, do not enter maintenance or
+clean files. If a live step fails, lift maintenance and STOP/report; no silent fix
+or automatic SQL restore. After approval for rollback, checkpoint any newer docs,
+return code to previous commit without rewriting history, clear caches/autoload
+(same Composer lock), restore preserved docs/cPanel handler and check health/gates.
+Prefer **code-only rollback with avatar column and private files retained**: old
+code tolerates nullable extra column; new feature is temporarily unavailable.
+Do not overwrite later reader/payment/activity with pre-promotion SQL/media.
+Migration down explicitly drops avatar_path; it is reversible structurally but
+would discard pointers after uploads. Use it only under separately approved
+preservation review after proving no new avatars need retention; never a blanket
+migrate:rollback of unrelated batches. Retained avatar files remain private;
+account deletion during rollback must be reconciled before any later avatar
+reactivation, so deleted-account photos are not resurrected. First_line rollback
+needs code only. Staging previous release remains available; no refresh performed.
+
+**Preserved artifact/boundaries:** AAB 1.0.11 (20), exact path/checksum in the next
+entry, untouched; no rebuild/upload. Checkout OFF; pricing-sync DEFERRED/disabled;
+second-phone restore owner-deferred/not passed/not a new blocker; financial expiry
+not implemented, second/cover-photo purpose unresolved, Android/iOS device
+acceptance pending and joint public-launch hold unchanged. “Live” means Play
+test-track only. This entry is a records-only follow-up after the exact staged
+candidate; do not substitute its later documentation commit for the tested
+promotion commit. Owner decision needed: approve the concrete production backend
+promotion and reversible document preservation above, not Play upload/public launch.
+
+
+## Review 3 signed production AAB — 10 October 2026
+
+**BUILD AND RELEASE CHECKS PASSED.** Owner-authorized corrections completed from
+latest Review 3 development, with sample wording incorporated before building:
+**بېلګه / نمونه / Sample**, selected interface language only. Blank wording issue
+is **RESOLVED**. “Live” means a **Google Play test-track update**, not public release;
+joint Android/iOS public-launch hold remains. No Play upload/Test APK/deployment.
+
+**Immutable AAB source:** 94c0ca014d0d9074bb8bf08714777db8b4202886, including mobile
+**a019b00d3429f8e8440056cfc2b510026594cba9**, all completed Review 2/3/pagination/
+avatar work and latest records. Backend-only final protection commit
+**5821c42ba4cc75eb96fd36a0172847dafe29c9aa** followed artifact preparation:
+first-line catalogue preview is bounded to 240 source characters; a sole paid
+nonempty line is withheld because it would expose the complete paid body (localized
+Untitled fallback remains). Multiline first-line preview and source bytes unchanged.
+No mobile tree difference from immutable build source, independently confirmed;
+no rebuild needed for this backend-only correction, which is NOT deployed.
+
+**Artifact:** production flavor **Shelf 1.0.11 (20)**, services.shelf.app,
+https://shelf.services/api/. Next unused code 20 after retained shared artifact
+codes 14–19; version set through build arguments, pubspec/lockfile unchanged.
+Exact private path:
+`/home/shelf/apps/shelf/storage/app/private/owner-aabs/shelf-review-3-production-1.0.11-20-20261010-040052.aab`
+SHA-256 **5afef9e0eb3228e8e7df8ea81164f4cb0445fbf49df7e8229759bae1475f60d6**;
+**63,122,418 bytes**, mode 0600, matching private JSON sidecar. Saved
+10 October 2026 04:00:52 UTC / 00:00:52 local. Existing upload certificate retained:
+SHA-1 DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB;
+SHA-256 2065572ecb0f174a9e669602232ffcea31335303d3ff011caaeb7216fdb69e77.
+No package/signing/OAuth/credential change; separate staging Test badge remains
+in source, production launcher references only unbadged supplied Shelf assets.
+
+**Packaged verification:** compiled manifest version/package/Shelf label/non-debuggable;
+ZIP CRC; jarsigner verification; independent verified read of **all 528 payload
+entries** using JarFile against the exact recorded upload certificate; production
+endpoint in all native app libraries; no staging endpoint/Test label/banner/access
+marker; no Test launcher resources in AAB; all **84 supplied logo/action PNGs** and
+three original fonts exact. **20 packaged launcher PNGs** match alpha/visible pixels;
+adaptive and legacy **circle/rounded-square/squircle** renders inspected from actual
+packaged resources, no white surround. No internal-test checkout opt-in/build token.
+Jarsigner warnings retained: self-signed/untrusted chain, missing timestamp, POSIX
+attributes and streaming archive-order/manifest ordering. JarFile payload verification
+passed independently; no repacking/signature replacement or Google approval inferred.
+Verifier initially assumed source density paths without Android-added -v4; corrected
+and passed on this same AAB, no rebuild. Task build workspace cleaned; recreated
+task-only Gradle registry removed and absence confirmed; archived source/logs retained.
+
+**Focused evidence:** 104 Flutter checks + identity check and final 31 reader/render
+checks + identity; PHP final **7 tests / 77 assertions**, including full single-line
+paid-body denial and bounded preview. Renderer-generated **1080×1350** light/sepia/
+dark cards inspected (correct contrasting supplied logo, title when selected,
+bold author, localized page digits). Reader/Contents/sharing three-language/narrow/
+short renders inspected, with real bundled fonts/icons; no duplicate bilingual
+Sample/Coming soon labels. Initial harness/fixture failures fixed; no live repair.
+Final backend log /home/shelf/tmp/shelf-review3-backend-final-checks.log SHA-256
+8d8d3e538787239f3cf9932ff053f1adf2fd06e43616445baa0d8e7f8ee54275.
+AAB logs/scripts and packaged masks: /home/shelf/tmp/shelf-review3-aab-20261009/;
+verify-production.log SHA-256 f744eed9e8694c3ccd7ad0222c9962275a6210204f8f48a655d14080c2b0ee6d;
+packaged-launcher-masks.png SHA-256 af0b9bb8d720a48877f70ab8007ccb75078ad9fd1a015b0b947b722659f1df2a.
+Earlier correction/render log hashes and preserved completed evidence remain below.
+
+**Required before test-track rollout:** separately authorize staging verification
+and identical tested-commit production promotion of existing private-avatar routes/
+2026_10_09_120000 reversible migration plus new protected first_line metadata and
+single-line guard, with verified backup. Production remains **34799b8**: actual
+avatar routes=0, avatar column absent and first-line method absent. Staging remains
+**9a748ef**, avatar column present; new first-line addition not staged. Current
+production responses parse compatibly but cannot supply locked first-line titles
+or support avatar add/remove; do not roll out as though those features are deployed.
+Synthetic/packaged checks do not establish Android phone or iOS acceptance.
+Real phone review remains pending; second/cover-photo purpose still unresolved.
+No new wording decision needed. Checkout OFF; manual first-100-book pricing,
+automatic sync DEFERRED/disabled, second-phone restore owner-deferred/not a new
+blocker, financial expiry absent and joint public-launch hold preserved. No main
+merge/push, provider edits, production setting/database/content changes or transaction.
+Next: owner downloads the AAB to Windows Downloads\Shelf-Review-3. Backend promotion
+and later Play test-track upload require separate authorized tasks; no upload now.
+
+## Review 3 final corrections and production AAB authorization — 9 October 2026
+
+Owner authorized continuing latest development 1e193b4, preserving all completed
+Review 2/3/pagination/avatar work. Backend source **3a787ee** adds catalogue-only
+`first_line` for null/blank titles. UI source **a019b00** corrects launcher legacy
+resources, icon-only font control, sharing editor, counters, Contents and author
+weight. All source/title/ID/order/access rules remain unchanged.
+
+**Owner clarification is binding before build:** Pashto **بېلګه**, Dari **نمونه**,
+English **Sample**, including related phrases and partial-sample notices, selected
+interface language only. Previously blank requested sample wording is **RESOLVED**.
+Exact **د لوست سیټینګ** retained. “Live” means **Google Play test-track update**,
+not public release; joint Android/iOS public-launch hold remains binding. No new
+launch confirmation needed for this clarification; final joint-launch approval
+still required before any public rollout. Second/cover-photo purpose remains pending.
+
+**Implemented:** supplied opaque square legacy launcher assets replace transparent
+rounded/circle resources (xxhdpi derived from supplied square at required density);
+supplied adaptive foreground/background/monochrome preserved. Staging adaptive
+icon retains the same mark and red T badge; package/signing identities unchanged.
+Six local launcher mask simulations (circle/rounded square/squircle, adaptive and
+legacy) checked opaque brown rims/no white surround. Actual OS/phone acceptance
+is pending. Top font control contains only supplied ب ب glyph, localized tooltip/
+accessibility retained. Sharing uses smaller localized Create card heading, preview
+at full available width in pinned scrollable viewport (52% height), expanded view
+retained, independent initially unchecked title and supplied contrasting logo.
+Exporter waits for logo decoding before raster capture. Previous reader share icon
+Icons.ios_share_rounded restored; improved editor retained. Four-consecutive-line/
+approved-readable-text export limits and attribution unchanged. Both sides of line/
+page counters, font sizes, search/book counts and audio time/progress localize digits.
+Untitled Contents uses exact first nonempty line as display fallback; reader retains
+poetry glyph. Actual titles/stored text are not changed. Quiet 13px Sample/Contents/
+locked notices, single-language Coming soon/credit labels and bold displayed authors.
+
+**Focused checks:** scripts/run_tests.sh --mobile: 104 Flutter + 1 required identity
+check; then 31 reader/render + 1 identity checks for final Contents bundled-font
+correction. Temporary-database CatalogueFirstLineTest/ReaderAvatarTest/PrivacySupportTest:
+6 tests / 69 assertions. Draft/hidden/paid-body denial, only necessary first-line
+metadata, original stored bytes, title selection, small/short screens at 2x,
+pagination/source/access regressions and actual 1080×1350 exported PNGs passed.
+Full scoped analysis had no errors; 58 pre-existing notices plus one subsequently
+removed interpolation notice. PHP syntax and git diff --check passed. Initial
+synthetic-fixture, outdated-expectation and render-harness failures fixed before
+passing runs; no live failure/data repair. Logs: /home/shelf/tmp/shelf-review3-final-checks.log
+SHA-256 c9484165d331765e2ffb349ae1fc2c8e042eee0df144d04d29f9175d3547fda7;
+/home/shelf/tmp/shelf-review3-final-render-checks.log
+SHA-256 6c659a5d2777c3a79df4626bed22238ea83e650335fb70b5cc68831364c2037c.
+Renders inspected: /home/shelf/tmp/shelf-review3-final-renders/ (three interface
+languages, reader/Contents, narrow/short sharing, three exported palettes, masks).
+These synthetic renders do not establish real-phone or iOS acceptance. Unrelated
+completed purchase/backup/provider evidence reused.
+
+**Production compatibility / rollout dependency:** release state read-only remains
+production **34799b8**, staging **9a748ef**. Actual production has zero avatar routes,
+no readers.avatar_path column and no catalogueFirstLine method. Existing catalogue
+responses parse compatibly; missing first_line falls back to approved excerpt or
+localized Untitled, and avatar features cannot function fully until promotion.
+Before test-track rollout, separately authorize staging verification/promotion of
+these backend additions plus existing reversible 2026_10_09_120000 avatar migration,
+with verified production backup and identical tested commit. No production deploy,
+migration or data change in this task, no staging deployment silently performed.
+Production real checkout=false, play_sync.enabled=false, deferred=true.
+
+**Authorized artifact preparation now:** production flavor, services.shelf.app,
+existing Shelf upload certificate, https://shelf.services/api/, next unused shared
+version **1.0.11 (20)** after retained codes 14–19; version via build arguments only.
+No Test APK, Google Play upload, production deployment or checkout enablement.
+Exact AAB path/hash and packaged verification will be added after successful build.
+All existing pricing-sync/second-phone/financial-expiry deferrals and joint hold retained.
+
+## Corrected Review 3 Shelf Test phone APK — 9 October 2026
+
+Owner authorized build-only preparation from latest clean development source
+**a66864e0f128bb0f137a65bdb72f021cca4553c2** (a66864e), including correction
+**340142b43cd42047e7bd76c0718ce1904ca87768** (340142b). No newer work was
+omitted. Immutable git-archive source and disposable build workspace; version
+supplied through build arguments, no source/pubspec/lockfile changes.
+
+**Artifact:** Shelf Test **1.0.10 (19)**, services.shelf.app.staging,
+https://staging.shelf.services/api/. Next unused code 19 confirmed against retained
+staging APK versions 12/13/16/17/18. Exact private path:
+`/home/shelf/staging-runtime/storage/app/private/test-apks/shelf-review-3-corrected-test-1.0.10-19-340142b-20261009-234648.apk`
+SHA-256 `576419c4f4b3758276675493a49a81f3d59eeaaa825d77a53fa1d749d1e1657f`; **62350628 bytes**, mode 0600,
+matching private JSON evidence. Same verified signing certificate SHA-256
+2065572ecb0f174a9e669602232ffcea31335303d3ff011caaeb7216fdb69e77
+as Shelf Test build 18; same package and increasing code enable in-place update
+without uninstalling or clearing data. Actual installed data retention remains
+pending owner phone observation. Existing Play Shelf stays separate.
+
+**Packaged checks passed:** release signature, manifest version/label/package,
+non-debuggable mode, ZIP CRC; staging endpoint/Test banner in every native app
+library; compiled exact **د لوست سیټینګ** with old phrase absent; localized
+untitled-poem accessibility labels, poetry action asset and local-script digit
+mapping; all 84 original logo/action PNGs byte-identical, original three fonts,
+pagination/pinned previews and native avatar channel. Manifest launcher points
+to supplied Shelf mark plus red Test badge; all **20 retained launcher density
+PNGs** match original alpha/visible pixels and adaptive background/foreground/
+monochrome references resolve. Android shrank unreferenced round-icon resources
+and optimized invisible transparent RGB values; verification accounts for these
+without rebuilding or changing the mark. Actual titled/untitled distinction and
+display-only digit behavior use completed unchanged-source test evidence.
+
+**Evidence reused:** 39 focused correction Flutter tests + 1 staging-identity
+test, required PHP smoke 1 test / 17 assertions, scoped analysis no issues;
+no unrelated suite repeated. Reused correction-log SHA-256
+f6450997169f639afc6c38547256d135a5cf18942d71c97c4105669c133adfb1.
+Build/verification scripts/logs: /home/shelf/tmp/shelf-review3-corrected-apk-20261009/.
+Task build workspace cleaned, including any recreated task Gradle cache; secrets
+stay private. Master Record updated additively, newer/unrelated records preserved.
+
+**Pending/boundaries:** corrected Android phone acceptance PENDING, iOS validation
+NOT VERIFIED, second/cover-photo purpose pending clarification. Staging backend
+remains 9a748ef; no backend deployment/migration, production AAB, store upload,
+production setting/data/source change or transaction. Checkout OFF; pricing sync
+DEFERRED/disabled and second-phone restore owner-deferred. Next: download this APK
+into Windows Downloads\Shelf-Review-3, update Shelf Test in place and review the
+four corrections, retained settings/positions and existing previews/photo controls.
+Then a separately authorized Google Play test-track update; public Android
+release stays held for complete/accepted iOS and owner-approved joint launch.
+
+## Review 3 focused owner-feedback correction — 9 October 2026
+
+Owner authorized four source-only corrections, continuing latest development
+208f544 and completed Review 3 c2f4025/c25e230 without discarding newer records.
+**Source commit: 340142b43cd42047e7bd76c0718ce1904ca87768 (340142b), ui/figma-review-2.**
+
+- Exact Pashto reading-settings title/entry/tooltips now **د لوست سیټینګ** through
+  the shared localization string; no remaining old phrase in mobile/lib.
+- Original shelf-icon-pack.zip Android launcher resources applied: density PNGs,
+  adaptive/round/monochrome layers (27 resources byte-identical to the supplied
+  pack). Shelf Test composes the same mark with a red T badge; existing Shelf Test
+  label/banner, staging package suffix, production ID and signing remain unchanged.
+- Genuinely untitled poems (null/blank stored title) show the supplied shelf-poetry
+  glyph in Contents and reader; localized accessibility labels identify an untitled
+  poem in Pashto/Dari/English. Actual titles remain source text, with no first line
+  promoted to a title. Independent icon semantics prevent list-row label merging.
+- Contents/list order numbers render **۰۱۲۳۴۵۶۷۸۹** in Pashto/Dari and ASCII
+  **0123456789** in English. Display-only conversion; no ID, sort order, stored
+  title/text, content mutation, migration or model serialization change.
+
+**Focused evidence:** scripts/run_tests.sh --mobile, review-3-correction scope:
+**39 Flutter tests + 1 staging-identity test**, required PHP PrivacySupportTest
+**1 test / 17 assertions**. Exact pinned settings heading, three-language list
+numbers/untitled semantics/real titled entry, native source package/signing/Test
+identity checks, original reader source/locked behavior and pinned settings
+regressions passed. Scoped Flutter analysis **no issues**; XML parsing, original
+launcher-resource byte checks and git diff --check passed. Initial semantics
+expectations failed; independent icon nodes and a semantics-enabled test frame
+corrected the issue before final passing run. Log:
+/home/shelf/tmp/shelf-review3-correction-checks.log. Static identity/resource checks
+are not a newly built artifact or launcher acceptance on a phone.
+
+**Preserved:** pagination engine and saved positions, sharing, avatars and access
+controls unchanged. Prior installed/available Shelf Test 1.0.9 (18) from 9a748ef
+has these corrections NOT PACKAGED; staging stays at 9a748ef, production at
+34799b8. No new APK/AAB build, deployment, live database change or store upload.
+Current governing records updated additively, preserving unrelated/newer edits.
+Checkout OFF; pricing sync DEFERRED/disabled; second-phone restore owner-deferred;
+second/cover-photo purpose pending clarification; iOS acceptance still unverified.
+
+**Owner-approved next sequence:** corrected phone review (a separately authorized
+fresh compatible Shelf Test build is needed), then Google Play **test-track**
+update. No test-track upload authorized in this correction task. Public Android
+release remains held until iOS is complete/accepted/ready and the owner approves
+joint Android/iOS launch. Phone acceptance of the corrected wording, launcher,
+untitled glyphs and numbering remains PENDING.
+
+## Review 3 staging and Shelf Test phone-review APK — 9 October 2026
+
+Owner authorized staging-only preparation and a compatible separate Shelf Test
+update, retaining completed Review 3 c2f4025/c25e230 and all newer records.
+Immutable deployed/build source: **9a748ef2022ef274eddcf1941269e35bafa8fb14** (9a748ef),
+which adds only the focused staging gate to completed Review 3. Mobile source
+remains **c25e23010a77fcf87618ee8bb0be68c6fa1b08b2**. Existing pagination/pinned
+reading preview and unrelated edits retained; no main merge/push.
+
+**Staging preflight and deployment:** actual connected database **shelf_staging**,
+canonical storage **/home/shelf/staging-runtime/storage**, separate from production;
+mail log, queue null, purchases/production checkout/pricing sync false. Only pending
+migration was 2026_10_09_120000_add_private_reader_avatar.php. Established workflow
+made and verified SQL/media/checksum backup
+**/home/shelf/backups/shelf-staging/20261009-224852/** before migration/deployment.
+Avatar column is now present on staging; production shelf_app has no avatar column.
+Production deployed revision remains 34799b8 and source/settings/data untouched.
+Reversible migration/code rollback requires reviewing intervening staging activity;
+prior release and verified staging backup retained. No catalogue refresh.
+
+**Staging evidence:** focused ReaderAvatarTest **4 tests / 35 assertions** passed
+at the deployed commit; private storage/session/cache/database isolation, logged
+mail/disabled queue, blocked sync, real HTTPS gate/noindex/TEST COPY/catalogue/
+locked paid content/account/private-file/webhook checks passed. A separate direct
+staged API probe used synthetic accounts/tokens in a rolled-back transaction and
+real staging-only avatar storage: upload/read/no-store, cross-account denial,
+replacement deleting old file and removal deleting current file passed. Synthetic
+accounts/tokens rolled back and task-created photo directories removed. Initial
+rapid probe failed its last request; subsequent probe respected the existing
+five-per-minute account-path limit and passed, without clearing/changing limits.
+Completed unchanged Flutter evidence (97 focused tests plus staging-identity test)
+was reused; no unrelated suite repeated. State records passing staging checks at
+2026-10-09 22:49:03 UTC, scope review-3-avatar-backend; staged-check log SHA-256
+48f8e1472cccf6d8a77becd87fa7c91a37efc4128796ca9f6550efed929058b8.
+
+**Phone artifact:** **Shelf Test 1.0.9 (18)**, package services.shelf.app.staging,
+API https://staging.shelf.services/api/. Version 18 is next after retained staging
+APK manifests 12/13/16/17. Build arguments supply version; source/pubspec/lockfile
+unchanged. APK path:
+`/home/shelf/staging-runtime/storage/app/private/test-apks/shelf-review-3-test-1.0.9-18-9a748ef-20261009-225653.apk`
+SHA-256: `f25b21ca3d640e9c4bcb43e4606a3bccfb66d32153690e7a4dc8074d9f38370b`; **62134954 bytes**, private mode 0600,
+matching private JSON evidence. APK signature verified; same upload certificate
+SHA-256 2065572ecb0f174a9e669602232ffcea31335303d3ff011caaeb7216fdb69e77
+(SHA-1 DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB)
+as prior Shelf Test 1.0.8 (17). Same package/signature and increasing version permit
+an in-place update: no uninstall or data clearing requested. Actual installed data
+retention remains pending phone observation. Play-installed Shelf stays separate.
+
+**Artifact verification:** compiled version/package/Shelf Test label/non-debuggable
+manifest, release signature, ZIP CRC, staging endpoint in every libapp.so, visible
+TEST COPY — Shelf Test banner, pagination/pinned reading and sharing-preview
+markers/Dari choice, native Android avatar-picker channel and all three original
+font families passed. All **84 supplied logo/action PNGs** match staging-source
+bytes, including density/light/dark/inactive variants. Native picker compiled;
+actual chooser/permission/photo lifecycle on phone remains unverified. Initial
+banner verifier looked for ASCII; corrected to the actual UTF-16 string and passed
+on the same artifact, no rebuild. Task build workspace cleaned; recreated Gradle
+registry cache removed. Logs/scripts: /home/shelf/tmp/shelf-review3-apk-20261009/
+(staging-deploy.log, preflight.json, staged-avatar.log, build-test.log, verify-test.py,
+verify-test.log). No secrets printed/committed.
+
+**Pending and boundaries:** owner install/update and Review 3 Android phone
+acceptance PENDING. Review three interface languages/logo/icons, localized fonts
+and size 16, enlarged text/small-screen controls, both pinned previews, page turns/
+Contents/resume and private photo add/replace/remove/sign-out/relogin. iOS native
+picker/build/device validation NOT VERIFIED. Proposed second/cover-photo purpose
+still PENDING CLARIFICATION, no public profile. No production build/upload/deploy,
+live production migration/account/data change or real-money transaction. Checkout
+OFF, pricing sync DEFERRED/disabled, second-phone restore owner-deferred and joint
+Android/iOS launch unchanged. Next action: download this private APK on Windows
+into Downloads\Shelf-Review-3 and update Shelf Test in place for review.
+
+## Shelf Review 3 — isolated implementation, 9 October 2026
+
+**Owner-approved scope:** continue latest isolated Review 2 branch, including
+pagination c211167, pinned reading preview 6c9ef45 and build-17 records 29dd095.
+Use the supplied original bilingual logo/action assets and written requirements;
+Figma board 15:8 was accessible and inspected as a visual reference. No placeholder
+prices, book text/covers or logo were copied. ZIP integrity evidence was reused.
+
+**Implemented:** proportion-preserving light/dark Shelf / شیلف Store header;
+supplied action/inactive-navigation icons, directional RTL/LTR page controls and
+local-script font glyph with localized label; persisted interface choices
+پښتو، دری، English, with Afghan Dari bookstore/reader/settings/sharing translations.
+Source text and book direction stay independent of interface language. Existing
+owner-approved English/LTR account and purchase flows remain English/LTR.
+Font names use only the interface language, including نوی شهرزاد; minimum reading
+size is 16, preserving valid saved sizes; Pashto Settings is سیټینګ. Contents has
+a subtly distinct reader-footer background without the repeated Book details
+caption; real Book details remain reachable. Duplicate empty-search instruction
+removed. Both Review 2 pagination/anchors and pinned reading preview retained.
+Sharing preview remains above scrolling controls, updates font/size/colors/lines
+immediately, offers expanded viewing and keeps attribution and existing limits.
+Small-screen/enlarged-text export buttons use full width.
+
+**Private account avatar:** authenticated own-account upload/replacement/removal,
+private storage and no public URL/profile. Server validates JPEG/PNG/WebP up to
+2 MB/4096 pixels, re-encodes bounded JPEG without source metadata, removes replaced
+files and erases avatar files after confirmed account deletion. Resident photo
+clears on sign-out; late requests cannot repopulate another account. Reversible
+avatar-path migration is prepared in git, NOT applied live. Android picker uses
+the existing native channel pattern without broad media permissions. Proposed
+second/cover photo is PENDING PURPOSE CLARIFICATION, not implemented.
+
+**Evidence:** focused scripts/run_tests.sh --mobile, review-3 scope and temporary
+ReaderAvatarTest database: 97 Flutter checks plus 1 staging-identity check;
+4 avatar API tests / 35 assertions. Covers all three UI languages, dark/inactive
+assets, RTL/LTR arrows, 320-width text scales 1/2/3, short landscape, pinned live
+preview updates, original-font reflow/pagination/positions/access regressions,
+private cross-account denial, invalid uploads, replacement/removal and confirmed
+deletion. Flutter analysis: no errors; 58 existing style/warning notices remain
+(nonfatal policy). PHP syntax and git diff --check passed. Log:
+/home/shelf/tmp/shelf-review3-checks.log; synthetic local renders:
+/home/shelf/tmp/shelf-review3-renders/. These are not real-phone acceptance.
+
+**Remaining/boundaries:** Android native picker/device and all new UI phone review
+pending; iOS native avatar picker/build/device readiness NOT VERIFIED. Existing
+installed Shelf Test 1.0.8 (17) does not contain Review 3. No production deployment,
+live migration, release build, store upload, real transaction or main merge/push.
+Checkout OFF, pricing sync DEFERRED/disabled, second-phone restore owner-deferred
+and Android/iOS joint launch preserved. Newer records/unrelated edits retained.
+Next phone-review step requires separately authorized private staging of the
+avatar backend and a fresh separate Shelf Test APK; then review languages/logo,
+font names/16-size, both pinned previews, pagination/Contents and photo lifecycle.
+
+## Paginated-reader Shelf Test update — 9 October 2026
+
+Owner authorized **only a fresh separate Shelf Test APK**, updating installed
+Shelf Test 1.0.7 (16) without uninstalling/clearing data. Completed immutable
+source **886220203a990b638af456913f65095d9fb596cc** (8862202 records), mobile implementation
+**c2111672957cb14cca9dc3c51bf05f87de31cadd**, includes pinned preview 6c9ef45
+and latest completed Review 2. Exported with git archive; mobile source,
+pubspec/dependencies and production checkout were not edited. Version supplied
+only through build arguments. No older branch/document replaced newer work.
+
+**Built artifact:** release APK **Shelf Test 1.0.8 (17)**,
+`services.shelf.app.staging`, API `https://staging.shelf.services/api/`.
+Next unused version code 17 was checked against retained staging APK manifests
+(12, 13, 16) and existing build records/artifacts through 16.
+Path: `/home/shelf/apps/shelf/storage/app/private/owner-apks/shelf-review-2-test-1.0.8-17-c211167-20261009-065639.apk`
+SHA-256: `b2d10c611a27c228ba794e698bdd9af645e4b405c6fb144a7ae8fd2ee3881bf0`
+Size: 61206058 bytes; private mode 0600, matching private JSON evidence.
+Build completed successfully with the established staging flavor/private access
+defines, JDK 17/Flutter/SDK and existing Shelf upload signing properties. No
+production AAB was built; all previous artifacts are retained.
+
+**Update compatibility verified:** apksigner verified both prior build-16 and
+new build-17 APKs. Same package and identical signer SHA-256
+`2065572ecb0f174a9e669602232ffcea31335303d3ff011caaeb7216fdb69e77`
+(SHA-1 DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB),
+with version code 16 → 17. This is compatible with an in-place Shelf Test
+update preserving its existing app data/account; no uninstall, data clearing or
+migration is required. Actual phone installation/data retention not yet observed.
+The separate Play-installed production Shelf remains untouched.
+
+**Artifact verification:** release signature/certificate, compiled package,
+version 1.0.8 (17), Shelf Test label, non-debuggable manifest, ZIP CRC, staging
+endpoint in every libapp.so, pagination controls and pinned-preview markers,
+and all three original font families passed. Build/verification evidence:
+`/home/shelf/tmp/shelf-pagination-apk-20261009/build-test.log` and
+`verify-test.py`, plus the private APK JSON. Disposable build workspace removed.
+Reused completed unchanged-source evidence: 52 focused Flutter tests + 1 required
+staging-identity test, PHP smoke 1 test / 17 assertions and scoped analysis with
+no issues. No repeated suite or accepted purchase/backend tests.
+
+**Pending:** owner installs this APK over Shelf Test and reviews pinned preview,
+Pages mode, direction/turns, font/size/viewport reflow, Contents and resume with
+real books. Android phone acceptance for these changes remains PENDING; iOS
+validation remains NOT VERIFIED. Earlier acceptance stays limited to improved
+design, font size and light/dark on build 16.
+
+**Boundaries preserved:** no production AAB, store upload, backend deployment,
+production settings/provider/database/account change or real-money transaction.
+Checkout OFF; pricing sync DEFERRED/disabled; second-phone restore owner-deferred,
+not passed or a newly imposed launch blocker; Android/iOS must launch together.
+No main merge/push. Current Master Record updated additively; unrelated edits kept.
+Next owner action: run the supplied Windows PowerShell download command on the
+Windows PC, then open the APK on the Android phone and update **Shelf Test** in
+place for review. Keep the existing apps and their data.
+
+## Optional paginated book reader — implemented 9 October 2026
+
+**Owner authorization and source:** owner authorized the planned shared Flutter
+reader as one implementation batch. Source commit
+`c2111672957cb14cca9dc3c51bf05f87de31cadd` on `ui/figma-review-2`, isolated at
+`/home/shelf/tmp/shelf-figma-review-2`, continues 320231c and pinned preview
+6c9ef45, retaining Review 2 correction c0e4561 and subsequent records. No older
+branch replaced current source/docs; production mobile source remains unchanged.
+
+**Implemented:** optional Scroll / Pages in existing reading preferences;
+scrolling remains the default. The pinned live preview/close control and all
+existing fonts, sizes and palettes remain. Book context supplies canonical ID,
+language and server-ordered Contents. Large previous/next controls and swipes
+follow Pashto/Dari RTL and English LTR, with continuous lazy navigation through
+adjacent accessible sections. Contents returns to the real book list for direct
+item jumps; those start the selected item, while Read resumes the book's saved
+accessible section. Loading/error/access states retain Contents and settings.
+
+Native TextPainter measures the exact original string with the selected font,
+text scaler and available viewport. Pages are contiguous UTF-16 ranges snapped
+to grapheme boundaries: no normalization, trimming, source rewriting or card
+export pagination. Fitting stanza/explicit-line boundaries are preferred;
+oversized stanzas split into exact ranges, and a line taller than the viewport
+can scroll without shrinking or losing text. Metadata/title/credits/date,
+artwork and audio remain reachable on each section's scrollable details page;
+sharing remains available through the existing reader entry. Extreme short
+viewports can scroll the navigation footer rather than clip its controls.
+
+Local positions contain item ID, source offset, exact-text SHA-256 and a details
+flag, never page number or book text. Keys isolate environment, account/guest
+and book. Reflow for family/size/text scaler/viewport or reopening selects the
+page containing that location; vertically panned oversized pages also update
+and restore a text location. Scrolling mode uses the same text anchor. Changed
+text safely restarts the same section with a notice; storage failure is visible.
+Positions never grant access or extend a lease. No cross-device sync was added.
+
+Navigation uses existing repositories, with no new protected-text cache or
+prefetch of locked neighbors. Public partial samples retain only the approved
+response; unexpected unlocked paid responses are rejected. Owned reading
+continues through OwnedBookRepository/LibraryController.copy checks. Account
+changes, revocation/download removal, lease expiry and failed clock checks deny
+resident pages; stale in-flight responses are rejected. Pause discards resident
+content and resume rechecks through the repository. Existing server protection,
+offline/account isolation, audio/session behavior and checkout remain authoritative.
+
+**Focused verification:** `SHELF_PHP_TEST_FILTER=PrivacySupportTest
+SHELF_MOBILE_TEST_SCOPE=paginated-reader bash scripts/run_tests.sh --mobile`
+passed: 52 focused Flutter tests, 1 required staging-identity test and the
+required PHP smoke (1 test / 17 assertions). Scoped Flutter analysis found no
+issues; git diff --check passed. Evidence:
+`/home/shelf/tmp/shelf-pagination-checks.log`. Tests prove exact range
+reconstruction/no missing or duplicated passages across all three bundled
+fonts, CRLF/blank lines, combining/emoji graphemes, RTL/LTR and narrow/large-text
+layouts; logical controls/swipes across items; reflow/reopen/changed-source
+resume; actual Contents jump and Read resume; optional-mode and pinned-preview
+interaction; approved sample/locked/contradictory paid-response denial;
+account sign-out with an in-flight result; owned offline navigation, lease expiry,
+clock rollback and revocation. Oversized pages preserve vertical text offsets;
+320×360 at 3× and 568×240 at 3× remain usable in widget checks. Existing reader,
+content-language, audio/share and pinned-preview regressions passed. Regression
+tap was corrected to scroll to a font control now below the mode selector;
+Contents integration test scrolls lazy list items into view. These are automated
+code/layout checks, not Android phone acceptance or iOS validation.
+
+**Remaining and deliberately omitted:** Android phone acceptance of pagination
+and the pinned preview, iOS validation and broader outstanding Review 2 phone
+checks remain pending. Installed Shelf Test 1.0.7 (16) is still c0e4561; owner
+acceptance remains limited to better design, font size and light/dark controls.
+Front matter stays in Book details; no progress percentage, cloud position sync,
+new engine/dependency or direction support claim for unknown configured languages.
+A later owner decision is needed to establish direction for additional languages.
+
+**Constitution/boundaries:** authorized isolated shared UI, focused verification
+and additive records only. No APK/AAB rebuild, store upload, backend deployment,
+main merge/push, database/content/media/date or production-setting changes and
+no transaction. Checkout OFF, pricing sync DEFERRED/disabled, second-phone
+restore owner-deferred/not a new launch blocker, and joint Android/iOS launch
+remain preserved. The production Master Record received this additive entry;
+unrelated/newer edits were retained. Next single owner action: authorize a fresh
+separate Shelf Test APK build for targeted pinned-preview/pagination phone review.
+
+## Owner reading-settings feedback and pinned preview — 9 October 2026
+
+**Owner phone evidence, limited acceptance:** owner confirms installing Shelf
+Test 1.0.7 (16), reports the design looks better, and confirms font-size and
+light/dark theme controls work. Record only these observations. No acceptance
+of every screen, all fonts/sepia, purchases, offline/account isolation, privacy,
+all reading/import checks or iOS is inferred. That installed artifact is from
+c0e4561; the pinned-preview change below has not been packaged or phone-tested.
+
+**Authorized and implemented:** keep live preview and close control pinned while
+reading settings scroll. Shared Flutter source commit
+`6c9ef455b5224321ebc7e5cfe06b517a928723d2`, continuing latest Review 2 branch
+9b1937c/c0e4561 without discarding completed work or unrelated edits. Header and
+preview are outside the controls' scroll view. Preview immediately observes
+ReaderSettings family/size/palette notifications; existing preference keys, font
+choices and reader/source behavior remain unchanged. Compact single-line preview
+can pan horizontally; exceptionally tall text can pan vertically within a region
+capped at 30% of available panel height. No reduction of selected font size or
+accessibility scaling. Close remains in the pinned header; safe-area handling
+and compact heading retain usable controls on narrow/short screens.
+
+**Verification:** scripts/run_tests.sh --mobile, pinned-preview scope, passed
+30 focused Flutter tests plus 1 required staging-identity test and the required
+PrivacySupportTest smoke (1 test / 17 assertions). Scoped Flutter analysis of
+the changed panel/new tests found no issues; git diff --check passed. Checks
+load actual bundled fonts and exercise RTL/LTR at 320×568, 390×844 and 568×240,
+text scales 1.0/2.0, maximum selected size 38, pinned offsets while settings
+scroll, all font/palette choices, immediate preview updates, size buttons/slider,
+persistence, settings reachability and closing from the bottom of the settings.
+Existing reader sample/locked/source-format/artwork/font behavior regressions
+passed. Initial test incorrectly required scrolling when every control fitted;
+corrected to allow zero scroll extent while preserving the pinned-offset checks.
+Evidence: `/home/shelf/tmp/shelf-figma-review-2/pinned-preview-checks.log`.
+
+**Next approved reader task — recorded, not implemented:** optional book-style
+paginated reading, page controls/swipes through the book, retained Contents,
+reflow for font/size/viewport changes, exact poetry line/stanza preservation,
+stable text-location position (not page number), sample/paid/offline/account
+boundaries and book-direction navigation. Current reader was inspected; native
+Flutter layout/range pagination, ordered item context and account-scoped anchors
+are proposed in [the concrete next-batch plan](PAGINATED_READER_PLAN.md).
+The card-export paginator rewrites spacing/newlines and must not be reused for
+book text. No owner decision blocks the current-book core: retain scrolling by
+default and front matter in Book details; owner inclusion of front matter as
+pages is optional. Unknown book languages require explicit direction metadata.
+
+**Remaining:** new pinned-preview Android phone acceptance and iOS validation
+are pending. Owner's above feedback does not close all Review 2 phone checks.
+No app rebuild, upload, backend deployment, real-money transaction, reading
+engine or dependency in this batch. Checkout OFF, pricing sync DEFERRED,
+second-phone restore owner-deferred/not a new blocker, and joint Android/iOS
+launch preserved. No main merge/push or production app-source change.
+
+
+## Review 2 Android phone-review artifacts — 9 October 2026 UTC / 9 October local
+
+Owner authorized artifact preparation from completed shared Review 2, including
+correction c0e4561, with no Play upload or backend deployment. Owner selected a
+separate Shelf Test APK beside the existing Play-installed Shelf, using the
+existing staging catalogue and separate test account. No uninstall/data migration.
+
+Immutable build source: **c0e4561b41c87f6f56cb2ffb58eedce9a46af178**, branch ui/figma-review-2,
+including Store, Book details, My Library, Search, Reader and reading preferences,
+the readable brown chip correction and diagnosed/fixed render fixture. Real book
+text and intentional poetry formatting were unchanged. Origin main was checked
+read-only at 72cabf0; no newer mobile source was omitted. Current governing
+amendments/unrelated edits are preserved; no old documentation snapshot replaced
+the current record. Source was exported with git archive and built in disposable
+workspaces. Version chosen only through build arguments: **1.0.7 (16)**;
+no mobile source, dependency lockfile or pubspec version edit in this build task.
+
+**Selected phone artifact:** release APK, label **Shelf Test**, package
+`services.shelf.app.staging`, API `https://staging.shelf.services/api/`.
+Path: `/home/shelf/apps/shelf/storage/app/private/owner-apks/shelf-review-2-test-1.0.7-16-c0e4561-20261009-044635.apk`
+SHA-256: `6dfc7839ea9ffe13f99b527def3391ffb3ba34cab1b40e91dadddef7b90a6933`
+Size: 61058570 bytes. Private mode 0600; matching private JSON evidence.
+Built with established staging flavor/private access defines, JDK 17/Flutter/SDK
+and existing Shelf upload signing properties. No owner-preview token generated.
+Separate staging account/data; production reader account/purchases are not copied.
+This verifies shared UI on a phone, not production-account or Play-signed behavior.
+
+**Production artifact retained, not phone-installable:** release AAB,
+package `services.shelf.app`, version **1.0.7 (16)**, production endpoint,
+with internal-test checkout opt-in omitted.
+Path: `/home/shelf/apps/shelf/storage/app/private/owner-aabs/shelf-review-2-production-1.0.7-16-c0e4561-20261009-044332.aab`
+SHA-256: `e251545cb97fb5ea1f63d0ee38707accdca4602f9c16c1730a92a5933eff8789`
+Size: 61899366 bytes. Private mode 0600; matching private JSON evidence.
+No Play upload, rollout or launch. Preserved prior approved 1.0.6 (15).
+
+**Installation compatibility:** actual APK signer matches the recorded Shelf
+upload certificate: SHA-1 DA:24:FF:12:6D:3A:D7:D2:83:E3:A3:36:B6:8A:A9:03:50:42:38:CB;
+SHA-256 20:65:57:2E:CB:0F:17:4A:9E:66:96:02:23:2F:FC:EA:31:33:53:03:D3:FF:01:1C:AA:EB:72:16:FD:B6:9E:77.
+Existing Play Shelf uses owner-confirmed Play signing SHA-1
+BE:61:2C:CD:0B:79:68:E3:AA:1E:2A:C7:E6:CF:B8:CB:61:8F:DE:24.
+A locally upload-signed APK cannot update the Play-signed production package;
+[Android requires compatible signing for updates](https://developer.android.com/studio/publish/app-signing).
+The chosen separate package leaves Play Shelf and its local data in place.
+Shelf Test also uses the same upload certificate as its earlier documented APK,
+with a higher version code. Actual installation on the owner's phone is not claimed.
+A production update would require a separately authorized Play-signed test update.
+
+**Verification:** both release builds completed. APK signature/certificate,
+compiled package/version/label/non-debuggable manifest, ZIP CRC, staging endpoint
+in every libapp.so, Review 2 preferences marker and all three original bundled
+reader font families passed. AAB ZIP CRC, compiled production manifest/version,
+non-debuggable mode, JAR signature/upload certificate and production endpoint in
+every libapp.so passed. Reused completed Review 2 focused 64-test evidence and
+correction 20-test evidence, plus their identity/PHP smoke checks; no unrelated
+suite or accepted purchase/backend test rerun. Build/verification scripts/logs:
+`/home/shelf/tmp/shelf-review2-android-20261009`. AAB trap cleanup initially returned nonzero after verified artifact
+save because a temporary Gradle directory was recreated; task-only leftover was
+removed and its absence confirmed. No artifact rebuild was needed. An independent
+APK verification initially lacked Java on PATH; setting the established JDK PATH
+fixed the check. No app/source change was required.
+
+Read-only runtime checks: production real checkout false, pricing sync false;
+staging purchases false, production checkout false and pricing sync false.
+Staging and production backend source remain deployed at 34799b8; no backend
+change, migration, deployment, account/provider/configuration edit or transaction.
+**Android phone installation/acceptance PENDING** until owner installs Shelf Test
+and reviews the result. **iOS validation NOT VERIFIED**. Checkout OFF, pricing sync
+DEFERRED, second-phone restore owner-deferred (not a new launch blocker), and
+joint Android/iOS launch unchanged. This build does not approve public release.
+
+**Single next owner action — Windows PC, PowerShell:** download the selected
+Shelf Test APK into the Windows Downloads/Shelf-Review-2 folder. The subsequent
+phone review uses Shelf Test beside Shelf and the separate existing test account.
+
+
+## Figma Review 2 implementation — 9 October 2026
+
+Owner approved [Figma Review 2](https://www.figma.com/design/NVSrbPa6eJJVUfIK3vdUeJ?node-id=7-5)
+and authorized one shared Flutter design batch: Store, Book details, My Library,
+Search, Reader and Reading preferences, focused verification and project records.
+Actual Figma context/screenshots were inspected; no design guessed from blocked access.
+Implementation is isolated on ui/figma-review-2 from current 72cabf0 source,
+whose baseline mobile tree matches deployed reviewer release 34799b8.
+Newer working governing amendments and unrelated production edits are preserved.
+
+Implemented shared cream/brown styling, flexible book rows, outlined search,
+clear navigation/filters/touch targets, original dynamic cover presentation,
+persistent sample/owned/purchase-status actions, Library download/restore controls,
+reader heading/Contents and visual persisted font/size/light/sepia/dark preferences.
+Existing source text/credits, metadata/front matter/contents, loading/error/offline
+states, account/language/privacy/support, purchases/restore, audio/sharing and
+server-controlled access remain. No placeholders, fixed store price or mock progress
+shipped. Progress/resume is absent: retain Read book and omit percentage/Continue
+reading claim. No daily-feature selection or unsupported reader arrows/author-filter
+API invented. See [implementation and evidence](FIGMA_REVIEW_2_IMPLEMENTATION.md).
+
+Final focused checks passed: 64 Flutter tests,
+1 staging-identity test, required PHP smoke 1 test / 17 assertions.
+Flutter analysis: zero errors; three pre-existing warnings and 61 style notices
+retained (strict default reports them; nonfatal-warning/info run succeeds).
+Rendered RTL/LTR screens at 320×568/390×844, text scales 1.0/1.8, and Library
+states were inspected; synthetic fixtures are not real-phone acceptance.
+Android phone acceptance remains PENDING until owner review and separately
+authorized build/device checks. iOS build/device/provider validation is not
+established by shared Flutter checks. Android/iOS joint launch remains binding.
+Checkout OFF; pricing sync DEFERRED; second-phone restore owner-deferred, not a
+new launch blocker. No deploy/build/upload, transaction, settings/schema/data or
+backend/admin changes. Next single owner action: review the rendered shared UI.
+
+## Joint-launch direction and single remaining-work list — 8 October 2026
+
+**Owner-approved amendment:** four work areas: Admin/backend, Android app, iOS app,
+shared app design and UX/UI. Android and iOS must launch together. Neither may
+release publicly until both are complete, accepted and ready, both store reviews
+are complete, and final owner launch approval is given. This supersedes Android-only
+Version 1, “iOS later”, one-platform release criteria and previous next-task priorities.
+Completed work and historical evidence remain intact.
+
+**Current work order:** inspect iOS readiness → agree/improve shared design and
+UX/UI → complete iOS and remaining admin/backend → accept both apps together and
+fix demonstrated issues → complete both store reviews and coordinate launch.
+Use complete practical batches, shared Flutter code and passed evidence.
+
+**Google Play — current owner report, 10 October:** **1.0.11 (20)** approved for
+**Closed testing – Alpha**; latest screenshot showed **“Changes ready to publish”**
+with **Managed publishing ON**. Publishing completion and Play-installed build-20
+phone acceptance are **NOT CONFIRMED**. Earlier build-15 approval and review
+snapshots remain historical. Preserve existing artifacts, assets, reviewer access,
+products/mappings and completed evidence. Current Review 3 work is owner-accepted;
+further Android/UI changes are paused pending separate authorization. No Console
+read, store action, tester availability or public-release approval is claimed here.
+
+**Preserved controls:** checkout OFF; manual Play pricing for the first 100 books;
+automatic pricing sync DEFERRED/disabled, no 403 retries; second-phone restore
+DEFERRED/not passed and not a launch blocker without a later owner decision.
+Financial policy: three years after the relevant tax return is filed, affected
+records held longer for applicable legal requirements, unresolved disputes or
+unpaid author balances, and minimum proof while recovery rights continue.
+Automatic financial expiry is NOT IMPLEMENTED. Seven-year/one-year alternatives
+remain unapproved. Optional improvements stay outside release scope.
+
+### One active remaining-work list under four areas
+
+Use this list for current priorities. Earlier lists and next-action paragraphs
+below and in supporting records are historical, not parallel active work queues.
+Assign cross-cutting work once; other areas depend on that result.
+
+| Area | Remaining work and type | Dependency / boundary |
+| --- | --- | --- |
+| **1. Admin/backend** | **Construction:** tax-return filing/mapping, scoped exception holds, minimum recovery-proof separation and owner-only financial-retention dry-run; reviewed preservation/disposal design before later expiry; align privacy/deletion wording with policy and actual behavior. | Batch 3 after readiness/design planning. Preserve built accounts, purchase verification, accounting, deletion/recovery and backups. Expiry OFF; deletion/schema/data changes need separately approved preservation, staging and backup plans. |
+| **1. Admin/backend** | **Evidence/external dependencies:** RevenueCat onward integrations, hosting/mail and Microsoft terms, Apache/statistics retention, remaining diagnostic/identifier handling and applicable audience safeguards. Actual provider metadata erasure unverified, conditional on genuine approved deletion work; no eligible job to drain. | Reuse existing evidence; no blanket sharing assertion or manufactured reader deletion. Store-specific reconciliation when final review needs it; owner handles rating questionnaire, assistant poem review stays cancelled. |
+| **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
+| **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
+| **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
+| **3. iOS app** | **Unsigned build owner-confirmed successful 10 Oct:** Codemagic 6acad0a1546ce6236ced5f95 / 869ebde, execution 4m25s, compilation 2m03s. Separate manual signed internal-TestFlight workflow prepared; signing integration/credentials, upload/processing and device/provider checks remain unverified. | Batch 1, next practical task. Inspection first; later concrete tasks authorize setup/build/implementation. |
+| **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
+| **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
+| **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
+| **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
+
+**Next practical task:** owner protected Apple signing setup for the prepared ios-testflight-internal workflow, following the complete IOS_FOUNDATION.md guide under separate authorization; then separately authorize signed build/upload. Unsigned compilation is owner-confirmed successful and must not be repeated for preparation. No build/upload/paid activation in this task. Financial-retention dry-run
+work remains in the backend list; it is no longer the immediate next-task priority.
+This amendment authorizes documentation only: no features/settings, rebuild,
+deployment, purchase, store submission or release; no commit/push in this task.
+
+**Summary reconciliation still needed:** AGENTS.md §§1–3 retain Android-only/current
+Step 4 scope, §4.11 has Android-only phone acceptance, §6 has small-step instructions,
+and §8 contains “App Store later with iOS”. Those active instructions need alignment
+with this amendment while preserving historical entries and unrelated edits.
+This task changes only the requested Master Record. The explicit owner amendment
+takes precedence over conflicting summary instructions.
+
+### Historical status and recommendations below
+
+Earlier entries, including old platform/review/next-task statements, remain dated
+history and do not supersede this amendment or the single active list above.
+
+
+## Financial retention approved — 8 October 2026
+
+Owner-approved policy (owner chat, not a claim of a universal statutory period):
+- Retain accounting and tax-supporting records for **three years after the relevant
+  tax return is filed**. The clock is the actual filing date, not purchase date,
+  account deletion, year-end, release date or the date this policy was approved.
+- Retain affected records longer where an applicable legal requirement, unresolved
+  dispute or unpaid author balance requires it. Exceptions apply to affected evidence,
+  not automatically to every record; document the basis and release condition.
+- Keep **only the minimum purchase proof needed while purchased-book recovery rights
+  continue**. The three-year period must not break those rights, including approved
+  support-assisted recovery after account deletion and refund/revocation checks.
+- The **seven-year proposal and one-year alternative are NOT APPROVED**. No blanket
+  permanent accounting archive or three-year post-rights period is approved here.
+
+**Approved policy versus implemented behavior:** policy decided; financial expiry
+NOT IMPLEMENTED. Existing accounting, tax-supporting and purchase/recovery records
+remain retained without automatic financial expiry. Current 03:45 maintenance covers
+approved log/backup retention and provider metadata retries, not financial records.
+There is no tax-return filing-date registry or approved financial eligibility job.
+Public policy still describes financial retention as under review; aligning deployed
+wording is a later scoped change, not performed by this documentation task. Earlier
+“financial expiry unresolved” entries remain historical; the policy is now approved,
+while implementation remains outstanding. D14 is not declared fully complete.
+
+Checkout **OFF**, pricing sync **DEFERRED / disabled**, reviewer access and completed
+work preserved. **Second-phone restore remains owner-deferred, not passed, not
+requested and not a launch blocker without a later owner decision.** No record
+expiry/deletion, production setting change, migration, rebuild or deployment here.
+
+Implementation plan: [D14_DATA_POLICY.md](D14_DATA_POLICY.md), scoped to filing-date
+mapping, holds, recovery-proof separation and dry-run eligibility before any later
+expiry authorization. No implementation or data deletion in this task.
+
+
+## Closed testing Alpha submitted — 8 October 2026 (owner-confirmed)
+
+Owner reports Shelf **1.0.6 (15)** uploaded to **Closed testing – Alpha**;
+countries and tester email lists configured; release notes saved with **en-US**
+language tags. Advertising ID declaration set to **No** after read-only inspection
+of the final AAB's compiled merged manifest and actual SDK usage. AD_ID permission
+is absent. Embedded dependencies include RevenueCat purchases 10.22.1,
+purchases-hybrid-common 19.3.1 and play-services-ads-identifier 17.0.1; Advertising
+ID capability is bundled, but Shelf invokes no identifier-collection/attribution
+calls (their channel markers absent in all three compiled Flutter architectures).
+Do not interpret the bundled library as an active Advertising ID collection flow.
+Final artifact/hash/source evidence remains in the build-15 entry below.
+
+Owner submitted the changes. Play Console shows **“Changes in review”**, with
+quick checks running. This records owner chat confirmation, not an independent
+Console read or Google approval. **Google approval, tester availability and build
+15 phone acceptance remain PENDING.** No exact tester emails/country list or review
+completion time invented. Submission does not certify every pending Data safety
+provider fact or constitute public-launch/real-payment approval. Earlier statements
+that no upload/submission occurred describe those earlier tasks and are superseded
+for current release status only.
+
+Checkout remains **OFF**; automatic Play pricing sync remains **DEFERRED / disabled**.
+Preserve reviewer access, approved books/rights/prices/product mappings, completed
+construction and test evidence, build 14 and the cPanel handler. This update changes
+records only: no feature work, rebuild/upload/deploy, production settings or data
+change. No broad tests or completed checks repeated.
+
+### Unfinished work before public launch — implementation/evidence reconciliation
+
+**1. Can progress while Play review is pending (separate authorization as needed):**
+- D14 financial policy is now approved: prepare filing mapping/holds and dry-run
+  implementation, then align disclosures in a later approved task. Automatic financial
+  expiry is not built. Existing deletion/recovery/log/backup construction is retained.
+- Close remaining provider/privacy evidence: RevenueCat dashboard onward integrations,
+  hosting/mail and Microsoft service-provider terms, Apache/statistics retention,
+  remaining provider diagnostic/identifier handling and applicable audience safeguards.
+  Reconcile submitted declarations against those facts; no blanket sharing conclusion
+  or guessed IARC answers. Owner handles the actual rating questionnaire; assistant
+  poem review remains cancelled. Submitted listing/declarations are not reopened
+  merely because older preparation documents said they were not submitted.
+- Obtain outstanding actual backup-alert delivery and replacement-host recovery/cutover
+  acceptance under a separately approved isolated drill/operating plan. Reuse already
+  passed encrypted upload/download/restore and scheduled-backup evidence.
+- Resolve recorded confirmation of removal of four temporary account-level Play grants,
+  preserving app-level access; plan separately approved old-app retirement without
+  accessing or changing the old account in this task.
+
+**2. Requires the approved/available Play build:**
+- Google approval and actual tester opt-in/install availability; then build 15 phone
+  acceptance: Play-signed Google sign-in, reviewer Library/full-book access, native
+  Privacy/Support links and copyable fallbacks, remaining account/reader UX acceptance.
+- Finish only unpassed real-phone Pashto/Farsi poetry/prose/mixed-text/font/sample
+  and real Word-import reading checks; remaining offline expiry/account isolation/
+  sign-out/withdrawal checks. Second-phone restore remains owner-deferred, NOT PASSED;
+  it is not a launch blocker without a later owner decision.
+  Preserve the owner's passed refund/decline/repurchase results; no broad repeat.
+- Actual production purchase/event delivery, SDK acknowledgement and production refund/
+  restore acceptance require the Play build **and separate explicit owner real-money/
+  controlled gate authorization**. Closed-test approval alone cannot enable checkout.
+- Owner final end-to-end acceptance, explicit public-launch approval and approved
+  launch rollout are still required. Review/tester availability is not public release.
+
+Actual provider erasure remains unverified, conditional on genuine approved deletion
+work; there is no eligible job to drain. Do not create/delete a real reader solely
+for evidence or mark D14 fully complete. No new generic purchase/accounting/recovery
+code defect established. Automatic price sync remains outside the launch work queue.
+
+**Next scoped task proposed:** filing-date mapping, exception metadata and owner-only
+financial-retention dry-run reporting, with expiry OFF, as planned in D14_DATA_POLICY.md.
+Financial policy has been approved; no implementation or deletion authorized here.
+
 
 ## Updated closed-testing Android AAB — 8 October 2026
 
@@ -1293,6 +2751,68 @@ Details and evidence: [status reconciliation](STATUS_RECONCILIATION_2026-10-02.m
 
 # Part 11 — Decision log
 
+- **10 October 2026 — iOS foundation authorized:** owner confirms active Individual Apple membership, Team YSLWJQDH8B, explicit services.shelf.app with primary Sign In with Apple, and Shelf - شیلف / iOS 1.0 Prepare for Submission. Isolated foundation and manual-only unsigned Codemagic configuration prepared from accepted source; server source/shared tests passed. No cloud build, signing success, Apple login/purchases, iPhone acceptance, paid activation, upload, deployment or Android rebuild claimed. Checkout OFF, deferrals and joint launch hold preserved.
+
+- **10 October 2026 — owner acceptance and pause:** current Shelf Review 3 work accepted; further Android/UI changes paused. Owner reports Google Play **1.0.11 (20)** approved for **Closed testing – Alpha**, latest screenshot **“Changes ready to publish”**, **Managed publishing ON**. Publishing completion and Play-installed build-20 phone acceptance **NOT CONFIRMED**, not passed. Completed backend promotion/evidence preserved; checkout OFF, automatic pricing-sync and second-phone-restore deferrals and joint Android/iOS public-launch hold unchanged. Master Record only; no implementation, rebuild, deployment or store action.
+
+- **9 October 2026 — Review 3 owner feedback:** exact د لوست سیټینګ wording;
+  supplied launcher mark with distinct Shelf Test badge; supplied poetry icon for
+  genuinely untitled poems and localized accessibility; Pashto/Dari list digits
+  ۰۱۲۳۴۵۶۷۸۹ with English ASCII. Source 340142b, focused checks passed. Next:
+  corrected phone review, then Google Play test-track update; public Android
+  release held for joint iOS launch. No build/deploy/upload in this correction.
+
+- **9 October 2026 — owner authorized Review 3 staging and phone-review build:**
+  staged 9a748ef with verified staging backup and reversible avatar migration only
+  on shelf_staging; produced compatible Shelf Test 1.0.9 (18), same package/signer,
+  staging endpoint/Test identity. No production deployment/build/migration/upload.
+  Focused staging/avatar and artifact evidence passed; owner phone acceptance
+  pending. Cover-photo purpose, iOS readiness and all existing deferrals/joint
+  launch remain unchanged. See Part 10 for exact private APK path/evidence.
+
+- **9 October 2026 — owner-approved Shelf Review 3:** supplied original logo/icons,
+  Afghan Dari interface alongside پښتو and English, pinned live sharing controls,
+  Contents-only footer label, localized font names/minimum 16, سیټینګ, private
+  account avatar replacement/removal and removal of repeated search instruction.
+  This supersedes earlier two-language interface scope; account/purchase English
+  policy is retained. Second photo/cover purpose remains undecided. Isolated
+  implementation and focused checks/records only; no production deployment,
+  live migration, release build/upload or real transaction. Joint launch and
+  existing checkout/pricing/restore deferrals remain binding.
+
+- **8 October 2026 owner approval; implementation continued 9 October:** Figma
+  Review 2, file NVSrbPa6eJJVUfIK3vdUeJ, board 7:5, approved at the URL above.
+  Authorized shared Flutter implementation of Store, Book details, My Library,
+  Search, Reader and Reading preferences, focused checks and project records.
+  Preserve working features, original content/credits, store localized prices,
+  access rules and new governing records. No production changes/deployment,
+  store upload, real transaction or checkout activation. Android phone acceptance
+  pending; iOS validation separate; joint launch and existing deferrals preserved.
+
+- **8 October 2026 — owner-approved joint-launch/work-order amendment:** four areas:
+  Admin/backend, Android, iOS, shared design/UX/UI. Android and iOS launch together
+  only after both are complete, accepted and ready, both store reviews complete,
+  and final owner launch approval. Supersedes Android-only Version 1 / “iOS later”.
+  Order: inspect iOS readiness (Flutter, Apple account, Mac/build access, signing,
+  purchases); agree/improve shared design; complete iOS and remaining backend;
+  accept both apps/fix demonstrated issues; complete both reviews/coordinated launch.
+  Complete practical batches, shared code/passed evidence, one four-area remaining
+  list; optional improvements outside release scope. Play 1.0.6 (15) owner-confirmed
+  approved for closed testing; further Play preparation paused until final release
+  needs it. Checkout OFF, three-year filing-based financial policy/continuing recovery
+  proof retained, automatic expiry absent, pricing-sync/second-phone deferrals retained.
+  Documentation only; no implementation/build/deployment/purchase/release or commit/push.
+
+
+- **8 October 2026 — financial-retention owner approval:** accounting and tax-supporting
+  records retained three years after the relevant tax return is filed; affected records
+  held longer for applicable legal requirements, unresolved disputes or unpaid author
+  balances. Minimum purchase proof retained while purchased-book recovery rights continue;
+  three-year expiry must not break recovery. Seven-year proposal and one-year alternative
+  NOT APPROVED. Documentation/implementation plan only; automatic financial expiry absent.
+  Checkout OFF, sync DEFERRED, second-phone restore deferred and not a launch blocker
+  without later owner decision. No deletion/production changes/rebuild/deployment.
+
 - **7 October 2026, production construction:** Owner approved constructing production-mode purchase verification behind disabled controls, with existing RevenueCat/Google Play integration. Real transactions require authenticated provider-event environment and independent server REST is_sandbox evidence to agree, with the exact reader, book, permanent entitlement and unique purchase-time match. Unknown, malformed, ambiguous or failed evidence never grants access or renews an offline lease. Test transactions remain excluded from real income. Production acceptance defaults OFF and is forced OFF on staging; no real payment or public release is authorized. Preserves manual first-100-book pricing, acknowledgement, refunds and accounting. Owner authorized focused tests, staging/backed-up promotion and commit/push; no real-sale activation.
 
 - **7 October 2026:** For Shelf’s first 100 books, the owner creates and manages Google Play products, prices and availability manually in Play Console. Automatic admin-to-Play product/price synchronization is **DEFERRED, NOT COMPLETED** and stays disabled. Stop 403 investigations, calculations, retries and support follow-ups unless the owner explicitly reopens automatic sync. Existing product mappings, credentials, app-level access, verification, acknowledgements, entitlements, refunds, accounting and historical records are preserved. Admin USD prices are approved reference values; saving does not update Play. Checkout uses Google’s localized store price. No Play product creation/change is authorized in this task.
@@ -1377,7 +2897,7 @@ Separate /api/owner-preview path, signed temporary access and isolated caches, k
 |--------------------|------------------------------------------------------------------------------------------------------|
 | Backend            | The server part (Laravel). Stores books, accounts and purchases and decides who can read what.       |
 | Filament           | The owner admin panel where Ajmal manages authors, books, prices and publishing.                     |
-| Flutter app        | The Android app readers install.                                                                     |
+| Flutter app        | The shared-code Android and iOS apps readers install.                                                                     |
 | Codex              | The coding assistant that works inside the shelf account on the server.                              |
 | AGENTS.md          | The short rule file in the code that Codex reads every time; the summary of this document.           |
 | cPanel account     | A separate user on the server with its own files, database, domain and settings. Shelf’s is “shelf”. |
@@ -1394,7 +2914,7 @@ Separate /api/owner-preview path, signed temporary access and isolated caches, k
 
 # Addendum — owner decisions after v2.3 (29 September–2 October 2026)
 
-These decisions are binding and will be folded into the next full version. Where they differ from the text above, this addendum wins.
+These decisions remain binding except where superseded by later dated owner amendments. The 8 October 2026 joint-launch amendment in Parts 2, 7–10 and 11 supersedes “App Store later with an iOS version” and Android-only release scope. Original rows below remain historical evidence; other unsuperseded decisions continue to apply.
 
 | ID | Decision |
 |---|---|
@@ -1409,7 +2929,7 @@ These decisions are binding and will be folded into the next full version. Where
 | D11 | Readers who bought a book keep it forever, even if the book is later withdrawn. New readers cannot buy a withdrawn book. |
 | D12 | All sales are final; Shelf gives no refunds except accidental duplicate purchases or a book that does not work (owner decides in the admin). Google Play's own 48-hour refund window cannot be disabled: if Google refunds, access is removed. Before buying, the reader ticks: "Read the free sample first. All sales are final. I agree." The admin shows refunds per reader and can block a reader from buying. |
 | D13 | Bought books can be downloaded and read offline. The app checks ownership with the server whenever it is online. An offline copy stays readable for at most 30 days without a successful check; after that the reader must go online once. A refunded or revoked book, and its downloaded copy, is removed at the next check. |
-| D15 | App interface languages: Pashto and English (Farsi later). Default Pashto, or English if the phone is set to English. Visible compact language dropdown in the Store header, a one-time choice on first launch, and the same option in Settings. English changes only the app's own words; books (reader, text, titles, author names, descriptions, contents, share cards) always stay right-to-left and unchanged. All account and purchase screens are always English and left-to-right. |
+| D15 | App interface languages and wording | **Decided 9 Oct Review 3:** پښتو، دری، English; Afghan Dari interface implemented in isolation; real-phone wording/layout acceptance pending. Existing account/purchase English policy retained. |
 | UX | Every screen must be friendly and clear for non-technical readers: obvious primary action, large touch targets, clear hierarchy, short plain text, helpful empty/error/loading states, no mixed-direction punctuation or clipped text, consistent with the Shelf look. |
 | Dev | Failing tests or build errors in Codex's own work-in-progress are normal development and are fixed without stopping. Codex stops and reports only when something fails on the live server or database, data could be lost or changed unexpectedly, a backup or rollback fails, or a fix would go beyond the approved task. |
 | Test app | Owner test builds are delivered the proven way: Codex builds an owner-preview APK with a fresh 7-day token and gives one scp download command. |

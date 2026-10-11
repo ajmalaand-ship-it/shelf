@@ -11,7 +11,7 @@ import 'package:shelf/screens/collection_detail_screen.dart';
 import 'package:shelf/screens/poem_reader_screen.dart';
 import 'package:shelf/services/api_client.dart';
 import 'package:shelf/settings/reader_settings.dart';
-import 'package:shelf/widgets/untitled_poem_marker.dart';
+import 'package:shelf/widgets/shelf_assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'test_support.dart';
@@ -34,7 +34,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Shelf'), findsWidgets);
+    expect(find.byType(ShelfLogo), findsOneWidget);
     expect(find.text('اجمل اند بشپړه شاعري'), findsOneWidget);
     expect(find.text('ټول کتابونه'), findsOneWidget);
     expect(find.byType(NavigationDestination), findsExactly(4));
@@ -105,7 +105,7 @@ void main() {
       final appBar = tester.widget<AppBar>(
         find.byKey(const Key('reader-app-bar')),
       );
-      expect(appBar.title, isNull);
+      expect(appBar.title, isA<Text>());
       expect(appBar.backgroundColor!.a, 1);
       expect(appBar.scrolledUnderElevation, 0);
 
@@ -131,7 +131,7 @@ void main() {
   );
 
   testWidgets(
-    'small Android reader defaults to 16 and exposes 336px body width',
+    'small Android reader defaults to 16 and exposes 320px body width',
     (tester) async {
       tester.view.physicalSize = const Size(360, 640);
       tester.view.devicePixelRatio = 1;
@@ -154,7 +154,7 @@ void main() {
         find.byKey(const Key('poem-body')),
       );
       expect(body.style!.fontSize, 16);
-      expect(tester.getSize(find.byKey(const Key('poem-body'))).width, 336);
+      expect(tester.getSize(find.byKey(const Key('poem-body'))).width, 320);
       expect(tester.takeException(), isNull);
     },
   );
@@ -176,6 +176,7 @@ void main() {
 
       await tester.scrollUntilVisible(find.text('ژمى'), 250);
       expect(find.text('د لومړۍ کرښې پېژندنه'), findsOneWidget);
+      expect(find.byKey(const Key('untitled-poem-indicator')), findsNothing);
       expect(find.text('بې سرليکه'), findsNothing);
       expect(find.text('ژمى'), findsOneWidget);
       expect(find.textContaining('اصلي لیکوال: پروین پژواک'), findsOneWidget);
@@ -186,7 +187,7 @@ void main() {
           .readerSettings;
       expect(
         tester
-            .widget<Text>(find.byKey(const Key('poem-list-title-301')))
+            .widget<Text>(find.byKey(const Key('poem-list-title-302')))
             .style!
             .fontFamily,
         'Vazirmatn',
@@ -194,12 +195,15 @@ void main() {
       await tester.tap(find.byKey(const Key('collection-font-chooser')));
       await tester.pumpAndSettle();
       expect(find.byType(RadioListTile<ReaderFont>), findsExactly(3));
+      await tester.ensureVisible(
+        find.byKey(const Key('font-choice-noto-nastaliq')),
+      );
       await tester.tap(find.byKey(const Key('font-choice-noto-nastaliq')));
       await tester.pumpAndSettle();
       expect(readerSettings.font, ReaderFont.literary);
       expect(
         tester
-            .widget<Text>(find.byKey(const Key('poem-list-title-301')))
+            .widget<Text>(find.byKey(const Key('poem-list-title-302')))
             .style!
             .fontFamily,
         'NotoNastaliqUrdu',
@@ -222,16 +226,18 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('شریکول'), findsOneWidget);
-    expect(find.text('لیکبڼه'), findsOneWidget);
+    expect(find.byKey(const Key('reader-share')), findsOneWidget);
+    expect(find.byKey(const Key('reader-font-chooser')), findsOneWidget);
     await tester.tap(find.byKey(const Key('reader-font-chooser')));
     await tester.pumpAndSettle();
 
     expect(find.byType(RadioListTile<ReaderFont>), findsExactly(3));
     await tester.tap(find.byKey(const Key('font-choice-scheherazade')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('تياره'));
+    await tester.ensureVisible(find.byKey(const Key('theme-dark')));
+    await tester.tap(find.byKey(const Key('theme-dark')));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('font-size-slider')));
     await tester.drag(
       find.byKey(const Key('font-size-slider')),
       const Offset(80, 0),
@@ -259,10 +265,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
-      final marker = tester.widget<CustomPaint>(
+      final marker = tester.widget<ShelfActionIcon>(
         find.byKey(const Key('untitled-poem-indicator')),
       );
-      expect(marker.painter, isA<ManuscriptPageQuillPainter>());
+      expect(marker.name, 'poetry');
       expect(
         find.descendant(
           of: find.byKey(const Key('untitled-poem-indicator')),
@@ -295,10 +301,7 @@ void main() {
       await readerSettings.setPalette(palette);
       await tester.pump();
       expect(find.byKey(const Key('untitled-poem-indicator')), findsOneWidget);
-      expect(
-        find.bySemanticsLabel('بې نومه شعر؛ اصلي سرليک نه لري'),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel('بې سرلیکه شعر'), findsOneWidget);
       expect(find.text('بې سرليکه'), findsNothing);
       expect(tester.takeException(), isNull, reason: palette.name);
     }
@@ -508,7 +511,7 @@ void main() {
       expect(find.textContaining('لنډه برخه'), findsNothing);
       expect(
         tester
-            .widget<TextButton>(find.byKey(const Key('reader-share')))
+            .widget<IconButton>(find.byKey(const Key('reader-share')))
             .onPressed,
         isNull,
       );

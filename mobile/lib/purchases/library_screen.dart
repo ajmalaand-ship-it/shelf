@@ -1,3 +1,5 @@
+import '../widgets/shelf_assets.dart';
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
@@ -36,6 +38,7 @@ class PurchasedLibraryScreen extends StatefulWidget {
 class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
   String? message;
   bool busy = false;
+  bool downloadedOnly = false;
   Future<void> _perform(Future<void> Function() action, String success) async {
     if (busy) return;
     setState(() {
@@ -58,7 +61,7 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
     }
   }
 
-  String _t(String en, String ps) => AppStrings.of(context).isEnglish ? en : ps;
+  String _t(String en, String ps) => AppStrings.of(context).phrase(en, ps);
   @override
   Widget build(BuildContext context) {
     final c = LibraryScope.of(context)!;
@@ -74,7 +77,7 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
           padding: const EdgeInsets.all(20),
           children: [
             if (c.readerId == null) ...[
-              const Icon(Icons.local_library_outlined, size: 56),
+              const ShelfActionIcon('library', size: 56),
               Text(
                 AppStrings.of(context).libraryAccountMessage,
                 textAlign: TextAlign.center,
@@ -85,7 +88,9 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                   minimumSize: const Size.fromHeight(52),
                 ),
                 onPressed: () => openAccount(context),
-                child: const Text('Sign in / Create account'),
+                child: Text(
+                  '${AppStrings.of(context).signIn} / ${AppStrings.of(context).createAccount}',
+                ),
               ),
             ] else ...[
               Row(
@@ -118,19 +123,51 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                             c.refresh,
                             _t('Library refreshed.', 'کتابتون تازه شو.'),
                           ),
-                    icon: const Icon(Icons.refresh),
+                    icon: const ShelfActionIcon('refresh'),
                   ),
                 ],
               ),
               if (busy || !c.initialized) const LinearProgressIndicator(),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: Text(AppStrings.of(context).all),
+                    labelStyle: TextStyle(
+                      fontFamily: 'Vazirmatn',
+                      color: !downloadedOnly
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                    selected: !downloadedOnly,
+                    onSelected: (_) => setState(() => downloadedOnly = false),
+                  ),
+                  ChoiceChip(
+                    label: Text(_t('Downloads', 'کښته شوي کتابونه')),
+                    labelStyle: TextStyle(
+                      fontFamily: 'Vazirmatn',
+                      color: downloadedOnly
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                    selected: downloadedOnly,
+                    onSelected: (_) => setState(() => downloadedOnly = true),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
               if (message != null && !c.refreshFailed) Text(message!),
               if (c.message != null)
                 Text(
-                  _t(
+                  AppStrings.of(context).choose(
                     c.message!,
                     c.refreshFailed
                         ? 'کتابتون تازه نه شو. انټرنېټ ته وصل شئ او بیا هڅه وکړئ. کتاب بیا مه پېرئ.'
                         : 'د کتابونو د مالکیت کتلو لپاره انټرنېټ ته وصل شئ. لغوه شوي کتابونه او کاپۍ لرې کېږي.',
+                    c.refreshFailed
+                        ? 'کتابخانه تازه نشد. به انترنت وصل شوید و دوباره کوشش کنید. دوباره کتاب را نخرید.'
+                        : 'برای بررسی مالکیت کتاب‌ها به انترنت وصل شوید. کتاب‌ها و دانلودهای لغوشده حذف می‌شوند.',
                   ),
                 ),
               if (c.books.isEmpty && c.initialized)
@@ -139,95 +176,124 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                   child: Text(
                     _t(
                       'Books you buy will appear here. Browse the Store and read a free sample first.',
-                      'ستاسو پېرودل شوي کتابونه دلته ښکاري. لومړی په پلورنځي کې وړیا نمونه ولولئ.',
+                      'ستاسو پېرودل شوي کتابونه دلته ښکاري. لومړی په پلورنځي کې وړیا بېلګه ولولئ.',
                     ),
                   ),
                 ),
-              for (final book in c.books)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Center(
-                          child: OwnedBookCover(
-                            key: ValueKey(
-                              '${c.readerId}/${book.id}/${c.downloaded.contains(book.id)}',
-                            ),
+              if (downloadedOnly &&
+                  c.books.isNotEmpty &&
+                  !c.books.any((b) => c.downloaded.contains(b.id)))
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Text(
+                    _t(
+                      'No downloaded books. Download a book from All to read offline.',
+                      'کښته شوي کتابونه نشته. له ټولو کتابونو څخه یو کتاب کښته کړئ.',
+                    ),
+                  ),
+                ),
+              for (final book in c.books.where(
+                (b) => !downloadedOnly || c.downloaded.contains(b.id),
+              ))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          BookPresentation(
                             book: book,
-                            library: c,
+                            fontFamily: widget.settings.fontFamily,
+                            cover: OwnedBookCover(
+                              key: ValueKey(
+                                '${c.readerId}/${book.id}/${c.downloaded.contains(book.id)}',
+                              ),
+                              book: book,
+                              library: c,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          book.title,
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        if (c.downloaded.contains(book.id))
-                          Row(
-                            key: const Key('library-downloaded'),
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(_t('Downloaded', 'کښته شوی')),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.check, size: 18),
-                            ],
-                          )
-                        else
-                          Text(_t('Owned', 'پېرودل شوی')),
-                        FilledButton(
-                          onPressed: busy
-                              ? null
-                              : () => openOwnedBook(
-                                  context,
-                                  c,
-                                  book,
-                                  widget.settings,
-                                ),
-                          child: Text(_t('Read book', 'کتاب ولولئ')),
-                        ),
-                        if (!c.downloaded.contains(book.id))
-                          OutlinedButton(
+                          const SizedBox(height: 12),
+                          if (c.downloaded.contains(book.id))
+                            Row(
+                              key: const Key('library-downloaded'),
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(_t('Downloaded', 'کښته شوی')),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.check, size: 18),
+                              ],
+                            )
+                          else
+                            Text(_t('Owned', 'پېرودل شوی')),
+                          FilledButton(
                             onPressed: busy
                                 ? null
-                                : () => _perform(
-                                    () async {
-                                      await c.download(book);
-                                    },
-                                    _t(
-                                      'Downloaded. Go online at least once every 30 days.',
-                                      'کښته شو. لږ تر لږه هر ۳۰ ورځې یو ځل انټرنېټ ته وصل شئ.',
-                                    ),
+                                : () => openOwnedBook(
+                                    context,
+                                    c,
+                                    book,
+                                    widget.settings,
                                   ),
-                            child: Text(
-                              _t(
-                                'Download for offline reading',
-                                'له انټرنېټ پرته لوستلو لپاره کښته کړئ',
+                            child: Text(_t('Read book', 'کتاب ولولئ')),
+                          ),
+                          if (!c.downloaded.contains(book.id))
+                            OutlinedButton.icon(
+                              icon: const ShelfActionIcon('download'),
+                              onPressed: busy
+                                  ? null
+                                  : () => _perform(
+                                      () async {
+                                        await c.download(book);
+                                      },
+                                      _t(
+                                        'Downloaded. Go online at least once every 30 days.',
+                                        'کښته شو. لږ تر لږه هر ۳۰ ورځې یو ځل انټرنېټ ته وصل شئ.',
+                                      ),
+                                    ),
+                              label: Text(
+                                _t(
+                                  'Download for offline reading',
+                                  'له انټرنېټ پرته لوستلو لپاره کښته کړئ',
+                                ),
                               ),
                             ),
-                          ),
-                        if (c.downloaded.contains(book.id))
-                          TextButton(
-                            onPressed: busy
-                                ? null
-                                : () => _perform(
-                                    () => c.removeDownload(book.id!),
-                                    _t(
-                                      'Download removed. You still own the book.',
-                                      'کاپي لرې شوه. کتاب لا هم ستاسو دی.',
+                          if (c.downloaded.contains(book.id))
+                            TextButton.icon(
+                              icon: const ShelfActionIcon('remove-download'),
+                              onPressed: busy
+                                  ? null
+                                  : () => _perform(
+                                      () => c.removeDownload(book.id!),
+                                      _t(
+                                        'Download removed. You still own the book.',
+                                        'کاپي لرې شوه. کتاب لا هم ستاسو دی.',
+                                      ),
                                     ),
-                                  ),
-                            child: Text(
-                              _t('Remove download', 'کښته شوې کاپي لرې کړئ'),
+                              label: Text(
+                                _t('Remove download', 'کښته شوې کاپي لرې کړئ'),
+                              ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _t(
+                    'Download your books to read offline. Go online at least once every 30 days.',
+                    'خپل کتابونه له انټرنېټ پرته لوستلو لپاره کښته کړئ. لږ تر لږه هر ۳۰ ورځې یو ځل انټرنېټ ته وصل شئ.',
+                  ),
+                ),
+              ),
             ],
           ],
         ),

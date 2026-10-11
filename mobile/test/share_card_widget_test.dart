@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf/models/poem.dart';
+import 'package:shelf/widgets/shelf_assets.dart';
 import 'package:shelf/share_cards/poem_card_widget.dart';
 import 'package:shelf/share_cards/share_card_models.dart';
 
@@ -39,7 +40,9 @@ void main() {
     );
 
     expect(find.text('اجمل اند'), findsOneWidget);
-    expect(find.text('Shelf'), findsNWidgets(3));
+    expect(find.byType(ShelfLogo), findsOneWidget);
+    expect(find.text('Shelf'), findsNothing);
+    expect(find.text('د تورو ازموينه'), findsNothing);
     expect(find.textContaining('ټ ډ ړ ږ ښ ڼ ې ۍ'), findsOneWidget);
     expect(
       Directionality.of(

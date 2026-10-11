@@ -119,7 +119,9 @@ void main() {
       await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
       expectSource(tester, tile, title);
-      expect(tester.getRect(tile), bounds);
+      // Shared navigation mirrors in English; source direction and available
+      // title width remain unchanged.
+      expect(tester.getRect(tile).size, bounds.size);
       await tester.tap(tile);
       await tester.pumpAndSettle();
       final heading = find.byKey(const Key('collection-detail-title'));
@@ -131,6 +133,7 @@ void main() {
         expectSource(tester, find.text(subtitle), subtitle);
         expectSource(tester, find.text(name), name);
       }
+      await switchLanguage(tester, InterfaceLanguage.en);
       await tester.scrollUntilVisible(find.text('About the book'), 200);
       await tester.tap(find.text('About the book'));
       await tester.pumpAndSettle();
@@ -216,6 +219,7 @@ void main() {
         scope: ShareCardScope.accessiblePoem,
         text: body,
         theme: ShareCardTheme.parchment,
+        includeTitle: true,
       );
       await tester.pumpWidget(
         InterfaceLanguageScope(

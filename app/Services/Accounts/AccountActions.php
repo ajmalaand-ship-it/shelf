@@ -64,6 +64,7 @@ class AccountActions
             // Money records are retained unchanged. These nullable identifiers have no
             // FK to the deleted identity; no names/emails are stored in accounting.
             $reader->delete();
+            DB::afterCommit(fn () => app(ReaderAvatar::class)->erase($reader));
         });
     }
 }

@@ -64,7 +64,7 @@ class _AuthorScreenState extends State<AuthorScreen> {
               author.name,
               textDirection: TextDirection.rtl,
               textAlign: TextAlign.right,
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             SectionTitle(AppStrings.of(context).biography),
             Text(
