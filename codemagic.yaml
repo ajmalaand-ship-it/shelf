@@ -68,6 +68,19 @@ workflows:
           test "$SHELF_API_BASE_URL" = "https://shelf.services/api/"
           : "${SHELF_IOS_BUILD_NUMBER:?Set an unused positive iOS build number in shelf_ios_testflight}"
           case "$SHELF_IOS_BUILD_NUMBER" in ''|*[!0-9]*|0*) exit 1 ;; esac
+      - name: Check photo-library purpose strings before building
+        script: |
+          set -eu
+          python3 - <<'PYTHON'
+          import plistlib
+          from pathlib import Path
+          plist = plistlib.loads(Path('ios/Runner/Info.plist').read_bytes())
+          for key in ('NSPhotoLibraryUsageDescription', 'NSPhotoLibraryAddUsageDescription'):
+              value = plist.get(key)
+              if not isinstance(value, str) or not value.strip():
+                  raise SystemExit(f'Missing or empty photo-library purpose string: {key}')
+          print('PASS: photo-library purpose strings are present and nonempty')
+          PYTHON
       - name: Resolve locked Flutter dependencies
         script: flutter pub get --enforce-lockfile
       - name: Generate native Flutter configuration

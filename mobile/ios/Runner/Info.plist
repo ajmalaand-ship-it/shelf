@@ -34,6 +34,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Shelf uses your photo library so you can choose a private account photo and save reading share cards to Photos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Save a reading share card to your photos.</string>
 	<key>UIApplicationSceneManifest</key>

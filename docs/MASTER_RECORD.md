@@ -579,6 +579,57 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple ITMS-90683 rejection and photo-purpose correction — 11 October 2026
+
+Owner reports Apple rejected **Shelf 1.0.0 build 1**, App Apple ID **6821471140**:
+**ITMS-90683**, **Runner.app/Info.plist** missing
+**NSPhotoLibraryUsageDescription**. Apple therefore received build 1; it is not
+reusable for the next upload. This supersedes earlier uncertainty about Apple
+receipt of build 1, without claiming processing/TestFlight acceptance or an
+independently inspected signed artifact.
+
+Inspected the existing avatar/share implementations and locked dependencies:
+**AppDelegate.swift** uses **PHPickerViewController**, images only, one selected
+image, re-encoded for a private account avatar; it does not request broad library
+access or use a camera. **PlatformShareCardOutput** saves generated PNG reading
+cards with **gal 2.3.3** (**hasAccess/requestAccess/putImage**, no custom album)
+and shares files through **share_plus 13.3.0/UIActivityViewController**.
+The installed gal native source contains PhotoKit add-only and read/write/legacy
+permission paths; its README documents both photo-purpose keys. This establishes
+dependency API usage, not which API caused Apple's static detection.
+
+Added **NSPhotoLibraryUsageDescription**:
+"Shelf uses your photo library so you can choose a private account photo and
+save reading share cards to Photos."
+Retained the accurate **NSPhotoLibraryAddUsageDescription**:
+"Save a reading share card to your photos."
+No camera, microphone or unrelated permissions, dependency or feature changes.
+References: [Apple photo-library purpose key](https://developer.apple.com/documentation/bundleresources/information-property-list/nsphotolibraryusagedescription)
+and [gal iOS setup](https://github.com/natsuk4ze/gal#ios-setup).
+
+Added a mandatory **ios-testflight-internal** pre-build plist parse/check before
+dependency resolution: both photo keys must be strings with nonempty trimmed
+explanations. Missing, whitespace-only and non-string values fail closed.
+Internal-only export, ditto extraction, all signing checks, explicit
+**$CM_BUILD_DIR/shelf-ios-artifacts** collection patterns and publishing preserved.
+Focused source-plist/YAML/shell/diff inspection and positive/negative check cases
+passed; completed Flutter tests were not repeated. No build/upload, dashboard
+variable/credential change, deployment or Android change.
+
+**Next upload instructions (preparation only):** in Codemagic refresh YAML for
+**ios/foundation**, select **ios-testflight-internal** at this correction commit,
+and set **SHELF_IOS_BUILD_NUMBER=2** in **shelf_ios_testflight** yourself. Keep
+version **1.0.0**, existing API/signing integration and internal-only export.
+After separate run authorization, start one manual signed run; confirm the
+pre-build photo check, exported signing verification and artifact collection
+pass, then inspect Apple processing for **6821471140 / 1.0.0 (2)**. Do not retry
+build 1. No variable was changed or run started by Codex. Actual acceptance and
+photo/avatar/share behavior on iPhone remain unverified.
+Checkout OFF, pricing-sync and second-phone-restore deferrals, Android/UI pause
+and joint Android/iOS public-launch hold preserved. Commit/push **ios/foundation**
+only. Rollback is an ordinary isolated git revert; no server/data changes.
+
+
 ## Completed Codemagic collection diagnostic — 11 October 2026
 
 **Owner-reported completed diagnostic at source commit 2d0f0dc.** Both diagnostic
