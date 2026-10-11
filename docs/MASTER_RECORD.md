@@ -579,6 +579,68 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## GitHub Actions unsigned iOS fallback preparation — 10 October 2026
+
+Owner authorized continuing the existing isolated ios/foundation checkout,
+preparing and validating only missing fallback work, account/API inspection,
+trigger resolution and records. Initial local/remote branch was 869ebde;
+no GitHub workflow existed. Added .github/workflows/ios-foundation.yml only;
+existing mobile source and codemagic.yaml are byte-unchanged. Queued Codemagic
+build left unchanged; no cloud build launched or cancelled by this task.
+
+Workflow uses macos-15, existing Flutter 3.47.2, locked pub resolution,
+config-only no-codesign generation, pod install and exactly the existing unsigned
+release compilation command/version. Approved production API build setting
+https://shelf.services/api/ and SHELF_TEST_MODE=false /
+SHELF_INTERNAL_TEST_PURCHASES=false retained. No secrets/signing/publishing,
+IPA export or store upload. Read-only contents token, no persisted checkout
+credentials; unsigned app archive and Podfile.lock/source-SHA evidence retained
+seven days. Actual Xcode/CocoaPods/toolchain compatibility remains UNVERIFIED.
+No passed source/shared tests repeated. Static YAML/trigger/permissions/API/command
+comparison, each run step's bash syntax, unchanged mobile/Codemagic and diff
+whitespace checks passed. No production/Android/database changes.
+
+Trigger resolution: workflow_dispatch requires a default-branch workflow.
+Instead use pull_request types=[opened], base main, guarded to a draft PR from
+this same repository's ios/foundation only. Explicitly check out PR head.sha,
+never the synthetic merged tree. No push, synchronize, schedule or dispatch
+trigger. Creation of the draft PR is the deliberate build action, not a merge;
+subsequent pushes do not launch it. Default branch unchanged; remote main
+72cabf0 is an ancestor of initial iOS HEAD. No outdated-main merge performed.
+Official requirements and conflict caveat:
+https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow
+
+Authentication/access: gh binary absent, no GH_TOKEN/GITHUB_TOKEN environment,
+no ~/.config/gh/hosts.yml, no configured git credential helper. Existing SSH
+repository access passed with ssh -F /dev/null; ordinary SSH system configuration
+failed on /etc/ssh/ssh_config.d/50-redhat.conf permissions, so existing documented
+isolated SSH invocation was used without modifying system files/keys.
+Unauthenticated repository metadata GET passed HTTP 200: default_branch=main,
+private=false, visibility=public, permissions absent. This current API visibility
+contradicts older private-repository records; no visibility/settings change made.
+GET /repos/ajmalaand-ship-it/shelf/actions/permissions returned HTTP 401;
+GET /users/ajmalaand-ship-it/settings/billing/usage returned HTTP 401.
+No accessible authenticated GitHub API/account connector is available here.
+Actions enabled/allowed-action policies, account plan, remaining included usage,
+spending controls and billing eligibility cannot be verified; never assumed.
+No paid activation or account/app recreation. Credentials never printed.
+
+Next exact execution action after preparation is pushed: open
+https://github.com/ajmalaand-ship-it/shelf/compare/main...ios/foundation?expand=1
+and choose Create draft pull request (base main, compare ios/foundation), titled
+"Run unsigned Shelf iOS foundation". This requests the build under existing
+GitHub permissions/usage; if provider policy blocks it, report that exact block,
+without enabling paid billing. Do not merge. No PR/build created in preparation.
+For another run, use the existing run's Re-run jobs after an actual run exists;
+branch updates alone deliberately do not rerun it. Merge conflicts block PR runs;
+current ancestor check establishes no source divergence from remote main.
+
+Rollback: normal branch revert of preparation, no live rollback. Checkout OFF,
+pricing sync DEFERRED/disabled, second-phone restore owner-deferred/not passed,
+financial expiry unimplemented and Android/iOS joint public-launch hold retained.
+Native compilation, signing, provider/device acceptance remain unfinished.
+
 ## Codemagic environment-group correction — 10 October 2026
 
 Owner confirms Codemagic is connected to **ajmalaand-ship-it/shelf** and has

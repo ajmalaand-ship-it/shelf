@@ -32,3 +32,26 @@ Official references inspected 10 October:
 - [Secure storage Keychain setup](https://pub.dev/packages/flutter_secure_storage)
 - [Gallery save plugin setup](https://github.com/natsuk4ze/gal)
 - [Native share requirements](https://pub.dev/packages/share_plus)
+
+## Prepared GitHub Actions fallback (10 October)
+
+`.github/workflows/ios-foundation.yml` uses a deliberate **draft PR creation**
+from this repository's `ios/foundation` to `main` as the build request. It runs
+only on `opened`, checks out the exact head SHA and never builds a merged main
+tree. Pushes do not launch it. No default-branch change/merge is needed.
+
+Next execution action: [compare main with ios/foundation](https://github.com/ajmalaand-ship-it/shelf/compare/main...ios/foundation?expand=1)
+→ **Create draft pull request**, title **Run unsigned Shelf iOS foundation**.
+Do not merge. No build has been launched here. Static checks passed, native
+compilation remains unverified. Existing Codemagic queue/configuration unchanged.
+
+GitHub SSH repository access passed. Authenticated API access is unavailable:
+Actions permissions and account billing usage GETs returned **401**. Enabled
+Actions policy and remaining usage/spending controls are unknown. Repository
+metadata currently reports **public**, contrary to prior private-repository notes.
+No account/settings/visibility changes made. See Master Record for exact evidence.
+
+[GitHub trigger requirements](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
+explain the PR-head checkout and conflict caveat;
+[manual dispatch requirements](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)
+require default-branch presence for workflow_dispatch.
