@@ -60,6 +60,10 @@ if [[ "${SHELF_TOOL_TEST_SCOPE:-}" == 'asc-key-upload' ]]; then
     if "$run_mobile"; then echo 'Tool scope cannot run mobile tests.' >&2; exit 2; fi
     python3 -B scripts/ios/test_asc_key_upload.py
     exit 0
+elif [[ "${SHELF_TOOL_TEST_SCOPE:-}" == 'apple-rollout' ]]; then
+    if "$run_mobile"; then echo 'Tool scope cannot run mobile tests.' >&2; exit 2; fi
+    python3 -B scripts/ios/test_apple_rollout.py
+    exit 0
 elif [[ -n "${SHELF_TOOL_TEST_SCOPE:-}" ]]; then
     echo 'Unknown tool test scope.' >&2; exit 2
 fi

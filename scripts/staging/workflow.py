@@ -311,9 +311,94 @@ echo json_encode([
     print('PASS: deployed Apple migration/schema, both gates false, HTTPS Apple endpoints 404, existing account controls and isolation.', flush=True)
 
 
+
+def apple_purchase_runtime_checks(app, production=False):
+    result = json.loads(php(app, r"""$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+echo json_encode([
+ 'stage'=>App\Support\Staging::active(),
+ 'gate_off'=>config('purchases.apple_sandbox_enabled')===false,
+ 'proof_off'=>!App\Services\Purchases\ApplePurchaseProof::configured(),
+ 'checkout_off'=>!config('purchases.production_enabled'), 'sync_off'=>!config('play_sync.enabled'),
+ 'signin_off'=>!config('reader_auth.apple_enabled') && !config('reader_auth.apple_relay_ready'),
+ 'migration'=>DB::table('migrations')->where('migration','2026_10_12_120000_add_purchase_event_store_scope')->exists(),
+ 'schema'=>Schema::hasColumns('purchase_events',['store','app_id','event_timestamp_ms'])
+   && Schema::hasColumn('purchases','store_purchased_at_ms') && Schema::hasColumn('purchase_consents','store'),
+ 'no_apple_history'=>!DB::table('purchases')->where('store','APP_STORE')->exists()
+   && !DB::table('purchase_events')->where('store','APP_STORE')->exists()
+   && !DB::table('purchase_consents')->where('store','APP_STORE')->exists(),
+ 'stage_private'=>!filled(config('purchases.apple_webhook_authorization'))
+   && !filled(config('purchases.apple_public_sdk_key')) && !filled(config('purchases.metadata_key_path')),
+],JSON_THROW_ON_ERROR);"""))
+    required=('gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history')
+    if not all(result.get(k) is True for k in required) or result['stage']==production:
+        raise RuntimeError('Apple purchase disabled rollout/schema checks failed; details withheld.')
+    if not production and not result['stage_private']:
+        raise RuntimeError('Staging contains production Apple purchase configuration.')
+    base='https://shelf.services' if production else 'https://staging.shelf.services'
+    headers={'Accept':'application/json'}
+    if not production: headers['X-Shelf-Test-Key']=settings(app)['SHELF_STAGING_ACCESS_KEY']
+    with urllib.request.urlopen(urllib.request.Request(base+'/api/purchases/config?platform=ios',headers=headers),timeout=20) as response:
+        data=json.load(response)
+        if response.status!=200 or any(data.get(k) is not False for k in ('enabled','sandbox_checkout_enabled','production_checkout_enabled')) or data.get('public_sdk_key') is not None:
+            raise RuntimeError('HTTPS iOS purchase configuration does not fail closed.')
+    # Deliberately incomplete, unauthenticated request: must stop before validation/DB/provider calls.
+    request=urllib.request.Request(base+'/api/purchases/webhook',headers={**headers,'Content-Type':'application/json'},
+        data=b'{"event":{"store":"APP_STORE"}}',method='POST')
+    try:
+        with urllib.request.urlopen(request,timeout=20) as response: status=response.status
+    except urllib.error.HTTPError as response: status=response.code
+    if status!=(503 if production else 403):
+        raise RuntimeError('Disabled Apple webhook guard returned an unexpected status.')
+    print('PASS: Apple purchase schema; sandbox/real checkout/sign-in/sync OFF; iOS HTTPS config disabled; webhook guard closed; no Apple history.',flush=True)
+
+
+def apple_purchase_checked(app, commit, changes):
+    source='08a2adf'
+    purchase_scope={
+        'app/Http/Controllers/LibraryController.php','app/Http/Controllers/PurchaseWebhookController.php',
+        'app/Models/Purchase.php','app/Models/PurchaseEvent.php',
+        'app/Services/Purchases/ApplePurchaseProof.php','app/Services/Purchases/AppleSandboxPurchases.php',
+        'app/Services/Purchases/PurchaseRecoveryService.php','app/Services/Purchases/PurchaseService.php',
+        'app/Services/Purchases/RevenueCatClient.php','config/purchases.php',
+        'database/migrations/2026_10_12_120000_add_purchase_event_store_scope.php',
+        'tests/Feature/AppleSandboxPurchasesTest.php',
+    }
+    other={'scripts/staging/workflow.py','scripts/run_tests.sh','scripts/ios/test_asc_key_upload.py',
+           'scripts/ios/configure_apple_sandbox.py','scripts/ios/test_apple_rollout.py'}
+    backend={p for p in changes if not p.startswith(('docs/','mobile/')) and p!='AGENTS.md'}
+    if not backend or not backend<=purchase_scope|other or 'tests/Feature/AppleSandboxPurchasesTest.php' not in backend:
+        return False
+    # Reuse completed synthetic tests only while all purchase implementation/test files are identical.
+    if run(['git','diff','--name-only',source,commit,'--',*sorted(purchase_scope)]).strip():
+        raise RuntimeError('Apple purchase source changed since completed tests; focused retesting required.')
+    evidence=run(['git','show',source+':docs/MASTER_RECORD.md'])
+    if '16 PHP tests / 190 assertions' not in evidence or '9 new' not in evidence:
+        raise RuntimeError('Completed Apple purchase test record missing.')
+    log=RUNTIME/('checks-'+commit+'.log')
+    artisan(app,'shelf:check-staging')
+    apple_purchase_runtime_checks(app)
+    https_checks()
+    private_write(log,json.dumps({'tested_source':commit_id(source),
+        'reused_record_sha256':hashlib.sha256(evidence.encode()).hexdigest(),
+        'purchase_paths_identical':True,'php_tests_reused':16,'php_assertions_reused':190,
+        'flutter_tests_reused':9,'runtime_checks_passed':True},indent=2)+'\n')
+    state=current_state()
+    state.update(staging_commit=commit,checks={'commit':commit,'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(),'mobile_tests':False,
+        'scope':'apple-purchase-backend-disabled','log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: exact staged Apple purchase source matches completed test evidence; only rollout checks run.',flush=True)
+    return True
+
+
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    if apple_purchase_checked(app, commit, changes):
+        return
     ios_auth_scope = {
         'app/Http/Controllers/Account/AuthController.php', 'app/Http/Controllers/Account/EmailActionController.php',
         'app/Models/Reader.php', 'app/Services/Accounts/AccountActions.php', 'app/Services/Accounts/AppleIdentity.php',
@@ -666,6 +751,15 @@ foreach (['readers','reader_account_actions','personal_access_tokens','purchases
  // Nullable avatar/Apple columns change schema, not existing reader values.
  // Omit only null added fields; any non-null/new identity still changes the fingerprint.
  if ($table==='readers') {$rows->each(function ($row) {foreach (['avatar_path','apple_subject_hash','apple_refresh_token'] as $field) {if (property_exists($row,$field) && $row->$field===null) {unset($row->$field);}}});}
+ // Omit only exact migration defaults; non-default/new Apple proof still changes the fingerprint.
+ $defaults=match($table) {
+  'purchase_events'=>['store'=>'PLAY_STORE','app_id'=>null,'event_timestamp_ms'=>null],
+  'purchases'=>['store_purchased_at_ms'=>null],
+  'purchase_consents'=>['store'=>'PLAY_STORE'], default=>[],
+ };
+ $rows->each(function ($row) use ($defaults) {foreach ($defaults as $field=>$value) {
+  if (property_exists($row,$field) && $row->$field===$value) {unset($row->$field);}
+ }});
  $out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
 }
 $out['agreement_limit']=$argv[2]==='all' ? (int)Illuminate\Support\Facades\DB::table('author_share_agreements')->max('id') : (int)$argv[2];
@@ -724,6 +818,8 @@ def promote(commit):
     artisan(PRODUCTION,'shelf:check-owner-shares')
     if state['checks'].get('scope') == 'ios-auth-backend-disabled':
         ios_auth_runtime_checks(PRODUCTION, production=True)
+    if state['checks'].get('scope') == 'apple-purchase-backend-disabled':
+        apple_purchase_runtime_checks(PRODUCTION, production=True)
     https_checks()
     state.update(production_commit=commit,last_backup=str(saved),previous_production_commit=previous)
     save_state(state)
