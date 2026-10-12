@@ -187,16 +187,15 @@ are still unverified. CocoaPods lockfile and native privacy manifests from the
 successful run have not been supplied; do not invent a lockfile or approval.
 The signed workflow retains Podfile.lock and manifest paths for subsequent review.
 
-Apple login is not implemented despite the entitlement. Google provider has only
-serverClientId; no iOS OAuth client/URL callback configuration is present, while
-shared account UI can show Google when the server enables it. Do not tap Google
-in this limited test. Email/password is shared source, unverified on iPhone;
-Keychain, sign-out, account isolation/deletion and offline behavior require testing.
-RevenueCat provider accepts goog_ keys and backend verification is Play-specific;
-App Store products/Apple configuration/receipts/restore/refunds are unfinished.
-No App Store transaction is part of this workflow. Server-decided existing Library
-access is not evidence of Apple purchasing. Native photos/save/share/audio,
-RTL/fonts/accessibility and actual iPhone reading remain unaccepted.
+**Updated 11 October:** Apple processed **1.0.0 (2)**, assigned to **Shelf Owner**,
+and the owner installed/tested it: “seems good.” Limited phone acceptance only;
+individual sign-in, deletion, offline, reading and provider checks are not inferred.
+Apple/Google iOS sign-in source has since been implemented; it is not in build 2.
+Missing provider setup and backend promotion still block end-to-end activation.
+Use the consolidated [iOS sign-in setup/validation guide](IOS_SIGN_IN.md).
+App Store purchases remain unfinished and outside this sign-in batch. Small
+Android/iOS improvements are deferred until before launch; checkout stays OFF
+and joint public release remains held.
 
 The stored profiles/internal export are documented by
 [Codemagic's Flutter guide](https://docs.codemagic.io/yaml-quick-start/building-a-flutter-app/).

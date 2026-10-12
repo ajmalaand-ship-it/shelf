@@ -163,6 +163,17 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-11: Owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf
+  Owner, installed/tested: “seems good.” Limited phone acceptance only. Apple/Google
+  iOS sign-in source 32ca4a0 implemented in isolation with focused account/purchase checks;
+  no automatic email-based linking, Apple relay-safe identity and deletion revocation.
+  Provider configuration, backend promotion and signed-iPhone acceptance remain
+  unfinished. No build/upload/deploy/settings/purchase or App Store purchase work.
+  Small Android/iOS improvements deferred until before launch; checkout OFF,
+  existing deferrals and joint public-launch hold preserved. See Master Record
+  and docs/IOS_SIGN_IN.md for the single setup guide and exact source evidence.
+
+
 - 2026-10-11: Owner selects GitHub as primary signed iOS/TestFlight route while
   Codemagic signed build remains queued; cancellation NOT confirmed. GitHub
   unsigned run 38102154478 / 93ec312 passed on macos-15, reused without rerun.

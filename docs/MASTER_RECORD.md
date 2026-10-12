@@ -579,6 +579,97 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## iOS functionality phase — Apple/Google sign-in source, 11 October 2026
+
+**Current owner-reported TestFlight status:** **1.0.0 build 2**, App Apple ID
+**6821471140**, completed Apple processing, was assigned to **Shelf Owner** internal
+group, and was installed/tested by the owner: **“seems good.”** Record this as
+**LIMITED PHONE ACCEPTANCE**, not completion of all reading, account/provider,
+offline, deletion, purchase or other acceptance checks. It supersedes earlier
+uncertainty about build-2 processing/install availability. The new authentication
+source below is not in installed build 2. Small Android/iOS improvements are
+**DEFERRED UNTIL BEFORE LAUNCH**; only scoped authentication controls change now.
+
+Owner authorized the iOS functionality phase starting with Apple/Google sign-in.
+Implemented in the existing isolated **ios/foundation** checkout, reusing shared
+email/password, Google SDK/server audience, secure session/offline identity,
+Apple bundle/team/entitlement/signing and server-decided per-reader book access.
+**Apple:** native AuthenticationServices channel and iOS-only sign-in control;
+email scope only, five-minute single-use server challenge with hashed nonce;
+server RSA signature/issuer/exact audience/expiry/subject/nonce checks, code
+exchange with returned-subject verification, encrypted refresh-token storage;
+repeat login by subject even without email. Relay email is retained exactly as
+provider-verified apart from existing email casing; no guessing underlying email.
+Apple-only password reset uses the existing mailbox-confirmation path. Deletion
+revokes Apple authorization before existing journal/reader erasure; provider
+failure retains reader/tokens, financial history stays unchanged.
+
+**Google:** existing Flutter/Android flow retained; iOS native-client detection,
+client initialization and build-time GIDClientID/reversed callback configuration
+added. Missing iOS configuration hides Google instead of opening a broken flow.
+Known Google subjects identify existing readers even if provider email changes.
+**Neither provider automatically merges/links an existing reader merely because
+emails match**; collisions return clear existing-method guidance. Existing Google
+links are preserved; a new external-domain Google account still requires explicit
+mailbox confirmation. Explicit cross-method linking is not implemented. Picker
+cancellation preserves the reader session. No login token confers book ownership,
+owner/admin rights or another reader's offline identity.
+
+**Reversible source migration only:** nullable unique **apple_subject_hash**,
+**apple_refresh_token** encrypted cast/private field, and **apple_login_challenges**.
+Not applied to staging or production; no existing data/schema/settings changed.
+Apple endpoint availability requires an explicit enable gate, signing config and
+relay-ready gate, default OFF. Tokens/codes/nonces are excluded from flashed input,
+provider errors sanitized, no credentials or provider response bodies logged.
+Codemagic adds only the optional Google configuration step; all existing signing
+verification, internal-only export, ditto extraction, photo-purpose guard and
+verified explicit **$CM_BUILD_DIR** artifact/publishing wiring are preserved.
+No dependency versions, credentials, build numbers or Android configuration changed.
+
+**Focused verification PASSED:** **43 PHP tests / 386 assertions**, **32 Flutter
+checks + 1 staging-identity check**, and Google client/callback plist fixture.
+Includes cryptographic invalid-token/nonce checks, expired/replayed challenges,
+code-subject mismatch/provider failure, relay repeat login, email collisions,
+owner separation, encrypted-token secrecy, deletion failure/success and reversible
+schema; existing account and purchase-isolation checks included. Static analysis
+has no errors/warnings (existing style infos). Plist/YAML/shell/diff checks passed.
+Tests ran through **scripts/run_tests.sh --mobile**, scoped **ios-auth**, synthetic
+provider responses/keys, in-memory DB and disposable **/home/shelf/tmp** storage.
+Fixture initialization/HTTP-fake selection and stale Library-icon/Dari selectors
+were fixed during work. Replaced the isolated checkout's production-vendor symlink
+with a private dependency copy/regenerated autoload so verification uses this
+source; production dependencies untouched. No native Swift/Xcode compilation,
+actual provider success or signed-iPhone sign-in acceptance claimed.
+
+**Remaining blockers:** existing server Google web-client configuration is present;
+Google iOS-client value is absent locally, actual dashboard existence unverified.
+Apple backend client/team/key/path/enable/relay settings are absent locally; an
+appropriate Apple Sign in with Apple key and relay delivery are unverified. Reuse
+appropriate existing dashboard objects rather than recreate them. Source work is
+complete for this batch, but end-to-end activation requires these values, relay
+setup/evidence, and separately approved staged/backed-up backend promotion.
+One consolidated owner guide with exact websites/fields/known values and
+Create/Save/Register buttons: **[IOS_SIGN_IN.md](IOS_SIGN_IN.md)**. Unknown generated
+IDs/key material must come from the owner dashboard, never guessed or exposed.
+Apple ongoing account/revocation notifications, explicit linking, final provider
+privacy/disclosure review and broader device acceptance remain release work.
+
+**Next phone step:** after setup and separately approved backend promotion,
+authorize one signed internal build at a confirmed unused number **greater than 2**,
+then owner-only Apple Hide My Email/repeat/cancel/logout, Google choose/repeat/cancel,
+email/password, identity/Library/offline isolation and disposable-account relay
+reset/deletion/revocation checks. Do not use a real purchased account for deletion.
+No cloud build/upload, dashboard/production setting change, backend deploy/migration,
+real-provider request, purchase or App Store purchase implementation in this batch.
+Commit/push **ios/foundation** only. Checkout **OFF**, pricing-sync and
+second-phone-restore deferrals, deferred Android/iOS improvements and the joint
+Android/iOS public-launch hold preserved. Before activation rollback is a normal
+git revert; after real Apple identities exist, schema removal/identity changes
+need a separately approved preservation plan. **Exact implementation commit:**
+**32ca4a04929ad065af21d85241c5ca3a749b5007**. The subsequent documentation
+commit records this evidence and setup guide without changing implementation.
+
+
 ## Apple ITMS-90683 rejection and photo-purpose correction — 11 October 2026
 
 Owner reports Apple rejected **Shelf 1.0.0 build 1**, App Apple ID **6821471140**:
@@ -2379,28 +2470,25 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Unsigned builds successful:** owner-confirmed Codemagic 6acad0a1546ce6236ced5f95 / 869ebde (execution 4m25s, compilation 2m03s); GitHub run 38102154478 / 93ec312 independently confirmed success on macos-15. GitHub primary manual signed internal route prepared; GitHub credential transfer/default-branch registration, Codemagic cancellation/build-number proof, actual signing/upload/processing and device/provider checks remain unverified. | Batch 1, next practical task. Inspection first; later concrete tasks authorize setup/build/implementation. |
+| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Provider/relay configuration, backend promotion, native compilation and signed-iPhone authentication validation remain unfinished. Prior unsigned successes are preserved without rerun. | Functionality phase, current scoped batch. Use IOS_SIGN_IN.md setup first; later separately approved activation/build/phone checks. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** one separately authorized manual signed
-**ios-testflight-internal** Codemagic run on **ios/foundation**, using an explicitly
-confirmed unused positive build number. Completed text diagnostic at **2d0f0dc**
-collected only the explicit-path probe despite both scripts/files being confirmed;
-this supports the existing correction, without proving every detail of the old
-failure. The signed workflow's staged IPA/evidence already use the same explicit
-**$CM_BUILD_DIR** format and publishing receives the collected IPA by configuration.
-No further diagnostic or repeated unsigned compilation is needed. Actual signing,
-IPA collection/upload/Apple processing and device/provider acceptance remain
-unverified; do not assume saved number **1** reusable. GitHub secrets are
-owner-confirmed saved and workflow-only main registration complete (**3188020**).
-Financial-retention dry-run remains in the backend list. This task records evidence
-only, with commit/push to **ios/foundation**; no tests, build/upload, credential or
-build-number changes, deployment, purchase, store submission or public release.
-Checkout OFF, pricing-sync/second-phone-restore deferrals and joint launch hold
-remain binding.
+**Next practical task:** complete the missing Apple/Google provider setup using
+[IOS_SIGN_IN.md](IOS_SIGN_IN.md), then separately approve staged/backed-up backend
+promotion and one signed internal phone-validation build at an unused number
+**greater than 2**. Build **1.0.0 (2)** is owner-confirmed processed/assigned/installed
+with limited “seems good” phone acceptance; it predates this authentication source.
+No repeated diagnostic or unsigned compilation is needed. Apple/Google sign-in
+source is prepared with focused evidence; dashboard/relay setup, activation,
+native compile and signed-iPhone authentication acceptance remain unfinished.
+Do not start App Store purchases in this batch. Small Android/iOS improvements
+are deferred until before launch. Existing financial-retention work remains in
+the backend list. Checkout OFF, pricing-sync/second-phone-restore deferrals and
+joint public-launch hold remain binding. No build/upload/settings/deploy/purchase
+was performed; scoped source/record commit/push to **ios/foundation** only.
 
 **Summary reconciliation still needed:** AGENTS.md §§1–3 retain Android-only/current
 Step 4 scope, §4.11 has Android-only phone acceptance, §6 has small-step instructions,
