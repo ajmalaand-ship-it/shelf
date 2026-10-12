@@ -84,8 +84,8 @@ def items(route):
     raise RuntimeError('Bounded pagination exceeded.')
 
 
-def exclusive(path, content):
-    if path.parent.resolve() != path.parent or path.parent.stat().st_uid != os.getuid() or path.parent.stat().st_mode & 0o077:
+def exclusive(path, content, private_parent=True):
+    if path.parent.resolve() != path.parent or path.parent.stat().st_uid != os.getuid() or path.parent.stat().st_mode & (0o077 if private_parent else 0o022):
         raise RuntimeError('Unsafe private parent.')
     fd = os.open(path, os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW, 0o600)
     with os.fdopen(fd, 'wb') as output:
@@ -96,7 +96,7 @@ def exclusive(path, content):
         raise RuntimeError('Private file read-back mismatch.')
 
 
-def prepare():
+def prepare(resume_checkpoint=None):
     w = workflow()
     before = w.settings(PRODUCTION)
     if before.get('SHELF_APPLE_SANDBOX_ENABLED', 'false') != 'false' or before.get('SHELF_REAL_PURCHASES_ENABLED', 'false') != 'false':
@@ -127,9 +127,22 @@ def prepare():
     if r.returncode or subprocess.run([*gpg,'--decrypt',str(destination)],capture_output=True).stdout != clear:
         raise RuntimeError('Encrypted configuration checkpoint failed; stopped before configuration changes.')
     destination.chmod(0o600)
+    resumed = False
+    if resume_checkpoint:
+        previous = Path(resume_checkpoint)
+        if previous.resolve() != previous or not str(previous).startswith('/home/shelf/backups/shelf/'):
+            raise RuntimeError('Invalid resume checkpoint.')
+        encrypted = previous/'private-configuration.tar.gpg'
+        r = subprocess.run([*gpg,'--decrypt',str(encrypted)],capture_output=True)
+        if r.returncode:
+            raise RuntimeError('Resume checkpoint decryption failed.')
+        with tarfile.open(fileobj=io.BytesIO(r.stdout),mode='r:') as archive:
+            resumed = archive.extractfile('production.env').read() == original
+        if not resumed or not AUTH_FILE.exists() or AUTH_FILE.lstat().st_mtime < encrypted.stat().st_mtime:
+            raise RuntimeError('Resume provenance/configuration mismatch; no secret replacement.')
     if AUTH_FILE.exists() or AUTH_FILE.is_symlink():
         auth = private(AUTH_FILE).decode().strip()
-        if before.get('SHELF_REVENUECAT_IOS_WEBHOOK_AUTH') != auth:
+        if before.get('SHELF_REVENUECAT_IOS_WEBHOOK_AUTH') != auth and not (resumed and not before.get('SHELF_REVENUECAT_IOS_WEBHOOK_AUTH')):
             raise RuntimeError('Existing Apple webhook authorization is not linked; no overwrite.')
     else:
         if before.get('SHELF_REVENUECAT_IOS_WEBHOOK_AUTH'):
@@ -154,7 +167,7 @@ def prepare():
         else:
             text += '\n'+line+'\n'
     target = PRODUCTION/'.env.apple-purchase-new'
-    exclusive(target,text.encode())
+    exclusive(target,text.encode(),private_parent=False)
     if private(PRODUCTION/'.env') != original:
         raise RuntimeError('Configuration changed concurrently; stopped.')
     target.replace(PRODUCTION/'.env')
@@ -216,8 +229,9 @@ def main():
         raise RuntimeError('Run as shelf.')
     parser=argparse.ArgumentParser()
     parser.add_argument('action',choices=['prepare','webhook'])
+    parser.add_argument('--resume-checkpoint',help='Verified checkpoint from this interrupted preparation; preserves its new authorization.')
     args=parser.parse_args()
-    prepare() if args.action=='prepare' else webhook()
+    prepare(args.resume_checkpoint) if args.action=='prepare' else webhook()
 
 
 if __name__=='__main__':

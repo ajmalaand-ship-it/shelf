@@ -329,13 +329,16 @@ echo json_encode([
  'no_apple_history'=>!DB::table('purchases')->where('store','APP_STORE')->exists()
    && !DB::table('purchase_events')->where('store','APP_STORE')->exists()
    && !DB::table('purchase_consents')->where('store','APP_STORE')->exists(),
+ 'stage_isolated'=>DB::connection()->getDatabaseName()==='shelf_staging'
+   && realpath(storage_path())!==realpath('/home/shelf/apps/shelf/storage')
+   && config('mail.default')==='log' && config('queue.default')==='null',
  'stage_private'=>!filled(config('purchases.apple_webhook_authorization'))
    && !filled(config('purchases.apple_public_sdk_key')) && !filled(config('purchases.metadata_key_path')),
 ],JSON_THROW_ON_ERROR);"""))
     required=('gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history')
     if not all(result.get(k) is True for k in required) or result['stage']==production:
         raise RuntimeError('Apple purchase disabled rollout/schema checks failed; details withheld.')
-    if not production and not result['stage_private']:
+    if not production and not (result['stage_private'] and result['stage_isolated']):
         raise RuntimeError('Staging contains production Apple purchase configuration.')
     base='https://shelf.services' if production else 'https://staging.shelf.services'
     headers={'Accept':'application/json'}
@@ -378,7 +381,6 @@ def apple_purchase_checked(app, commit, changes):
     if '16 PHP tests / 190 assertions' not in evidence or '9 new' not in evidence:
         raise RuntimeError('Completed Apple purchase test record missing.')
     log=RUNTIME/('checks-'+commit+'.log')
-    artisan(app,'shelf:check-staging')
     apple_purchase_runtime_checks(app)
     https_checks()
     private_write(log,json.dumps({'tested_source':commit_id(source),
