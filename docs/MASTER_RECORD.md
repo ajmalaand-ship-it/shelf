@@ -579,6 +579,55 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple private key upload verified; backend rollout pending — 11 October 2026
+
+Owner reports PowerShell upload verified original name/shelf:shelf/600. Codex
+independently found exactly one regular, non-symlink file:
+`/home/shelf/secrets/apple/AuthKey_2VQ43945YB.p8`, **shelf:shelf / 600**; parent
+**shelf:shelf / 700**. OpenSSL consistency and PHP parsing/in-memory signing
+verification passed: unencrypted **PKCS#8 EC P-256 / prime256v1**, suitable for
+local ES256 signing. No key/public components, signatures, JWTs or contents
+printed/copied/committed; no key or permissions altered. Filename does NOT prove
+Apple Key ID/capability/active status/primary App ID. Owner must confirm those
+from Apple Developer → team YSLWJQDH8B → Keys → ShelfLogin; preserve the separate
+App Store Connect upload key. Prior transfer-pending notes are historical.
+
+Google iOS client/Codemagic variable and Apple domain/green SPF setup remain
+owner-confirmed. Actual relay delivery/provider acceptance remains unverified.
+Exact ordered rollout/configuration/rollback and owner-only delivery procedure
+are prepared in **[IOS_SIGN_IN.md](IOS_SIGN_IN.md)**. Reuse existing implementation
+**32ca4a04929ad065af21d85241c5ca3a749b5007** and completed 43 PHP/386 assertions,
+32 Flutter + 1 identity checks; no tests repeated for documentation. Staging and
+production remain **5f5c8f6087d5d908b96558863129b8a09b44fcf8**. Later release must
+have focused staged backend evidence at the identical production SHA, fresh
+verified backups, reversible Apple migration and historical-reader/money checks.
+Current rollout-helper fallback would repeat broad Flutter checks; a reviewed
+focused iOS-auth gate is still needed. Production unrelated local AGENTS/Master
+Record changes must be preserved/reconciled before helper promotion; cPanel
+handler stays unchanged. Neither obstacle was changed in this task.
+
+Remaining configuration: dashboard-confirmed Key ID/capability association;
+future client services.shelf.app, team YSLWJQDH8B and actual private-key path;
+both APPLE_SIGN_IN_ENABLED and APPLE_SIGN_IN_RELAY_READY stay false until their
+separate evidence/approval gates. Existing web Google audience/mail/APP_KEY
+preserved; no new Google backend credential. Protect key/config with encrypted
+backup separately from SQL/media-only promotion backup; offsite inclusion source
+exists but this newly uploaded key's recovery is not yet evidenced.
+
+Practical relay check: later send one harmless Shelf Laravel mail to the owner's
+actual active Shelf @privaterelay.appleid.com address, verify owner's inbox
+receipt plus private envelope/SPF/DKIM evidence; no account/token/data edits.
+If no Shelf relay address exists yet, the enabled-gate requirement creates a
+bootstrap blocker: prepare a separately approved owner-only native authorization
+rehearsal to obtain it without public activation/reader creation. Do not mark
+relay-ready true prematurely or substitute an iCloud alias. Phone reset/deletion
+and Apple revocation remain later disposable-account acceptance checks.
+
+Documentation-only commit/push ios/foundation. No .env/settings change, gate
+activation, migration, deployment, build, Apple upload, provider call, mail send
+or purchase. Checkout OFF, pricing-sync and second-phone-restore deferrals,
+Android/UI pause, deferred improvements and joint public-launch hold preserved.
+
 ## iOS owner setup and private Apple upload destination — 11 October 2026
 
 Owner confirms the Google iOS client was created and its actual
@@ -2505,7 +2554,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Key transfer, actual relay delivery, backend promotion, native compilation and signed-iPhone authentication validation remain unfinished. Prior unsigned successes are preserved without rerun. | Functionality phase, current scoped batch. Use IOS_SIGN_IN.md setup first; later separately approved activation/build/phone checks. |
+| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard Key ID/capability confirmation, actual relay delivery, backend promotion, native compilation and signed-iPhone authentication validation remain unfinished. Prior unsigned successes are preserved without rerun. | Functionality phase, current scoped batch. Use IOS_SIGN_IN.md setup first; later separately approved activation/build/phone checks. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |

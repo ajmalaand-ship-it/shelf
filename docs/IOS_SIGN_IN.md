@@ -52,6 +52,147 @@ the earlier proposed `sign-in-with-apple.p8`, will be used in any later approved
 server configuration. Do not rename or upload the App Store Connect key instead.
 No `.env` change, activation, deployment, build or Apple upload is authorized here.
 
+## Uploaded key verification and backend rollout plan — 11 October 2026
+
+Owner reports upload success. Independently verified one regular file at
+`/home/shelf/secrets/apple/AuthKey_2VQ43945YB.p8`: **shelf:shelf / 600**, parent
+Apple directory **shelf:shelf / 700**, no symlink. OpenSSL private-key consistency
+check passed. It is unencrypted PKCS#8 PEM, **EC P-256 / prime256v1**, compatible
+with the implementation's ES256 client-secret signing. PHP OpenSSL parsing and
+an in-memory SHA-256 sign/verify also passed. No private/public key components,
+signature, JWT or contents were printed, copied, modified or committed.
+These checks establish local format/usability, not Apple's capability, key status,
+Key ID or association. Filename text is not authority for `APPLE_SIGN_IN_KEY_ID`.
+The older transfer-pending/proposed-path entries above are historical.
+
+### Required configuration before a separately approved rollout
+
+On https://developer.apple.com/account select team **YSLWJQDH8B** →
+**Certificates, Identifiers & Profiles → Keys → ShelfLogin**. Owner must confirm
+its actual **Key ID**, **Sign in with Apple** capability and configured primary
+App ID **services.shelf.app**, and that it is active. This is a read-only check;
+no Save/recreation/revocation is needed if correct. Supply the Key ID as metadata,
+never the `.p8` contents. Keep the existing App Store Connect upload API key and
+Codemagic integration unchanged. Successful real code exchange will provide
+provider acceptance evidence later; local parsing does not provide it.
+
+Future private production `.env` mapping (NOT written now):
+
+| Setting | Value |
+| --- | --- |
+| APPLE_SIGN_IN_CLIENT_ID | services.shelf.app |
+| APPLE_SIGN_IN_TEAM_ID | YSLWJQDH8B |
+| APPLE_SIGN_IN_KEY_ID | actual dashboard-confirmed Key ID; not inferred from filename |
+| APPLE_SIGN_IN_PRIVATE_KEY_PATH | /home/shelf/secrets/apple/AuthKey_2VQ43945YB.p8 |
+| APPLE_SIGN_IN_RELAY_READY | false until the delivery check below passes |
+| APPLE_SIGN_IN_ENABLED | false through rollout; true only in separately approved activation |
+
+Reuse existing `READER_ACCOUNTS_ENABLED`, `GOOGLE_WEB_CLIENT_ID`, Android client,
+mail transport, APP_KEY and reader/purchase configuration; do not print or rotate
+them. Keep the Apple private key on the server, never in Flutter/Codemagic.
+Owner already saved `SHELF_GOOGLE_IOS_CLIENT_ID` in `shelf_ios_testflight`; no new
+backend Google iOS audience or client secret is required. Later confirm sender
+configuration using redacted metadata only; preserve staging's forced log mail.
+Owner keeps encrypted independent key backup. Existing encrypted offsite source
+includes `/home/shelf/secrets/apple` (production secret traversal excludes only
+backup/staging), but recovery of THIS new key is not yet evidenced. Local daily
+SQL/media backup does not itself back up this key or `.env`; explicitly protect
+private configuration/key with an approved encrypted backup and record its path.
+Do not initiate a backup upload as part of this documentation task.
+
+### Ordered backend rollout, after separate authorization
+
+1. Pin the release to an exact full commit containing implementation
+   **32ca4a04929ad065af21d85241c5ca3a749b5007** and any reviewed rollout-helper work.
+   Current subsequent changes are documentation/AGENTS only. Record the final
+   release SHA, then use that identical SHA on staging and production. Do not
+   silently merge iOS into main or alter the selected build source.
+2. Read `python3 -B scripts/staging/workflow.py status`; currently both deployed
+   commits are **5f5c8f6087d5d908b96558863129b8a09b44fcf8**, with passed
+   review-3-backend-dependencies checks. Preserve the prior release/rollback SHA.
+   Production currently has unrelated local **AGENTS.md**, **MASTER_RECORD.md**
+   and **public/.htaccess** changes. The promote helper refuses more than its
+   verified cPanel-handler exception: preserve/reconcile the documentation changes
+   through a reviewed plan before promotion; never reset/stash away owner work.
+3. Before staging deploy, prepare/review a narrowly scoped iOS-auth branch in
+   `workflow.py checked()`, using `scripts/run_tests.sh` without `--mobile` and
+   `SHELF_PHP_TEST_FILTER=IosSignInTest|ReaderAccountsTest|BookPurchasesTest`.
+   The current helper has no iOS-auth gate and otherwise falls through to broad
+   tests/Flutter because this release differs in mobile source. Do not claim a
+   focused gate exists or reuse old staging evidence for a new commit. This is
+   independent later source work, not performed by this documentation update.
+   Reuse the completed **43 PHP / 386 assertions**, **32 Flutter + 1 staging
+   identity**, Google plist fixture and analyzer evidence from IOS_SIGN_IN.md;
+   repeat only the focused backend/environment checks necessary for promotion.
+4. As shelf, from the trusted release checkout, run
+   `python3 -B scripts/staging/workflow.py deploy RELEASE_SHA` with the reviewed
+   focused gate. It backs up staging first, deploys, migrates and records checks.
+   Apply only existing reversible migration
+   `2026_10_11_120000_add_apple_reader_identity.php`: nullable unique Apple subject
+   hash, encrypted refresh-token field and expiring challenge table. No reader,
+   purchase, ownership, financial or catalogue rewriting. Keep Apple disabled and
+   relay-ready false; no live Apple credential/provider exchange on staging.
+   Verify staging isolation/logged mail, disabled Apple API configuration,
+   email/password, existing Google policy/collision behavior, deletion and purchase
+   isolation with synthetic fixtures. Use independent staging DB/config/APP_KEY.
+5. After passing staging at RELEASE_SHA and explicit production approval, protect
+   private configuration/key, then run
+   `python3 -B scripts/staging/workflow.py promote RELEASE_SHA`. Its fresh verified
+   SQL/media backup precedes maintenance/migration, checks historical reader/money
+   fingerprints and restores service with `up` in its failure path. Record exact
+   backup path, migration batch and both deployed SHAs. Configure only approved
+   Apple fields privately in this later task; both gates remain false. Clear stale
+   Laravel configuration through `optimize:clear` and verify effective values as
+   booleans/redacted metadata, not a configuration dump. Verify existing account,
+   purchase/webhook, catalogue/locked text and health behavior, disabled Apple,
+   and private-file denial. No build, upload or purchases follow automatically.
+6. Complete the owner-only relay check below before enabling either gate. Only
+   after separate activation approval set relay-ready and enabled true, refresh
+   configuration, and verify availability. Signed iPhone Apple/Google acceptance
+   requires a later authorized internal build at an unused build number >2.
+   Keep internal-only export, ditto, signing/photo-purpose checks and explicit
+   artifact paths. Build 2 remains limited acceptance of older source.
+
+Stop at the first live failure, restore service if maintenance was entered and
+report. Before any Apple identities exist, roll back code to the recorded prior
+release through the approved workflow and leave gates false; inspect the migration
+batch before any rollback. Once identities exist, disable the gate but preserve
+subject/encrypted-token records; never drop the migration or restore an older DB
+across subsequent reader/purchase activity without a preservation plan.
+
+### Practical owner-only relay delivery check (later authorization required)
+
+Obtain privately an **owner-controlled, active Sign in with Apple address for
+Shelf**, ending `@privaterelay.appleid.com`, with forwarding enabled. Never guess
+it from the owner's real email or use somebody else's address. Apple's green SPF
+registration is preliminary evidence only. An iCloud+ `@icloud.com` Hide My Email
+alias is not equivalent evidence for the Sign in with Apple relay.
+
+With separately authorized production mail access, send exactly one harmless
+plain-text message to that address through Shelf's existing Laravel mailer and
+actual `noreply@shelf.services` sender, subject **Shelf relay delivery check**,
+body **This is the owner-only Shelf email delivery check. No action is required.**
+Use no account token, reset link, purchase or database edit for this probe. Keep
+address, transport secrets and raw headers private. Owner confirms inbox receipt;
+inspect sanitized sending/result metadata and private headers for actual envelope
+sender and SPF/DKIM authentication/alignment. Record timestamp, received/not
+received and authentication outcome, not the address/headers. SMTP acceptance
+alone does not pass delivery; failure leaves both gates false. Staging never sends.
+
+If the owner does not yet have a Shelf relay address, record this as a bootstrap
+blocker: both current Apple challenge and login require `AppleIdentity::enabled()`.
+Do not set relay-ready true merely to get an address. A later separately approved
+owner-only native authorization rehearsal must obtain Shelf's real relay address
+without activating the public backend or creating a reader; its token/code must
+stay private and not be logged or retained. This requires a reviewed rehearsal
+path, which is not implemented/authorized now. After mail delivery passes, later
+signed-phone acceptance must still exercise genuine reset/deletion email and
+revocation on a disposable owner Apple reader, with no purchases or real-account
+deletion. This separates mail readiness from full account acceptance.
+
+Checkout OFF, pricing-sync/second-phone-restore deferrals, Android/UI pause,
+deferred improvements and joint public-launch hold remain unchanged.
+
 ## One consolidated owner setup guide
 
 Independent source work and focused checks are complete. These are the remaining
