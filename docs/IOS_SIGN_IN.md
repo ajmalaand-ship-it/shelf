@@ -52,6 +52,46 @@ the earlier proposed `sign-in-with-apple.p8`, will be used in any later approved
 server configuration. Do not rename or upload the App Store Connect key instead.
 No `.env` change, activation, deployment, build or Apple upload is authorized here.
 
+## Authorized disabled backend rollout preparation — 12 October 2026 UTC
+
+Owner authorizes staging verification and backed-up production promotion with
+Apple disabled. Dashboard evidence confirms **ShelfLogin**, **2VQ43945YB**,
+**Sign in with Apple**, association **YSLWJQDH8B.services.shelf.app**. This supersedes
+the earlier dashboard-confirmation blocker; real Apple code exchange still remains
+unverified. The verified original key path remains unchanged. No new Apple key,
+Google client, upload integration or signing identity is required.
+
+Prepared focused `ios-auth-backend-disabled` staging gate in workflow.py: only
+IosSignInTest, ReaderAccountsTest and BookPurchasesTest through scripts/run_tests.sh,
+actual staged schema/config checks, isolated staging lifecycle and HTTPS probes.
+Existing Flutter/Android source evidence is reused; no Flutter run/build. The gate
+requires no staging Apple credentials, both gates false, logged mail/null queue,
+checkout/sync OFF. Promotion history comparison excludes only NULL newly added
+Apple columns; non-null identities/tokens still affect the historical fingerprint.
+Production HTTPS Apple login/challenge must return 404 and config advertises false.
+
+Production local AGENTS/Master Record insertions were reconciled in isolation
+without losing their content. Before removing their tracked working diffs for the
+established fast-forward workflow, preserve exact originals, full diff/status and
+cPanel handler in a verified production-backup checkpoint. Retain handler bytes
+unchanged throughout. Separately encrypt and verify .env/private Apple key backup
+locally; no offsite upload. Staging and production use the identical committed
+candidate. Only after promotion write the six owner-approved Apple settings
+privately, keeping both enabled/relay-ready **false**, preserve every other .env
+value including Google Web client/APP_KEY, clear cached configuration and verify
+actual deployed controls. Record completion and exact backup/migration evidence
+in a documentation-only follow-up; that follow-up does not replace the verified
+application commit or trigger another deployment/test run.
+
+No actual relay email, Apple authorization, real provider login or signed iPhone
+acceptance follows from disabled rollout. See the owner-only relay procedure below:
+if no Shelf relay address already exists, a separately approved native authorization
+rehearsal must obtain one while the public backend stays disabled. The current
+normal flow cannot do this because its challenge requires both gates true. Do not
+mark relay ready to work around that guard; the rehearsal is not implemented now.
+No email/cloud build/store upload/Android rebuild/purchase in this task. All holds,
+Android/UI pause and deferrals remain binding.
+
 ## Uploaded key verification and backend rollout plan — 11 October 2026
 
 Owner reports upload success. Independently verified one regular file at

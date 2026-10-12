@@ -260,9 +260,92 @@ def https_checks():
     print('PASS: real HTTPS/private gate, noindex, API marker, banner, catalogue/cover, locked paid text, accounts, locked Library, denied webhook/private files; production healthy.',flush=True)
 
 
+def ios_auth_runtime_checks(app, production=False):
+    # Read-only checks against the actual deployed schema/config; never expose IDs/keys.
+    result = json.loads(php(app, r'''$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+$stage=App\Support\Staging::active();
+echo json_encode([
+ 'stage'=>$stage, 'accounts'=>(bool)config('reader_auth.enabled'),
+ 'apple_disabled'=>!config('reader_auth.apple_enabled') && !config('reader_auth.apple_relay_ready') && !App\Services\Accounts\AppleIdentity::enabled(),
+ 'checkout_off'=>!config('purchases.enabled'), 'sync_off'=>!config('play_sync.enabled'),
+ 'subject_column'=>Schema::hasColumn('readers','apple_subject_hash'),
+ 'token_column'=>Schema::hasColumn('readers','apple_refresh_token'),
+ 'challenges'=>Schema::hasTable('apple_login_challenges'),
+ 'migration'=>DB::table('migrations')->where('migration','2026_10_11_120000_add_apple_reader_identity')->exists(),
+ 'no_apple_credentials'=>!filled(config('reader_auth.apple_private_key_path')) && !filled(config('reader_auth.apple_key_id')) && !filled(config('reader_auth.apple_team_id')),
+ 'logged_mail'=>config('mail.default')==='log', 'null_queue'=>config('queue.default')==='null',
+ 'google_present'=>filled(config('reader_auth.google_web_client_id')),
+],JSON_THROW_ON_ERROR);'''))
+    required = ('accounts', 'apple_disabled', 'checkout_off', 'sync_off',
+                'subject_column', 'token_column', 'challenges', 'migration')
+    if not all(result.get(key) is True for key in required) or result['stage'] == production:
+        raise RuntimeError('Deployed iOS auth schema/disabled controls failed; details withheld.')
+    if production:
+        if not result['google_present']:
+            raise RuntimeError('Existing production Google web configuration missing.')
+    elif not all(result[key] for key in ('no_apple_credentials', 'logged_mail', 'null_queue')):
+        raise RuntimeError('Staging Apple credential/mail/queue isolation failed.')
+    base = 'https://shelf.services' if production else 'https://staging.shelf.services'
+    headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+    if not production:
+        headers['X-Shelf-Test-Key'] = settings(app)['SHELF_STAGING_ACCESS_KEY']
+    for path, method in (('/api/auth/config', 'GET'), ('/api/auth/apple-challenge', 'POST'), ('/api/auth/apple', 'POST')):
+        request = urllib.request.Request(base + path, headers=headers, method=method,
+                                         data=b'{}' if method == 'POST' else None)
+        try:
+            with urllib.request.urlopen(request, timeout=20) as response:
+                status, body = response.status, response.read()
+        except urllib.error.HTTPError as response:
+            status, body = response.code, response.read()
+        if method == 'GET':
+            data = json.loads(body)
+            if status != 200 or data.get('apple_enabled') is not False or data.get('enabled') is not True:
+                raise RuntimeError('Apple API advertisement was not disabled.')
+            if production and data.get('google_enabled') is not True:
+                raise RuntimeError('Existing production Google API advertisement changed.')
+        elif status != 404:
+            raise RuntimeError('Disabled Apple endpoint did not fail closed.')
+    print('PASS: deployed Apple migration/schema, both gates false, HTTPS Apple endpoints 404, existing account controls and isolation.', flush=True)
+
+
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    ios_auth_scope = {
+        'app/Http/Controllers/Account/AuthController.php', 'app/Http/Controllers/Account/EmailActionController.php',
+        'app/Models/Reader.php', 'app/Services/Accounts/AccountActions.php', 'app/Services/Accounts/AppleIdentity.php',
+        'bootstrap/app.php', 'config/reader_auth.php', 'routes/api.php',
+        'database/migrations/2026_10_11_120000_add_apple_reader_identity.php',
+        'tests/Feature/IosSignInTest.php', 'tests/Feature/ReaderAccountsTest.php',
+        'scripts/run_tests.sh', 'scripts/staging/workflow.py',
+        'scripts/check_ios_foundation.py', 'scripts/ios/configure_google.py',
+        'scripts/ios/github_testflight.py', 'scripts/ios/test_configure_google.py',
+        '.github/workflows/ios-foundation.yml', '.github/workflows/ios-testflight.yml', 'codemagic.yaml',
+    }
+    ios_changes = {path for path in changes if not path.startswith(('docs/', 'mobile/')) and path != 'AGENTS.md'}
+    if ios_changes and ios_changes <= ios_auth_scope and 'tests/Feature/IosSignInTest.php' in ios_changes:
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'IosSignInTest|ReaderAccountsTest|BookPurchasesTest'
+        test_env.pop('SHELF_MOBILE_TEST_SCOPE', None)
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+                stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Focused staged iOS auth tests failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        ios_auth_runtime_checks(app)
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+            'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+            'scope':'ios-auth-backend-disabled', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: focused staged iOS auth/account/purchase checks; existing Flutter evidence reused; no production Apple credentials or real mail.', flush=True)
+        return
     avatar_scope = {'app/Http/Controllers/Account/AvatarController.php', 'app/Models/Reader.php',
         'app/Services/Accounts/AccountActions.php', 'app/Services/Accounts/ReaderAvatar.php',
         'bootstrap/app.php', 'config/filesystems.php', 'routes/api.php',
@@ -580,9 +663,9 @@ foreach (['readers','reader_account_actions','personal_access_tokens','purchases
  $q=Illuminate\Support\Facades\DB::table($table)->orderBy('id');
  if ($table==='author_share_agreements' && $argv[2]!=='all') {$q->where('id','<=',(int)$argv[2]);}
  $rows=Illuminate\Support\Facades\Schema::hasTable($table) ? $q->get() : collect();
- // Adding a nullable avatar column changes schema, not existing reader values.
- // Omit only null avatar_path; any non-null/new value still changes the fingerprint.
- if ($table==='readers') {$rows->each(function ($row) {if (property_exists($row,'avatar_path') && $row->avatar_path===null) {unset($row->avatar_path);}});}
+ // Nullable avatar/Apple columns change schema, not existing reader values.
+ // Omit only null added fields; any non-null/new identity still changes the fingerprint.
+ if ($table==='readers') {$rows->each(function ($row) {foreach (['avatar_path','apple_subject_hash','apple_refresh_token'] as $field) {if (property_exists($row,$field) && $row->$field===null) {unset($row->$field);}}});}
  $out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
 }
 $out['agreement_limit']=$argv[2]==='all' ? (int)Illuminate\Support\Facades\DB::table('author_share_agreements')->max('id') : (int)$argv[2];
@@ -639,6 +722,8 @@ def promote(commit):
     finally:
         artisan(PRODUCTION,'up')
     artisan(PRODUCTION,'shelf:check-owner-shares')
+    if state['checks'].get('scope') == 'ios-auth-backend-disabled':
+        ios_auth_runtime_checks(PRODUCTION, production=True)
     https_checks()
     state.update(production_commit=commit,last_backup=str(saved),previous_production_commit=previous)
     save_state(state)

@@ -579,6 +579,24 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Disabled iOS authentication backend rollout authorized — 12 October 2026 UTC
+
+Owner authorizes focused staging verification and backed-up identical-commit
+production promotion with Apple sign-in disabled. Dashboard evidence confirms
+ShelfLogin / Key ID 2VQ43945YB / Sign in with Apple /
+YSLWJQDH8B.services.shelf.app. Uploaded P-256 key remains verified and private.
+Focused staging gate prepared in isolation; nullable-column history comparison
+preserves all existing reader/money values. Production local AGENTS/Master Record
+changes reconciled into candidate; exact-byte backup checkpoint precedes targeted
+document cleanup for promotion, cPanel handler preserved. No staging credential
+copy or live email. Completion/migration/backup evidence will be recorded only
+after actual passing rollout. Only six approved Apple settings may be saved,
+both flags false; Google Web/APP_KEY and all other settings unchanged. Source and
+Flutter evidence reused; no build/store upload/Android rebuild/purchases.
+Checkout OFF, pricing-sync and second-phone-restore deferrals, deferred UI,
+Android/UI pause and joint public-launch hold unchanged. See IOS_SIGN_IN.md.
+
+
 ## Apple private key upload verified; backend rollout pending — 11 October 2026
 
 Owner reports PowerShell upload verified original name/shelf:shelf/600. Codex
