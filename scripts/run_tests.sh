@@ -63,6 +63,10 @@ fi
 php -d display_errors=1 -d sys_temp_dir="$run_dir" -d upload_tmp_dir="$run_dir" \
     -d session.save_path="$run_dir" vendor/bin/phpunit "${php_args[@]}"
 
+if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "ios-auth" ]]; then
+    python3 -B scripts/ios/test_configure_google.py
+fi
+
 if "$run_mobile"; then
     # Flutter generates build and .dart_tool files in the project directory.
     # Test a disposable copy so those files are also contained and cleaned up.
@@ -74,7 +78,10 @@ if "$run_mobile"; then
     cd -- "$run_dir/mobile"
     echo "Running Flutter tests (--mobile requested)"
     mobile_args=()
-    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-final-render" ]]; then
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "ios-auth" ]]; then
+        mobile_args=(test/ios_auth_test.dart test/accounts_test.dart test/book_purchases_test.dart)
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib/accounts test/ios_auth_test.dart
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-final-render" ]]; then
         mobile_args=(test/review_3_final_test.dart test/reader_widget_test.dart test/paginated_reader_test.dart)
     elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-final" ]]; then
         mobile_args=(test/review_3_final_test.dart test/review_3_correction_test.dart test/review_3_test.dart

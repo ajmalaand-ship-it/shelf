@@ -11,10 +11,12 @@ class AccountController extends ChangeNotifier {
     required this.store,
     required this.google,
     this.identityStore,
+    this.apple = const PlatformAppleAccountProvider(),
   });
   final AccountService service;
   final AccountTokenStore store;
   final GoogleAccountProvider google;
+  final AppleAccountProvider apple;
   final AccountIdentityStore? identityStore;
   AccountConfiguration configuration = const AccountConfiguration();
   ReaderAccount? user;
@@ -176,8 +178,25 @@ class AccountController extends ChangeNotifier {
       throw const AccountFailure(404);
     // Remove a previous Google picker session so account switching is explicit.
     await google.signOut();
-    final idToken = await google.idToken(configuration.webClientId!);
-    await _authenticate('google', {'id_token': idToken});
+    try {
+      final idToken = await google.idToken(configuration.webClientId!);
+      await _authenticate('google', {'id_token': idToken});
+    } on AccountCancelled {
+      return;
+    }
+  }
+
+  Future<void> appleSignIn() async {
+    if (!configuration.appleEnabled) throw const AccountFailure(404);
+    final challenge = await service.request('apple-challenge');
+    final credential = await apple.credential(challenge['nonce'] as String);
+    if (credential == null)
+      return; // Cancelling the picker changes no reader session.
+    await _authenticate('apple', {
+      'challenge': challenge['challenge'],
+      'id_token': credential['id_token'],
+      'authorization_code': credential['authorization_code'],
+    });
   }
 
   Future<void> register(

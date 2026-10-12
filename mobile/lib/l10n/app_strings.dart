@@ -655,7 +655,7 @@ class BookstoreStrings {
     403 => ownerAccountTesting,
     409 =>
       isEnglish
-          ? 'This Google identity cannot be linked. Use your existing sign-in method.'
+          ? 'Use your existing sign-in method. Accounts are not linked just because their email addresses match.'
           : 'دا ګوګل حساب نه شي تړل کېدای. په پخوانۍ لاره ننوځئ.',
     422 =>
       isEnglish

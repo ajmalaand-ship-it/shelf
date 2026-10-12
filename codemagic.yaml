@@ -81,6 +81,8 @@ workflows:
                   raise SystemExit(f'Missing or empty photo-library purpose string: {key}')
           print('PASS: photo-library purpose strings are present and nonempty')
           PYTHON
+      - name: Configure optional Google iOS client and callback
+        script: python3 ../scripts/ios/configure_google.py
       - name: Resolve locked Flutter dependencies
         script: flutter pub get --enforce-lockfile
       - name: Generate native Flutter configuration

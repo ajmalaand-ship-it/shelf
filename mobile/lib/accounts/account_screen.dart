@@ -77,6 +77,7 @@ class _AccountScreenState extends State<AccountScreen>
         setState(
           () => _message =
               failure ??
+              error.validationMessage ??
               const BookstoreStrings(true).accountError(error.status),
         );
     } catch (_) {
@@ -238,7 +239,9 @@ class _AccountScreenState extends State<AccountScreen>
                   TextButton(
                     onPressed: blocked
                         ? null
-                        : () => user.method == 'google'
+                        : () =>
+                              (user.method == 'google' ||
+                                  user.method == 'apple')
                               ? _perform(
                                   () => c.forgotPassword(user.email),
                                   success: s.emailSent,
@@ -350,6 +353,16 @@ class _AccountScreenState extends State<AccountScreen>
                         : s.signIn,
                   ),
                 ),
+                if (c.configuration.appleEnabled && _form == _AccountForm.login)
+                  OutlinedButton.icon(
+                    key: const Key('apple-sign-in'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                    ),
+                    icon: const Icon(Icons.apple),
+                    label: const Text('Sign in with Apple'),
+                    onPressed: blocked ? null : () => _perform(c.appleSignIn),
+                  ),
                 if (c.configuration.googleEnabled &&
                     _form == _AccountForm.login)
                   OutlinedButton.icon(

@@ -2,9 +2,13 @@ import Flutter
 import UIKit
 import PhotosUI
 import ImageIO
+import AuthenticationServices
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate, PHPickerViewControllerDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate, PHPickerViewControllerDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+  private var appleResult: FlutterResult?
+  private var appleController: ASAuthorizationController?
+  private var appleAnchor: UIWindow?
   private var avatarResult: FlutterResult?
   private var channels: [FlutterMethodChannel] = []
 
@@ -32,7 +36,66 @@ import ImageIO
       }
       UIApplication.shared.open(url, options: [:]) { opened in result(opened) }
     }
-    channels = [avatar, external]
+    let identity = FlutterMethodChannel(name: "services.shelf.app/identity", binaryMessenger: messenger)
+    identity.setMethodCallHandler { [weak self] call, result in
+      if call.method == "googleClientId" {
+        let value = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String
+        result(value)
+      } else if call.method == "apple" {
+        guard let nonce = call.arguments as? String, nonce.count == 64 else {
+          result(FlutterError(code: "invalid_nonce", message: "Please try sign-in again.", details: nil)); return
+        }
+        self?.signInWithApple(nonce: nonce, result: result)
+      } else { result(FlutterMethodNotImplemented) }
+    }
+    channels = [avatar, external, identity]
+  }
+
+  private func signInWithApple(nonce: String, result: @escaping FlutterResult) {
+    guard appleResult == nil else {
+      result(FlutterError(code: "busy", message: "Sign-in is already open.", details: nil)); return
+    }
+    guard let anchor = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene })
+      .first(where: { $0.activationState == .foregroundActive })?.windows.first(where: { $0.isKeyWindow }) else {
+      result(FlutterError(code: "unavailable", message: "Cannot open sign-in right now.", details: nil)); return
+    }
+    let request = ASAuthorizationAppleIDProvider().createRequest()
+    request.requestedScopes = [.email]
+    request.nonce = nonce
+    let controller = ASAuthorizationController(authorizationRequests: [request])
+    controller.delegate = self
+    controller.presentationContextProvider = self
+    appleResult = result
+    appleAnchor = anchor
+    appleController = controller
+    controller.performRequests()
+  }
+
+  func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+    return appleAnchor!
+  }
+
+  func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+    guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+      let tokenData = credential.identityToken, let token = String(data: tokenData, encoding: .utf8),
+      let codeData = credential.authorizationCode, let code = String(data: codeData, encoding: .utf8) else {
+      finishApple(FlutterError(code: "invalid_identity", message: "Apple sign-in could not be verified.", details: nil)); return
+    }
+    // Email and identity are accepted only from server-verified token claims.
+    finishApple(["id_token": token, "authorization_code": code])
+  }
+
+  func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    if (error as? ASAuthorizationError)?.code == .canceled { finishApple(nil); return }
+    finishApple(FlutterError(code: "unavailable", message: "Apple sign-in is unavailable. Please try again.", details: nil))
+  }
+
+  private func finishApple(_ value: Any?) {
+    let result = appleResult
+    appleResult = nil
+    appleController = nil
+    appleAnchor = nil
+    result?(value)
   }
 
   private func presenter() -> UIViewController? {

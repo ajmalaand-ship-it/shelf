@@ -11,11 +11,11 @@ class Reader extends Authenticatable
 
     protected $fillable = ['email', 'name'];
 
-    protected $hidden = ['password', 'google_subject_hash', 'avatar_path'];
+    protected $hidden = ['password', 'google_subject_hash', 'apple_subject_hash', 'apple_refresh_token', 'avatar_path'];
 
     protected function casts(): array
     {
-        return ['password' => 'hashed', 'email_verified_at' => 'datetime', 'buying_blocked' => 'boolean'];
+        return ['apple_refresh_token' => 'encrypted', 'password' => 'hashed', 'email_verified_at' => 'datetime', 'buying_blocked' => 'boolean'];
     }
 
     public function getIsOwnerAttribute(): bool

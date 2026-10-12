@@ -61,7 +61,7 @@ Route::prefix('owner-preview')
 Route::prefix('auth')->middleware([PrivateAccountResponse::class])->group(function (): void {
     Route::get('config', [AuthController::class, 'config'])->middleware('throttle:60,1');
     Route::middleware([AccountsEnabled::class, 'throttle:reader-auth'])->group(function (): void {
-        foreach (['register', 'login', 'google', 'forgot' => 'forgot-password'] as $method => $path) {
+        foreach (['register', 'login', 'google', 'apple', 'appleChallenge' => 'apple-challenge', 'forgot' => 'forgot-password'] as $method => $path) {
             $method = is_int($method) ? $path : $method;
             Route::post($path, [AuthController::class, $method]);
         }
