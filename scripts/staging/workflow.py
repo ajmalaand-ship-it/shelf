@@ -270,7 +270,7 @@ $stage=App\Support\Staging::active();
 echo json_encode([
  'stage'=>$stage, 'accounts'=>(bool)config('reader_auth.enabled'),
  'apple_disabled'=>!config('reader_auth.apple_enabled') && !config('reader_auth.apple_relay_ready') && !App\Services\Accounts\AppleIdentity::enabled(),
- 'checkout_off'=>!config('purchases.enabled'), 'sync_off'=>!config('play_sync.enabled'),
+ 'checkout_off'=>!config('purchases.production_enabled'), 'sync_off'=>!config('play_sync.enabled'),
  'subject_column'=>Schema::hasColumn('readers','apple_subject_hash'),
  'token_column'=>Schema::hasColumn('readers','apple_refresh_token'),
  'challenges'=>Schema::hasTable('apple_login_challenges'),

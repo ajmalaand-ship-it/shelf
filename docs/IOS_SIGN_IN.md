@@ -52,6 +52,20 @@ the earlier proposed `sign-in-with-apple.p8`, will be used in any later approved
 server configuration. Do not rename or upload the App Store Connect key instead.
 No `.env` change, activation, deployment, build or Apple upload is authorized here.
 
+## Rollout gate correction during verification — 12 October 2026 UTC
+
+First staged candidate 15d873c passed 43 PHP/386 assertions and staging isolation.
+Its production fast-forward/migration/history checks passed, migration batch 27,
+maintenance lifted. A new post-check then falsely treated the existing sandbox
+purchase enable setting as real checkout. Read-only diagnosis confirms production
+healthy: Apple/relay false, Google configured, sandbox preserved, **real purchase
+acceptance false**, sync false. Release-state completion was not written by the
+failed check. This is a gate implementation error, not an actual purchase/control
+failure. Corrected isolated gate reads `purchases.production_enabled` to verify
+real checkout OFF without disabling the existing sandbox integration. Corrected
+commit must pass staging then fresh backed-up promotion; no bypass of evidence.
+No Apple .env settings were written before this diagnosis/correction.
+
 ## Authorized disabled backend rollout preparation — 12 October 2026 UTC
 
 Owner authorizes staging verification and backed-up production promotion with
