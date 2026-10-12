@@ -58,7 +58,7 @@ transaction was performed. Real checkout stays OFF.**
   a recovery claim can run. Support-assisted Apple claimant/transaction proof,
   off-server recovery claims and any Family Sharing support are future work.
 
-## Owner setup — do these in order, under a later setup authorization
+## Original setup checklist — historical; current status below supersedes completed steps
 
 No dashboard access or completion is assumed. Reuse the existing Shelf project
 `projbbce26da`; preserve Play app `appf83cd58c5c`, its keys, products, webhook and
@@ -128,8 +128,10 @@ binary is needed.
    app configuration provides its own **App Store Server Notifications URL**.
    Copy that actual URL; App Store Connect → Shelf → **App Information → App Store
    Server Notifications → Sandbox Server URL → Set Up**: URL = that copied value,
-   version **2**, click **Save**. Production notification setup is not activated
-   by this sandbox guide. Keep RevenueCat's **Track new purchases from server-to-
+   click **Save**. The owner’s actual form offered no version selector; do not
+   search for one again. Both Production and Sandbox URLs are now owner-confirmed
+   saved; their versions and delivery remain unverified (see current status below).
+   Keep RevenueCat's **Track new purchases from server-to-
    server notifications** off; numeric Shelf IDs must first be established by the
    SDK. Add a separate RevenueCat webhook in **Integrations → Webhooks → + New**:
    name **Shelf iOS sandbox**, URL **https://shelf.services/api/purchases/webhook**,
@@ -147,6 +149,103 @@ binary is needed.
    [Purchase REST schema](https://www.revenuecat.com/docs/api-v2/purchase),
    [app schema](https://www.revenuecat.com/docs/api-v2/app),
    [product schema](https://www.revenuecat.com/docs/api-v2/product).
+
+## Current provider evidence and single access request — 12 October 2026
+
+Completed purchase implementation **08a2adf** and its tests are reused. The original
+checklist is retained as history, not a request to repeat completed setup.
+Paid Apps Agreement, banking, W-9 Active; DSA In Review; ShelfPurchases added with
+RevenueCat Valid credentials; Apple book-3 product and reported availability/
+pricing/localization completed; both notification URLs saved without a version
+selector: **owner/dashboard evidence**. Exact Apple saved values are uninspected.
+
+Independent Shelf RevenueCat V2 GETs verified:
+
+| Reference | Verified value |
+| --- | --- |
+| Apple app | app8ef018b95b / Shelf (App Store), services.shelf.app |
+| Apple product | prod0d084e901f / shelf_book_3, non_consumable |
+| Existing entitlement | entlb3d491e78e / shelf_book_3, Apple and original Play attachment only |
+| Purchase credential | subscription_key_configured=true; fresh Apple validation not performed |
+| Optional ASC import credential | app_store_connect_api_key_configured=false; separate from purchase key |
+| Apple SDK key | One appl_ key exists; value withheld, not configured on server |
+| Shelf webhook | Play webhook only; separate Apple sandbox webhook still absent |
+| Verifier permissions | Apps/products reads and purchases search passed; no permission change needed |
+
+The documented existing private V2 file is protected and reused without printing
+its value. Server iOS app/product/SDK/webhook fields and Apple sandbox gate are
+absent; no configuration changed. API inspection covers Shelf only.
+
+### Notification versions when the form has no selector
+
+Apple Help still describes a choice, while its [App.Attributes schema](https://developer.apple.com/documentation/appstoreconnectapi/app/attributes-data.dictionary)
+exposes independent `subscriptionStatusUrlVersion` and
+`subscriptionStatusUrlVersionForSandbox` alongside the production/sandbox URLs.
+The [enum](https://developer.apple.com/documentation/appstoreconnectapi/subscriptionstatusurlversion)
+allows V1/V2. Neither source establishes an automatic V2 default for the owner's
+form. Do not repeat the selector search or change the saved URLs. Authenticated
+GET `/v1/apps/6821471140` can inspect both saved versions and compare the saved
+URLs privately; null/missing version fields do not establish V2.
+[RevenueCat supports both and recommends V2](https://www.revenuecat.com/docs/platform-resources/server-notifications/apple-server-notifications).
+Its public app API does not expose notification URLs/versions, purchase tracking
+or restore behavior. Saved configuration is separate from delivery. Apple's
+[TEST notification](https://developer.apple.com/documentation/appstoreservernotifications/enabling-app-store-server-notifications)
+is V2 regardless of the configured version; later TEST success alone cannot prove
+the version of ordinary events or end-to-end Shelf purchase/refund delivery.
+No TEST request or transaction was sent.
+
+### One consolidated private access request
+
+Reuse the **existing Shelf App Store Connect upload team key** already used by
+GitHub/Codemagic, from the owner's secure retained original. Supply its `.p8`,
+actual Key ID and Issuer ID privately. **Existing App Manager access** is sufficient
+for the requested app/IAP metadata, price schedule and availability GETs. No new
+key, Admin/Finance/report access, capability or permission change is requested.
+App Manager is not a read-only provider role; this inspection will make only GETs.
+Team keys apply account-wide, but requests are limited to Shelf app 6821471140 and
+its existing shelf_book_3. Do not use ShelfLogin or ShelfPurchases. No provider
+secrets can be recovered from GitHub's saved secret values by this workflow.
+If the original upload key is unavailable, report that limitation first.
+
+Secure transfer, for a later owner-approved credential-transfer step only:
+use the existing trusted **SFTP/SSH** connection to **root@157.250.199.106**
+(Windows WinSCP, SFTP protocol), directory **/home/shelf/secrets/apple**.
+Never accept a changed/unknown host key automatically. Stop if either destination
+already exists; neither existed at today's read-only inspection. Upload the
+retained upload key as **shelf-asc-inspection.p8**, and one private local metadata
+file as **shelf-asc-inspection.json** containing only:
+
+```json
+{"key_id":"ACTUAL_UPLOAD_KEY_ID","issuer_id":"ACTUAL_TEAM_ISSUER_ID"}
+```
+
+Replace the placeholders locally; never paste actual metadata or key contents
+into chat, Git or logs. Set WinSCP upload permissions to **0600**, retain the
+existing private directory **0700**, and keep the owner's original secure backup.
+The later agent verifies permissions/ownership privately before using either
+file. No upload/credential change was performed or authorized for execution here;
+this is the single prepared transfer request. No purchase key transfer needed.
+
+After access, automate bounded Apple GETs for the existing product, localizations,
+price schedule/base territory/current prices, availability/territories and Family
+Sharing, plus both notification URL/version fields. Use current schema paths,
+follow bounded pagination without unrelated apps, and report saved values rather
+than assuming USD 2.99 or worldwide availability from completion reports.
+
+### Remaining setup after read-only inspection
+
+Under separate authorization: confirm RevenueCat Track new purchases off and
+Keep with original App User ID; create the one distinct Apple sandbox Shelf
+webhook described above, preserving Play. Existing documented integration-write
+access can automate that later action if still sufficient; no write probe or
+permission expansion now. Private server configuration uses the verified IDs and
+existing SDK key with Apple sandbox OFF. Backend staging/backed-up reversible
+migration/promotion, later internal TestFlight build at a confirmed unused number,
+explicit owner-only sandbox activation and actual purchase/restore/refund/reversal/
+notification delivery acceptance remain pending. Deferred Apple sign-in/relay
+acceptance is not required to use the existing verified owner email/password
+account. DSA review remains unresolved for public release. All existing holds and
+deferrals remain unchanged.
 
 ## Later backend rollout and phone checks — not authorized by this batch
 

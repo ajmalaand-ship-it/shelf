@@ -579,6 +579,112 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple purchase provider setup and read-only verification — 12 October 2026
+
+Continued completed implementation **08a2adfd5363896ce27907deaaffbd52648116cc**;
+no repeated purchase audit or completed tests. Owner/dashboard evidence: Paid
+Apps Agreement, banking and W-9 **Active**; EU Digital Services Act verification
+**In Review**, not cleared. ShelfPurchases In-App Purchase key added to RevenueCat
+Shelf (App Store), dashboard **Valid credentials**. Apple non-consumable
+`shelf_book_3` created; availability, pricing and localization owner-reported
+complete, exact saved values **not independently inspected**. Owner confirms
+Apple product attachment became visible after RevenueCat refresh. Same RevenueCat
+notification URL saved in Apple's Production and Sandbox fields, owner-confirmed;
+form offered **NO version selector**. No request to find it again.
+
+**Notification version finding:** current Apple Help still describes a V1/V2
+choice; current API App.Attributes independently exposes `subscriptionStatusUrl`,
+`subscriptionStatusUrlForSandbox`, `subscriptionStatusUrlVersion` and
+`subscriptionStatusUrlVersionForSandbox`. Version enum permits **V1 / V2**, with
+V1 deprecated. These sources do not document a guaranteed default for a form
+without that selector. Thus neither a forced V2 claim nor a missing-setup claim
+is justified from this UI. Read the two version fields on Shelf app **6821471140**
+when authenticated access is supplied; null/omitted fields remain unresolved.
+RevenueCat accepts both versions and recommends V2, including for one-time refund
+handling. Its app GET/schema does not expose Apple notification URLs/versions or
+purchase-tracking/restore settings. Apple's TEST notification is always V2 even
+when the registered configuration is V1: a later TEST success would establish
+endpoint delivery, **not the saved ordinary-event version**, nor the full
+RevenueCat-to-Shelf purchase/refund path. No notification test was requested.
+Saved URLs alone establish no delivery. Earlier selector instructions are
+superseded by this finding and the revised purchase guide.
+
+**Authenticated RevenueCat verification**, existing Shelf V2 file reused privately
+(mode 0600, regular, no symlink); bounded GETs only in `projbbce26da`, no customer
+history retrieved or credentials printed. Apps/products/entitlements/webhooks
+lists HTTP 200 with no further page; individual Apple app, book-3 entitlement
+products and public-key metadata GETs also 200:
+- Apple app **app8ef018b95b**, **Shelf (App Store)**, bundle **services.shelf.app**.
+  `subscription_key_configured=true` establishes purchase-key configuration;
+  dashboard Valid credentials remains owner evidence, not a fresh Apple validation.
+  `app_store_connect_api_key_configured=false`: separate optional catalogue-import
+  credential is absent in RevenueCat, not a failed purchase-key configuration.
+- Apple product **prod0d084e901f**, store identifier **shelf_book_3**, API type
+  **non_consumable**. Existing **entlb3d491e78e / shelf_book_3** has exactly that
+  Apple product and original Play **prod03ffc5153f**; Play attachment preserved.
+  RevenueCat catalogue evidence is not independent Apple metadata/price verification.
+- One `appl_` public SDK key exists; its value withheld and not installed.
+- Webhook list contains only **whintgr75a4892970**, Play app **appf83cd58c5c**,
+  environment null (Both), original three event filters. **Apple-to-Shelf webhook
+  absent**; Apple-to-RevenueCat URLs do not replace this separate integration.
+- Apps/products/entitlements/integrations read access passed. At **21:56:32 UTC**,
+  GET purchases search with unique non-transaction marker returned HTTP 200,
+  empty list/no further page, establishing `customer_information:purchases:read`.
+  Purchase-entitlement GET uses this same permission per current schema; actual
+  Apple purchase/entitlement response acceptance remains unverified. No new
+  RevenueCat read permission or key replacement is required for the verifier.
+
+**Private access boundary:** production environment has the documented Shelf V2
+key path, but no App Store Connect key/issuer configuration or inherited ASC
+fields. No ASC-named candidate in documented Shelf private root/Apple directory.
+Existing upload key is documented in protected GitHub/Codemagic setup, unavailable
+as a callable credential here; no attempt to extract provider secrets. ShelfLogin
+is a Sign in with Apple key and was not read/used for ASC. No unrelated project
+secrets inspected. Apple product/price/availability/localization/Family Sharing,
+saved URL comparison and saved versions cannot be independently verified yet.
+
+**One consolidated next access request:** privately transfer the **existing Shelf
+App Store Connect upload team key** from the owner's retained original, plus its
+actual Key ID and Issuer ID. Reuse its existing **App Manager** role (sufficient
+for the app/IAP/pricing/availability inspection); no Admin, Finance, reports or
+credential/permission change requested. This task will use it for GETs only;
+App Manager itself is not an Apple read-only role, and team keys are account-wide.
+Do not substitute ShelfLogin or ShelfPurchases. Exact secure SFTP destination,
+metadata format and permission instructions are in **[IOS_PURCHASES.md](IOS_PURCHASES.md)**.
+No credentials were transferred or changed in this task. If the retained original
+is unavailable, report that fact before proposing any new credential.
+
+**Remaining setup**, under separate explicit authorization: inspect Apple saved
+values/versions through that access; confirm RevenueCat Track new purchases stays
+off and Keep with original App User ID remains selected (not exposed by these
+GETs); create only the separate Apple app-scoped sandbox Shelf webhook with
+NON_RENEWING_PURCHASE/CANCELLATION/EXPIRATION/REFUND_REVERSED and distinct private
+authorization. Existing V2 integrations read_write permission was documented in
+original setup but not re-probed by writing; use it for later authorized automation
+only if still sufficient, otherwise owner dashboard setup, not automatic elevation.
+Configure the verified app/product/SDK references privately with Apple sandbox
+OFF; later stage exact source, back up and promote reversible migration, then
+separately authorize internal build/owner-only sandbox activation and delivery/
+phone acceptance. No offering, other Apple book or new purchase key needed.
+Installed build 3 lacks purchase source. DSA In Review remains public-release
+uncertainty; no new sandbox blocker inferred solely from that status.
+
+Documentation-only isolated change; diff/scope checks, no suites/audit/build rerun.
+Commit/push **ios/foundation only**; rollback ordinary documentation revert.
+Production dirty MASTER_RECORD/IOS_SIGN_IN/.htaccess preserved. No provider writes,
+credentials/settings/migrations/deployments/builds/uploads/mail/transactions.
+Checkout OFF; pricing-sync and second-phone-restore deferrals, deferred Apple
+authentication/relay checks and stopped email task, Android/UI pause, deferred
+improvements and joint public-launch hold preserved.
+
+Official sources checked today:
+- [Apple URL setup](https://developer.apple.com/help/app-store-connect/configure-in-app-purchase-settings/enter-server-urls-for-app-store-server-notifications/)
+- [Apple app attributes](https://developer.apple.com/documentation/appstoreconnectapi/app/attributes-data.dictionary), [version enum](https://developer.apple.com/documentation/appstoreconnectapi/subscriptionstatusurlversion)
+- [Apple notification enablement and TEST limitations](https://developer.apple.com/documentation/appstoreservernotifications/enabling-app-store-server-notifications)
+- [RevenueCat notifications](https://www.revenuecat.com/docs/platform-resources/server-notifications/apple-server-notifications)
+- [RevenueCat apps](https://www.revenuecat.com/docs/api-v2/app), [products](https://www.revenuecat.com/docs/api-v2/product), [entitlements](https://www.revenuecat.com/docs/api-v2/entitlement), [purchases](https://www.revenuecat.com/docs/api-v2/purchase), [webhooks](https://www.revenuecat.com/docs/api-v2/integration)
+- [Apple API key roles](https://developer.apple.com/help/app-store-connect/get-started/app-store-connect-api/)
+
 ## One-book Apple sandbox purchase source prepared — 12 October 2026
 
 Owner authorized the completed purchase audit's smallest implementation batch,
