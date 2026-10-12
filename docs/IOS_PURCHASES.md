@@ -207,24 +207,54 @@ its existing shelf_book_3. Do not use ShelfLogin or ShelfPurchases. No provider
 secrets can be recovered from GitHub's saved secret values by this workflow.
 If the original upload key is unavailable, report that limitation first.
 
-Secure transfer, for a later owner-approved credential-transfer step only:
-use the existing trusted **SFTP/SSH** connection to **root@157.250.199.106**
-(Windows WinSCP, SFTP protocol), directory **/home/shelf/secrets/apple**.
-Never accept a changed/unknown host key automatically. Stop if either destination
-already exists; neither existed at today's read-only inspection. Upload the
-retained upload key as **shelf-asc-inspection.p8**, and one private local metadata
-file as **shelf-asc-inspection.json** containing only:
+**Current transfer method — prepared 12 October 2026:** use
+[IOS_ASC_KEY_UPLOAD.ps1](IOS_ASC_KEY_UPLOAD.ps1). It replaces the earlier manual SFTP/two-
+file request; no local JSON creation, filename typing or key-content
+copying is required. Codex automates all possible authorized work; owner actions
+are limited to necessary local access/interaction.
 
-```json
-{"key_id":"ACTUAL_UPLOAD_KEY_ID","issuer_id":"ACTUAL_TEAM_ISSUER_ID"}
+Checked Shelf records and configured/inherited upload metadata first: no verified
+upload Key ID or Issuer ID is available here. The helper derives Key ID from the
+original `AuthKey_<Key-ID>.p8` filename and asks **only the missing Issuer ID** in
+a GUI input box. Copy that existing Issuer ID from **Codemagic → Team Settings →
+Integrations → Developer Portal → shelf_app_store_connect**. Do not generate or
+rotate a key, and do not use the Apple Team ID as Issuer ID. Key ID derivation
+matches a filename; Apple/dashboard association remains a later verification.
+
+Select the existing `.p8` used by Shelf’s Codemagic `shelf_app_store_connect`
+upload integration, **not ShelfLogin or ShelfPurchases**.
+
+**Windows PowerShell — command 1, download to Downloads (refuses an existing file):**
+
+```powershell
+& { $shelfHelper = Join-Path $env:USERPROFILE 'Downloads\IOS_ASC_KEY_UPLOAD.ps1'; if (Test-Path -LiteralPath $shelfHelper) { throw 'Helper already exists; preserved. Stop and report.' }; scp.exe -o StrictHostKeyChecking=yes 'root@157.250.199.106:/home/shelf/tmp/shelf-ios-foundation/docs/IOS_ASC_KEY_UPLOAD.ps1' $shelfHelper; if ($LASTEXITCODE -ne 0) { throw 'Download failed; do not run the helper.' } }
 ```
 
-Replace the placeholders locally; never paste actual metadata or key contents
-into chat, Git or logs. Set WinSCP upload permissions to **0600**, retain the
-existing private directory **0700**, and keep the owner's original secure backup.
-The later agent verifies permissions/ownership privately before using either
-file. No upload/credential change was performed or authorized for execution here;
-this is the single prepared transfer request. No purchase key transfer needed.
+**Windows PowerShell — command 2, run:**
+
+```powershell
+powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\IOS_ASC_KEY_UPLOAD.ps1"
+```
+
+The owner’s original filename, bytes and ACL are preserved. Local links/reparse
+points (including parent directories) are refused. Only public receiver code
+appears in SSH command arguments; key/identifiers use binary SSH stdin, no tokens,
+clipboard or key/metadata output. Existing SSH host trust is required; no automatic
+acceptance of unknown/changed hosts. Server opens directory components without
+following symlinks, requires existing private parents shelf:shelf/0700, and
+exclusively creates **/home/shelf/secrets/apple/shelf-asc-inspection.p8** and
+**shelf-asc-inspection.json**, both shelf:shelf/0600. Either existing destination
+(including dangling symlink) refuses the upload. Length/SHA-256 and exact metadata
+are verified from disk before success. Handled failures clean only newly created
+matching-inode files; abrupt interruption/cleanup failure may leave private partial
+files, so stop for private inspection rather than overwrite or automatic retry.
+No actual credential transfer performed by Codex in this preparation.
+
+13 synthetic checks passed through the focused test-wrapper scope, using the
+actual embedded receiver and disposable /home/shelf/tmp storage. Windows picker/
+PowerShell runtime and real SSH transfer remain unexecuted; no PowerShell binary
+available on this server. No purchase/API checks repeated. After transfer, the
+next task is read-only Apple inspection; the helper makes no API call itself.
 
 After access, automate bounded Apple GETs for the existing product, localizations,
 price schedule/base territory/current prices, availability/territories and Family

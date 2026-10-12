@@ -222,6 +222,11 @@ These rules apply in every step. They can only be changed by an approved amendme
 
 ## 5.2 The work cycle (every task)
 
+**Standing owner instruction — 12 October 2026:** automate everything possible
+through Codex within the approved scope. Request manual action only where owner
+interaction or access is genuinely necessary. Reuse known verified identifiers
+and completed evidence; do not ask for repeated setup or manual work Codex can do.
+
 - **1. Check** — Claude checks the task against this Master Record. If an amendment is needed, it is discussed and approved first.
 - **2. Plan** — Claude writes the task; technical choices are Claude’s, owner questions go to Ajmal in plain words.
 - **3. Build** — Codex writes the code and runs the automated tests (temporary database only), then commits and pushes.
@@ -578,6 +583,90 @@ build, deployment, purchase, provider setting change or release.
 | D18 | Content management and import         | **Decided 28 Sep:** each book manages its own content; Word import by Heading 1 and \*\*\* (6.12).                                                                                              |
 
 # Part 10 — Current status
+
+## Secure Windows upload-key helper prepared — 12 October 2026
+
+Continued **ae9016c** on isolated **ios/foundation**, reusing its completed Apple/
+RevenueCat schema/configuration checks; no provider calls or purchase tests repeated.
+Owner standing automation preference is now recorded in Part 5.2 and AGENTS.md:
+automate all possible approved work, manual action only for necessary owner
+interaction/access. The owner's local .p8 selection and missing Issuer ID are the
+only interactive inputs here; no manual SFTP/JSON file creation is needed.
+
+Checked current Shelf governing/purchase/foundation/signing documentation and
+local configured/inherited upload identifier presence privately. The documented
+integration is **shelf_app_store_connect**, the existing **Shelf Codemagic App
+Store Connect upload team key**, with expected existing App Manager role. Actual
+upload Key ID and Issuer ID are not recorded as verified values or locally
+configured; protected provider secret values were not retrieved. **ShelfLogin /
+2VQ43945YB** is a different Sign in with Apple key; **ShelfPurchases** is the
+separate In-App Purchase key already supplied to RevenueCat. Neither is selected
+for this helper. No credential created/rotated or key contents inspected.
+
+Prepared **docs/IOS_ASC_KEY_UPLOAD.ps1**, reusing the established
+IOS_APPLE_KEY_UPLOAD.ps1 Windows picker / binary SSH stdin / encoded public Python
+receiver / strict existing SSH host trust approach. New picker explicitly names
+the existing Codemagic upload key and excludes sign-in/purchase key use. Requires
+original **AuthKey_<10-character-Key-ID>.p8** basename, derives Key ID without
+retyping, rejects the known ShelfLogin ID and local reparse points/parent links.
+Only unknown Issuer ID is requested once in a private GUI input; UUID syntax
+checked. Owner reads it from the existing Codemagic integration. Actual key
+capability/role/Apple acceptance remain unverified, to be inspected later.
+Filename derivation is not independent dashboard association verification.
+
+Original local file bytes/name/ACL are unchanged; one read-only stream prevents
+concurrent ordinary writes/deletion while hashing/sending. Identifiers, expected
+size/SHA-256 and key travel only through SSH binary stdin, not command arguments,
+PowerShell text pipeline, clipboard, local metadata copies, tokens or logs. Public
+receiver alone is encoded in the remote command; StrictHostKeyChecking=yes, no
+automatic host acceptance, no PTY. No authentication token is generated.
+
+Receiver opens every server directory component with directory descriptors and
+O_NOFOLLOW, verifies existing secrets/apple ownership **shelf:shelf / 0700**, then
+exclusively creates **/home/shelf/secrets/apple/shelf-asc-inspection.p8** and
+**shelf-asc-inspection.json**, both **shelf:shelf / 0600** before data write. Existing
+regular files or dangling/normal symlinks at either destination are refused; no
+renaming/overwriting current keys. SHA-256/length key read-back and exact metadata
+read-back/fsync/ownership/mode/link checks establish saved transfer integrity.
+Handled failure removes only this attempt's created files with matching inode;
+existing files and links preserved. Abrupt SSH/process interruption or unsuccessful
+cleanup can leave restricted partial files: stop for private inspection rather
+than overwrite or automatic retry. Source backup unchanged and independently kept.
+Destination absence checked read-only; no live credential files created now.
+
+**Synthetic verification passed: 13 focused checks** via
+`SHELF_TOOL_TEST_SCOPE=asc-key-upload scripts/run_tests.sh`; persistent test is
+scripts/ios/test_asc_key_upload.py. It extracts/executes the helper's actual receiver
+with only synthetic binary data and overridden disposable root under the wrapper's
+/home/shelf/tmp directory; no real key/provider/SSH/Windows picker invoked.
+Success byte-for-byte key + parseable metadata/mode/owner; key and metadata
+collisions, destination/dangling/parent symlinks, unsafe directory, truncated/hash-
+mismatched/oversized input, extra bytes, invalid identifiers/header bounds and
+secret-output absence checked. Client source contract checks cover filename,
+private-input/stream/disposal, no original modification and strict SSH trust.
+Existing wrapper gains only a focused tool scope that exits before PHP/mobile;
+ordinary PHP/mobile/backup behavior retained. Shell syntax and git diff checks
+passed. **Windows PowerShell runtime/picker and actual SSH transfer unexecuted**
+(no PowerShell binary here); source checks are not a Windows execution claim.
+No completed purchase/audit/build/app test repeated.
+
+Updated IOS_PURCHASES.md replaces the earlier manual SFTP/JSON request with this
+helper and two Windows PowerShell download/run commands. Download refuses a
+preexisting helper filename; run opens the picker and asks only missing Issuer ID.
+Owner must select the existing file for shelf_app_store_connect, not create a new
+credential. After transfer, next separate task is **read-only Apple API inspection**
+of Shelf's existing book-3 configuration and notification URLs/versions, with
+completed RevenueCat evidence reused; no other provider action authorized.
+
+Commit/push **ios/foundation only**. Revert helper/test/wrapper/document changes
+normally before use; after transfer, any file removal needs separate review and
+must never affect the owner's original or existing login/purchase/upload keys.
+Production unrelated MASTER_RECORD/IOS_SIGN_IN/.htaccess untouched. No real
+transfer in this preparation, provider writes/settings, checkout activation,
+deploy/migration/build/app upload/mail/transactions. Checkout OFF, pricing-sync
+and second-phone-restore deferrals, deferred Apple authentication/relay checks,
+stopped email task, Android/UI pause, deferred improvements and joint public-
+launch hold preserved.
 
 ## Apple purchase provider setup and read-only verification — 12 October 2026
 

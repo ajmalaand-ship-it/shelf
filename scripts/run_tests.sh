@@ -55,6 +55,14 @@ if "$run_backup"; then
     python3 -B -m unittest discover -s scripts -p "$backup_pattern" -v
     exit 0
 fi
+# Credential-transfer verification is synthetic only; never rerun purchase/app suites.
+if [[ "${SHELF_TOOL_TEST_SCOPE:-}" == 'asc-key-upload' ]]; then
+    if "$run_mobile"; then echo 'Tool scope cannot run mobile tests.' >&2; exit 2; fi
+    python3 -B scripts/ios/test_asc_key_upload.py
+    exit 0
+elif [[ -n "${SHELF_TOOL_TEST_SCOPE:-}" ]]; then
+    echo 'Unknown tool test scope.' >&2; exit 2
+fi
 echo "Running PHP tests (temporary files: $run_dir)"
 php_args=(--do-not-cache-result)
 if [[ -n "${SHELF_PHP_TEST_FILTER:-}" ]]; then

@@ -127,6 +127,10 @@ sample retained, declined payment locked, and successful repurchase on 2 October
   /home/shelf/backups/shelf, 14 kept.
 
 ## 6. How to work on every task
+Standing owner instruction (12 October 2026): automate everything possible through
+Codex within the authorized task. Request manual action only where owner interaction
+or access is genuinely necessary; reuse known verified identifiers and passed evidence.
+
 From 1 October 2026, every change is developed and tested in an isolated checkout,
 deployed to staging first, and promoted to production only at the same verified
 commit. Never develop in the running production checkout. Use docs/STAGING.md.
