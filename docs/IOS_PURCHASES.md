@@ -150,14 +150,14 @@ binary is needed.
    [app schema](https://www.revenuecat.com/docs/api-v2/app),
    [product schema](https://www.revenuecat.com/docs/api-v2/product).
 
-## Current provider evidence and single access request — 12 October 2026
+## Earlier provider evidence and access preparation — 12 October 2026
 
 Completed purchase implementation **08a2adf** and its tests are reused. The original
 checklist is retained as history, not a request to repeat completed setup.
 Paid Apps Agreement, banking, W-9 Active; DSA In Review; ShelfPurchases added with
 RevenueCat Valid credentials; Apple book-3 product and reported availability/
 pricing/localization completed; both notification URLs saved without a version
-selector: **owner/dashboard evidence**. Exact Apple saved values are uninspected.
+selector: **owner/dashboard evidence**. Exact Apple saved values were uninspected at that point; authenticated findings below supersede this limitation.
 
 Independent Shelf RevenueCat V2 GETs verified:
 
@@ -194,7 +194,7 @@ is V2 regardless of the configured version; later TEST success alone cannot prov
 the version of ordinary events or end-to-end Shelf purchase/refund delivery.
 No TEST request or transaction was sent.
 
-### One consolidated private access request
+### Completed private access transfer — preparation retained for reference
 
 Reuse the **existing Shelf App Store Connect upload team key** already used by
 GitHub/Codemagic, from the owner's secure retained original. Supply its `.p8`,
@@ -261,6 +261,63 @@ price schedule/base territory/current prices, availability/territories and Famil
 Sharing, plus both notification URL/version fields. Use current schema paths,
 follow bounded pagination without unrelated apps, and report saved values rather
 than assuming USD 2.99 or worldwide availability from completion reports.
+
+### Current authenticated Apple findings — 12 October 2026
+
+Owner completed the helper; Codex verified both documented credential files are
+regular/no symlinks, shelf:shelf/0600, parents 0700, key parses EC P-256, and actual
+authenticated Apple GETs succeed (200). Key/identifiers/JWTs withheld; filename
+alone is not credential proof. The credential's dashboard name/role was not
+independently introspected. No additional credential transfer is needed.
+
+App GET at 23:33:04 UTC confirms **6821471140**, **Shelf - شیلف**, **services.shelf.app**.
+Both production **subscriptionStatusUrlVersion=V2** and sandbox
+**subscriptionStatusUrlVersionForSandbox=V2** are explicitly saved. **No version
+selector action is needed.** Both URLs are present, exactly equal and use HTTPS
+api.revenuecat.com with its Apple server-notification endpoint path. Opaque
+endpoint identifier withheld. Exact app-specific dashboard destination association
+is still based on the owner's supplied confirmation: no independently retained
+exact URL or RevenueCat public API field was available for that comparison.
+Actual delivery remains unverified; no notification test was requested.
+
+Book 3: Apple IAP **6822080809**, **shelf_book_3**, **NON_CONSUMABLE**,
+**MISSING_METADATA**, reference name **Shelf book 3**; Family Sharing and content
+hosting false. One **ar-SA** localization, state **PREPARE_FOR_SUBMISSION**, saved
+name **څپو کې انڅورونه**, description **شعري ټولګه**. The name differs from the
+recorded book title **څپو کې انځورونه**; preserve both as evidence and obtain final
+owner wording before any later provider correction. No source text changed.
+
+Price schedule: **USA/USD 2.99**, one manual base price plus **174 automatic
+territory prices**, all customer-price/currency fields resolved, no explicit start
+or end dates. Examples: Afghanistan USD 2.99, Canada CAD 3.99, UK GBP 2.99, Saudi
+Arabia SAR 12.99. Available territories total **175**, including Afghanistan and
+excluding Iran; **availableInNewTerritories=true**. This is distinct from the
+approved Play territory list and does not establish expanded rights approval.
+Final Apple territory/future-territory acceptance remains a public-release matter.
+
+Review screenshot GET returned **data=null**; reviewNote null. The screenshot is
+missing required review metadata, while notes are optional
+([RevenueCat](https://www.revenuecat.com/docs/getting-started/entitlements/ios-products)).
+Apple supplies no complete missing-field diagnosis, so do not claim this is the
+only missing field. [Apple TN3186](https://developer.apple.com/documentation/technotes/tn3186-troubleshooting-in-app-purchases-availability-in-the-sandbox)
+says sandbox testing does not require product review submission. Actual product
+retrieval still needs the later real StoreKit flow; MISSING_METADATA is not a
+proven sandbox failure. Keep the real purchase-screen review screenshot pending
+the later build, with no fabricated substitute or screenshot request now.
+
+All requests were bounded GETs scoped to Shelf and its existing product. One
+availability query rejected an unsupported parameter (400); corrected separate
+availability/territories GETs passed 200. No provider state changed. Completed
+RevenueCat evidence and purchase implementation/tests were reused, not repeated.
+
+**Next smallest batch, requiring separate authorization:** automate the distinct
+Apple-scoped SANDBOX RevenueCat-to-Shelf webhook below, private server configuration
+using app8ef018b95b / prod0d084e901f / existing SDK key with gate OFF, and exact
+backend staging/backed-up reversible migration/promotion. No Apple product or
+notification-version change is needed for that batch. Later separate build,
+owner-only sandbox activation and phone purchase/refund/reversal checks establish
+product retrieval and actual notification delivery. Keep final metadata/territory
+acceptance and genuine review screenshot separate from backend preparation.
 
 ### Remaining setup after read-only inspection
 

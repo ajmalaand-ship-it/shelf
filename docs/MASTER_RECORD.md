@@ -584,6 +584,92 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Authenticated Apple inspection completed — 12 October 2026
+
+Continued **dc054af** on isolated **ios/foundation**. Owner reported completing
+IOS_ASC_KEY_UPLOAD.ps1 with verified transfer and no API call. Codex then checked
+the documented private `.p8` and identifier JSON under
+`/home/shelf/secrets/apple/`: regular files, no symlinks, **shelf:shelf / 0600**;
+private secrets/apple directories **shelf:shelf / 0700**. OpenSSL parsed an EC
+P-256 private key; identifier syntax passed. Key contents, Key ID/Issuer ID and
+JWTs were not printed or committed. Authenticated Apple GETs returned **200**,
+proving actual credential validity/access rather than trusting the filename.
+This does not independently establish its dashboard name or assigned role.
+
+First app GET at **2026-10-12 23:33:04 UTC** verified **6821471140 / Shelf - شیلف /
+services.shelf.app**. Both saved fields, **subscriptionStatusUrlVersion** and
+**subscriptionStatusUrlVersionForSandbox**, explicitly returned **V2**. The form's
+missing version selector is resolved for this app; no selector search or version
+change is needed. Production and Sandbox URLs are present, byte-for-byte equal,
+HTTPS on api.revenuecat.com with the documented Apple server-notification path.
+The endpoint identifier is withheld. Exact comparison to a separately retained
+RevenueCat dashboard URL was unavailable: the public RevenueCat app API does not
+expose that app-specific destination, and no independent exact private copy was
+found in the documented records. The owner's correct dashboard-copy confirmation
+is reused; host/path and Apple-to-Apple equality are independently verified,
+app-specific opaque destination association remains owner-confirmed. **Actual
+notification delivery remains unverified.** An initial tool URL summary exposed
+the opaque endpoint suffix; the local summary was immediately sanitized, and no
+suffix/key/token is included in these records.
+
+| Apple book-3 item | Authenticated saved value |
+| --- | --- |
+| Product | 6822080809 / shelf_book_3 / Shelf book 3; NON_CONSUMABLE |
+| State | MISSING_METADATA |
+| Family Sharing / content hosting | false / false |
+| Localization | One ar-SA; PREPARE_FOR_SUBMISSION |
+| Display name / description | څپو کې انڅورونه / شعري ټولګه |
+| Base price | USA / USD 2.99, one manual price, startDate/endDate null |
+| Other prices | 174 automatic territory prices, all price/currency fields resolved; dates null |
+| Examples | AFG USD 2.99; CAN CAD 3.99; GBR GBP 2.99; SAU SAR 12.99 |
+| Availability | 175 explicit territories; AFG included, IRN absent; availableInNewTerritories=true |
+| Review screenshot / review notes | Screenshot data null; reviewNote null |
+
+The saved display name differs from recorded book title **څپو کې انځورونه**;
+recorded verbatim, no text guessed or repaired. Apple availability is a distinct
+saved list, not the approved 174-region Play list or new worldwide-rights approval.
+Rights/territory acceptance and final localization wording remain owner matters
+before public release. Pricing proceeds are not settled income or future author
+accounting evidence. The missing screenshot is confirmed required review metadata;
+review notes are optional. Apple does not return a field-by-field deficiency list,
+so this is not proof the screenshot is the only reason for MISSING_METADATA.
+[Apple sandbox guidance](https://developer.apple.com/documentation/technotes/tn3186-troubleshooting-in-app-purchases-availability-in-the-sandbox)
+says product review submission is not required for sandbox testing;
+[RevenueCat review metadata guidance](https://www.revenuecat.com/docs/getting-started/entitlements/ios-products)
+requires a screenshot for submission. Actual StoreKit product retrieval is still
+unverified; neither approval nor a fabricated screenshot is requested now.
+
+GET-only inspection covered app, its IAP list, book-3 localization, review
+screenshot, price schedule/manual and automatic prices, availability and all
+available territories with bounded pagination. An initial availability query
+returned 400 PARAMETER_ERROR.INVALID; removing the unsupported include-limit
+query and reading the availability/territory relationship separately returned
+200. No provider state changed. Completed **ae9016c RevenueCat verification** and
+**08a2adf purchase tests** reused without rerun: Apple product prod0d084e901f remains
+verified attached to entlb3d491e78e / shelf_book_3 with original Play product;
+Apple app app8ef018b95b, purchase credential configured, required V2 reads verified.
+The separate **Apple-scoped RevenueCat-to-Shelf sandbox webhook remains missing**.
+
+**Smallest next separately authorized batch:** automate that distinct Apple app /
+SANDBOX webhook to https://shelf.services/api/purchases/webhook with separate
+private Authorization and NON_RENEWING_PURCHASE/CANCELLATION/EXPIRATION/
+REFUND_REVERSED, preserving Play; privately configure the verified Apple app,
+internal product and existing appl_ SDK key with the Apple sandbox gate OFF;
+stage the existing backend source, then verified backup/reversible migration and
+same-commit promotion. Check tracking-off/original-ID restore settings only where
+existing access exposes them; no repeat credentials/product/selector setup.
+Later separate internal build and owner-only sandbox activation/phone acceptance
+must establish product retrieval and actual delivery. A genuine purchase-screen
+review image and final localization/territory acceptance remain review/release
+work. No extra access or owner action is needed for this completed inspection.
+
+Documentation-only commit/push on ios/foundation; git whitespace/scope checks,
+no purchase audit/tests repeated. Unrelated production records/.htaccess preserved.
+No provider writes, test notifications, credentials/.env changes, deployment,
+migration, build/upload, email or transaction. Checkout OFF, pricing-sync and
+second-phone-restore deferrals, deferred Apple authentication/relay checks,
+Android/UI pause, stopped email task and joint public-launch hold preserved.
+
 ## Secure Windows upload-key helper prepared — 12 October 2026
 
 Continued **ae9016c** on isolated **ios/foundation**, reusing its completed Apple/
