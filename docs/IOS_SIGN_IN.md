@@ -30,6 +30,28 @@ callback scheme; absent configuration hides that option. Android's provider rema
 Picker cancellation changes no server reader session. Both methods use the existing
 server session/offline-identity path; neither grants book ownership.
 
+## Owner setup update — 11 October 2026
+
+Owner confirms Google iOS client creation and `SHELF_GOOGLE_IOS_CLIENT_ID` saved
+in Codemagic group `shelf_ios_testflight`; Apple Sign in key **ShelfLogin**
+downloaded privately; `shelf.services` relay registration with green SPF.
+Actual relay delivery and real-provider/signed-iPhone authentication remain
+unverified. These dashboard values have not been independently reread.
+
+The private upload destination `/home/shelf/secrets/apple` was absent on initial
+inspection and is now empty, owned by **shelf:shelf**, mode **700**. Use
+[IOS_APPLE_KEY_UPLOAD.ps1](IOS_APPLE_KEY_UPLOAD.ps1) in Windows PowerShell to pick
+the new ShelfLogin `.p8` from Downloads. It retains the original filename,
+refuses overwrites and creates a **shelf:shelf / 600** file over trusted SSH.
+The script restricts the selected local file to the current Windows user and
+requires the server's SSH host key to be already trusted; it never accepts an
+unknown/changed host automatically. Keep the original in encrypted private
+storage with a secure backup, separately labelled from the upload API key.
+No key has been transferred by Codex. The actual uploaded filename, rather than
+the earlier proposed `sign-in-with-apple.p8`, will be used in any later approved
+server configuration. Do not rename or upload the App Store Connect key instead.
+No `.env` change, activation, deployment, build or Apple upload is authorized here.
+
 ## One consolidated owner setup guide
 
 Independent source work and focused checks are complete. These are the remaining

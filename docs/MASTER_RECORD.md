@@ -579,6 +579,41 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## iOS owner setup and private Apple upload destination — 11 October 2026
+
+Owner confirms the Google iOS client was created and its actual
+`SHELF_GOOGLE_IOS_CLIENT_ID` saved in Codemagic group `shelf_ios_testflight`.
+Owner downloaded the new Sign in with Apple key named **ShelfLogin** privately.
+This is separate from the existing App Store Connect upload API key/integration,
+which remains unchanged. Owner registered `shelf.services` for Apple email relay
+and reports Apple's green SPF check. **Actual relay delivery remains UNVERIFIED**;
+provider sign-in and signed-iPhone acceptance are not inferred from setup.
+
+Codex inspected the destination first: `/home/shelf/secrets` was a real directory,
+owned by `shelf:shelf`, mode **700**; `/home/shelf/secrets/apple` did not exist.
+Created the empty Apple directory, verified **shelf:shelf / 700**, without reading,
+replacing or overwriting any key. **Key transfer is pending owner execution**;
+no server key filename, Key ID, capability association or key validity is claimed.
+The supplied Windows file-picker script preserves the downloaded basename,
+uses the existing trusted SSH connection to root@157.250.199.106, restricts the
+selected local file ACL, and streams bytes over encrypted SSH without shell text
+conversion, key output or staging copies. Server exclusive creation refuses any
+existing path; the new file is **shelf:shelf / 600** before writing. It verifies
+length/SHA-256 silently, deleting only its own incomplete file on handled failure.
+An interrupted connection can leave a private partial file; never overwrite it.
+
+No `.env` change, sign-in activation, migration, deployment, build, Apple upload,
+provider request or purchase. No completed Flutter tests repeated. Public receiver checked with synthetic
+nonsecret bytes: successful original-name/600 transfer, duplicate refusal with
+existing bytes unchanged, and incomplete-transfer cleanup passed. Windows
+PowerShell/file picker and actual SSH upload were not executed here. Existing
+App Store Connect/signing configuration preserved. Checkout **OFF**, pricing-sync
+and second-phone-restore deferrals, Android/UI pause, deferred improvements and
+joint Android/iOS public-launch hold retained. Next: owner private transfer, then
+separately authorized metadata/permissions/key association checks and later
+approved backend rollout, relay-delivery evidence and signed-phone validation.
+
+
 ## iOS functionality phase — Apple/Google sign-in source, 11 October 2026
 
 **Current owner-reported TestFlight status:** **1.0.0 build 2**, App Apple ID
@@ -2470,7 +2505,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Provider/relay configuration, backend promotion, native compilation and signed-iPhone authentication validation remain unfinished. Prior unsigned successes are preserved without rerun. | Functionality phase, current scoped batch. Use IOS_SIGN_IN.md setup first; later separately approved activation/build/phone checks. |
+| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Key transfer, actual relay delivery, backend promotion, native compilation and signed-iPhone authentication validation remain unfinished. Prior unsigned successes are preserved without rerun. | Functionality phase, current scoped batch. Use IOS_SIGN_IN.md setup first; later separately approved activation/build/phone checks. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
