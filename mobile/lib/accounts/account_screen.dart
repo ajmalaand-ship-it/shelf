@@ -6,6 +6,7 @@ import '../l10n/app_strings.dart';
 import 'account_controller.dart';
 import 'account_service.dart';
 import 'avatar_picker.dart';
+import 'apple_relay_rehearsal.dart';
 
 enum _AccountForm { login, register, forgot, password }
 
@@ -397,6 +398,8 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
               ],
             ],
+            if (c?.configuration.appleEnabled != true)
+              const AppleRelayRehearsal(),
           ],
         ),
       ),

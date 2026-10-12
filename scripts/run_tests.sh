@@ -78,7 +78,10 @@ if "$run_mobile"; then
     cd -- "$run_dir/mobile"
     echo "Running Flutter tests (--mobile requested)"
     mobile_args=()
-    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "ios-auth" ]]; then
+    if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "ios-relay" ]]; then
+        mobile_args=(test/apple_relay_rehearsal_test.dart)
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib/accounts/apple_relay_rehearsal.dart lib/accounts/account_screen.dart test/apple_relay_rehearsal_test.dart
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "ios-auth" ]]; then
         mobile_args=(test/ios_auth_test.dart test/accounts_test.dart test/book_purchases_test.dart)
         "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib/accounts test/ios_auth_test.dart
     elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "review-3-final-render" ]]; then
