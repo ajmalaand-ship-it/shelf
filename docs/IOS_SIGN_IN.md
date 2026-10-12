@@ -31,6 +31,120 @@ callback scheme; absent configuration hides that option. Android's provider rema
 Picker cancellation changes no server reader session. Both methods use the existing
 server session/offline-identity path; neither grants book ownership.
 
+## One internal build for relay preparation and full login — 12 October 2026
+
+**Prepared only; execution is not authorized by this preparation.** Owner confirms
+build **3 remains unused**. Target **Shelf 1.0.0 (3)**, bundle services.shelf.app,
+team YSLWJQDH8B, existing Codemagic `ios-testflight-internal` workflow. Build source: **9194793edd1f33885af9522620efa7950bec19e0** (ios/foundation). Pin this exact
+commit and verify it against the workflow's source-commit evidence before accepting
+the build. A later documentation-only commit records this source; it does not
+change the app. Backend
+remains deployed at 31d123aaee8310b71e9550dfa1e13047e44541db; both Apple flags false.
+This section supersedes the earlier statements that no rehearsal path exists.
+
+### Why this resolves the bootstrap
+
+AuthenticationServices can obtain the native Apple credential before any Shelf
+challenge/account creation. The normal Flutter login deliberately requires the
+server gates first. A separate **Owner Apple email check** uses the same native
+SDK with a locally generated cryptographic nonce. Its native completion reads
+only the SDK email field, requires an actual @privaterelay.appleid.com address,
+and retains only that address in non-synchronizing, unlocked-device-only Keychain
+storage. It does not read, return, log or retain the identity token, authorization
+code or Apple user identifier. Flutter receives only availability/saved/success
+booleans. No API call, reader creation, account linking, session replacement or
+book ownership is involved; the existing authenticated login is unchanged.
+
+The entry point is limited natively to non-debug services.shelf.app **1.0.0 (3)**,
+and hidden when the fetched server configuration enables ordinary Apple login.
+Android and later build numbers have no rehearsal controls. Version gating is a
+scope constraint, not proof of owner identity: **assign this internal-only build
+only to Shelf Owner, with the owner as its sole tester**. Do not distribute it to
+other groups. iOS TestFlight receipts may be absent, so no receipt refresh or
+purchase is required. Signing, photo-purpose validation, internal-only export,
+ditto extraction and explicit `$CM_BUILD_DIR` IPA/evidence collection are unchanged.
+
+### Ordered execution after separate authorization
+
+1. **One build and internal upload.** Check App Store Connect at
+   https://appstoreconnect.apple.com/apps/6821471140/testflight/ios for no use or
+   pending upload of build 3. In https://codemagic.io, Shelf application → environment
+   variables → existing group `shelf_ios_testflight`, set `SHELF_IOS_BUILD_NUMBER`
+   to **3**, and save. Keep the existing `SHELF_GOOGLE_IOS_CLIENT_ID`, Google Web
+   client, signing identity and App Store Connect upload integration unchanged.
+   Confirm the saved iOS client is nonempty before starting; do not invent it or
+   put private keys into YAML. Manually run only `ios-testflight-internal` against
+   the exact reported SHA. Verify source/build evidence, Apple entitlement, strict
+   signing checks and collected IPA; inspect packaged Google client/callback values.
+   After Apple processing, TestFlight → Internal Testing → **Shelf Owner** → add
+   **1.0.0 (3)**. Keep sole-owner distribution and all public-release holds.
+2. **Get the real address without enabling Apple login.** Owner updates Shelf in
+   TestFlight, opens Shelf → account icon → **Owner Apple email check** →
+   **Prepare Apple email check**. In Apple's sheet choose **Hide My Email**, then
+   Continue/Face ID. The app says the address is saved privately and no Shelf
+   account was created. Both production flags remain false. Cancellation is harmless.
+   If Apple omits its first-response email or returns a real address instead,
+   stop: use an existing active Shelf relay address if available, never guess one
+   or revoke a real/purchased account to force a new response.
+3. **Transfer only the address securely.** Tap **Copy address for private transfer**,
+   immediately paste into an encrypted private password-manager item labelled
+   Shelf Apple relay check. The clipboard is device-local, expires after one minute
+   and is not shared by Handoff. Do not paste it into chat, screenshots, git or logs.
+   For the later mail task, privately transfer only this address over the existing
+   trusted SSH connection (`StrictHostKeyChecking=yes`) via stdin, never as a shell
+   argument. Store it exclusively at
+   `/home/shelf/secrets/apple/owner-relay-address.txt`, shelf:shelf, mode 600,
+   under the already verified mode-700 directory; refuse existing files/symlinks.
+   This transfer is a future execution step, not performed here. The `.p8` uploader
+   is for keys and must not be used for this address. After verified secure transfer,
+   tap **Remove saved address** before later activation hides the panel. This removes
+   only the local rehearsal copy, not Apple's authorization or any Shelf account.
+4. **One separately authorized mail check, flags still false.** Send exactly one
+   harmless message through Shelf's production Laravel mailer using actual sender
+   `noreply@shelf.services`, subject **Shelf relay delivery check**, body
+   **This is the owner-only Shelf email delivery check. No action is required.**
+   Read the address privately from the protected file; no reset token, reader,
+   purchase or staging email. Owner confirms actual inbox receipt; privately inspect
+   envelope sender and SPF/DKIM results. Record only timestamp/outcome/authentication
+   summary. Green dashboard SPF or SMTP acceptance alone does not pass delivery.
+   Failure leaves both flags false; do not send retries without authorization.
+5. **Later activation and full acceptance on the same build.** After actual delivery
+   evidence, obtain separate owner approval for a backed-up production flag change,
+   `APPLE_SIGN_IN_RELAY_READY=true` and `APPLE_SIGN_IN_ENABLED=true`, through the
+   established configuration process; refresh cached configuration and verify it.
+   No new migration or backend code is required. Owner force-closes/reopens Shelf
+   to fetch configuration, signs out if needed, and uses ordinary **Sign in with
+   Apple**. That path obtains a fresh server challenge and credential and performs
+   all existing backend signature/nonce/code checks. Never use the rehearsal address
+   as authentication evidence or reuse its discarded credentials. Test ordinary
+   Google login on the same iPhone, cancellation, logout/relogin, existing
+   email/password access, collision rejection without automatic merging, and Library/
+   download isolation without purchases. Use only a separately approved disposable
+   owner identity for reset/deletion/revocation checks; do not delete real ownership.
+
+**A second internal build is not expected:** the same binary already includes
+normal Apple/Google login and fetches server configuration at startup. Apple
+continues returning email in subsequent identity tokens even when its native
+first-response email field is absent; normal backend login uses verified claims.
+See [Apple's authentication guide](https://developer.apple.com/documentation/signinwithapple/authenticating-users-with-sign-in-with-apple).
+Native compilation, packaged Google configuration and actual phone behavior still
+need the signed run; a defect discovered there could require a corrected build.
+The temporary rehearsal must remain excluded from wider/public distribution;
+normal later build numbers disable it. No public launch is authorized.
+
+**Source verification:** focused wrapper scope `ios-relay` covers the new UI/native
+method boundary, cancellation/privacy errors, no network/account creation,
+unchanged signed-in reader session, and the normal Apple button after a later
+configuration refresh. Swift is source-inspected only on this Linux host;
+macOS compilation and signed-iPhone/provider/relay acceptance are pending.
+Final focused results: **7 rehearsal Flutter tests + 1 staging identity test**,
+**1 PHP disabled-configuration test / 3 assertions**, no analyzer errors/warnings
+(four existing style infos). Completed backend 43-test/386-assertion and earlier
+Flutter authentication evidence are reused. No broad rerun, cloud build, upload, email, migration, deployment or
+production flag change is included in preparation. Checkout OFF, pricing sync and
+second-phone restore deferred, Android/UI pause, deferred improvements before
+launch and joint Android/iOS public-launch hold remain.
+
 ## Owner setup update — 11 October 2026
 
 Owner confirms Google iOS client creation and `SHELF_GOOGLE_IOS_CLIENT_ID` saved
@@ -83,8 +197,8 @@ a cryptographically random local nonce, and the owner's choice **Hide My Email**
 Confirm a signing/install route for that rehearsal before executing it; no current
 build/store upload is authorized. Retain only the actual relay email privately,
 discard native tokens/codes without logging, and create no Shelf reader/session.
-Do not turn either backend gate on merely to retrieve an address. This rehearsal
-entry point does not exist yet; the normal challenge/login endpoints remain gated.
+Do not turn either backend gate on merely to retrieve an address. The entry point was subsequently prepared in the one-build section above;
+execution is still unapproved and normal challenge/login endpoints remain gated.
 If the owner already has an active Shelf Sign in with Apple address, reuse that
 address instead; do not revoke any real account to force a new first response.
 
@@ -287,7 +401,7 @@ Do not set relay-ready true merely to get an address. A later separately approve
 owner-only native authorization rehearsal must obtain Shelf's real relay address
 without activating the public backend or creating a reader; its token/code must
 stay private and not be logged or retained. This requires a reviewed rehearsal
-path, which is not implemented/authorized now. After mail delivery passes, later
+path, now prepared in the one-build section above; its execution is not authorized here. After mail delivery passes, later
 signed-phone acceptance must still exercise genuine reset/deletion email and
 revocation on a disposable owner Apple reader, with no purchases or real-account
 deletion. This separates mail readiness from full account acceptance.

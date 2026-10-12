@@ -579,6 +579,59 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## One-build iOS Apple relay bootstrap prepared — 12 October 2026
+
+Owner confirms **iOS build 3 is still unused**. Plan: existing Shelf **1.0.0 (3)**
+from ios/foundation source **9194793edd1f33885af9522620efa7950bec19e0**,
+existing `ios-testflight-internal`, sole-owner **Shelf Owner** internal distribution.
+No new build/upload has been started. Installed build 2 remains limited owner
+acceptance (“seems good”), not acceptance of these authentication changes.
+
+Prepared in isolated `/home/shelf/tmp/shelf-ios-foundation`: a temporary account
+panel **Owner Apple email check**, natively limited to release services.shelf.app
+1.0.0 (3). It invokes the existing Apple SDK before backend account creation,
+requests email with a cryptographically random local nonce, and saves only an
+actual SDK-supplied Apple private relay address to device-only Keychain. It does
+not read/retain/return Apple tokens, codes or subject; Flutter receives booleans
+only. Owner copy is device-local and expires after 60 seconds; private password
+manager/SSH transfer only, never chat/git/logs. Remove saved address does not
+revoke Apple authorization. Scope relies on sole-owner internal distribution,
+not a claim that a build number authenticates the owner. No API/session/account
+or purchase path is bypassed or changed. Existing email/password, Android Google,
+account collision refusal, ownership and deletion behavior retained.
+
+Backend stays at **31d123aaee8310b71e9550dfa1e13047e44541db**, Apple enabled=false
+and relay-ready=false. Signing/photo guards/internal-only export/ditto and verified
+explicit `$CM_BUILD_DIR` artifact paths are unchanged. No new dependency/credential,
+production `.env`, migration, deployment, email, purchase or store operation.
+Production's local Master Record/sign-in guide and cPanel `.htaccess` changes
+are preserved; preparation is not a backend promotion.
+
+Execution plan is in `docs/IOS_SIGN_IN.md`: one separately authorized internal
+build → owner taps Prepare Apple email check/Hide My Email → private collection
+of address only → one separately authorized harmless production relay email while
+both flags remain false → actual inbox/authentication evidence → separately
+approved backed-up activation → force-close/reopen and full Apple/Google login
+on the **same build**. No second internal build expected because normal provider
+flows and configuration refresh are already included. Native compilation and
+signed-phone behavior remain pending; a discovered defect may require correction.
+Green relay SPF alone is not delivery. Missing first-response address is a stop,
+not permission to revoke a real account or guess an address.
+
+Focused source checks use `scripts/run_tests.sh --mobile`, scope `ios-relay`,
+with only the backend disabled/missing-configuration check. Native Swift is
+source-inspected; this Linux host cannot compile/verify signed iPhone behavior.
+Completed broad backend/Flutter evidence is reused. Development-test failures
+in platform-override cleanup and viewport selection were corrected in isolation;
+no production failure occurred. Final checks passed: **7 rehearsal Flutter tests,
+1 staging-identity Flutter test, 1 focused PHP test / 3 assertions**. Focused
+analyzer had no errors/warnings and four pre-existing account-screen style infos. UI has explicit preparation/copy/removal states and sanitized errors;
+no relay address or credential is displayed. Actual device acceptance remains open.
+
+Checkout OFF; pricing-sync and second-phone-restore deferrals, Android/UI pause,
+small improvements deferred until before launch and joint public-launch hold remain.
+
+
 ## Disabled iOS authentication backend deployed — 12 October 2026 UTC
 
 **COMPLETED DISABLED BACKEND ROLLOUT**, not Apple/provider/iPhone acceptance.
