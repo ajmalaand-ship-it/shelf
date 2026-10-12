@@ -579,6 +579,57 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Build-3 relay rehearsal accepted; private transfer and single email authorized — 12 October 2026
+
+Owner reports installed build **1.0.0 (3)** “Prepare Apple email check” works
+and displays the hidden email address. Record this as **limited owner-phone
+rehearsal acceptance**. No relay address, screenshot or token supplied in chat;
+no inference of full Apple/Google login, inbox delivery, reset/deletion/revocation
+or wider acceptance. Exact signed-build source/artifacts were not independently
+reread in this task. Earlier build-3 unused/preparation status is historical.
+
+Owner authorizes secure address transfer and exactly **one** harmless relay test
+email to their own address. Both activation flags must remain false. Inspected
+existing key uploader and mail setup helper; key uploader only accepts .p8 and
+mail setup changes configuration, so neither is used for this check. Prepared
+`docs/IOS_APPLE_RELAY_UPLOAD.ps1`, reusing trusted SSH/stdin and original ownership/
+mode checks. Hidden PowerShell prompt; no address in command arguments, printed
+output, history, Git or local plaintext file. SSH host must already be trusted;
+receiver validates Apple relay format, private mode-700 shelf directories,
+creates only `owner-relay-address.txt` with exclusive/no-symlink mode-600 semantics,
+sets shelf:shelf, verifies bytes privately and refuses overwrite.
+
+Private directory verified shelf:shelf/700. Address destination and attempt file
+were absent at inspection. **Transfer pending owner execution/confirmation;
+no email sent.** Exact Downloads scp/run commands are in `docs/IOS_SIGN_IN.md`.
+Only generic upload result is requested; never ask the owner to paste the address.
+
+Prepared operational `docs/IOS_APPLE_RELAY_CHECK.php`, run outside application
+routes against the existing production Laravel bootstrap. Its non-sending
+preflight passed: configured SMTP/default sender noreply@shelf.services; Apple
+flags false; real checkout OFF and sync disabled. After transfer, verify file
+owner/mode/regular-file identity/relay format without printing contents, then
+send once using the existing mailer, subject **Shelf relay delivery check**,
+body **This is the owner-only Shelf email delivery check. No action is required.**
+No mail setting, reader account, database, token or purchase change. Before SMTP,
+create an exclusive private `relay-test-attempt.json` with sanitized timestamps/
+status, preventing another attempt even after failure or uncertain acceptance.
+SMTP acceptance and **owner-confirmed inbox receipt** are separate evidence;
+receipt and SPF/DKIM outcome remain unverified. No automatic resend.
+
+Checks: PHP syntax and non-sending production preflight passed; synthetic Python
+receiver tests passed invalid-input refusal, private mode/ownership, correct
+transfer, overwrite/symlink refusal and sanitized output. Windows PowerShell
+runtime is unavailable here; Windows prompt/SSH execution awaits the owner.
+Completed Flutter/backend tests reused; no app source changed or broad rerun.
+Changes are isolated tools/documentation only, not deployed application code.
+Production local records/cPanel handler and all unrelated changes preserved.
+
+Checkout OFF; pricing-sync/second-phone restore deferrals, Android/UI pause,
+deferred small improvements and joint Android/iOS public-launch hold preserved.
+No activation, cloud build/store upload, deployment or purchases in this task.
+
+
 ## One-build iOS Apple relay bootstrap prepared — 12 October 2026
 
 Owner confirms **iOS build 3 is still unused**. Plan: existing Shelf **1.0.0 (3)**

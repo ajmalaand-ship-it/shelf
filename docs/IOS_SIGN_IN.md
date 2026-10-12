@@ -31,6 +31,54 @@ callback scheme; absent configuration hides that option. Android's provider rema
 Picker cancellation changes no server reader session. Both methods use the existing
 server session/offline-identity path; neither grants book ownership.
 
+## Build-3 owner acceptance and authorized relay check — 12 October 2026
+
+Owner confirms build 3's **Prepare Apple email check** works and displays the
+hidden address. This is limited rehearsal acceptance, not complete login or
+relay-delivery acceptance. Earlier unused-build/preparation statements below
+are historical. Owner authorizes private transfer and **one** harmless email;
+both Apple activation flags remain false throughout. No new build is needed.
+
+Existing .p8 uploader is key-specific; mail configuration helper must not run.
+Use [IOS_APPLE_RELAY_UPLOAD.ps1](IOS_APPLE_RELAY_UPLOAD.ps1), which asks for the
+address privately and sends only address bytes through trusted SSH stdin.
+No local address file, command argument or printed address; no overwrite.
+
+In Windows PowerShell, first download into Downloads:
+
+```powershell
+scp.exe -o StrictHostKeyChecking=yes root@157.250.199.106:/home/shelf/tmp/shelf-ios-foundation/docs/IOS_APPLE_RELAY_UPLOAD.ps1 "$env:USERPROFILE\Downloads\IOS_APPLE_RELAY_UPLOAD.ps1"
+```
+
+Then run separately:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\IOS_APPLE_RELAY_UPLOAD.ps1"
+```
+
+Paste only the actual Shelf @privaterelay.appleid.com address at the **hidden
+prompt**, never as a command or into chat. It stores privately at
+`/home/shelf/secrets/apple/owner-relay-address.txt`, shelf:shelf/600, private
+parent 700. It refuses an existing file or symlink. Report only the generic
+**Relay upload verified: shelf:shelf; mode 600; address withheld. No email sent.**
+If it fails/refuses, report the sanitized error without the address and do not
+retry over an existing file. The server SSH host key must already be trusted.
+Keep any retained address copy in an encrypted password manager.
+
+Codex next runs [IOS_APPLE_RELAY_CHECK.php](IOS_APPLE_RELAY_CHECK.php) as shelf:
+`--check` verifies the protected address without printing it; then `--send-once`
+uses Shelf's unchanged configured SMTP sender for subject **Shelf relay delivery
+check**, harmless body **This is the owner-only Shelf email delivery check. No
+action is required.** Production preflight passed, without sending. Exclusive
+private attempt evidence is written **before** SMTP; no automatic retries, even
+on uncertain acceptance. No account creation or mail configuration change.
+
+**Current result: transfer pending; email not sent; inbox receipt unconfirmed.**
+After SMTP acceptance, owner confirms actual inbox receipt separately. Mail
+service acceptance alone does not prove relay delivery; SPF/DKIM checks remain
+private and must be recorded accurately. Do not activate either flag in this task.
+Checkout OFF, all deferrals/Android/UI pause and joint launch hold preserved.
+
 ## One internal build for relay preparation and full login — 12 October 2026
 
 **Prepared only; execution is not authorized by this preparation.** Owner confirms
