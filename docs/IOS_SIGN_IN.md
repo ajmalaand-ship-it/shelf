@@ -35,10 +35,12 @@ server session/offline-identity path; neither grants book ownership.
 
 **Prepared only; execution is not authorized by this preparation.** Owner confirms
 build **3 remains unused**. Target **Shelf 1.0.0 (3)**, bundle services.shelf.app,
-team YSLWJQDH8B, existing Codemagic `ios-testflight-internal` workflow. Build source: **9194793edd1f33885af9522620efa7950bec19e0** (ios/foundation). Pin this exact
-commit and verify it against the workflow's source-commit evidence before accepting
-the build. A later documentation-only commit records this source; it does not
-change the app. Backend
+team YSLWJQDH8B, existing Codemagic `ios-testflight-internal` workflow. App implementation: **9194793edd1f33885af9522620efa7950bec19e0**. Build from
+**ios/foundation at the exact final commit reported with this preparation**;
+subsequent commits in this preparation change documentation only. Before manual
+start, verify the remote branch head equals that reported SHA, allow no intervening
+push, and match the resulting source-commit evidence. Codemagic manual YAML
+start selects a branch/workflow; do not assume an undocumented SHA input. Backend
 remains deployed at 31d123aaee8310b71e9550dfa1e13047e44541db; both Apple flags false.
 This section supersedes the earlier statements that no rehearsal path exists.
 
@@ -73,8 +75,8 @@ ditto extraction and explicit `$CM_BUILD_DIR` IPA/evidence collection are unchan
    to **3**, and save. Keep the existing `SHELF_GOOGLE_IOS_CLIENT_ID`, Google Web
    client, signing identity and App Store Connect upload integration unchanged.
    Confirm the saved iOS client is nonempty before starting; do not invent it or
-   put private keys into YAML. Manually run only `ios-testflight-internal` against
-   the exact reported SHA. Verify source/build evidence, Apple entitlement, strict
+   put private keys into YAML. Click **Start new build**, select branch **ios/foundation** and workflow
+   **ios-testflight-internal**, after confirming its head is the exact reported SHA. Verify source/build evidence, Apple entitlement, strict
    signing checks and collected IPA; inspect packaged Google client/callback values.
    After Apple processing, TestFlight → Internal Testing → **Shelf Owner** → add
    **1.0.0 (3)**. Keep sole-owner distribution and all public-release holds.
@@ -130,7 +132,8 @@ See [Apple's authentication guide](https://developer.apple.com/documentation/sig
 Native compilation, packaged Google configuration and actual phone behavior still
 need the signed run; a defect discovered there could require a corrected build.
 The temporary rehearsal must remain excluded from wider/public distribution;
-normal later build numbers disable it. No public launch is authorized.
+normal later build numbers disable it. No public launch is authorized. Manual branch/workflow controls are described in
+[Codemagic YAML documentation](https://docs.codemagic.io/yaml-basic-configuration/yaml-getting-started/).
 
 **Source verification:** focused wrapper scope `ios-relay` covers the new UI/native
 method boundary, cancellation/privacy errors, no network/account creation,

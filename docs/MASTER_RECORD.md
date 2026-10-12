@@ -582,7 +582,8 @@ build, deployment, purchase, provider setting change or release.
 ## One-build iOS Apple relay bootstrap prepared — 12 October 2026
 
 Owner confirms **iOS build 3 is still unused**. Plan: existing Shelf **1.0.0 (3)**
-from ios/foundation source **9194793edd1f33885af9522620efa7950bec19e0**,
+with app source **9194793edd1f33885af9522620efa7950bec19e0** and documentation-only
+follow-ups. Build the exact final ios/foundation head reported with this preparation,
 existing `ios-testflight-internal`, sole-owner **Shelf Owner** internal distribution.
 No new build/upload has been started. Installed build 2 remains limited owner
 acceptance (“seems good”), not acceptance of these authentication changes.
