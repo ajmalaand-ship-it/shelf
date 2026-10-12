@@ -2,8 +2,9 @@
 
 11 October 2026. Apple and Google sign-in source is prepared on ios/foundation
 at **32ca4a04929ad065af21d85241c5ca3a749b5007**.
-Nothing here claims provider or signed-iPhone acceptance, authorizes a build,
-changes production settings or authorizes a backend rollout. Build 1.0.0 (2)
+Disabled backend rollout at 31d123aaee8310b71e9550dfa1e13047e44541db completed
+under separate owner authorization on 12 October UTC; both Apple gates remain false.
+No provider/signed-iPhone acceptance, further activation, build or upload is authorized. Build 1.0.0 (2)
 processed, reached Shelf Owner internally and was installed/tested by the owner:
 “seems good.” This is limited general phone acceptance of that older source.
 The sign-in changes are not in installed build 2. Small Android/iOS improvements
@@ -51,6 +52,53 @@ No key has been transferred by Codex. The actual uploaded filename, rather than
 the earlier proposed `sign-in-with-apple.p8`, will be used in any later approved
 server configuration. Do not rename or upload the App Store Connect key instead.
 No `.env` change, activation, deployment, build or Apple upload is authorized here.
+
+## Current deployed status and next owner step — 12 October 2026 UTC
+
+**Both staging and production: 31d123aaee8310b71e9550dfa1e13047e44541db**.
+Owner confirms ShelfLogin / Key ID 2VQ43945YB / Sign in with Apple /
+YSLWJQDH8B.services.shelf.app. Production has only the six approved Apple settings;
+client/team/key/original path resolve correctly, configured=true,
+**enabled=false / relay-ready=false**. Google Web/APP_KEY/all unrelated settings
+unchanged; key/handler unchanged. Staging has no production Apple signing settings,
+uses independent APP_KEY, log mail and disabled queue. Apple HTTPS endpoints 404,
+accounts/Google advertised available, real checkout OFF and sync disabled.
+
+Focused gate passed **43 PHP / 386 assertions** and deployed staging isolation/
+HTTPS checks; existing Flutter evidence reused. Auth migration production batch
+**27**, staging **10**, no pending migrations; history unchanged, health passed,
+maintenance lifted. Initial gate confused sandbox enablement with real checkout;
+corrected in isolation and reverified before final backed-up promotion, preserving
+sandbox. Production backups/checkpoint and exact evidence are in Master Record;
+final promotion backup **/home/shelf/backups/shelf/20261012-035221/**, private
+configuration/key checkpoint **/home/shelf/backups/shelf/20261012-034809/ios-auth-checkpoint/**.
+Earlier future/pending rollout instructions below are historical where superseded.
+Documentation follow-up is not a new deployed application commit.
+
+**Next owner action:** authorize a narrowly scoped owner-only native Apple
+rehearsal on a signed iPhone using existing Shelf App ID **services.shelf.app** and
+team **YSLWJQDH8B**, with no public-backend activation. It needs a reviewed local
+rehearsal entry point using the existing AuthenticationServices implementation,
+a cryptographically random local nonce, and the owner's choice **Hide My Email**.
+Confirm a signing/install route for that rehearsal before executing it; no current
+build/store upload is authorized. Retain only the actual relay email privately,
+discard native tokens/codes without logging, and create no Shelf reader/session.
+Do not turn either backend gate on merely to retrieve an address. This rehearsal
+entry point does not exist yet; the normal challenge/login endpoints remain gated.
+If the owner already has an active Shelf Sign in with Apple address, reuse that
+address instead; do not revoke any real account to force a new first response.
+
+Once that address is privately available, separately authorize **one owner-only
+production relay message** through the existing Laravel mailer/sender, as specified
+in the delivery procedure below. Keep its address/raw headers out of chat/git.
+Owner confirms inbox receipt; inspect actual envelope sender and SPF/DKIM evidence
+privately. Green registration SPF alone is not receipt; an @icloud.com alias does
+not prove app relay. Both flags stay false if address/delivery evidence is missing.
+Later activation and signed-phone reset/deletion/revocation/provider acceptance
+remain separate steps. No new Services ID, Apple key or Google client is needed.
+
+All public launch/UI/checkout holds and pricing-sync/second-phone-restore deferrals
+remain. No email, real provider call, purchases, cloud build or store upload occurred.
 
 ## Rollout gate correction during verification — 12 October 2026 UTC
 
