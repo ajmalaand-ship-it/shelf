@@ -31,13 +31,34 @@ callback scheme; absent configuration hides that option. Android's provider rema
 Picker cancellation changes no server reader session. Both methods use the existing
 server session/offline-identity path; neither grants book ownership.
 
-## Build-3 owner acceptance and authorized relay check — 12 October 2026
+## Owner correction: phone/relay checks deferred; transfer/email stopped — 12 October 2026
 
-Owner confirms build 3's **Prepare Apple email check** works and displays the
-hidden address. This is limited rehearsal acceptance, not complete login or
-relay-delivery acceptance. Earlier unused-build/preparation statements below
-are historical. Owner authorizes private transfer and **one** harmless email;
-both Apple activation flags remain false throughout. No new build is needed.
+Owner reached Apple's **Face ID prompt**, but could not complete authorization
+because the test iPhone belongs to someone else. Earlier “it works” did not
+confirm successful Apple authorization or relay-address acquisition. Preserve
+confirmed build-3 build/install and native prompt evidence; do not mark the
+rehearsal or full Apple login passed.
+
+**Apple sign-in phone acceptance and relay-email delivery: OWNER-DEFERRED,
+UNVERIFIED.** No relay upload and no test email. The pending transfer/email task
+is **STOPPED**, and the prior one-email authorization is withdrawn. Both Apple
+flags remain false. The following transfer commands and check tools are retained
+as historical preparation only: **do not run them or send email without a later
+explicit owner instruction**. No further phone/relay request is pending.
+No rebuild, upload, deployment or purchase is part of this correction.
+
+Next useful work is the unfinished iOS per-book App Store purchase readiness audit
+and preparation plan; it does not require this phone. Full purchase implementation
+and dashboard/transaction changes need a separate scoped task. All holds and
+existing deferrals remain. See the current Master Record four-area list.
+
+## Historical build-3 report and relay tooling — corrected/stopped, 12 October 2026
+
+Owner initially reported the build-3 preparation worked and displayed an
+address. **Correction:** only the Face ID prompt was reached; authorization did
+not finish. No relay acquisition or successful rehearsal acceptance is confirmed. Earlier unused-build/preparation statements below
+are historical. The earlier private-transfer/one-email authorization is now **withdrawn** and
+the task **stopped**. Both Apple flags remain false; no new build is authorized.
 
 Existing .p8 uploader is key-specific; mail configuration helper must not run.
 Use [IOS_APPLE_RELAY_UPLOAD.ps1](IOS_APPLE_RELAY_UPLOAD.ps1), which asks for the
@@ -73,7 +94,8 @@ action is required.** Production preflight passed, without sending. Exclusive
 private attempt evidence is written **before** SMTP; no automatic retries, even
 on uncertain acceptance. No account creation or mail configuration change.
 
-**Current result: transfer pending; email not sent; inbox receipt unconfirmed.**
+**Current result: transfer/email STOPPED; no upload, email not sent; relay
+receipt owner-deferred and unverified.**
 After SMTP acceptance, owner confirms actual inbox receipt separately. Mail
 service acceptance alone does not prove relay delivery; SPF/DKIM checks remain
 private and must be recorded accurately. Do not activate either flag in this task.

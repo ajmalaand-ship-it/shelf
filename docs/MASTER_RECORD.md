@@ -579,17 +579,60 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
-## Build-3 relay rehearsal accepted; private transfer and single email authorized — 12 October 2026
+## Owner correction: Apple phone/relay checks deferred; transfer/email stopped — 12 October 2026
 
-Owner reports installed build **1.0.0 (3)** “Prepare Apple email check” works
-and displays the hidden email address. Record this as **limited owner-phone
-rehearsal acceptance**. No relay address, screenshot or token supplied in chat;
+Owner clarifies the build-3 rehearsal reached **Apple's Face ID prompt only**.
+Authorization could not finish because the test iPhone belongs to somebody else.
+Earlier “it works” did **not** establish successful Apple authorization, actual
+Shelf relay-address acquisition or complete rehearsal acceptance. Correct the
+prior acceptance wording below accordingly; preserve the confirmed build/install
+and observed native prompt evidence. No signed-build source/artifact reread or
+additional install/processing claim is made by this records-only correction.
+
+**Apple sign-in phone acceptance and relay-email delivery are OWNER-DEFERRED,
+UNVERIFIED, not passed.** No relay address was uploaded, SMTP test attempted or
+inbox receipt established. Read-only file existence check confirms both
+`owner-relay-address.txt` and `relay-test-attempt.json` absent. The pending private
+transfer and single-email task is **STOPPED**; its earlier send authorization is
+withdrawn by this instruction. Prepared tools remain historical preparation and
+must not be run without a later explicit owner instruction. Do not request a
+relay address or another phone check now; no email is sent.
+
+Both **APPLE_SIGN_IN_ENABLED=false** and **APPLE_SIGN_IN_RELAY_READY=false** are
+preserved. No code/configuration/key/account/data change, rebuild, upload,
+deployment or purchase. This correction changes only isolated records; production
+local Master Record/sign-in guide and cPanel `.htaccess` edits are preserved.
+
+**Next useful task without the owner's iPhone:** a scoped **iOS per-book App Store
+purchase readiness audit and preparation plan**, the unfinished iOS functionality
+work in the single four-area list. Inspect existing shared Flutter purchase flow,
+backend verification/ownership/accounting and store-specific configuration;
+identify reusable Android functionality and exact iOS/RevenueCat/App Store gaps,
+then prepare a minimal implementation/setup and sandbox-validation plan. This
+can proceed as inspection/preparation without Apple phone login, production flag
+changes, real transactions or a new build. Do not infer Android evidence proves
+iOS purchases. Purchase implementation/dashboard changes and transactions need
+separate task authorization; they are not begun by this correction.
+
+Existing backend financial-retention construction remains in the Master Plan;
+Android/UI work remains paused. Checkout OFF, pricing-sync and second-phone
+restore deferrals, small improvements deferred until before launch and joint
+Android/iOS public-launch hold are unchanged. No broad test rerun for records.
+
+
+## Historical build-3 report and transfer preparation — corrected and stopped, 12 October 2026
+
+Owner initially reported installed build **1.0.0 (3)** “Prepare Apple email check”
+works and displays the hidden email address. **Owner corrected this report:**
+only Apple’s Face ID prompt was reached; authorization could not finish on the
+borrowed phone. Build/install and prompt evidence remain; **no successful
+authorization, relay acquisition or rehearsal acceptance is confirmed**. No relay address, screenshot or token supplied in chat;
 no inference of full Apple/Google login, inbox delivery, reset/deletion/revocation
 or wider acceptance. Exact signed-build source/artifacts were not independently
 reread in this task. Earlier build-3 unused/preparation status is historical.
 
-Owner authorizes secure address transfer and exactly **one** harmless relay test
-email to their own address. Both activation flags must remain false. Inspected
+Owner initially authorized secure transfer and exactly **one** harmless test
+email; **that pending task is now stopped and authorization withdrawn**. Both activation flags must remain false. Inspected
 existing key uploader and mail setup helper; key uploader only accepts .p8 and
 mail setup changes configuration, so neither is used for this check. Prepared
 `docs/IOS_APPLE_RELAY_UPLOAD.ps1`, reusing trusted SSH/stdin and original ownership/
@@ -600,8 +643,7 @@ creates only `owner-relay-address.txt` with exclusive/no-symlink mode-600 semant
 sets shelf:shelf, verifies bytes privately and refuses overwrite.
 
 Private directory verified shelf:shelf/700. Address destination and attempt file
-were absent at inspection. **Transfer pending owner execution/confirmation;
-no email sent.** Exact Downloads scp/run commands are in `docs/IOS_SIGN_IN.md`.
+were absent at inspection. **Transfer/email task STOPPED by owner; no upload and no email sent.** Exact Downloads scp/run commands are in `docs/IOS_SIGN_IN.md`.
 Only generic upload result is requested; never ask the owner to paste the address.
 
 Prepared operational `docs/IOS_APPLE_RELAY_CHECK.php`, run outside application
@@ -620,7 +662,7 @@ receipt and SPF/DKIM outcome remain unverified. No automatic resend.
 Checks: PHP syntax and non-sending production preflight passed; synthetic Python
 receiver tests passed invalid-input refusal, private mode/ownership, correct
 transfer, overwrite/symlink refusal and sanitized output. Windows PowerShell
-runtime is unavailable here; Windows prompt/SSH execution awaits the owner.
+runtime is unavailable here; Windows prompt/SSH execution was not completed and is now owner-deferred.
 Completed Flutter/backend tests reused; no app source changed or broad rerun.
 Changes are isolated tools/documentation only, not deployed application code.
 Production local records/cPanel handler and all unrelated changes preserved.
@@ -2770,25 +2812,23 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner relay-address bootstrap/delivery, later activation, native compilation and signed-iPhone authentication validation remain unfinished. Prior unsigned successes are preserved without rerun. | Functionality phase, current scoped batch. Use IOS_SIGN_IN.md setup first; later separately approved activation/build/phone checks. |
+| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. Next independent scope is iOS purchase readiness/preparation; later sign-in activation/device checks require owner resumption. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
 | **4. Shared app design and UX/UI** | **Acceptance:** accept both apps together against agreed design, clear actions/touch targets, loading/empty/error states, text/layout and account/purchase/Library flows; fix demonstrated issues and reuse passed evidence. | Batch 4 with platform-specific device/reading checks. One ready platform cannot release publicly alone. |
 
-**Next practical task:** complete the missing Apple/Google provider setup using
-[IOS_SIGN_IN.md](IOS_SIGN_IN.md), then separately approve staged/backed-up backend
-promotion and one signed internal phone-validation build at an unused number
-**greater than 2**. Build **1.0.0 (2)** is owner-confirmed processed/assigned/installed
-with limited “seems good” phone acceptance; it predates this authentication source.
-No repeated diagnostic or unsigned compilation is needed. Apple/Google sign-in
-source is prepared with focused evidence; dashboard/relay setup, activation,
-native compile and signed-iPhone authentication acceptance remain unfinished.
-Do not start App Store purchases in this batch. Small Android/iOS improvements
-are deferred until before launch. Existing financial-retention work remains in
-the backend list. Checkout OFF, pricing-sync/second-phone-restore deferrals and
-joint public-launch hold remain binding. No build/upload/settings/deploy/purchase
-was performed; scoped source/record commit/push to **ios/foundation** only.
+**Next practical task (12 October owner correction):** iOS per-book App Store
+purchase readiness audit and scoped preparation plan, without needing the owner's
+iPhone. Reuse shared Flutter/backend and completed Android evidence; inspect exact
+iOS product/RevenueCat/verification gaps before implementation. Apple phone login
+and relay delivery are owner-deferred/unverified; transfer/email task stopped.
+Preserve build-2 limited acceptance and build-3 install/native Face ID prompt
+only. No new build/upload, settings, transaction or deployment is implied.
+Existing backend financial-retention work remains in this list. Checkout OFF,
+pricing-sync/second-phone-restore deferrals, Android/UI pause, deferred improvements
+and joint public-launch hold remain. This identifies the next task; it does not
+start App Store purchase implementation or authorize dashboard changes.
 
 **Summary reconciliation still needed:** AGENTS.md §§1–3 retain Android-only/current
 Step 4 scope, §4.11 has Android-only phone acceptance, §6 has small-step instructions,
