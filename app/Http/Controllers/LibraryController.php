@@ -17,8 +17,16 @@ class LibraryController extends Controller
             && app(BookAccessService::class)->ownsBook($r->user(), $book), 404);
     }
 
-    public function config()
+    public function config(Request $request)
     {
+        if ($request->query('platform') === 'ios') {
+            $ready = \App\Services\Purchases\ApplePurchaseProof::configured();
+            return response()->json(['enabled' => $ready, 'store' => 'APP_STORE', 'test_mode' => true,
+                'production_checkout_enabled' => false, 'sandbox_checkout_enabled' => $ready,
+                'public_sdk_key' => $ready ? config('purchases.apple_public_sdk_key') : null,
+                'allowed_product_ids' => ['shelf_book_3'], 'consent' => PurchaseService::CONSENT,
+                'offline_days' => 30, 'identity_prefix' => \App\Support\Staging::active() ? 'staging_' : '']);
+        }
         return response()->json(['enabled' => RevenueCatClient::configured(), 'test_mode' => ! RevenueCatClient::productionEnabled(),
             'production_checkout_enabled' => RevenueCatClient::configured() && RevenueCatClient::productionEnabled(),
             'sandbox_checkout_enabled' => RevenueCatClient::configured(),
@@ -40,6 +48,23 @@ class LibraryController extends Controller
 
     public function consent(Request $r, Collection $collection)
     {
+        if ($r->input('store') === 'APP_STORE') {
+            abort_unless(\App\Services\Purchases\ApplePurchaseProof::configured(), 503);
+            abort_unless(\App\Services\Purchases\ApplePurchaseProof::owner($r->user()), 403);
+            $r->validate(['agree' => ['required', 'accepted'], 'checkout_mode' => ['required', 'in:sandbox']]);
+            DB::transaction(function () use ($r, $collection): void {
+                $reader = \App\Models\Reader::whereKey($r->user()->id)->lockForUpdate()->firstOrFail();
+                $book = Collection::whereKey($collection->id)->lockForUpdate()->firstOrFail();
+                abort_unless(\App\Services\Purchases\ApplePurchaseProof::owner($reader), 403);
+                abort_unless($book->id === 3 && $book->product_id === 'shelf_book_3'
+                    && $book->isPublished() && $book->price_usd > 0, 409);
+                abort_if(app(BookAccessService::class)->ownsBook($reader, $book), 409);
+                DB::table('purchase_consents')->insert(['reader_id' => $reader->id, 'collection_id' => 3,
+                    'store' => 'APP_STORE', 'wording' => PurchaseService::CONSENT, 'created_at' => now()]);
+            });
+            return response()->json(['accepted' => true, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE',
+                'product_id' => 'shelf_book_3', 'app_user_id' => (string) $r->user()->id]);
+        }
         abort_unless(RevenueCatClient::configured(), 503, 'Purchases are not configured yet.');
         $r->validate(['agree' => ['required', 'accepted'], 'checkout_mode' => ['sometimes', 'required', 'in:sandbox,production']]);
         // Legacy installed owner-test clients omit the mode. This authorizes checkout,

@@ -87,7 +87,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         setState(() {
           product = value;
           if (value == null)
-            message = 'This book is not available in Google Play yet.';
+            message = 'This book is not available in $purchaseStoreName yet.';
         });
     } catch (_) {
       if (mounted)
@@ -104,7 +104,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     if (library == null || product == null || loading || !agreed) return;
     setState(() {
       loading = true;
-      message = 'Opening Google Play…';
+      message = 'Opening $purchaseStoreName…';
     });
     try {
       final result = await library.purchase(widget.book, product!, agreed);
@@ -118,7 +118,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         () => message = switch (result) {
           StorePurchaseResult.cancelled =>
             'Purchase cancelled. Your book was not unlocked.',
-          StorePurchaseResult.pending => 'Payment is pending with Google Play. Your book will appear after the store and Shelf confirm it.',
+          StorePurchaseResult.pending => 'Payment is pending with $purchaseStoreName. Your book will appear after the store and Shelf confirm it.',
           StorePurchaseResult.failed => 'The purchase did not finish. No book was unlocked. Please try again.',
           StorePurchaseResult.confirming =>
             library.message ??
@@ -165,9 +165,9 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
             const SizedBox(height: 20),
             Text(library?.checkoutAvailable != true
                 ? 'Purchases are not available yet. You can still read the free sample.'
-                : library!.internalTestCheckout
-                    ? 'Owner test — use only Google Play test payment methods.'
-                    : 'Google Play will confirm your payment.'),
+                : library!.checkoutMode == 'sandbox'
+                    ? applePurchasePlatform ? 'Owner Apple sandbox test — no real checkout.' : 'Owner test — use only Google Play test payment methods.'
+                    : '$purchaseStoreName will confirm your payment.'),
             const SizedBox(height: 16),
             if (account == null) ...[
               const Text(

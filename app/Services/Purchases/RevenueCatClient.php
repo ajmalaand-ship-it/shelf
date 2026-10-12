@@ -25,6 +25,11 @@ class RevenueCatClient
         return trim(file_get_contents($real)) ?: null;
     }
 
+    public static function appleCredential(): ?string
+    {
+        return self::credential(true);
+    }
+
     public static function configured(): bool
     {
         if (\App\Support\Staging::active() && (! config('purchases.staging_project_confirmed')

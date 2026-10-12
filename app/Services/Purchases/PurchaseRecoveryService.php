@@ -15,6 +15,7 @@ class PurchaseRecoveryService
             'Verify the claimant and enter a support case reference without personal data.');
         abort_unless($target->email_verified_at && ($token === '' || (strlen($token) >= 10 && strlen($token) <= 4096)), 422);
         $purchase = Purchase::with('book')->findOrFail($purchaseId);
+        abort_unless($purchase->store === 'PLAY_STORE', 409, 'Apple deleted-account recovery needs reviewed store proof; no ownership moved.');
         abort_unless($purchase->reader_id && ! Reader::whereKey($purchase->reader_id)->exists(), 409, 'Original account must be deleted.');
         abort_if($purchase->entries()->whereIn('status', ['refund', 'revoke'])->exists(), 409, 'Refunded or revoked purchases cannot be recovered.');
         $play = app(GooglePlayClient::class);

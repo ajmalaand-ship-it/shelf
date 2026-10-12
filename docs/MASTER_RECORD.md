@@ -579,6 +579,106 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## One-book Apple sandbox purchase source prepared — 12 October 2026
+
+Owner authorized the completed purchase audit's smallest implementation batch,
+`shelf_book_3`, in the existing isolated `ios/foundation` checkout based on
+`a5047f495ca4ba79a0869fd837787089b06521ac`. Shared purchase infrastructure and
+completed evidence are reused; no general readiness audit or broad unchanged
+suite is repeated. Production's local Master Record, sign-in guide and
+`public/.htaccess` changes are untouched. This record describes source preparation
+only: **not staged, deployed, activated, built, uploaded or phone-accepted**.
+
+Implemented native iOS `appl_` / Android `goog_` RevenueCat selection, exact
+one-book Apple sandbox configuration/consent and the Runner In-App Purchase
+capability. Existing Android behavior, numeric reader identity, purchase
+confirmation and account-isolated Library/download protection are preserved.
+SDK success/restore never grants access; server evidence remains authoritative.
+Apple checkout is **default OFF**, owner-only (verified exact owner email, no
+plus-alias/private-relay inference), sandbox only; Apple production acceptance is
+not implemented/enabled and real checkout remains OFF.
+
+Independent server RevenueCat V2 reads verify configured Apple app/project,
+`services.shelf.app`, its permanent non-consumable `shelf_book_3`, original/current
+reader ID, purchased ownership, quantity one, transaction ID, exact millisecond
+purchase time, sandbox environment and active individual entitlement. Unknown,
+invalid, ambiguous, transferred or production proof fails closed. Apple uses its
+own webhook authorization/app scope. Event IDs, refund tombstones and consent
+are store-scoped; duplicate events/state notifications do not repeat purchases or
+money. Existing Play transaction/environment isolation and production-OFF gates
+are retained.
+
+Confirmation/restore/reconciliation use independent server proof. Refunds and
+revocations lock access; the existing client removes the downloaded copy at the
+next successful check. `REFUND_REVERSED` requires fresh owned proof and a matching
+unreversed refund without revocation, restores only the original account and
+appends a compensating ledger entry. Original sales/refunds are never rewritten;
+sandbox remains Test and excluded from real income/author totals. REST-observed
+refund time is labelled observation evidence, not an invented Apple refund date;
+unknown money stays unknown. Stale/conflicting corrections fail closed. Buying
+blocks stop new checkout without preventing historical refund verification.
+Apple deleted-account recovery remains explicitly blocked before a recovery claim
+or Google-proof call; reviewed Apple claimant proof/recovery-journal support and
+Family Sharing remain outside this batch.
+
+Committed reversible migration preparation adds event store/app/time, exact Apple
+purchase milliseconds and consent store, defaults historical rows to Play and
+refuses rollback that would discard Apple history/consents. **No migration has
+been applied to production or staging.** A later separately authorized rollout
+must verify the exact commit in existing staging with isolated synthetic data,
+then take/verify the required production backup before migration and identical-
+commit promotion through the established process. No new environment created.
+
+Focused verification: **16 PHP tests / 190 assertions**, comprising 14 new Apple
+synthetic tests and two selected shared-path Android compatibility checks; **9 new
+Flutter tests** and the wrapper's existing **1 staging-identity guard**. PHP uses
+SQLite in memory; provider HTTP is mocked/prevented from escaping. Coverage:
+default/staging-off gates, owner-only book/mode consent, app/product/environment/
+identity/transaction/time/entitlement proof rejection, duplicates and key-order
+replay, cross-account paid-access denial, store collision isolation, refund/
+reversal cycles, late duplicate sale, stale corrections, refund-before-sale,
+restore/server confirmation, unavailable-proof lease refusal, buying-blocked
+historical refunds, deleted-account recovery and reversible/history-preserving
+migration guards. Flutter verifies iOS key/config/mode, native capability, book-3
+restriction, store-bound consent, confirmation, native-then-server restore,
+refund download removal, unavailable-proof lease, cancellation/pending and Android
+key/mode preservation. Focused analyzer has no errors/warnings; informational
+style notices remain. No general Flutter/PHP rerun or actual store request.
+
+Signing checks, internal-only export, `ditto` extraction, photo-purpose pre-build
+check and explicit `$CM_BUILD_DIR` IPA/verification-evidence artifact collection
+remain unchanged, verified by focused source diff; completed signing/build
+results are reused without rerunning them. No credentials/build numbers/dashboard
+variables/mail/production flags changed. Installed build 3 does not contain this
+purchase source; a later separately authorized internal build and owner-controlled
+iPhone purchase/restore/refund/reversal checks remain pending. Verify the next
+unused build number at that later step; none reserved here.
+
+Remaining setup is documented in [Apple purchase setup](IOS_PURCHASES.md) and linked
+from the existing purchase guide: actual purchase `.p8` key/Issuer ID; Apple Paid
+Apps Agreement/tax/banking status; Apple book-3 product metadata/price/storefronts;
+RevenueCat Apple app/public key/internal product ID and existing individual
+entitlement attachment; least-privilege V2 purchases/entitlements/apps/products
+read access; separate Apple sandbox notification/webhook configuration; later
+backed-up deployment/default-off configuration and explicit owner sandbox
+activation. None is assumed complete or changed by this batch. Actual Apple →
+RevenueCat → Shelf notification delivery, real response shapes and iPhone results
+remain unverified, separate from synthetic source evidence.
+
+**Next single owner action:** App Store Connect → Users and Access → Integrations
+→ In-App Purchase: inspect existing Active keys; if no suitable existing key/file,
+Generate In-App Purchase Key / +, **Name: ShelfPurchases → Generate → Download API
+Key**; preserve the downloaded `.p8` privately. This purchase key differs from
+both the existing upload key and ShelfLogin Sign in with Apple key; reuse neither
+as purchase proof. Do not activate, deploy, build, upload or transact in this task.
+
+Apple sign-in phone acceptance/relay delivery stay owner-deferred and unverified;
+the relay transfer/email task remains STOPPED and both Apple authentication flags
+false. Checkout OFF, pricing-sync/second-phone-restore deferrals, Android/UI pause,
+small improvements deferred until before launch and joint Android/iOS public-
+launch hold remain binding. Step 4 and iOS acceptance are not marked complete.
+
+
 ## Owner correction: Apple phone/relay checks deferred; transfer/email stopped — 12 October 2026
 
 Owner clarifies the build-3 rehearsal reached **Apple's Face ID prompt only**.
@@ -2812,7 +2912,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. Next independent scope is iOS purchase readiness/preparation; later sign-in activation/device checks require owner resumption. |
+| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. One-book Apple sandbox purchase source is prepared, default off; provider setup, backed-up rollout and iPhone acceptance remain pending. Later sign-in/relay checks require owner resumption. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
