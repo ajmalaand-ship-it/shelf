@@ -6,7 +6,7 @@ the enquiry, request address/phone, or resume this research without new authoriz
 The material below is historical preparation, superseded by that decision.**
 
 Prepared 13 October 2026 from 7d8d5eb. **DRAFT / NOT SUBMITTED.** The earlier France-included plan is superseded. No declaration, acknowledgement, ANSSI decision or Apple approval exists
-in this packet. Build 4's last verified state remains MISSING_EXPORT_COMPLIANCE.
+in this packet. Build 4's current verified state is READY_FOR_BETA_TESTING; see the evidence below.
 
 ## Current non-France plan — supersedes all historical France paperwork below
 
@@ -32,12 +32,35 @@ not the earlier builds' false flags. See
 [Apple's documentation table](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)
 and [encryption property guidance](https://developer.apple.com/documentation/security/complying-with-encryption-export-regulations).
 
-**One next action:** separately authorize saving only build 1.0.0 (4)'s
-usesNonExemptEncryption=false (or the accurate questionnaire above), then verify
-Apple's actual internal-testing state. No declaration or compliance answer saved
-this task. Build readback remains **VALID / INTERNAL_ONLY**, flag null,
-**MISSING_EXPORT_COMPLIANCE**. No rebuild/upload or French paperwork next step.
-All disabled gates, holds and deferrals remain binding.
+### Executed build-4 declaration — 13 October 2026
+
+Owner authorized minimum compliance write for build 4 only. Pre-write readback
+confirmed **VALID / INTERNAL_ONLY**, flag null, declaration null,
+MISSING_EXPORT_COMPLIANCE; FRA remains absent from product's 174 territories and
+app availability remains unconfigured. Existing private API key used, no new access.
+
+Current Apple guidance and BuildUpdateRequest schema rechecked. The supported
+no-document declaration uses **usesNonExemptEncryption=false**, with the actual
+standard Dart encryption explicitly retained in the technical basis. No earlier
+build's flag copied and no OS-only/no-encryption assertion. France exclusion must
+persist in eventual app-wide distribution setup. Unconfigured app availability
+did not block this API operation and was not changed.
+
+PATCH /v1/builds/**60002f22-847e-4d06-9b7c-623eee9aea70** with only
+usesNonExemptEncryption=false returned **200**. Private before-state snapshot at
+/home/shelf/tmp/shelf-build4-compliance-before-20261013.json, 0600, outside git.
+
+**Readback 2026-10-13 07:52:31 UTC:** flag false; processing **VALID**;
+audience **INTERNAL_ONLY**; encryption-declaration association **null**;
+internalBuildState **READY_FOR_BETA_TESTING**, external **NOT_APPLICABLE**.
+All other build attributes unchanged. **MISSING_EXPORT_COMPLIANCE cleared.**
+Null document association is the no-document route, not missing evidence of this
+actual saved flag/status. No official government attestation or certification claimed.
+
+**One next action:** separately authorize assigning the existing build to existing
+Shelf Owner internal group for installation. No tester assignment or purchase
+activation occurred. No rebuild, upload, app-wide territory creation, ANSSI work,
+email or transaction. All disabled gates, holds and deferrals remain binding.
 
 ## Historical cancelled French research
 

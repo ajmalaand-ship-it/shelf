@@ -584,6 +584,62 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Build 4 export compliance cleared by Apple API — 13 October 2026
+
+Continued **55a64da** under explicit owner authorization for the minimum build-4
+compliance write. Existing encryption inventory/provider evidence reused; no repeat
+audit/tests. France excluded; ANSSI enquiry, filing and email remain **CANCELLED**.
+
+Pre-write authenticated GETs: build **60002f22-847e-4d06-9b7c-623eee9aea70**
+confirmed **1.0.0 (4), IOS, VALID, INTERNAL_ONLY**, usesNonExemptEncryption null,
+no appEncryptionDeclaration; internalBuildState MISSING_EXPORT_COMPLIANCE.
+Full shelf_book_3 availability GET confirms **174 territories, FRA absent**.
+AppAvailabilityV2 still **404 NOT_FOUND / unconfigured**; no list created, activated
+or claimed to have had France removed. Future App Store availability must exclude
+France. That unconfigured state did not prevent Apple's supported build flag update.
+
+Current official [Apple documentation table](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)
+and [encryption property guidance](https://developer.apple.com/documentation/security/complying-with-encryption-export-regulations)
+checked again. Shelf has standard **AES-256-GCM via Dart cryptography**, Keychain
+and HTTPS, not no encryption or OS-only encryption. For standard non-OS algorithms,
+French documentation is conditional on France distribution; the proprietary CCATS
+case does not match the verified inventory. With France excluded, supported
+no-document/exempt-use declaration is **usesNonExemptEncryption=false**. It does
+not assert absent encryption. Earlier builds' flags were not used as justification.
+Current official BuildUpdateRequest schema supports this single field.
+
+Private before-state saved outside git 0600:
+/home/shelf/tmp/shelf-build4-compliance-before-20261013.json. Only request:
+**PATCH /v1/builds/60002f22-847e-4d06-9b7c-623eee9aea70**, data type builds,
+attributes **usesNonExemptEncryption=false**; HTTP **200**. No relationship,
+expiry, tester, notification or app-wide declaration/configuration field sent.
+No credential/token/key printed or committed, existing access reused.
+
+**Readback verified 2026-10-13 07:52:31 UTC:** usesNonExemptEncryption **false**;
+processing **VALID**, audience **INTERNAL_ONLY**; all other build attributes
+exactly equal before/after. appEncryptionDeclaration GET **200 / null**, consistent
+with the no-document route. buildBetaDetail GET **200** returns
+**internalBuildState=READY_FOR_BETA_TESTING**, externalBuildState=NOT_APPLICABLE,
+autoNotifyEnabled=true (existing value, not changed). Thus **MISSING_EXPORT_COMPLIANCE
+actually cleared**, not merely PATCH success. No associated official document or
+regulatory certification claimed. No build, upload or installation inferred from
+that status; prior owner-reported Codemagic evidence stays distinct.
+
+**One next action:** authorize assignment of this existing internal-only build to
+the existing **Shelf Owner** group for installation; no new tester/group or purchase
+activation follows automatically. Assignment and signed-phone purchase acceptance
+remain pending; prior group-read 403 limitation retained, not re-audited here.
+Backend/webhook evidence unchanged. Public app availability, review metadata/title
+correction/genuine screenshot and joint release readiness remain separate work.
+
+No rebuild/upload, emails/ANSSI, transactions, release, tester assignment, .env,
+migration, deployment or gate change. Real checkout, Apple sandbox and Apple
+sign-in/relay gates remain OFF. Deferred Apple authentication/relay checks,
+Android/UI pause, pricing-sync and second-phone restore deferrals, joint Android/
+iOS public-release hold preserved. Scoped documentation-only commit/push on
+ios/foundation; unrelated work untouched. No source/tests changed or broad rerun.
+
+
 ## France removed from saved Apple IAP availability — 13 October 2026
 
 Owner explicitly supersedes include-France: **exclude France from Shelf App Store
@@ -3675,7 +3731,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. One-book Apple sandbox backend 560ef50 is deployed with gate OFF; separate webhook configured. Internal 1.0.0 (4), owner-reported source 2702fbb/run 6acda60d546ce6236cee037c, is API-confirmed uploaded COMPLETE and processed VALID; internal testing is blocked by MISSING_EXPORT_COMPLIANCE. Activation and iPhone/delivery acceptance remain pending. Later sign-in/relay checks require owner resumption. |
+| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. One-book Apple sandbox backend 560ef50 is deployed with gate OFF; separate webhook configured. Internal 1.0.0 (4), owner-reported source 2702fbb/run 6acda60d546ce6236cee037c, is API-confirmed uploaded COMPLETE and processed VALID; build-4 compliance was API-cleared on 13 October (READY_FOR_BETA_TESTING). Shelf Owner assignment/install, activation and iPhone/delivery acceptance remain pending. Later sign-in/relay checks require owner resumption. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
