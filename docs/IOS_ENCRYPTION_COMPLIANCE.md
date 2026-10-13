@@ -8,6 +8,39 @@ The material below is historical preparation, superseded by that decision.**
 Prepared 13 October 2026 from 7d8d5eb. **DRAFT / NOT SUBMITTED.** The earlier France-included plan is superseded. No declaration, acknowledgement, ANSSI decision or Apple approval exists
 in this packet. Build 4's last verified state remains MISSING_EXPORT_COMPLIANCE.
 
+## Current non-France plan — supersedes all historical France paperwork below
+
+Owner expressly excludes France from App Store distribution. ANSSI enquiry,
+filing and email are cancelled. No further owner address/phone is needed.
+
+On **2026-10-13 07:11:55 UTC**, authenticated Apple API readback verified
+shelf_book_3 availability **174 territories / FRA absent**, exact original 175
+minus FRA. availableInNewTerritories=true, all other territories, product attributes,
+price schedule and manual/automatic prices unchanged. Scoped availability POST
+returned 201. AppAvailabilityV2 remains **404 NOT_FOUND / unconfigured**; no
+app-wide list was created and no removal from that list is claimed. Future app
+availability must explicitly exclude FRA without inventing the other countries.
+
+Shelf still uses standard **Dart AES-256-GCM**, plus Keychain/HTTPS. Accurate
+future Apple answers: encryption **Yes**, standard outside OS **Yes**, proprietary
+**No**, France **No**. Apple's current documentation table makes the French document
+conditional on France distribution; no such document is required for this recorded
+non-France standard-algorithm case. usesNonExemptEncryption=false expresses that
+exempt/no-document case, **not** an assertion that the app has no encryption or is
+OS-only. This justification uses actual inventory and current Apple guidance,
+not the earlier builds' false flags. See
+[Apple's documentation table](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)
+and [encryption property guidance](https://developer.apple.com/documentation/security/complying-with-encryption-export-regulations).
+
+**One next action:** separately authorize saving only build 1.0.0 (4)'s
+usesNonExemptEncryption=false (or the accurate questionnaire above), then verify
+Apple's actual internal-testing state. No declaration or compliance answer saved
+this task. Build readback remains **VALID / INTERNAL_ONLY**, flag null,
+**MISSING_EXPORT_COMPLIANCE**. No rebuild/upload or French paperwork next step.
+All disabled gates, holds and deferrals remain binding.
+
+## Historical cancelled French research
+
 ## Applicable procedure and content protection
 
 ANSSI's current [control page](https://cyber.gouv.fr/reglementation/reglementation-identite-confiance-numerique/controles-reglementaires-cryptographie/controle-moyen-de-cryptologie/)

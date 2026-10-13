@@ -584,6 +584,69 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## France removed from saved Apple IAP availability — 13 October 2026
+
+Owner explicitly supersedes include-France: **exclude France from Shelf App Store
+distribution** and relevant Apple IAP availability. ANSSI enquiry/filing/email is
+**CANCELLED**, no owner address/phone request or French paperwork work to resume.
+This decision authorizes the availability change, not a compliance submission.
+
+Authenticated existing private ASC API inspection found app
+**6821471140 / services.shelf.app** appAvailabilityV2 **404 NOT_FOUND**, both before
+and after the operation. App availability is unconfigured; **no app-wide list was
+created or modified**, no other-country list invented, no claim France was removed
+from that unconfigured list. Future app availability setup must exclude FRA and
+preserve the owner's eventual explicitly selected remaining countries.
+
+Bounded app IAP list GET 200 returned only **shelf_book_3 / 6822080809**.
+Its availability GET and full territory list GET 200 initially returned **175**,
+including FRA, availableInNewTerritories **true**. Private before-state/rollback
+payload and product/price evidence saved 0600 outside git at
+/home/shelf/tmp/shelf-france-availability-before-20261013.json. Concurrent-state
+recheck passed before write. Using current official
+[Apple IAP availability schema](https://developer.apple.com/documentation/appstoreconnectapi/post-v1-inapppurchaseavailabilities),
+POST /v1/inAppPurchaseAvailabilities **201**, preserving the exact existing set
+minus **FRA**, original future-territory value and product relationship.
+
+**Readback verified 2026-10-13 07:11:55 UTC:** exactly **174** territories, FRA
+absent, all other territory IDs unchanged, availableInNewTerritories still true.
+Product attributes, price-schedule resource and every manual/automatic price
+record unchanged by exact comparison. France's price record was retained, not
+sold/changed/deleted; price availability and purchase availability are separate.
+No Google availability/webhook or other provider settings touched. Rollback would
+restore saved availability payload only under later owner authorization; do not
+restore France automatically against the superseding instruction.
+
+**Build-4 compliance reassessment:** reuse verified standard Dart AES-256-GCM
+book/manifests protection plus platform Keychain/HTTPS; not OS-only and not no
+cryptography. Current [Apple documentation table](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)
+requires the French declaration for standard non-OS algorithms only if distributed
+on the App Store in France; its CCATS row concerns proprietary/nonstandard
+algorithms, which are not present in the verified inventory. With France excluded,
+that French-document requirement no longer applies. Earlier build flags alone are
+not justification. Future accurate questionnaire: **uses encryption Yes; standard
+algorithms beyond OS Yes; proprietary/nonstandard No; France No**. Where Apple
+asks the exempt-use question, no export-compliance document is required for this
+recorded non-France standard-algorithm case; Apple's exempt/no-document use maps
+to **usesNonExemptEncryption=false**, rather than asserting no encryption.
+
+**Exact next step, not executed:** under separate compliance-write authorization,
+set only build **60002f22-847e-4d06-9b7c-623eee9aea70 / 1.0.0 (4)**
+usesNonExemptEncryption=false using Apple's build-modification API (or the truthful
+questionnaire above if required). Read back build and buildBetaDetail until actual
+internal state is confirmed; do not copy builds 2/3 or claim state changed now.
+No French declaration/file, ANSSI contact, rebuild or repeat upload needed for that
+step. App-wide future distribution must continue to exclude France.
+
+Final GETs 200: build 4 **VALID / INTERNAL_ONLY / usesNonExemptEncryption=null**;
+buildBetaDetail **MISSING_EXPORT_COMPLIANCE / NOT_APPLICABLE**. No declaration or
+build PATCH in this task. No tester assignment, release, transaction, gate/.env
+change, build/upload, migration or deployment. Checkout and Apple sandbox/sign-in/
+relay gates OFF; pricing-sync/second-phone restore deferrals, deferred Apple
+authentication/relay checks, Android/UI pause and joint public-launch hold retained.
+Documentation-only commit/push to ios/foundation; unrelated work preserved.
+
+
 ## Owner removes France and stops French paperwork — 13 October 2026
 
 Owner supersedes the preceding include-France instruction: **exclude France from
