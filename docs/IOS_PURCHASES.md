@@ -1,5 +1,31 @@
 # Shelf — one-book Apple sandbox setup
 
+## Build 4 owner-only TestFlight installation — 13 October 2026
+
+Current build **1.0.0 (4)**, source owner-reported **2702fbb**, Apple build
+**60002f22-847e-4d06-9b7c-623eee9aea70**. Processing **VALID**, audience
+**INTERNAL_ONLY**; export compliance already cleared and reused unchanged.
+On **2026-10-13 07:58:42 UTC**, authorized group-build POST returned **204**;
+GET readback confirms assignment to existing **Shelf Owner** internal group
+**1511a217-4f89-4dc7-8b8d-4679ce8a6226**, same sole owner tester, same settings,
+builds now **4, 3, 2**. Apple internalBuildState **IN_BETA_TESTING**.
+No extra tester/group created. Build-side group GET 403 is a route permission
+limitation; group-side reads/writes worked, so assignment is independently verified.
+No dashboard assignment needed. Actual iPhone installation is still unverified.
+
+**Single next owner action:** iPhone **TestFlight → Shelf → Update** (or Install)
+to **1.0.0 (4)**. If needed select **Previous Builds → 1.0.0 → build 4 → Install**.
+Keep the existing installation/account; do not uninstall or clear data. Confirm
+version/build after installation. This step does not authorize purchases or Apple
+sign-in; server Apple sandbox, real checkout and sign-in/relay gates stay OFF.
+No new build/upload, invitation, external test or public release.
+
+France remains excluded, ANSSI work cancelled, Android/UI paused; pricing-sync,
+second-phone restore and Apple authentication/relay checks remain deferred, and
+joint Android/iOS public-launch hold remains binding. Older preparation sections
+below are historical; current build is uploaded, compliance cleared and assigned.
+
+
 12 October 2026: source preparation on `ios/foundation`, based on `a5047f4`.
 This guide extends [the existing purchase setup](PURCHASES_TEST_SETUP.md). The
 completed readiness audit is reused; Android's acceptance does not establish iOS

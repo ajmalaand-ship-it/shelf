@@ -584,6 +584,55 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Build 4 assigned only to existing Shelf Owner internal group — 13 October 2026
+
+Continued **41b1388** under explicit owner authorization. Reused compliance/
+purchase evidence; no repeated audit/test/build. Authenticated build GET **200**
+on 13 October UTC confirms **1.0.0 (4) / VALID / INTERNAL_ONLY**, encryption flag
+false; buildBetaDetail initially **READY_FOR_BETA_TESTING / NOT_APPLICABLE**.
+
+Build-side betaGroups GET returned **403 FORBIDDEN_ERROR**, a route permission
+limitation, not proof no assignment exists. Top-level betaGroups scoped to Shelf
+app **6821471140** GET **200** returned exactly one group: **Shelf Owner**,
+**1511a217-4f89-4dc7-8b8d-4679ce8a6226**, isInternalGroup=true,
+hasAccessToAllBuilds=false; no external group returned. Existing group and tester
+GETs **200**, exactly **one tester**, name matches recorded Ajmal Aand, state
+**INSTALLED**, inviteType EMAIL. This is the existing owner setup that already
+received builds 2/3, not a new invite. Its Apple email differs from the Shelf admin/
+reader email, privately compared; identity preserved, no linking or replacement
+assumed. No email/PII printed or committed. Group builds GET **200** initially
+returned only **2 and 3**; build 4 genuinely absent on that readable relationship.
+
+Private before-state group/tester/build snapshot 0600 outside git:
+/home/shelf/tmp/shelf-build4-group-before-20261013.json.
+[Apple's supported group-build endpoint](https://developer.apple.com/documentation/appstoreconnectapi/post-v1-betagroups-_id_-relationships-builds)
+used: **POST /v1/betaGroups/1511a217-4f89-4dc7-8b8d-4679ce8a6226/relationships/builds**,
+payload contains only build **60002f22-847e-4d06-9b7c-623eee9aea70**; **204**.
+No new group/user/invitation, group configuration or external-test relationship.
+
+**Readback 2026-10-13 07:58:42 UTC:** group builds GET **200** now includes exactly
+**4, 3, 2**; tester list and group settings exactly equal before/after.
+BuildBetaDetail GET **200** now **IN_BETA_TESTING** (not inferred from POST alone).
+Thus build 4 is available through the existing owner-only internal group; actual
+installation remains a phone step, not claimed. The earlier build-side 403 did
+not prevent inspection/assignment via authorized group-side API endpoints. No
+credential request or manual App Store Connect assignment is necessary.
+
+**One owner action:** on the iPhone, open **TestFlight → Shelf → Update** (or
+Install), selecting **1.0.0 (4)**; if a newer build is not selected automatically,
+open **Previous Builds → 1.0.0 → build 4** and install it. Confirm the installed
+version/build; no purchase or Apple sign-in test is requested. Existing app/account
+and content retained; do not uninstall/clear data. Gate activation needs later
+separate authorization. See updated IOS_PURCHASES.md installation section.
+
+No additional build/upload, product/territory write, transaction, external testing,
+public release, migration, deployment or .env/gate change. Real checkout and Apple
+sandbox/sign-in/relay gates remain OFF. France exclusion/ANSSI cancellation,
+Android/UI pause, pricing-sync/second-phone-restore and Apple authentication/relay
+deferrals, joint Android/iOS release hold retained. Documentation-only scoped
+commit/push on ios/foundation, unrelated work preserved.
+
+
 ## Build 4 export compliance cleared by Apple API — 13 October 2026
 
 Continued **55a64da** under explicit owner authorization for the minimum build-4
@@ -3731,7 +3780,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. One-book Apple sandbox backend 560ef50 is deployed with gate OFF; separate webhook configured. Internal 1.0.0 (4), owner-reported source 2702fbb/run 6acda60d546ce6236cee037c, is API-confirmed uploaded COMPLETE and processed VALID; build-4 compliance was API-cleared on 13 October (READY_FOR_BETA_TESTING). Shelf Owner assignment/install, activation and iPhone/delivery acceptance remain pending. Later sign-in/relay checks require owner resumption. |
+| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. One-book Apple sandbox backend 560ef50 is deployed with gate OFF; separate webhook configured. Internal 1.0.0 (4), owner-reported source 2702fbb/run 6acda60d546ce6236cee037c, is API-confirmed uploaded COMPLETE and processed VALID; build-4 compliance was API-cleared on 13 October (READY_FOR_BETA_TESTING). Assigned only to existing Shelf Owner internal group (IN_BETA_TESTING); installation, activation and iPhone/delivery acceptance remain pending. Later sign-in/relay checks require owner resumption. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
