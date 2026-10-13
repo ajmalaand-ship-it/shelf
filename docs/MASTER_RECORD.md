@@ -584,6 +584,90 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Build 4 encryption assessment; French declaration required — 13 October 2026
+
+Continued **dd05b12**, inspection/documentation only. Owner authorized an accurate
+build-4 declaration if established, and now explicitly confirms **include France**
+for Shelf's App Store availability. This records the owner decision; it does not
+change any saved availability, price, territory, product or provider setting.
+
+**Actual build-source inventory (2702fbb):**
+mobile/lib/purchases/download_store.dart uses **AesGcm.with256bits()**, from locked
+**cryptography 2.9.0**, to authenticated-encrypt purchased-book JSON and library
+manifests. Per-reader random 256-bit keys are stored via FlutterSecureStorage
+(iOS Keychain); each box has a 12-byte nonce and 16-byte authentication tag.
+LibraryController writes books/manifests through this store. Media is stored in
+private app files without this AES layer. HTTPS protects API/SDK transport;
+account tokens use secure storage and audio cache filenames use SHA-256 hashing.
+The app is a bookstore/reader, not a general encryption utility. No proprietary
+or unpublished encryption algorithm found in Shelf source. Its Dart AES-GCM is
+standard cryptography outside Apple's OS, so **OS-only/None of the above** is
+inaccurate even though Keychain and transport also use platform security.
+No source/Info.plist or dependency modification, rebuild or repeated purchase test.
+
+**Earlier accepted-build evidence, independently read:** builds **2 and 3** have
+usesNonExemptEncryption **false**, but both appEncryptionDeclaration relationships
+are null. GET /v1/appEncryptionDeclarations?filter[app]=6821471140 returns **200 /
+zero declarations**. Thus there is no approved saved declaration/document to
+reuse and no recorded questionnaire basis establishing that those flags were
+correct. Their successful processing/installation is not proof of classification.
+An initial /v1/apps/{id}/appEncryptionDeclarations route returned 404 PATH_ERROR;
+correct top-level filtered collection succeeded. AppAvailabilityV2 returns 404
+NOT_FOUND, so saved app-wide France availability was not established by API;
+the owner's explicit France instruction resolves planned distribution.
+
+**Current official requirements and accurate questionnaire answers:**
+- Uses encryption: **Yes** (including third-party library encryption).
+- Encryption kind: **standard encryption algorithms instead of, or in addition
+  to, Apple's OS encryption**. AES-256-GCM is implemented via the Dart library.
+- Proprietary/non-standard encryption algorithms: **No**.
+- Available/distributed on the App Store in France: **Yes**, owner-confirmed.
+- Description: Shelf is a digital bookstore and reader. Standard AES-256-GCM
+  encrypts downloaded purchased-book text and library manifests per reader;
+  iOS Keychain stores keys/tokens and HTTPS protects network connections.
+
+[Apple's current encryption-documentation table](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)
+calls for a French encryption declaration for standard non-OS encryption when
+App Store distribution includes France; the proprietary-algorithm CCATS row does
+not match this inventory. [Apple's declaration procedure](https://developer.apple.com/help/app-store-connect/manage-app-information/determine-and-upload-app-encryption-documentation/)
+requires uploading required documentation and Apple approval before attachment.
+[BIS DRM guidance](https://www.bis.gov/learn-support/encryption-controls/cryptography-for-data-confidentiality)
+is relevant to book-access protection, but is not evidence of a French filing,
+Apple approval, or a blanket exemption for every linked library. No classification,
+French filing or exemption is invented from it. Formal French declaration evidence
+is absent; no accurate document can be reused or fabricated from earlier flags.
+
+**Dashboard path when the required French declaration is available:** App Store
+Connect → Apps → Shelf → TestFlight → iOS → **1.0.0 (4)** → **Manage** beside
+Missing Compliance. Give the exact answers above. Upload the required French
+cryptology declaration via **App Information → App Encryption Documentation → +**
+if prompted; retain the accurate description and wait for Apple's document approval.
+Then return to **build 4 only** and attach that approved declaration. Do not change
+builds 2/3, select OS-only/no encryption, exclude France, assign testers or rebuild.
+Required dashboard role: Account Holder, Admin or App Manager. Codex should automate
+submission/attachment with existing access when accurate documentation is supplied
+and authorization covers any necessary app-level document creation/upload; no new
+credential or credential permission request is needed now.
+
+**Final API verification, 2026-10-13 06:22:29 UTC:** build
+60002f22-847e-4d06-9b7c-623eee9aea70 remains **VALID / INTERNAL_ONLY**,
+usesNonExemptEncryption **null**; buildBetaDetail remains
+**MISSING_EXPORT_COMPLIANCE / NOT_APPLICABLE**; declaration remains null (all
+three GETs 200). No provider PATCH/POST attempted because required supporting
+French documentation is absent, not because API write permission was proven
+unavailable. Existing key's write permission remains untested. Blocker unresolved
+honestly; no fabricated declaration and no legal exemption guessed.
+
+**Next:** obtain the actual French encryption declaration required for the confirmed
+France distribution, then submit/attach it to build 4 and verify internal readiness.
+No remaining owner choice about France; formal supporting documentation is the
+missing input. All purchasing/checkout/sign-in/relay gates OFF, existing pricing-sync
+and second-phone-restore deferrals, deferred Apple authentication/relay checks,
+Android/UI pause and joint public-launch hold preserved. No tester assignment,
+notification/email, transaction, build/upload, deployment, migration, .env or
+credential change. Documentation-only commit/push on ios/foundation.
+
+
 ## Internal purchase build 4 received; compliance pending — 13 October 2026
 
 **Owner-supplied Codemagic evidence:** run **6acda60d546ce6236cee037c** finished
