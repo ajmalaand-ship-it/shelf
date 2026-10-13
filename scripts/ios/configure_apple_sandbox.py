@@ -28,7 +28,8 @@ AUTH_FILE = Path('/home/shelf/secrets/revenuecat-apple-sandbox-webhook-auth.txt'
 RECORD = Path('/home/shelf/secrets/revenuecat-apple-sandbox-webhook.json')
 V2_KEY = Path('/home/shelf/secrets/revenuecat-v2-secret-key.txt')
 EVENTS = ['non_renewing_purchase', 'cancellation', 'expiration', 'refund_reversed']
-URL = 'https://shelf.services/api/purchases/webhook'
+# Distinct integration URL; query only distinguishes configuration, never authorizes events.
+URL = 'https://shelf.services/api/purchases/webhook?source=apple'
 
 
 def workflow():
@@ -180,6 +181,19 @@ def prepare(resume_checkpoint=None):
     print('Checkpoint: '+str(checkpoint),flush=True)
 
 
+def probe_disabled_endpoint():
+    request = urllib.request.Request(URL, data=b'{"event":{"store":"APP_STORE"}}',
+        headers={'Accept':'application/json','Content-Type':'application/json'},method='POST')
+    try:
+        with urllib.request.build_opener(NoRedirect).open(request,timeout=20) as response:
+            status=response.status
+    except urllib.error.HTTPError as response:
+        status=response.code
+    if status!=503:
+        raise RuntimeError('Distinct Apple URL is not guarded by the disabled backend.')
+    print('PASS: distinct Apple integration URL reaches the disabled 503 guard; no event accepted.',flush=True)
+
+
 def webhook():
     w = workflow()
     state = w.current_state()
@@ -187,6 +201,7 @@ def webhook():
     if state.get('production_commit') != commit or state.get('staging_commit') != commit or (state.get('checks') or {}).get('scope') != 'apple-purchase-backend-disabled':
         raise RuntimeError('Exact disabled purchase backend must be staged/verified/promoted first.')
     w.apple_purchase_runtime_checks(PRODUCTION,production=True)
+    probe_disabled_endpoint()
     settings = w.settings(PRODUCTION)
     auth = private(AUTH_FILE).decode().strip()
     if settings.get('SHELF_REVENUECAT_IOS_WEBHOOK_AUTH') != auth:

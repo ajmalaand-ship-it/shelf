@@ -26,7 +26,7 @@ class WebhookSafety(unittest.TestCase):
         self.apple = {'id':'synthetic-apple','name':'Shelf iOS sandbox','url':m.URL,'environment':'sandbox',
             'app_id':m.APPLE_APP,'event_types':m.EVENTS}
         for name, value in [('workflow', Mock(return_value=self.w)),('RECORD',self.record),
-            ('private',Mock(return_value=b'synthetic-distinct-auth')),('exclusive',Mock())]:
+            ('private',Mock(return_value=b'synthetic-distinct-auth')),('exclusive',Mock()),('probe_disabled_endpoint',Mock())]:
             p = patch.object(m,name,value);p.start();self.addCleanup(p.stop)
 
     def test_unpromoted_backend_cannot_call_provider(self):
