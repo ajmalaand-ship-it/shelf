@@ -1,5 +1,7 @@
 # Shelf — projet de saisie ANSSI et attestation
 
+**CANCELLED historical draft: owner excludes France from planned App Store availability. Do not send, file or complete this document.**
+
 **BROUILLON NON SIGNÉ / NON DÉPOSÉ.** Préparé pour l'éventualité où ANSSI exige
 une déclaration. Ne pas envoyer avant résolution de la dispense de protection
 contenu. Correspondance avec la notice officielle 260331_Notice_V3.pdf, pas copie

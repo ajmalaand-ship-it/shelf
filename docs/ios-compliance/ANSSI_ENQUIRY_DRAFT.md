@@ -1,5 +1,7 @@
 # Demande de confirmation — protection des livres téléchargés Shelf
 
+**CANCELLED historical draft: owner excludes France from planned App Store availability. Do not send, file or complete this document.**
+
 **BROUILLON — NON ENVOYÉ.** Destinataire officiel : controle@ssi.gouv.fr
 (contact d'aide affiché sur le portail ANSSI). Pas un dépôt de déclaration.
 Pièce proposée : SHELF_TECHNICAL_DRAFT.md, après validation et copie privée finale.

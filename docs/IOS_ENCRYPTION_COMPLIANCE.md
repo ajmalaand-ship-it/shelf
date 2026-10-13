@@ -1,7 +1,11 @@
 # Shelf iOS encryption compliance — procedure and draft packet
 
-Prepared 13 October 2026 from 7d8d5eb. **DRAFT / NOT SUBMITTED.** France stays
-included. No declaration, acknowledgement, ANSSI decision or Apple approval exists
+**STOPPED by owner instruction, 13 October 2026: France is excluded from planned
+Apple App Store availability. Do not pursue or submit this French paperwork, send
+the enquiry, request address/phone, or resume this research without new authorization.
+The material below is historical preparation, superseded by that decision.**
+
+Prepared 13 October 2026 from 7d8d5eb. **DRAFT / NOT SUBMITTED.** The earlier France-included plan is superseded. No declaration, acknowledgement, ANSSI decision or Apple approval exists
 in this packet. Build 4's last verified state remains MISSING_EXPORT_COMPLIANCE.
 
 ## Applicable procedure and content protection

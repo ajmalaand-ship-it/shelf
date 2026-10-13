@@ -584,6 +584,28 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Owner removes France and stops French paperwork — 13 October 2026
+
+Owner supersedes the preceding include-France instruction: **exclude France from
+Shelf's planned Apple App Store availability**, rather than pursue France-specific
+encryption paperwork. Stop ANSSI enquiries, declarations, exemption research and
+requests for owner postal address/phone for that work. Existing drafts are retained
+as cancelled historical preparation, not active next actions. Do not restart this
+work without a new owner instruction. Owner preference: avoid country-specific
+paperwork work when the owner instead elects to exclude that country.
+
+The prior authenticated appAvailabilityV2 GET returned 404 NOT_FOUND; no saved
+app-wide Apple territory list was established. This task records the approved
+exclusion for the eventual availability setup, **not a claim that a saved provider
+list was changed**. Preserve all other planned countries and existing IAP prices/
+territories; no new bulk availability configuration or product change made.
+Build 4's last verified compliance status is unchanged; no exemption or cleared
+status inferred solely from the owner decision. No more French paperwork next step.
+All purchasing/real checkout and Apple sign-in/relay gates OFF; pricing-sync,
+second-phone restore and Apple authentication/relay deferrals, Android/UI pause
+and joint public-launch hold preserved. Documentation-only record on ios/foundation.
+
+
 ## Encryption paperwork prepared; content-protection exemption investigated — 13 October 2026
 
 Continued **7d8d5eb**. Current official Apple/ANSSI material read; completed

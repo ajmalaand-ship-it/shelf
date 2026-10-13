@@ -1,5 +1,7 @@
 # Shelf — brochure commerciale et technique
 
+**CANCELLED historical draft: owner excludes France from planned App Store availability. Do not send, file or complete this document.**
+
 **BROUILLON — NON DÉPOSÉ — sans récépissé ni attestation officielle.**
 Préparé le 13 octobre 2026; inventaire déjà vérifié, pas de nouveau test d'achat.
 
