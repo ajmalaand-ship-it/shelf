@@ -584,6 +584,54 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Encryption paperwork prepared; content-protection exemption investigated — 13 October 2026
+
+Continued **7d8d5eb**. Current official Apple/ANSSI material read; completed
+cryptographic inventory reused, no re-audit/build/provider query required.
+Prepared [procedure](IOS_ENCRYPTION_COMPLIANCE.md), French technical/commercial
+annex, current-notice form-field draft, unsigned accuracy attestation and French
+ANSSI enquiry in docs/ios-compliance/. **All drafts, not filed or official receipts.**
+
+Important qualification of the preceding entry: decree 2007-663 Annex I category
+6 exempts limited content/software protection with user-inaccessible cryptographic
+capability. Shelf's book/manifests layer has a credible factual rationale, but whole
+app scope includes HTTPS/Keychain/SDK functions. No agency exemption or Apple
+acceptance is inferred. Formal French filing is therefore **conditional**, not
+necessarily required solely because France is included. Current ANSSI control
+page points to this decree; official government/regulator copies read, with
+2014 annex-copy date disclosed and direct consolidated Legifrance fetch blocked.
+
+Current ANSSI portal notice **260331_Notice_V3.pdf** read using temporary PDF
+reader (pdftotext unavailable; no product dependency change). Procedure available
+online since 31 March 2026; signed applicant accuracy statement differs from the
+portal deposit acknowledgement and later ANSSI accepted declaration attestation.
+Mandatory technical/commercial materials drafted; official portal signature-model
+access requires login, so field draft is not misrepresented as that downloaded form.
+Apple table still asks for French declaration in standard non-OS/France case;
+public Apple sources do not specify exact substitute for an exempt product or
+that a mere draft/deposit receipt suffices. ANSSI scope response first, Apple
+confirmation for exemption evidence if applicable; otherwise actual accepted
+ANSSI declaration/form packet, followed by Apple's separate document review.
+
+One practical next action: review prepared enquiry for a later authorized request
+to **controle@ssi.gouv.fr**, ANSSI's official help contact on
+https://demarche.numerique.gouv.fr/commencer/declaration-relative-a-un-moyen-de-cryptologie.
+No email, declaration, enquiry or portal draft submitted/created this task.
+Owner confirmed existing name/email and country privately; address/phone reply
+contained placeholders, so actual postal address/phone remain missing. A single
+consolidated request made; no personal contact values committed. No new owner
+choice about France or cryptography requested. Existing Individual membership
+reused, no invented company/Kbis, signature, filing number or approval.
+
+Build 4 last verified **VALID / INTERNAL_ONLY / MISSING_EXPORT_COMPLIANCE** at
+06:22:29 UTC remains the governing Apple evidence; no status change claimed.
+No compliance answer/availability/encryption/source/gate change, rebuild/upload,
+tester assignment, provider write, transaction, deployment or migration. Purchase,
+real-checkout and Apple sign-in/relay gates OFF; pricing-sync/second-phone restore
+and Apple authentication/relay deferrals, Android/UI pause and joint-launch hold
+preserved. Documentation-only scoped commit/push on ios/foundation.
+
+
 ## Build 4 encryption assessment; French declaration required — 13 October 2026
 
 Continued **dd05b12**, inspection/documentation only. Owner authorized an accurate
