@@ -334,7 +334,64 @@ acceptance is not required to use the existing verified owner email/password
 account. DSA review remains unresolved for public release. All existing holds and
 deferrals remain unchanged.
 
-## Later backend rollout and phone checks — not authorized by this batch
+## Current disabled rollout and webhook state — 12 October local / 13 October 2026 UTC
+
+**Backend deployed on existing staging and production at 560ef50ac35aa2db78492b1c7bfb92ee72a69f76.**
+Purchase source/tests remain identical to 08a2adf; completed purchase checks reused.
+Eight synthetic rollout-tool checks and actual migration/configuration/HTTPS/
+isolation/history-preservation checks passed. Migration production batch **28**,
+staging **11**, no pending migrations. Promotion backup
+**/home/shelf/backups/shelf/20261013-000201/**; private configuration and original
+unrelated production documentation/handler checkpoints in
+**/home/shelf/backups/shelf/20261012-235938/apple-purchase-checkpoint/**. Exact
+configuration/backup/stop evidence and rollback target are in Master Record.
+
+All required production Apple IDs, existing SDK key and V2 path, and a distinct
+private webhook authorization are saved; unrelated .env values and Google
+integration unchanged. **Apple sandbox OFF, real checkout OFF, Apple sign-in and
+relay OFF.** Staging has no production Apple purchase credentials. Public iOS
+purchase config advertises false and exposes no SDK key; Apple events are
+intentionally rejected **503 production / 403 staging** while disabled.
+
+**Apple-scoped RevenueCat sandbox webhook configured: whintgr769cb03ff2**,
+Shelf iOS sandbox, app8ef018b95b, environment sandbox, NON_RENEWING_PURCHASE /
+CANCELLATION / EXPIRATION / REFUND_REVERSED. Actual saved destination:
+**https://shelf.services/api/purchases/webhook?source=apple**. This supersedes the
+base URL in the historical checklist. A create on Google's same base URL returned
+409 with no Apple integration created; the distinct query URL reached the deployed
+endpoint and create returned 201, followed by exact GET/list confirmation 200.
+Google whintgr75a4892970, Both, unchanged. No broader provider uniqueness rule
+assumed. Query text is a routing distinction, never authentication evidence.
+Private authorization/file and sanitized integration metadata are shelf-owned/0600
+outside Git, at /home/shelf/secrets/revenuecat-apple-sandbox-webhook-auth.txt and
+revenuecat-apple-sandbox-webhook.json. No test notification was sent.
+
+**Configuration is complete for the disabled backend; delivery/processing is not
+verified or activated.** A later separate internal build/upload and explicit
+owner-only sandbox activation must establish actual StoreKit retrieval and
+purchase/restore/refund/reversal and notification delivery. Installed build 3
+lacks purchase source. Confirm the next unused build number only in that later
+batch. Tracking-off/original-ID restore dashboard confirmation remains necessary
+before activation where API access cannot expose it; do not recreate credentials,
+products or search for a version selector.
+
+Title discrepancy and missing genuine review screenshot remain pending unchanged.
+MISSING_METADATA is recorded, without claiming all missing fields diagnosed or
+actual sandbox product retrieval established. Final Apple localization/territory/
+rights/DSA/review matters remain separate public-release work. No product titles,
+prices or territories changed. Current holds/deferrals remain in force.
+
+The operator helper follow-up 598ae45 only adapts provider URL configuration;
+purchase application source remains deployed 560ef50. Further documentation
+commits are not new deployed revisions. Scripts/ios/configure_apple_sandbox.py
+is narrowly scoped: prepare makes a fresh verified backup/encrypted checkpoint
+before private configuration; webhook requires matching staged/promoted evidence
+and disabled guards, creates only a distinct Apple sandbox integration, refuses
+unrecognized existing integrations and verifies all unrelated integrations.
+Do not blindly rerun preparation or replace private files after an interrupted
+run; inspect its checkpoint and preserve the existing authorization.
+
+## Historical rollout plan and later phone checks — completed rollout superseded above
 
 Keep `SHELF_APPLE_SANDBOX_ENABLED=false`, real checkout OFF and both Apple sign-in
 flags false. A later approved rollout must stage the exact commit with synthetic

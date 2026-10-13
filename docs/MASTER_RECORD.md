@@ -584,6 +584,124 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Disabled Apple purchase backend deployed and sandbox webhook configured — 12 October local / 13 October 2026 UTC
+
+Owner authorized the disabled purchase rollout from **61b0845**, existing staging,
+required backup, private configuration and separate Apple-scoped sandbox webhook
+only after backend readiness. **COMPLETED DISABLED BACKEND ROLLOUT / WEBHOOK
+CONFIGURATION**, not transaction/device/notification-delivery acceptance.
+
+**Deployed source on both staging and production: 560ef50ac35aa2db78492b1c7bfb92ee72a69f76.**
+The purchase implementation and its tests match **08a2adf** byte-for-byte; no
+speculative purchase-source or mobile changes. Rollout tools added in 59e139b,
+corrected in c4dbf7d, guard regression checks in 560ef50. Operator-only webhook
+helper follow-up **598ae45** uses a distinct integration URL; it changes no backend
+application source and does not trigger another deployment. Documentation
+follow-up commits likewise are not deployed application revisions.
+
+Existing staging was reused. A focused workflow gate compares all purchase
+implementation/test paths to 08a2adf and hashes its committed completed test record:
+**16 PHP / 190 assertions, 9 Flutter + existing staging-identity evidence reused**.
+No purchase audit, PHP/Flutter purchase suite, build or phone test repeated.
+**Eight new synthetic rollout-helper safeguards passed** through
+SHELF_TOOL_TEST_SCOPE=apple-rollout scripts/run_tests.sh: no provider call before
+verified promotion/runtime guard; exact Apple-only sandbox create/read-back;
+existing integration refusal; event mismatch and Google-change stop without
+corrective writes; owned application-directory/private-file permissions,
+collision refusal and private-parent/symlink refusal. Corrected helper required
+necessary synthetic reruns; source syntax and git whitespace/scope checks passed.
+
+Staged/production checks verified the actual new schema, sandbox/real checkout/
+sign-in/sync OFF, disabled public iOS purchase config with no SDK key advertised,
+Apple webhook guards **403 staging / 503 production**, no Apple purchase/event/
+consent history, staging database/files/mail-log/null-queue isolation and real
+HTTPS private gate/noindex/catalogue/locked paid text/Library/private-file checks.
+No registration/lifecycle/mail check rerun or email sent. Promotion verified
+historical reader/token/action, purchase/event/refund/ledger/entitlement/consent,
+agreements and accounting fingerprints unchanged. Fingerprint normalization omits
+only the migration's exact PLAY_STORE/null defaults; actual Apple/non-default
+proof still changes the fingerprint. Accounting/owner shares and health passed;
+maintenance lifted. Existing Google purchase configuration remains ready; staging
+has no production purchase SDK/auth/V2 credential configuration and an independent
+APP_KEY. Both Apple sign-in/relay flags remain false.
+
+**Migration** 2026_10_12_120000_add_purchase_event_store_scope applied once:
+production **batch 28**, staging **batch 11**, **zero pending migrations** on both.
+Defaults historical event/consent stores to Play; nullable app/time proof columns,
+no reader/financial backfill or purchase event. Reversible migration remains
+committed; rollback refuses loss if later Apple history exists.
+
+**Verified backups:** initial production **/home/shelf/backups/shelf/20261012-235634/**;
+fresh successful configuration preparation **/home/shelf/backups/shelf/20261012-235938/**;
+staging **/home/shelf/backups/shelf-staging/20261013-000113/**;
+fresh promotion **/home/shelf/backups/shelf/20261013-000201/**. SQL/ZIP/SHA checks
+passed before changes. Configuration preparation checkpoints include encrypted
+private-configuration.tar.gpg, decrypted in memory and compared exactly, plus
+exact original production documentation/handler bytes, diff and release state.
+Successful **apple-purchase-checkpoint/** includes configuration-verification and
+documentation-preservation records. Production's existing Master Record/sign-in
+additions were already retained in the isolated source; three superseded lines
+follow the newer owner deferral/source status. Exact originals remain recoverable
+before normalization for fast-forward promotion. cPanel handler stayed
+byte-identical and remains the only unrelated working diff. No unrelated settings
+or historical data changed. This local checkpoint is not new offsite recovery
+or unattended backup acceptance.
+
+**Private configuration:** existing project projbbce26da, Apple app app8ef018b95b,
+internal Apple product prod0d084e901f, existing appl_ SDK key fetched privately,
+existing protected V2 verifier path and distinct Apple webhook Authorization
+saved; SHELF_APPLE_SANDBOX_ENABLED=false and SHELF_REAL_PURCHASES_ENABLED=false.
+Every unrelated .env value compared unchanged, config cache cleared, no key/token
+contents printed. New authorization is private shelf:shelf/0600 outside Git at
+/home/shelf/secrets/revenuecat-apple-sandbox-webhook-auth.txt; sanitized integration
+record beside it is revenuecat-apple-sandbox-webhook.json, same protections.
+Existing upload/login/purchase/V1/V2/recovery credentials unchanged.
+
+**Apple sandbox webhook configured:** **whintgr769cb03ff2 / Shelf iOS sandbox**,
+app **app8ef018b95b**, environment **sandbox**, URL
+**https://shelf.services/api/purchases/webhook?source=apple**, events
+**non_renewing_purchase, cancellation, expiration, refund_reversed**.
+POST creation **201**, exact configuration GET/list read-back **200**. The query
+only distinguishes the provider integration URL; authorization and store/app
+checks remain authoritative. Google **whintgr75a4892970 / appf83cd58c5c / Both**,
+its URL/filters and all other integration response fields compared unchanged.
+No provider test notification, delivery, purchase, transaction, email or Apple
+product/price/title/territory change. **With gate OFF, Apple events are deliberately
+rejected 503; configured webhook does not mean active delivery/processing.**
+
+**Recorded setup stops:** first helper run's SQL/media/encrypted checkpoint passed,
+then an overly strict parent-directory guard stopped before .env change (the
+application directory is normally 0755). Corrected in isolation, synthetic guard
+checks passed, fresh backup taken; resume verified the earlier encrypted original
+.env and reused that run's new private authorization without rotation. First
+webhook create on the same base URL as Google returned **409**; stopped without
+retry, read-only GET confirmed no Apple integration created/Google unchanged.
+Distinct query URL reached the already deployed disabled guard and subsequent
+create succeeded 201. No existing integration updated or provider setting relaxed;
+no broader undocumented uniqueness rule inferred from this result.
+
+**Remaining blockers / next batch:** installed TestFlight build 3 lacks purchase
+source. Later separately authorized internal build/upload at a confirmed unused
+number, owner-only sandbox activation and actual StoreKit retrieval/purchase/
+restore/refund/reversal and Apple→RevenueCat→Shelf delivery acceptance remain.
+Track-new-purchases OFF / Keep original App User ID are still not exposed by the
+public app API; obtain only the necessary dashboard confirmation before activation,
+without repeating earlier setup. Apple **MISSING_METADATA**, saved title
+**څپو کې انڅورونه** versus recorded **څپو کې انځورونه**, and absent genuine review
+screenshot remain pending; no text guessed/repaired. Apple 175 territories /
+new-territories setting and DSA In Review retain prior evidence; final rights/
+localization/territory/review acceptance remains public-release work.
+
+Rollback target **31d123aaee8310b71e9550dfa1e13047e44541db** is retained in promotion
+notes. Prefer code-only rollback retaining schema/private configuration/history;
+never bulk restore over later reader/money activity. Review the scoped migration
+before reversal; preserve Apple history if any later appears. Any later webhook
+removal/configuration reversal is a separate authorized provider action.
+Commit/push scoped work on **ios/foundation** only, no origin/main or default-branch change.
+Checkout OFF, pricing-sync and second-phone-restore deferrals, deferred Apple
+authentication/relay checks, stopped email task, Android/UI pause, deferred small
+improvements and joint Android/iOS public-launch hold remain binding.
+
 ## Authenticated Apple inspection completed — 12 October 2026
 
 Continued **dc054af** on isolated **ios/foundation**. Owner reported completing
