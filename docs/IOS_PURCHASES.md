@@ -334,6 +334,104 @@ acceptance is not required to use the existing verified owner email/password
 account. DSA review remains unresolved for public release. All existing holds and
 deferrals remain unchanged.
 
+## Prepared single internal purchase build — 12 October local / 13 October 2026 UTC
+
+Reviewed application/workflow source **dabedf552bd4b47b13e91baccbfac053141a3652**,
+branch **ios/foundation**, workflow **ios-testflight-internal**, version **1.0.0**,
+proposed build **4**. This preparation is documentation only; final documentation
+revision retains that exact application/YAML. Later record the actual clone SHA
+from source-commit.txt and validate any intervening source changes before running.
+No build/upload, cloud setting edit or build-number reservation occurred.
+
+Apple authenticated GETs on 13 October UTC: received builds **2 and 3 VALID**;
+all upload records **1 FAILED / 2 COMPLETE / 3 COMPLETE**, IOS, 1.0.0.
+Both bounded lists contain **no 4 and no pending upload**. Build 4 is the next
+unused candidate from actual records; recheck both endpoints before the separately
+approved run and stop on collision/concurrent upload. App is 6821471140 /
+services.shelf.app. Existing protected ASC key reused; no key/JWT printed.
+
+Signed Codemagic YAML passes parse/shell/inline-Python checks. Purchase dependency
+is locked to purchases_flutter 10.13.2 and native In-App Purchase capability is
+present. Production API/group settings, existing signing integration/certificate/
+profile, photo-purpose check, testFlightInternalTestingOnly=true,
+manageAppVersionAndBuildNumber=false, strict signing verification, ditto and
+explicit $CM_BUILD_DIR artifact/evidence paths are intact. No omission confirmed,
+no code/dependency/YAML fix or purchase suite rerun needed. iOS automatically
+chooses sandbox; SHELF_INTERNAL_TEST_PURCHASES=false is compatible. The Apple SDK
+key is supplied by the configured backend after activation, not a build variable.
+
+For the later authorized run: use existing Shelf application and signed workflow
+on the prepared ios/foundation revision; set only **SHELF_IOS_BUILD_NUMBER=4** in
+existing **shelf_ios_testflight**, retain **SHELF_API_BASE_URL=https://shelf.services/api/**
+and all signing/groups. Verify no competing run and exact source. Codemagic
+account variables/queue are not independently visible through documented access;
+no token search/creation is required now. After separately authorized upload,
+inspect exact IPA/signing/source/version/build evidence and Apple processing, then
+assign only to existing **Shelf Owner** internal group and install. No public or
+external testing, sign-in activation or purchase activation follows automatically.
+
+### Exact sandbox activation plan — NOT EXECUTED
+
+The existing owner reader is already verified, buying allowed, and its email
+exactly matches the one owner admin; this was checked privately without printing
+email/ID. Use that reader's **email/password** in Shelf, not admin login or an
+Apple/relay/new/plus-alias account. Apple sandbox access is only book **3 /
+shelf_book_3**. No account creation or identity linking is required.
+
+1. Obtain separate authorization after the new internal build is received and
+   installed. Confirm no competing build/test and necessary RevenueCat dashboard
+   tracking **OFF / Keep original App User ID** (not exposed by the public app API).
+   Reuse verified provider setup; do not search for a notification-version selector.
+2. As shelf, Codex runs **python3 -B scripts/shelf_daily_backup.py** in production,
+   verifies its SQL/ZIP/checksums and makes a private encrypted .env checkpoint.
+   Read current controls/mapping/webhook and exact owner eligibility privately.
+   Require production revision **560ef50**, existing schema/migration, Apple app
+   app8ef018b95b, product prod0d084e901f, project projbbce26da, protected V2 key,
+   existing appl_ key and separate Apple authorization; no credential replacement.
+3. Atomically edit only production **SHELF_APPLE_SANDBOX_ENABLED=false → true** in
+   /home/shelf/apps/shelf/.env, retaining shelf ownership/0600 and all other values.
+   Refuse duplicate fields, symlinks, concurrent modification or unexpected prior
+   state. Run **php artisan config:clear** in that production directory.
+   Keep **SHELF_REAL_PURCHASES_ENABLED=false**, **APPLE_SIGN_IN_ENABLED=false**,
+   **APPLE_SIGN_IN_RELAY_READY=false**, Play sync disabled and staging untouched.
+   Do not use configure_apple_sandbox.py prepare to activate; it is OFF-only setup.
+4. Check actual runtime ApplePurchaseProof::configured()=true, real purchase
+   productionEnabled()=false and sign-in/relay/sync false. GET
+   **https://shelf.services/api/purchases/config?platform=ios** privately: enabled
+   and sandbox_checkout_enabled true, production_checkout_enabled false,
+   allowed_product_ids exactly [shelf_book_3], correct APP_STORE/numeric identities.
+   Validate the key privately; never print the whole config response. Confirm
+   staging remains disabled and other settings/Google integration unchanged.
+   Stop/close gate on any mismatch; no transaction before explicit test approval.
+5. On the owner's iPhone, sign in with that existing reader, refresh, open book 3,
+   read sample and consent, and inspect the Apple sandbox sheet. Execute only the
+   approved sandbox acceptance cases. Do not test other products or real checkout.
+
+### Exact rollback/close-window plan — NOT EXECUTED
+
+Codex atomically changes **only SHELF_APPLE_SANDBOX_ENABLED=true → false**, retains
+permissions/unrelated values, then runs **php artisan config:clear**. Confirm
+runtime proof disabled and the same iOS GET advertises enabled/sandbox/production
+false and public_sdk_key null. The deliberately incomplete unauthenticated Apple
+webhook guard must return 503 before any event/proof/database processing. Staging
+stays 403/off; real checkout/sign-in/relay/sync remain OFF. Keep the Apple/Google
+webhooks and private keys unchanged. Preserve all purchase/refund/consent/ledger
+history, schema and downloaded/account data; never blanket restore SQL or run
+migration down to close a test window. Existing Apple history cannot receive fresh
+proof/offline leases while disabled; any unfinished reconciliation needs a later
+explicitly authorized handling window. Gate closure is not proof of refund.
+
+Phone acceptance still pending: actual product retrieval, server-confirmed paid
+text/media/download, cancellation/pending locked behavior, same-account restore,
+other-account denial, refund removal, refund reversal without a second sale/real
+income, and Apple→RevenueCat→Shelf delivery/live REST shapes. No second-phone
+restore request. Genuine review screenshot, title discrepancy/MISSING_METADATA,
+final rights/territory/DSA/review acceptance remain pending unchanged.
+
+**Next single action:** authorize one internal Codemagic build/upload **1.0.0 (4)**
+from prepared ios/foundation, all gates OFF. Activation/transactions require a
+separate later authorization. Existing holds and owner deferrals remain binding.
+
 ## Current disabled rollout and webhook state — 12 October local / 13 October 2026 UTC
 
 **Backend deployed on existing staging and production at 560ef50ac35aa2db78492b1c7bfb92ee72a69f76.**

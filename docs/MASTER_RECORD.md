@@ -584,6 +584,103 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## One internal Apple purchase build prepared — 12 October local / 13 October 2026 UTC
+
+Continued **dabedf552bd4b47b13e91baccbfac053141a3652** in isolated ios/foundation.
+Owner authorized preparation only: **no build/upload, activation, transaction,
+email, product metadata or interface change**. Reused deployed **560ef50** and
+configured Apple sandbox webhook **whintgr769cb03ff2** evidence without re-audit.
+
+**Reviewed application/workflow source SHA: dabedf552bd4b47b13e91baccbfac053141a3652**;
+workflow **ios-testflight-internal**, iOS version **1.0.0**, proposed build **4**.
+This documentation-only follow-up changes no application/workflow source. Later
+run must use the current prepared ios/foundation revision and record its exact
+clone SHA from source-commit.txt before claiming receipt; verify any intervening
+application/YAML changes against this reviewed source. No build number reserved.
+
+Authenticated read-only Apple GET at **2026-10-13 00:18:42 UTC** of
+/v1/builds scoped to app **6821471140**, including preReleaseVersion, returned
+only **1.0.0 (2)** and **1.0.0 (3)**, both **VALID**, not expired. Additional
+/v1/apps/6821471140/buildUploads GET 200 returned **1 FAILED, 2 COMPLETE,
+3 COMPLETE**, all IOS / 1.0.0, with no other/pending upload records. All pages read
+with bounded pagination, no unrelated app request, private credentials/JWTs
+withheld. **4 is unused in both received-build and upload lists**, rather than
+assumed from the owner's last installed build. Recheck both lists immediately
+before a separately authorized run/upload and refuse collisions/concurrent runs.
+The failed build-1 upload is historical, not a failure in this preparation.
+[Apple build-upload list schema](https://developer.apple.com/documentation/appstoreconnectapi/get-v1-apps-_id_-builduploads).
+
+**No confirmed build configuration omission.** Parsed signed YAML and every shell/
+inline-Python script checked. Existing App Store Connect integration
+shelf_app_store_connect, distribution certificate shelf_ios_distribution and
+profile shelf_ios_app_store retained; explicit 1.0.0/build-number variable,
+locked dependencies (purchases_flutter **10.13.2**), native In-App Purchase
+capability, photo-purpose guards, internal-only export, signing verification,
+permission-preserving ditto extraction and explicit $CM_BUILD_DIR artifact/evidence
+paths present. No automatic trigger or App Store/public tester submission.
+SHELF_TEST_MODE=false keeps production numeric reader identities/API;
+SHELF_INTERNAL_TEST_PURCHASES=false remains valid because the iOS platform branch
+selects **sandbox independently**. Apple appl_ SDK key comes from server
+purchases/config?platform=ios after gate activation; no Codemagic purchase key,
+secret, new Dart define or dependency update is required. Current gate OFF means
+no SDK key/checkout advertised to the app. Completed purchase PHP/Flutter/native
+source evidence reused; no completed suite/analyzer/native compile/build rerun.
+Only focused read-only source/syntax/configuration checks run.
+
+Private read-only production record verification found **one owner admin and one
+exact-email-matching reader**, already verified and buying allowed; the deployed
+ApplePurchaseProof owner predicate accepts that reader. No email/ID/token printed
+or reader created/modified. Intended account is the owner's existing exact admin
+email **through normal reader email/password sign-in**, not the admin UI, a plus
+alias, guest, new account or Apple relay sign-in. Both client and server restrict
+Apple checkout to **book ID 3 / shelf_book_3**, sandbox only; server independently
+verifies numeric reader identity, permanent entitlement and exact transaction/time.
+Book 3 remains Published with the expected product mapping. Actual runtime Apple
+sandbox/real checkout and both Apple sign-in/relay gates confirmed OFF.
+
+**Exact future activation/rollback procedure** is in IOS_PURCHASES.md. After the
+new internal build is received/processed, assigned only to existing Shelf Owner
+and installed, separately authorize one owner-only sandbox acceptance window.
+Codex takes/validates a fresh backup and private encrypted configuration checkpoint,
+checks existing mappings/webhook, exact owner eligibility, tracking OFF/original-ID
+restore and all disabled controls, then changes **only production
+SHELF_APPLE_SANDBOX_ENABLED=false → true** and runs **php artisan config:clear**.
+Real checkout, sign-in/relay and sync stay OFF; staging stays OFF; no deployment,
+new credentials or product/price/territory writes are needed. Verify public iOS
+config enabled/sandbox=true, production=false and only shelf_book_3 before purchase.
+Rollback changes only that gate **true → false**, clears config and verifies disabled
+advertisement/key withholding/503 Apple guard. Preserve schema, integration,
+reader/purchase/refund/accounting history and private credentials; no deletion or
+blanket database rollback. Existing Apple history may need later explicitly
+authorized reconciliation; gate closure cannot count as refund acceptance.
+
+Remaining phone steps: install the verified new internal build, sign in with the
+existing owner reader email/password, confirm free sample and consent, inspect
+Apple sandbox sheet and execute only separately authorized book-3 tests. Server
+confirmation/full text/media/download, cancelled/pending lock behavior,
+same-account restore, account isolation, refund removal and reversal without
+second sale/real income, actual Apple→RevenueCat→Shelf delivery and live proof
+shapes all remain pending. Second-phone restore is not requested. Existing title
+discrepancy/MISSING_METADATA and absent genuine review screenshot stay pending;
+no product metadata changes or fabricated screenshot. Apple sign-in/relay checks
+remain owner-deferred and are not a prerequisite to this email/password purchase
+flow. DSA/public metadata/territory rights remain separate launch dependencies.
+
+Live Codemagic variable values/run queue cannot be authenticated with currently
+documented access; preserve the prior no-token/no-connector limitation, no
+unauthorized secret search or credential request needed for preparation. Under
+later build authorization, set **SHELF_IOS_BUILD_NUMBER=4** in existing
+shelf_ios_testflight, retain approved API/groups/signing identities, verify the
+selected prepared branch/source and no competing run; use owner interaction only
+if authenticated Codemagic action is still unavailable. Nothing saved/run now.
+
+**One next action:** authorize one existing Codemagic **ios-testflight-internal**
+run/upload from prepared ios/foundation as **1.0.0 (4)**, with all gates OFF;
+recheck number availability before starting. Commit/push these scoped records
+only; no deployment required. Production unrelated handler preserved. Checkout
+OFF, pricing-sync and second-phone-restore deferrals, deferred Apple authentication/
+relay checks, Android/UI pause and joint public-launch hold unchanged.
+
 ## Disabled Apple purchase backend deployed and sandbox webhook configured — 12 October local / 13 October 2026 UTC
 
 Owner authorized the disabled purchase rollout from **61b0845**, existing staging,
@@ -3311,7 +3408,7 @@ Assign cross-cutting work once; other areas depend on that result.
 | **1. Admin/backend** | **Operations/acceptance:** actual backup-alert delivery, full replacement-host recovery/cutover, owner admin/end-to-end acceptance and separately approved old-app retirement. | Reuse passed encrypted upload/download/isolated restore and October 7 unattended success. Preserve baseline/cPanel handler; no old-account access authorized here. |
 | **2. Android app** | **Acceptance:** current Review 3 work owner-accepted; Play-installed build-20 phone acceptance NOT CONFIRMED. Retain unpassed Play-signed sign-in, reviewer access, reading/import, account isolation, sign-out, offline expiry/clock, withdrawal and platform acceptance requirements; earlier build-15 references are historical, not current-build acceptance. Further Android changes paused. | Batch 4 joint acceptance only when authorized. Reuse completed evidence; second-phone restore deferred. Current Android/UI pause remains binding. |
 | **2. Android app** | **Final-release dependencies:** tester opt-in/install evidence when needed, final Play review/readiness and confirmation of removal of four temporary account-level grants, preserving app-level access; actual production event/acknowledgement/purchase/refund/restore evidence. | Batch 5 when release needs it. Closed-testing approval complete, not public approval. Real-money/gate checks require separate explicit owner authorization and coordinated launch readiness. |
-| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. One-book Apple sandbox purchase source is prepared, default off; provider setup, backed-up rollout and iPhone acceptance remain pending. Later sign-in/relay checks require owner resumption. |
+| **3. iOS app** | **Internal phone/source status:** owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf Owner, installed/tested “seems good”; limited acceptance only. Apple/Google sign-in source implemented with focused checks, not in build 2. Owner confirms Google iOS/Codemagic setup, privately downloaded ShelfLogin key and Apple relay registration with green SPF. Private upload/permissions/P-256 format independently verified; Apple dashboard key/service/association confirmed; backend 31d123a deployed with both gates false. Owner confirms build 3 installed and rehearsal reached Apple’s Face ID prompt only; authorization did not finish on the borrowed phone. Apple phone acceptance/relay delivery are owner-deferred and unverified; transfer/email task stopped, both flags false. Full Apple/Google signed-phone authentication remains unfinished. Prior unsigned successes are preserved without rerun. | Apple phone/relay checks owner-deferred; pending transfer/email stopped. Keep gates false. One-book Apple sandbox backend 560ef50 is deployed with gate OFF; separate webhook configured. Internal 1.0.0 (4) is prepared from reviewed source dabedf5, not built/uploaded; activation and iPhone/delivery acceptance remain pending. Later sign-in/relay checks require owner resumption. |
 | **3. iOS app** | **Construction/acceptance:** complete platform project/configuration, signing, account/provider and per-book App Store purchase integration, reader/Library/offline/deletion/support flows as readiness establishes necessary; then real-iOS-phone acceptance and demonstrated fixes. | Batches 3–4 after inspection/agreed design. Reuse shared Flutter/backend. Exact gaps unverified until inspection; no Apple identity/availability/approval/purchase success claimed. |
 | **3. iOS app** | **External/release dependencies:** necessary Apple account/build/signing access, App Store configuration/disclosures/review/readiness and approved transaction/restore/refund acceptance. | Batch 5 joint launch. Android evidence does not establish iOS provider/device results. Checkout OFF absent separate authorization. |
 | **4. Shared app design and UX/UI** | **Agreement/construction:** current Review 3 work owner-accepted; further UI changes paused. Preserve delivered shared components and completed checks; no new design batch authorized. | Batch 2 after iOS readiness. Preserve source text, RTL book layout, interface/account-language decisions and access rules. Concrete reader-facing changes need agreement; optional improvements excluded. |
