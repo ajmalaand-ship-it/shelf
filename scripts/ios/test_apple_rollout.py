@@ -71,4 +71,24 @@ class WebhookSafety(unittest.TestCase):
             self.assertEqual(len(request.call_args_list),2);m.exclusive.assert_not_called()
 
 
+class FileSafety(unittest.TestCase):
+    def test_private_file_in_owned_application_directory_and_collision_refusal(self):
+        with tempfile.TemporaryDirectory(dir=os.environ['SHELF_TEST_TMP']) as folder:
+            parent=Path(folder)/'application';parent.mkdir(mode=0o755);parent.chmod(0o755)
+            path=parent/'synthetic.env'
+            m.exclusive(path,b'synthetic-only',private_parent=False)
+            self.assertEqual(path.stat().st_mode & 0o777,0o600)
+            self.assertEqual(path.read_bytes(),b'synthetic-only')
+            with self.assertRaises(FileExistsError):m.exclusive(path,b'replacement',private_parent=False)
+            self.assertEqual(path.read_bytes(),b'synthetic-only')
+
+    def test_secret_requires_private_parent_and_rejects_symlink(self):
+        with tempfile.TemporaryDirectory(dir=os.environ['SHELF_TEST_TMP']) as folder:
+            parent=Path(folder)/'unsafe';parent.mkdir(mode=0o755);parent.chmod(0o755)
+            with self.assertRaises(RuntimeError):m.exclusive(parent/'synthetic.secret',b'synthetic-only')
+            safe=Path(folder)/'safe';safe.mkdir(mode=0o700)
+            link=Path(folder)/'link';link.symlink_to(safe,target_is_directory=True)
+            with self.assertRaises(RuntimeError):m.exclusive(link/'synthetic.secret',b'synthetic-only')
+
+
 if __name__=='__main__':unittest.main()
