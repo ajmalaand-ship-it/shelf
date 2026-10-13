@@ -1,5 +1,94 @@
 # Shelf — one-book Apple sandbox setup
 
+## Smallest owner-only book-3 sandbox test — prepared, NOT ACTIVATED
+
+13 October 2026: owner confirms **1.0.0 (4) installed and launches**; basic
+installation/launch acceptance only. Backend source 560ef50 and separate Apple
+sandbox webhook remain ready with all gates OFF. Current staging/runtime/HTTPS/
+private config/mapping checks passed, and Apple/Google product attachments to
+shelf_book_3 are preserved. France remains excluded, app-wide availability remains
+previously unconfigured; no public availability/release permitted.
+
+### Confirmed blocker before opening a gate
+
+The existing exact-admin-email owner reader already owns **book3**, with existing
+Play book3 purchase history. Client LibraryController.purchase() refuses owned
+books; server consent also blocks existing access (409). No Apple purchase exists.
+Do not remove Play ownership, switch reader identity or bypass server consent.
+The current implementation cannot perform the requested new Apple purchase for
+that reader. **Next action: authorize focused owner-only Apple sandbox test support
+for already-owned book3**, retaining Play access and disabled controls. Any needed
+client source/artifact follow-up requires its own authorized task; no rebuild here.
+
+Normal app checkout is server-isolated: verified/unblocked exact owner reader only,
+APP_STORE sandbox only, book3/shelf_book_3 only, original numeric customer identity
+and independent permanent transaction/entitlement evidence. Read-only process
+simulation confirmed non-owner/blocked-owner denial and configured readiness without
+changing server settings. Public iOS readiness is not per-reader; consent/proof are
+the restriction, not hidden controls. Other books and Google integration unchanged.
+
+### Deferred activation — do not execute while ownership blocker remains
+
+1. Resolve that blocker in the separately approved scope; reuse installed build
+   evidence and existing keys/providers. Confirm RC tracking **OFF** and effective
+   sandbox restore **Keep with original App User ID**; those settings aren't public
+   API fields and aren't established by product/webhook GETs. No settings changes
+   or repeated owner request in this preparation task.
+2. Under separate owner activation/transaction authorization, run production
+   **python3 -B scripts/shelf_daily_backup.py**, verify SQL/content/checksums, save
+   encrypted private .env checkpoint, and recheck exact runtime identity/config.
+3. Atomically change only production **SHELF_APPLE_SANDBOX_ENABLED=false → true**;
+   retain shelf ownership/0600, reject symlinks/duplicates/concurrent changes.
+   Run **php artisan config:clear**. Retain real checkout/sign-in/relay/sync OFF,
+   staging untouched, owner restriction and exact book3 mapping. Never rerun the
+   OFF-only configure helper to activate. No deployment/migration needed merely
+   to flip a resolved supported gate.
+4. Privately verify actual runtime proof readiness, real OFF, iOS GET
+   enabled/sandbox=true, production=false, allowed_product_ids exactly
+   [shelf_book_3], key privately matched, normal non-owner consent denied before
+   any write, other books rejected, no changes to Google/other entitlements.
+   If an unexpected exposure or mismatch appears, close the gate immediately;
+   do not proceed to a transaction.
+
+### Smallest phone window and evidence — separately authorized later
+
+Use existing owner reader **email/password**, not Apple/relay/admin/alias login.
+Apple account for TestFlight is separate from Shelf reader identity. TestFlight
+purchases are sandbox, with no charge; use the existing installation/account.
+Do not create a new sandbox account or sign out of Media & Purchases for this
+basic case. After refresh, open only book3, read sample/consent and inspect Apple's
+sheet. First cancel one sheet and confirm no new Apple ownership; then, if still
+within authorization, complete **at most one book3 sandbox purchase**. If product
+is unavailable, stop and report; don't edit products, prices, territories or reset
+history. Sandbox price/localization quirks do not justify store changes.
+
+Codex verifies independent RevenueCat V2 APP_STORE/sandbox purchase proof for exact
+reader/product/original identity/transaction/time and entitlement; Shelf event,
+purchase and append-only journal show **Test**, no real revenue, no second sale.
+Verify expected paid text/download access without corrupting pre-existing Play
+ownership. Capture actual provider webhook delivery versus REST reconciliation as
+separate evidence; REST success alone is not webhook delivery. Preserve other
+books. Same-account restore/refund/reversal/isolation matrix remains later scope;
+second-phone restore is deferred. No Apple sign-in/relay acceptance requested.
+
+### Exact close-window / rollback
+
+Atomically change only **SHELF_APPLE_SANDBOX_ENABLED=true → false**, same owner/
+permissions/concurrency safeguards; **php artisan config:clear**. Verify runtime
+proof OFF, real/sign-in/relay/sync OFF; public iOS config enabled/sandbox/production
+false and public_sdk_key null; staging still OFF. Under separately authorized
+verification, incomplete Apple webhook returns its disabled guard before event/
+provider/data processing. Keep webhook/key/history/schema/entitlements intact;
+no SQL restore, migration-down, refund claim or Play entitlement deletion. Gate
+closure is not proof of refund and does not revoke legitimate Play access.
+
+Current Apple product remains NON_CONSUMABLE / MISSING_METADATA, with 174 saved
+territories excluding FRA; title discrepancy/genuine screenshot stay pending.
+Apple TN3186 does not require IAP review submission for sandbox. Saved purchase
+key credentials and notification V2 evidence reused; receipt/product-fetch and
+end-to-end delivery acceptance remain unverified. All holds and deferrals preserved.
+
+
 ## Build 4 owner-only TestFlight installation — 13 October 2026
 
 Current build **1.0.0 (4)**, source owner-reported **2702fbb**, Apple build
@@ -11,7 +100,7 @@ GET readback confirms assignment to existing **Shelf Owner** internal group
 builds now **4, 3, 2**. Apple internalBuildState **IN_BETA_TESTING**.
 No extra tester/group created. Build-side group GET 403 is a route permission
 limitation; group-side reads/writes worked, so assignment is independently verified.
-No dashboard assignment needed. Actual iPhone installation is still unverified.
+No dashboard assignment needed. Owner subsequently confirms iPhone installation/launch; purchase acceptance remains unverified.
 
 **Single next owner action:** iPhone **TestFlight → Shelf → Update** (or Install)
 to **1.0.0 (4)**. If needed select **Previous Builds → 1.0.0 → build 4 → Install**.
