@@ -320,6 +320,7 @@ use Illuminate\Support\Facades\DB;
 echo json_encode([
  'stage'=>App\Support\Staging::active(),
  'gate_off'=>config('purchases.apple_sandbox_enabled')===false,
+ 'owned_gate_off'=>config('purchases.apple_owned_book3_test_enabled',false)===false,
  'proof_off'=>!App\Services\Purchases\ApplePurchaseProof::configured(),
  'checkout_off'=>!config('purchases.production_enabled'), 'sync_off'=>!config('play_sync.enabled'),
  'signin_off'=>!config('reader_auth.apple_enabled') && !config('reader_auth.apple_relay_ready'),
@@ -335,11 +336,27 @@ echo json_encode([
  'stage_private'=>!filled(config('purchases.apple_webhook_authorization'))
    && !filled(config('purchases.apple_public_sdk_key')) && !filled(config('purchases.metadata_key_path')),
 ],JSON_THROW_ON_ERROR);"""))
-    required=('gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history')
+    required=('gate_off','owned_gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history')
     if not all(result.get(k) is True for k in required) or result['stage']==production:
         raise RuntimeError('Apple purchase disabled rollout/schema checks failed; details withheld.')
     if not production and not (result['stage_private'] and result['stage_isolated']):
         raise RuntimeError('Staging contains production Apple purchase configuration.')
+    denied=json.loads(php(app, r"""$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$controller=$app->make(App\Http\Controllers\LibraryController::class);
+$reader=new App\Models\Reader(['email'=>'synthetic-non-owner@example.test']);
+$book=App\Models\Collection::findOrFail(3);
+$out=['exception_disabled'=>!App\Services\Purchases\OwnerAppleSandboxTest::allowed($reader,$book)];
+foreach ([['APP_STORE',3,true,503],['APP_STORE',4,true,503],['APP_STORE',3,false,503],['PLAY_STORE',3,true,422]] as [$store,$id,$test,$expected]) {
+ $target=$id===3 ? $book : new App\Models\Collection(); $target->id=$id;
+ $request=Illuminate\Http\Request::create('/','POST',['agree'=>true,'checkout_mode'=>'sandbox','store'=>$store,'owned_book_sandbox_test'=>$test]);
+ $request->setUserResolver(fn()=>$reader);
+ try {$controller->consent($request,$target); $out[]=false;}
+ catch (Symfony\Component\HttpKernel\Exception\HttpException $e) {$out[]=$e->getStatusCode()===$expected;}
+}
+echo json_encode($out,JSON_THROW_ON_ERROR);"""))
+    if not all(value is True for value in denied.values()):
+        raise RuntimeError('Disabled owned-book exception denial checks failed.')
     base='https://shelf.services' if production else 'https://staging.shelf.services'
     headers={'Accept':'application/json'}
     if not production: headers['X-Shelf-Test-Key']=settings(app)['SHELF_STAGING_ACCESS_KEY']
@@ -359,7 +376,7 @@ echo json_encode([
 
 
 def apple_purchase_checked(app, commit, changes):
-    source='08a2adf'
+    source='c8c266221d972d409ffa947ca87397293c69c004'
     purchase_scope={
         'app/Http/Controllers/LibraryController.php','app/Http/Controllers/PurchaseWebhookController.php',
         'app/Models/Purchase.php','app/Models/PurchaseEvent.php',
@@ -367,7 +384,8 @@ def apple_purchase_checked(app, commit, changes):
         'app/Services/Purchases/PurchaseRecoveryService.php','app/Services/Purchases/PurchaseService.php',
         'app/Services/Purchases/RevenueCatClient.php','config/purchases.php',
         'database/migrations/2026_10_12_120000_add_purchase_event_store_scope.php',
-        'tests/Feature/AppleSandboxPurchasesTest.php',
+        'tests/Feature/AppleSandboxPurchasesTest.php','tests/Feature/BookPurchasesTest.php',
+        'app/Services/Purchases/OwnerAppleSandboxTest.php',
     }
     other={'scripts/staging/workflow.py','scripts/run_tests.sh','scripts/ios/test_asc_key_upload.py',
            'scripts/ios/configure_apple_sandbox.py','scripts/ios/test_apple_rollout.py'}
@@ -378,15 +396,24 @@ def apple_purchase_checked(app, commit, changes):
     if run(['git','diff','--name-only',source,commit,'--',*sorted(purchase_scope)]).strip():
         raise RuntimeError('Apple purchase source changed since completed tests; focused retesting required.')
     evidence=run(['git','show',source+':docs/MASTER_RECORD.md'])
-    if '16 PHP tests / 190 assertions' not in evidence or '9 new' not in evidence:
+    if '56 PHP tests / 511 assertions' not in evidence or '1 staging identity test' not in evidence:
         raise RuntimeError('Completed Apple purchase test record missing.')
+    for path in sorted(purchase_scope):
+        expected = subprocess.run(['git','show',source+':'+path], cwd=SOURCE, capture_output=True, check=True).stdout
+        if (app/path).read_bytes() != expected:
+            raise RuntimeError('Deployed Apple purchase path differs from validated source: '+path)
+    pending=json.loads(php(app, r'''$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+echo json_encode(array_values(array_diff(array_keys($app->make('migrator')->getMigrationFiles(database_path('migrations'))),$app->make('migration.repository')->getRan())));'''))
+    if pending:
+        raise RuntimeError('Unexpected pending migration in owner Apple test rollout.')
     log=RUNTIME/('checks-'+commit+'.log')
     apple_purchase_runtime_checks(app)
     https_checks()
     private_write(log,json.dumps({'tested_source':commit_id(source),
         'reused_record_sha256':hashlib.sha256(evidence.encode()).hexdigest(),
-        'purchase_paths_identical':True,'php_tests_reused':16,'php_assertions_reused':190,
-        'flutter_tests_reused':9,'runtime_checks_passed':True},indent=2)+'\n')
+        'purchase_paths_identical':True,'php_tests_reused':56,'php_assertions_reused':511,
+        'flutter_tests_reused':15,'runtime_checks_passed':True},indent=2)+'\n')
     state=current_state()
     state.update(staging_commit=commit,checks={'commit':commit,'passed':True,
         'checked_at':datetime.now(timezone.utc).isoformat(),'mobile_tests':False,
