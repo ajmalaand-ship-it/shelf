@@ -30,8 +30,12 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
     _identityChanged();
   }
   final bool internalTestCheckout;
-  String get checkoutMode => applePurchasePlatform || internalTestCheckout ? 'sandbox' : 'production';
-  bool get checkoutAvailable => configuration['enabled'] == true && configuration['${checkoutMode}_checkout_enabled'] == true && !buyingBlocked;
+  String get checkoutMode =>
+      applePurchasePlatform || internalTestCheckout ? 'sandbox' : 'production';
+  bool get checkoutAvailable =>
+      configuration['enabled'] == true &&
+      configuration['${checkoutMode}_checkout_enabled'] == true &&
+      !buyingBlocked;
   final AccountController accounts;
   final LibraryService service;
   final BookPurchaseProvider provider;
@@ -47,6 +51,18 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
   DateTime? validUntil, _lastObserved;
   bool busy = false, initialized = false, buyingBlocked = false;
   bool refreshFailed = false;
+  bool _ownedAppleTestAllowed = false, _appleBook3Confirmed = false;
+  bool canTestOwnedAppleBook(PoetryCollection book) =>
+      applePurchasePlatform &&
+      checkoutMode == 'sandbox' &&
+      checkoutAvailable &&
+      !refreshFailed &&
+      _ownedAppleTestAllowed &&
+      !_appleBook3Confirmed &&
+      owns(book.id) &&
+      book.id == 3 &&
+      book.productId == 'shelf_book_3';
+  bool get appleBook3Confirmed => _appleBook3Confirmed;
   Map<String, dynamic> configuration = {};
   String? message;
   final Set<VoidCallback> stopReading = {};
@@ -78,6 +94,8 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
     _identityToken = accounts.readerToken;
     final generation = ++_generation;
     configuration = {};
+    _ownedAppleTestAllowed = false;
+    _appleBook3Confirmed = false;
     buyingBlocked = false;
     books = [];
     downloaded = {};
@@ -206,6 +224,8 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
       validUntil = serverExpiry.isBefore(maxExpiry) ? serverExpiry : maxExpiry;
       _lastObserved = clock();
       buyingBlocked = data['buying_blocked'] == true;
+      _ownedAppleTestAllowed = data['apple_owned_book3_test_allowed'] == true;
+      _appleBook3Confirmed = data['apple_sandbox_book3_confirmed'] == true;
       message = null;
       refreshFailed = false;
       initialized = true;
@@ -249,11 +269,17 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
     final reader = readerId, generation = _generation;
     if (reader == null) throw const AccountFailure(401);
     configuration = {};
-    final config = await service.request(applePurchasePlatform ? 'purchases/config?platform=ios' : 'purchases/config');
+    final config = await service.request(
+      applePurchasePlatform
+          ? 'purchases/config?platform=ios'
+          : 'purchases/config',
+    );
     assertIdentity(reader, generation);
     configuration = config;
     if (configuration['enabled'] != true ||
-        (applePurchasePlatform && (configuration['store'] != 'APP_STORE' || configuration['production_checkout_enabled'] != false)))
+        (applePurchasePlatform &&
+            (configuration['store'] != 'APP_STORE' ||
+                configuration['production_checkout_enabled'] != false)))
       throw const AccountFailure(503);
     await provider.identify(
       configuration['public_sdk_key'] as String,
@@ -268,22 +294,31 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
   Future<StoreBookProduct?> product(PoetryCollection book) async {
     await _identityWork;
     await configureStore();
-    if (book.productId != 'shelf_book_${book.id}' || !_allowedProduct(book.productId!)) return null;
+    if (book.productId != 'shelf_book_${book.id}' ||
+        !_allowedProduct(book.productId!))
+      return null;
     final reader = readerId!, generation = _generation;
     final product = await provider.product(book.productId!);
     assertIdentity(reader, generation);
     return product?.id == book.productId ? product : null;
   }
 
-  bool _allowedProduct(String id) => !applePurchasePlatform ||
-      (id == 'shelf_book_3' && (configuration['allowed_product_ids'] as List? ?? []).contains(id));
+  bool _allowedProduct(String id) =>
+      !applePurchasePlatform ||
+      (id == 'shelf_book_3' &&
+          (configuration['allowed_product_ids'] as List? ?? []).contains(id));
 
   Future<StorePurchaseResult> purchase(
     PoetryCollection book,
     StoreBookProduct product,
-    bool agreed,
-  ) async {
-    if (busy || !agreed || readerId == null || owns(book.id))
+    bool agreed, {
+    bool ownedBookSandboxTest = false,
+  }) async {
+    if (busy ||
+        !agreed ||
+        readerId == null ||
+        (ownedBookSandboxTest && !canTestOwnedAppleBook(book)) ||
+        (owns(book.id) && !ownedBookSandboxTest))
       return StorePurchaseResult.failed;
     if (product.id != book.productId || product.id != 'shelf_book_${book.id}')
       return StorePurchaseResult.failed;
@@ -292,16 +327,30 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
     final reader = readerId!, generation = _generation;
     try {
       await configureStore();
-      if (!checkoutAvailable || !_allowedProduct(product.id)) throw const AccountFailure(503);
+      if (!checkoutAvailable || !_allowedProduct(product.id))
+        throw const AccountFailure(503);
       final consent = await request(
         'library/books/${book.id}/consent',
         method: 'POST',
-        data: {'agree': true, 'checkout_mode': checkoutMode, if (applePurchasePlatform) 'store': 'APP_STORE'},
+        data: {
+          'agree': true,
+          'checkout_mode': checkoutMode,
+          if (applePurchasePlatform) 'store': 'APP_STORE',
+          if (ownedBookSandboxTest) 'owned_book_sandbox_test': true,
+        },
       );
       assertIdentity(reader, generation);
-      if ((applePurchasePlatform && consent['store'] != 'APP_STORE') || consent['accepted'] != true || consent['checkout_mode'] != checkoutMode ||
+      if ((ownedBookSandboxTest &&
+              consent['owned_book_sandbox_test'] != true) ||
+          (applePurchasePlatform && consent['store'] != 'APP_STORE') ||
+          consent['accepted'] != true ||
+          consent['checkout_mode'] != checkoutMode ||
           consent['product_id'] != product.id ||
-          consent['app_user_id'] != shelfPurchaseIdentity(reader, configuration['identity_prefix'] as String? ?? '')) {
+          consent['app_user_id'] !=
+              shelfPurchaseIdentity(
+                reader,
+                configuration['identity_prefix'] as String? ?? '',
+              )) {
         throw const AccountFailure(503);
       }
       final result = await provider.buy(product);
@@ -315,8 +364,12 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
             await refresh(operation: 'library/confirm');
           } catch (_) {}
           assertIdentity(reader, generation);
-          if (owns(book.id)) {
-            message = 'Your book is ready in My Library.';
+          if (ownedBookSandboxTest
+              ? (!refreshFailed && _appleBook3Confirmed)
+              : owns(book.id)) {
+            message = ownedBookSandboxTest
+                ? 'Apple sandbox purchase confirmed. Your existing book stays available.'
+                : 'Your book is ready in My Library.';
             return result;
           }
           await Future<void>.delayed(const Duration(seconds: 3));

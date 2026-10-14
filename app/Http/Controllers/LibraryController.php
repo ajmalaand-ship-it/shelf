@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\{CollectionResource, OwnedPoemResource, PoemSummaryResource};
 use App\Models\{Collection, Poem};
 use App\Services\BookAccessService;
-use App\Services\Purchases\{PurchaseService, RevenueCatClient};
+use App\Services\Purchases\{OwnerAppleSandboxTest, PurchaseService, RevenueCatClient};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Storage};
 
@@ -43,7 +43,12 @@ class LibraryController extends Controller
         $data = $books->map(fn ($book) => $this->bookData($r, $book))->all();
         return response()->json(['books' => $data,
             'checked_at' => now()->toIso8601String(), 'offline_valid_until' => now()->addDays(30)->toIso8601String(),
-            'buying_blocked' => (bool) $r->user()->buying_blocked]);
+            'buying_blocked' => (bool) $r->user()->buying_blocked,
+            'apple_owned_book3_test_allowed' => ($testBook = Collection::find(3))
+                ? OwnerAppleSandboxTest::allowed($r->user(), $testBook) : false,
+            'apple_sandbox_book3_confirmed' => \App\Models\Purchase::where('reader_id', $r->user()->id)
+                ->where('store', 'APP_STORE')->where('environment', 'SANDBOX')->where('collection_id', 3)
+                ->get()->contains(fn ($p) => \App\Services\Purchases\AppleSandboxPurchases::active($p))]);
     }
 
     public function consent(Request $r, Collection $collection)
@@ -51,20 +56,28 @@ class LibraryController extends Controller
         if ($r->input('store') === 'APP_STORE') {
             abort_unless(\App\Services\Purchases\ApplePurchaseProof::configured(), 503);
             abort_unless(\App\Services\Purchases\ApplePurchaseProof::owner($r->user()), 403);
-            $r->validate(['agree' => ['required', 'accepted'], 'checkout_mode' => ['required', 'in:sandbox']]);
+            $r->validate(['agree' => ['required', 'accepted'], 'checkout_mode' => ['required', 'in:sandbox'],
+                'owned_book_sandbox_test' => ['sometimes', 'boolean']]);
             DB::transaction(function () use ($r, $collection): void {
                 $reader = \App\Models\Reader::whereKey($r->user()->id)->lockForUpdate()->firstOrFail();
                 $book = Collection::whereKey($collection->id)->lockForUpdate()->firstOrFail();
                 abort_unless(\App\Services\Purchases\ApplePurchaseProof::owner($reader), 403);
                 abort_unless($book->id === 3 && $book->product_id === 'shelf_book_3'
                     && $book->isPublished() && $book->price_usd > 0, 409);
-                abort_if(app(BookAccessService::class)->ownsBook($reader, $book), 409);
+                if ($r->boolean('owned_book_sandbox_test')) {
+                    abort_unless(OwnerAppleSandboxTest::allowed($reader, $book), 409);
+                } else {
+                    abort_if(app(BookAccessService::class)->ownsBook($reader, $book), 409);
+                }
                 DB::table('purchase_consents')->insert(['reader_id' => $reader->id, 'collection_id' => 3,
-                    'store' => 'APP_STORE', 'wording' => PurchaseService::CONSENT, 'created_at' => now()]);
+                    'store' => 'APP_STORE', 'wording' => $r->boolean('owned_book_sandbox_test')
+                        ? OwnerAppleSandboxTest::CONSENT : PurchaseService::CONSENT, 'created_at' => now()]);
             });
             return response()->json(['accepted' => true, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE',
-                'product_id' => 'shelf_book_3', 'app_user_id' => (string) $r->user()->id]);
+                'product_id' => 'shelf_book_3', 'app_user_id' => (string) $r->user()->id,
+                'owned_book_sandbox_test' => $r->boolean('owned_book_sandbox_test')]);
         }
+        abort_if($r->boolean('owned_book_sandbox_test'), 422, 'Owned-book tests require Apple sandbox consent.');
         abort_unless(RevenueCatClient::configured(), 503, 'Purchases are not configured yet.');
         $r->validate(['agree' => ['required', 'accepted'], 'checkout_mode' => ['sometimes', 'required', 'in:sandbox,production']]);
         // Legacy installed owner-test clients omit the mode. This authorizes checkout,

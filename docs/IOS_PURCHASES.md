@@ -1,5 +1,146 @@
 # Shelf — one-book Apple sandbox setup
 
+## Recovered owner test for an already-owned Book 3 — completed 14 October 2026
+
+Resumed interrupted work at **29d9f32** in `/home/shelf/tmp/shelf-ios-foundation`,
+branch **ios/foundation**. Actual recovered HEAD and remote tip were
+**29d9f3250fdcd3030907c5ae7d65643e6915b92e**; no later local commits existed.
+Inspected the complete pending diff and preserved all **11 modified files plus
+one untracked service**; no reset, clean, discarded work or recreated implementation. This authorization covers isolated source, focused
+verification, records and branch-only commit/push. **NOT DEPLOYED OR ACTIVATED.**
+The historical ownership blocker remains present in deployed 560ef50 and installed
+TestFlight **1.0.0 (4)** until separately authorized rollout and a new artifact.
+
+### Completed safeguards
+
+- New **SHELF_APPLE_OWNED_BOOK3_TEST_ENABLED** defaults false. It additionally
+  requires configured Apple sandbox (existing SHELF_APPLE_SANDBOX_ENABLED),
+  staging inactive and SHELF_REAL_PURCHASES_ENABLED false. Both Apple controls
+  remain OFF; no .env/provider setting changed in this task.
+- Eligibility requires the verified, buying-allowed exact-owner-email reader,
+  Published **3 / shelf_book_3**, positive price, current active entitlement and
+  an unrefunded/unrevoked **PLAY_STORE sale** for that same reader/book. An
+  account without that sale or with any recorded Apple book-3 purchase cannot
+  use the exception. No alias/relay/new account or complimentary grant substitutes.
+- Library returns authenticated `apple_owned_book3_test_allowed` and a separate
+  `apple_sandbox_book3_confirmed` only after existing reconciliation succeeds.
+  Book details adds a 52-pixel LTR **Test Apple purchase — no charge** action only
+  for native iOS with current server permission, owned book3 and sandbox checkout.
+  Normal Read book/sample and duplicate-purchase paths remain intact. Permission
+  is not persisted offline and clears on identity change; failed refresh blocks it.
+- The test screen explains existing Play ownership, preserves source title RTL,
+  requires the existing sample/all-sales-final agreement, and identifies sandbox/
+  no charge. Client sends explicit `owned_book_sandbox_test=true` with APP_STORE/
+  sandbox consent and requires the server to echo authorization before SDK buy.
+  The server locks reader/book, rechecks eligibility, appends distinct test consent
+  wording, and rejects that flag on the Play consent path. Normal owned-book
+  consent still returns 409; other books/nonowners/real checkout are rejected.
+- Before recording a new overlapping Apple purchase, server requires that same
+  test consent **at or before Apple purchase time and no more than 15 minutes
+  before it** (existing consent timestamps have second precision). Older Apple
+  proof preceding consent and stale consent fail closed. Existing independent V2
+  app/product/original-reader/transaction/millisecond-time/permanent-entitlement/
+  APP_STORE/SANDBOX checks are retained. SDK success or existing Play access can
+  never establish Apple confirmation. A failed confirmation refresh cannot reuse
+  a cached confirmation flag. Confirmation retries never initiate another buy.
+- Only a proven Apple transaction appends Apple purchase/event/Test journal rows;
+  it does not rewrite Play purchase/ledger history. Existing union-of-valid-store
+  access remains: cancelling/pending/failing Apple testing leaves Play ownership
+  and download intact; Apple refund/reversal never removes valid Play access.
+  Duplicate event delivery remains idempotent; a second new overlapping Apple
+  transaction is rejected. Sandbox sale/refund/reversal rows remain excluded from
+  real revenue and author totals, without new royalty calculation or payout.
+
+### Verification and remaining limits
+
+Focused wrapper invocation:
+`SHELF_PHP_TEST_FILTER='AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest' SHELF_MOBILE_TEST_SCOPE=ios-purchases scripts/run_tests.sh --mobile`.
+All tests use synthetic identities/provider responses and disposable SQLite/
+Flutter storage under `/home/shelf/tmp`; no live request, purchase or data change.
+PHP checks cover both gates, staging, exact owner/verified/unblocked account,
+book/store/mode scope, unchanged normal duplicate guard, active Play-sale eligibility,
+fresh consent/proof, a second Apple transaction, immutable Play rows, Test-only
+income and independent Library Apple confirmation/refund behavior. Flutter checks
+cover controller guards, server consent echo, separate proof versus Play access,
+account reset, cancellation/pending/failure/download preservation and the actual
+Book details → test screen route, agreement, price, confirmation and disabled
+repeat button. Final wrapper **passed: 56 PHP tests / 511 assertions, 14 Flutter
+iOS purchase tests and 1 staging identity test**. Focused analysis passed with
+21 style infos, no errors or warnings; `git diff --check` passed.
+The first recovery run exposed widget platform-override cleanup and a stale Play
+test expecting 422 for an Apple event; the existing default-OFF Apple guard
+returns 503. Restored the override before widget invariants and corrected only
+that assertion, then reran the complete focused scope successfully. No live
+failure occurred. No dependency
+upgrade, broad suite or Android artifact. Source UX checked by widget routing/
+layout with 52-pixel actions; real iPhone rendering/StoreKit acceptance is pending.
+
+A **new internal TestFlight build is required**: book-detail routing, controller
+and purchase screen are bundled Flutter changes absent from installed build 4.
+This task starts/reserves no build, upload or build number. Recheck actual unused
+number and exact branch source under later build authorization. No native signing,
+SDK/dependency, key, Apple/RevenueCat product or workflow setting change needed.
+Real StoreKit retrieval, purchase proof shapes, notification delivery and phone
+acceptance remain unverified; tracking OFF / original App User ID dashboard
+confirmation is still required before later activation. Product title discrepancy,
+MISSING_METADATA/genuine review image and public-release requirements remain open.
+
+### Exact recovered files and completion
+
+Recovered existing changes in:
+
+- `app/Http/Controllers/LibraryController.php`
+- `app/Services/Purchases/AppleSandboxPurchases.php`
+- `app/Services/Purchases/OwnerAppleSandboxTest.php` (untracked at recovery)
+- `config/purchases.php`
+- `mobile/lib/purchases/library_controller.dart`
+- `mobile/lib/purchases/purchase_screen.dart`
+- `mobile/lib/screens/collection_detail_screen.dart`
+- `mobile/test/ios_purchases_test.dart`
+- `tests/Feature/AppleSandboxPurchasesTest.php`
+- `scripts/run_tests.sh`
+- `docs/MASTER_RECORD.md`
+- `docs/IOS_PURCHASES.md`
+
+The interrupted source implementation was present; final passing verification and
+accurate recovery/test records were unfinished. Completed those, corrected the
+widget fixture and added the narrowly scoped existing-guard assertion correction
+in `tests/Feature/BookPurchasesTest.php`. All 13 final files belong to this scope.
+No schema, deployment, provider setting, gate, build, upload or purchase changed.
+The validated branch-only commit is titled **Allow owner Book 3 Apple sandbox test
+without changing Play ownership**; deployment remains 560ef50, not this source.
+
+### Rollout and rollback — plans only, no deployment in this task
+
+1. Under separate rollout authorization, stage this exact verified commit with
+   both Apple gates and real checkout OFF; staging must force Apple off. Reuse the
+   existing already-applied store-scope schema: **no new migration**. Verify fresh
+   backups and promote the same tested commit through docs/STAGING.md, preserving
+   private config, Google integration, ownership and all history. Record exact
+   promotion evidence; do not assume current deployment contains these changes.
+2. Separately build/install the updated internal iOS artifact with all gates OFF.
+   Later explicit activation/transaction approval must include **both** Apple
+   sandbox and owned-book3-test switches, fresh verified backup/encrypted .env
+   checkpoint and exact runtime owner/mapping checks. The older one-switch plan
+   is insufficient for this exception. Keep real/sign-in/relay/sync OFF. Refresh
+   Library to obtain current owner permission before opening only book3 test UI.
+3. To close an approved window, atomically set **SHELF_APPLE_OWNED_BOOK3_TEST_ENABLED=false**
+   and **SHELF_APPLE_SANDBOX_ENABLED=false**, retaining permissions and unrelated
+   settings, then clear config cache and verify disabled config/guards. Preserve
+   all Play/Apple records, keys, webhooks, schema and downloads; no SQL restoration
+   or migration down. Closing gates is not a refund. As already documented,
+   disabled Apple verification cannot issue fresh offline leases for recorded
+   Apple history; any pending reconciliation needs a separately approved window.
+   The Play purchase remains valid and is not revoked by this exception.
+   A later code rollback uses the recorded previous deployed revision with gates
+   closed and schema/history retained, never blanket restoration over reader data.
+
+**Exactly one next action:** authorize staging-first, backed-up promotion of this
+verified backend source with both Apple controls and real checkout OFF.
+France excluded/ANSSI cancelled, deferred Apple authentication/relay checks,
+Android/UI pause, pricing-sync and second-phone-restore deferrals, small-improvement
+pause and joint Android/iOS public-launch hold all remain unchanged.
+
 ## Smallest owner-only book-3 sandbox test — prepared, NOT ACTIVATED
 
 13 October 2026: owner confirms **1.0.0 (4) installed and launches**; basic
@@ -9,7 +150,7 @@ private config/mapping checks passed, and Apple/Google product attachments to
 shelf_book_3 are preserved. France remains excluded, app-wide availability remains
 previously unconfigured; no public availability/release permitted.
 
-### Confirmed blocker before opening a gate
+### Historical blocker before opening a gate — source follow-up below supersedes it
 
 The existing exact-admin-email owner reader already owns **book3**, with existing
 Play book3 purchase history. Client LibraryController.purchase() refuses owned

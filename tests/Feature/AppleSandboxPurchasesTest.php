@@ -19,6 +19,7 @@ class AppleSandboxPurchasesTest extends TestCase
     private array $productProof;
     private array $entitlement;
     private int $httpStatus = 200;
+    private bool $hideApplePurchase = false;
 
     protected function setUp(): void
     {
@@ -59,7 +60,7 @@ class AppleSandboxPurchasesTest extends TestCase
                 str_contains($url, '/apps/') => $this->appProof,
                 str_contains($url, '/products/') => $this->productProof,
                 str_contains($url, '/entitlements') => $this->listing([$this->entitlement]),
-                default => $this->listing([$this->proof]),
+                default => $this->listing($this->hideApplePurchase ? [] : [$this->proof]),
             };
             return Http::response($data, $this->httpStatus);
         });
@@ -260,4 +261,135 @@ class AppleSandboxPurchasesTest extends TestCase
         catch (\RuntimeException $e) { $this->assertStringContainsString('preservation plan', $e->getMessage()); }
         $this->assertDatabaseCount('purchases', 1); $this->assertDatabaseCount('sales_ledger', 1);
     }
+    private function existingPlayOwnership(): Purchase
+    {
+        $play = Purchase::create(['reader_id' => $this->reader->id, 'collection_id' => 3,
+            'store' => 'PLAY_STORE', 'environment' => 'SANDBOX', 'transaction_id' => 'play-existing',
+            'product_id' => 'shelf_book_3', 'purchased_at' => now()->subDay()]);
+        SalesLedger::create(['purchase_id' => $play->id, 'entry_key' => 'sale:'.$play->id,
+            'status' => 'sale', 'amount' => '2.99', 'currency' => 'USD', 'occurred_at' => now()->subDay(), 'earnings_status' => 'test']);
+        app(PurchaseService::class)->refreshAccess($this->reader, $this->book);
+        return $play;
+    }
+
+    private function ownedTestConsent(array $changes = [], ?Reader $reader = null, int $book = 3)
+    {
+        return $this->postJson('/api/library/books/'.$book.'/consent', array_replace([
+            'agree' => true, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE',
+            'owned_book_sandbox_test' => true], $changes), $this->bearer($reader));
+    }
+
+    public function test_owned_book_exception_is_default_off_and_normal_duplicate_guard_stays(): void
+    {
+        $this->existingPlayOwnership();
+        $this->assertFalse(config('purchases.apple_owned_book3_test_enabled'));
+        $this->ownedTestConsent()->assertStatus(409);
+        $this->webhook()->assertStatus(409);
+        config(['purchases.apple_owned_book3_test_enabled' => true]);
+        $this->ownedTestConsent(['owned_book_sandbox_test' => false])->assertStatus(409);
+        $this->ownedTestConsent()->assertOk()->assertJsonPath('owned_book_sandbox_test', true);
+        $this->assertTrue($this->active());
+        $this->assertDatabaseCount('purchases', 1);
+    }
+
+    public function test_owned_test_requires_both_gates_exact_owner_book_store_and_no_real_checkout(): void
+    {
+        $this->existingPlayOwnership();
+        config(['purchases.apple_owned_book3_test_enabled' => true]);
+        $other = Reader::create(['email' => 'owner+alias@example.test']);
+        $other->forceFill(['email_verified_at' => now()])->save();
+        $this->ownedTestConsent([], $other)->assertForbidden();
+        $this->ownedTestConsent(['store' => 'PLAY_STORE'])->assertUnprocessable();
+        $this->ownedTestConsent(['checkout_mode' => 'production'])->assertUnprocessable();
+        $otherBook = new Collection(['title' => 'Other', 'status' => 'published', 'price_usd' => '2.99']);
+        $otherBook->forceFill(['id' => 4])->save();
+        $this->ownedTestConsent([], null, 4)->assertStatus(409);
+        foreach (['buying_blocked' => true, 'email_verified_at' => null] as $field => $value) {
+            $old = $this->reader->fresh()->$field;
+            $this->reader->forceFill([$field => $value])->save();
+            $this->ownedTestConsent()->assertForbidden();
+            $this->reader->forceFill([$field => $old])->save();
+        }
+        config(['purchases.production_enabled' => true]);
+        $this->ownedTestConsent()->assertStatus(409);
+        config(['purchases.production_enabled' => false, 'purchases.apple_sandbox_enabled' => false]);
+        $this->ownedTestConsent()->assertStatus(503);
+        config(['purchases.apple_sandbox_enabled' => true, 'staging.testing' => true]);
+        $this->assertFalse(\App\Services\Purchases\ApplePurchaseProof::configured());
+        $this->ownedTestConsent()->assertUnauthorized(); // Production reader tokens cannot cross staging.
+        $this->assertDatabaseCount('purchases', 1);
+    }
+
+    public function test_owned_test_needs_active_play_sale_and_cannot_use_a_complimentary_or_refunded_purchase(): void
+    {
+        config(['purchases.apple_owned_book3_test_enabled' => true]);
+        $this->ownedTestConsent()->assertStatus(409);
+        $play = $this->existingPlayOwnership();
+        SalesLedger::create(['purchase_id' => $play->id, 'entry_key' => 'refund:fixture',
+            'status' => 'refund', 'occurred_at' => now(), 'earnings_status' => 'test']);
+        $this->ownedTestConsent()->assertStatus(409);
+    }
+
+    public function test_owned_test_requires_fresh_consent_and_fresh_apple_proof_preserving_play_history(): void
+    {
+        $play = $this->existingPlayOwnership();
+        $original = $play->fresh()->toArray(); $ledger = $play->entries()->first()->toArray();
+        config(['purchases.apple_owned_book3_test_enabled' => true]);
+        $this->webhook()->assertStatus(409); // Normal Apple consent cannot waive ownership.
+        $this->ownedTestConsent()->assertOk();
+        $this->proof['environment'] = 'production'; $this->webhook()->assertStatus(503);
+        $this->proof['environment'] = 'sandbox';
+        DB::table('purchase_consents')->where('wording', \App\Services\Purchases\OwnerAppleSandboxTest::CONSENT)
+            ->update(['created_at' => now()->subMinutes(16)]);
+        $this->webhook()->assertStatus(409);
+        DB::table('purchase_consents')->where('wording', \App\Services\Purchases\OwnerAppleSandboxTest::CONSENT)
+            ->update(['created_at' => now()->addMinute()]);
+        $this->webhook()->assertStatus(409); // Old Apple proof predating the new consent.
+        DB::table('purchase_consents')->where('wording', \App\Services\Purchases\OwnerAppleSandboxTest::CONSENT)
+            ->update(['created_at' => now()]);
+        $this->webhook()->assertOk(); $this->webhook()->assertOk();
+        $this->assertSame($original, $play->fresh()->toArray());
+        $this->assertSame($ledger, $play->entries()->first()->toArray());
+        $this->assertDatabaseCount('purchases', 2);
+        $this->assertSame(2, SalesLedger::withTestPurchases()->where('status', 'sale')->count());
+        $this->assertSame(0, SalesLedger::count());
+        $this->assertTrue($this->active());
+        $this->ownedTestConsent()->assertStatus(409); // A second new Apple transaction is prohibited.
+        $this->proof['store_purchase_identifier'] = '100000000000002';
+        $this->webhook(['id' => 'second-apple', 'transaction_id' => '100000000000002'])->assertStatus(409);
+        $this->proof['store_purchase_identifier'] = $this->event['transaction_id'];
+        $this->refund()->assertOk(); $this->assertTrue($this->active());
+        $this->assertTrue(AppleSandboxPurchases::active($play));
+        $this->reversal()->assertOk(); $this->assertTrue($this->active());
+        $this->assertSame($ledger, $play->entries()->first()->toArray());
+        $this->assertSame(0, SalesLedger::count());
+    }
+
+    public function test_library_reports_separate_apple_confirmation_only_after_independent_proof(): void
+    {
+        $play = $this->existingPlayOwnership();
+        // Keep this test focused on Apple; Play verifier itself is covered separately.
+        $provider = \Mockery::mock(\App\Services\Purchases\RevenueCatClient::class);
+        $provider->shouldReceive('subscriber')->andReturn([]);
+        $provider->shouldReceive('confirms')->andReturn(true);
+        $this->app->instance(\App\Services\Purchases\RevenueCatClient::class, $provider);
+        config(['purchases.apple_owned_book3_test_enabled' => true]);
+        $this->hideApplePurchase = true;
+        $this->getJson('/api/library', $this->bearer())->assertOk()
+            ->assertJsonPath('apple_owned_book3_test_allowed', true)
+            ->assertJsonPath('apple_sandbox_book3_confirmed', false)->assertJsonPath('books.0.id', 3);
+        $this->ownedTestConsent()->assertOk();
+        $this->hideApplePurchase = false;
+        $this->postJson('/api/library/confirm', [], $this->bearer())->assertOk()
+            ->assertJsonPath('apple_owned_book3_test_allowed', false)
+            ->assertJsonPath('apple_sandbox_book3_confirmed', true)->assertJsonPath('books.0.id', 3);
+        $this->refund()->assertOk();
+        $this->getJson('/api/library', $this->bearer())->assertOk()
+            ->assertJsonPath('apple_sandbox_book3_confirmed', false)->assertJsonPath('books.0.id', 3);
+        $this->assertTrue(AppleSandboxPurchases::active($play));
+        $this->httpStatus = 503;
+        $this->getJson('/api/library', $this->bearer())->assertStatus(503)
+            ->assertJsonMissing(['apple_sandbox_book3_confirmed' => true]);
+    }
+
 }

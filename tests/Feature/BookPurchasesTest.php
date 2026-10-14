@@ -254,7 +254,9 @@ class BookPurchasesTest extends TestCase
     public function test_authenticated_webhook_and_rest_both_required_idempotent_and_no_global_or_real_money(): void
     {
         $this->postJson('/api/purchases/webhook', ['event' => $this->event])->assertUnauthorized();
-        foreach ([['environment' => 'PRODUCTION'], ['app_id' => 'other-app'], ['store' => 'APP_STORE'], ['type' => 'TEMPORARY_ENTITLEMENT_GRANT']] as $change) {
+        // Apple events reach their separate default-OFF guard before Play validation.
+        $this->webhook(['store' => 'APP_STORE'])->assertStatus(503);
+        foreach ([['environment' => 'PRODUCTION'], ['app_id' => 'other-app'], ['type' => 'TEMPORARY_ENTITLEMENT_GRANT']] as $change) {
             $this->webhook($change)->assertUnprocessable();
         }
         $this->webhook(['product_id' => 'pitswal_unlock_all_v1'])->assertNotFound();

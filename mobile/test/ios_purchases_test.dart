@@ -1,6 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shelf/repository/poetry_repository.dart';
+import 'package:shelf/screens/collection_detail_screen.dart';
+import 'package:shelf/purchases/purchase_screen.dart';
+import 'package:shelf/settings/reader_settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf/accounts/account_controller.dart';
 import 'package:shelf/models/poetry_collection.dart';
@@ -24,6 +30,10 @@ class AppleApi implements LibraryService {
       owned = false,
       consentStoreMatches = true,
       proofFails = false;
+  bool ownedTestAllowed = false,
+      appleConfirmed = false,
+      confirmApple = true,
+      echoTestAuthorization = true;
   final paths = <String>[];
   Map<String, dynamic>? consent;
   @override
@@ -47,13 +57,18 @@ class AppleApi implements LibraryService {
       consent = data;
       return {
         'accepted': true,
+        'owned_book_sandbox_test':
+            echoTestAuthorization && data?['owned_book_sandbox_test'] == true,
         'store': consentStoreMatches ? 'APP_STORE' : 'PLAY_STORE',
         'checkout_mode': 'sandbox',
         'product_id': 'shelf_book_3',
         'app_user_id': '1',
       };
     }
-    if (path == 'library/confirm') owned = true;
+    if (path == 'library/confirm') {
+      owned = true;
+      if (confirmApple) appleConfirmed = true;
+    }
     if (proofFails) throw StateError('Synthetic provider unavailable');
     return {
       'books': owned ? [appleBook.toJson()] : [],
@@ -61,11 +76,23 @@ class AppleApi implements LibraryService {
           .add(const Duration(days: 30))
           .toIso8601String(),
       'buying_blocked': false,
+      'apple_owned_book3_test_allowed': ownedTestAllowed,
+      'apple_sandbox_book3_confirmed': appleConfirmed,
     };
   }
 
   @override
   Future<Uint8List> media(String url, String token) async => Uint8List(0);
+}
+
+class OwnedTestBooks implements PoetryDataSource {
+  @override
+  Future<CollectionBundle> loadCollection(
+    String slug,
+    int contentVersion,
+  ) async => const CollectionBundle(collection: appleBook, poems: []);
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
@@ -243,5 +270,205 @@ void main() {
         throwsStateError,
       );
     },
+  );
+  test('owned Apple test is denied by default and cannot waive normal duplicate protection', () async {
+    api.owned = true;
+    await library.refresh();
+    expect(library.canTestOwnedAppleBook(appleBook), false);
+    expect(
+      await library.purchase(
+        appleBook,
+        const StoreBookProduct('shelf_book_3', 'US\$2.99'),
+        true,
+        ownedBookSandboxTest: true,
+      ),
+      StorePurchaseResult.failed,
+    );
+    api.ownedTestAllowed = true;
+    await library.refresh();
+    expect(library.canTestOwnedAppleBook(appleBook), true);
+    expect(
+      await library.purchase(
+        appleBook,
+        const StoreBookProduct('shelf_book_3', 'US\$2.99'),
+        true,
+      ),
+      StorePurchaseResult.failed,
+    );
+    expect(provider.buys, 0);
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    expect(library.canTestOwnedAppleBook(appleBook), false);
+    expect(
+      await library.purchase(
+        appleBook,
+        const StoreBookProduct('shelf_book_3', 'US\$2.99'),
+        true,
+        ownedBookSandboxTest: true,
+      ),
+      StorePurchaseResult.failed,
+    );
+    expect(provider.buys, 0);
+  });
+
+  test('owned test needs server authorization and Apple confirmation separate from Play access', () async {
+    api.owned = api.ownedTestAllowed = true;
+    await library.refresh();
+    api.echoTestAuthorization = false;
+    await expectLater(
+      library.purchase(
+        appleBook,
+        const StoreBookProduct('shelf_book_3', 'US\$2.99'),
+        true,
+        ownedBookSandboxTest: true,
+      ),
+      throwsA(isA<Exception>()),
+    );
+    expect(provider.buys, 0);
+    api.echoTestAuthorization = true;
+    await library.purchase(
+      appleBook,
+      const StoreBookProduct('shelf_book_3', 'US\$2.99'),
+      true,
+      ownedBookSandboxTest: true,
+    );
+    expect(api.consent?['owned_book_sandbox_test'], true);
+    expect(library.appleBook3Confirmed, true);
+    expect(library.message, contains('Apple sandbox purchase confirmed'));
+    expect(library.owns(3), true);
+    expect(library.canTestOwnedAppleBook(appleBook), false);
+    expect(provider.buys, 1);
+    await accounts.signOut();
+    expect(library.appleBook3Confirmed, false);
+    expect(library.canTestOwnedAppleBook(appleBook), false);
+  });
+
+  test(
+    'existing Play ownership alone cannot confirm Apple even after SDK success',
+    () async {
+      api.owned = api.ownedTestAllowed = true;
+      api.confirmApple = false;
+      await library.refresh();
+      await library.purchase(
+        appleBook,
+        const StoreBookProduct('shelf_book_3', 'US\$2.99'),
+        true,
+        ownedBookSandboxTest: true,
+      );
+      expect(library.owns(3), true);
+      expect(library.appleBook3Confirmed, false);
+      expect(library.message, contains('Still confirming'));
+      expect(provider.buys, 1);
+    },
+  );
+
+  test(
+    'cancel pending and failed owned tests preserve existing book and download',
+    () async {
+      api.owned = api.ownedTestAllowed = true;
+      await library.refresh();
+      library.downloaded.add(3);
+      downloads.copies['1/3'] = {};
+      for (final result in [
+        StorePurchaseResult.cancelled,
+        StorePurchaseResult.pending,
+        StorePurchaseResult.failed,
+      ]) {
+        provider.result = result;
+        expect(
+          await library.purchase(
+            appleBook,
+            const StoreBookProduct('shelf_book_3', 'US\$2.99'),
+            true,
+            ownedBookSandboxTest: true,
+          ),
+          result,
+        );
+        expect(library.owns(3), true);
+        expect(library.appleBook3Confirmed, false);
+        expect(downloads.copies['1/3'], isNotNull);
+      }
+      api.proofFails = true;
+      await expectLater(library.refresh(), throwsStateError);
+      expect(library.canTestOwnedAppleBook(appleBook), false);
+    },
+  );
+
+  testWidgets(
+    'owned test screen clearly identifies no charge and requires consent',
+    (tester) async {
+      api.owned = api.ownedTestAllowed = true;
+      await tester.runAsync(() => library.refresh());
+      SharedPreferences.setMockInitialValues({});
+      final settings = await ReaderSettings.load(
+        await SharedPreferences.getInstance(),
+      );
+      await tester.pumpWidget(
+        AccountScope(
+          controller: accounts,
+          child: LibraryScope(
+            controller: library,
+            child: MaterialApp(
+              home: CollectionDetailScreen(
+                slug: 'test',
+                contentVersion: 1,
+                repository: OwnedTestBooks(),
+                readerSettings: settings,
+                ownedMode: true,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final entry = find.byKey(const Key('owner-apple-sandbox-test'));
+      expect(entry, findsOneWidget);
+      await tester.ensureVisible(entry);
+      await tester.runAsync(() async {
+        await tester.tap(entry);
+        await tester.pump();
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      });
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<PurchaseScreen>(find.byType(PurchaseScreen))
+            .ownedBookSandboxTest,
+        true,
+      );
+      expect(find.text('Apple sandbox test'), findsOneWidget);
+      expect(find.textContaining('will not charge you'), findsOneWidget);
+      final buy = find.byKey(const Key('purchase-buy'));
+      await tester.scrollUntilVisible(
+        buy,
+        150,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text('Test Apple purchase · €2.79'), findsOneWidget);
+      expect(tester.widget<FilledButton>(buy).onPressed, isNull);
+      await tester.ensureVisible(find.byType(Checkbox));
+      await tester.tap(find.byType(Checkbox));
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilledButton>(buy).onPressed, isNotNull);
+      await tester.ensureVisible(buy);
+      await tester.runAsync(() async {
+        await tester.tap(buy);
+        await tester.pump();
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      });
+      await tester.pumpAndSettle();
+      expect(
+        find.text(
+          'Apple sandbox purchase confirmed. Your existing book stays available.',
+        ),
+        findsOneWidget,
+      );
+      expect(library.owns(3), true);
+      expect(tester.widget<FilledButton>(buy).onPressed, isNull);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      settings.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    },
+    timeout: const Timeout(Duration(seconds: 45)),
   );
 }

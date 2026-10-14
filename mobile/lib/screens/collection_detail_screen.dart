@@ -158,6 +158,27 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                             : AppStrings.of(context).readSample,
                       ),
                     ),
+                    if (LibraryScope.of(context)?.canTestOwnedAppleBook(book) ==
+                        true)
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: OutlinedButton(
+                          key: const Key('owner-apple-sandbox-test'),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(52),
+                          ),
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => PurchaseScreen(
+                                book: book,
+                                settings: widget.readerSettings,
+                                ownedBookSandboxTest: true,
+                              ),
+                            ),
+                          ),
+                          child: const Text('Test Apple purchase — no charge'),
+                        ),
+                      ),
                     const SizedBox(height: 8),
                     if (!widget.ownedMode) BookPriceLabel(book: book),
                     if (!widget.ownedMode &&

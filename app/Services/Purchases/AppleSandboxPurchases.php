@@ -54,7 +54,7 @@ class AppleSandboxPurchases
                 $lockedReader = Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail();
                 abort_unless(ApplePurchaseProof::owner($lockedReader, ! $existing && $type === 'NON_RENEWING_PURCHASE'), 403);
             }
-            Collection::withTrashed()->whereKey(3)->lockForUpdate()->firstOrFail();
+            $book = Collection::withTrashed()->whereKey(3)->lockForUpdate()->firstOrFail();
             $duplicate = PurchaseEvent::where('provider_event_id', $id)->first();
             if ($duplicate) {
                 abort_unless(($duplicate->details['payload_hash'] ?? null) === $hash, 409);
@@ -64,6 +64,14 @@ class AppleSandboxPurchases
             abort_if($purchase && ($purchase->reader_id !== (int) $event['app_user_id'] || $purchase->collection_id !== 3
                 || $purchase->environment !== 'SANDBOX' || $purchase->store_purchased_at_ms !== $event['purchased_at_ms']), 409);
             if ($type === 'NON_RENEWING_PURCHASE' && ! $purchase) {
+                if ($reader && app(\App\Services\BookAccessService::class)->ownsBook($lockedReader, $book)) {
+                    abort_unless(OwnerAppleSandboxTest::allowed($lockedReader, $book), 409, 'Owned-book Apple test is not authorized.');
+                    abort_unless(DB::table('purchase_consents')->where('reader_id', $reader->id)
+                        ->where('collection_id', 3)->where('store', 'APP_STORE')
+                        ->where('wording', OwnerAppleSandboxTest::CONSENT)
+                        ->where('created_at', '<=', $purchasedAt)
+                        ->where('created_at', '>=', $purchasedAt->subMinutes(15))->exists(), 409, 'Fresh owned-book Apple test agreement missing.');
+                }
                 abort_unless($reader && DB::table('purchase_consents')->where('reader_id', $reader->id)->where('collection_id', 3)->where('store', 'APP_STORE')
                     ->where('created_at', '<=', $purchasedAt->addSeconds(5))->exists(), 409, 'Purchase agreement missing.');
             }
