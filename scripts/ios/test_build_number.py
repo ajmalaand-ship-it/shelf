@@ -1,133 +1,78 @@
 #!/usr/bin/env python3
-"""Synthetic only: no Apple API, build, signing identity or upload."""
+"""Synthetic CLI responses and workflow inspection; no network/build/upload."""
 import contextlib
 import io
-import json
 from pathlib import Path
 import subprocess
 import unittest
-from unittest.mock import patch
-import urllib.error
+from unittest.mock import Mock
 import yaml
 import check_build_number as guard
 
 
-def build(n='4', state='VALID'):
-    return {'attributes': {'version': n, 'processingState': state}}
-
-
-def upload(n='4', state='COMPLETE', platform='IOS'):
-    return {'attributes': {'cfBundleVersion': n, 'state': {'state': state}, 'platform': platform}}
-
-
-class NumberGuardTests(unittest.TestCase):
-    def test_explicit_number_rejects_missing_fallback_whitespace_and_invalid_values(self):
-        for value in [None, '', '0', '04', '-1', '5.0', ' 5', '5\n', 'fallback', '9'*19]:
-            with self.subTest(value=value), self.assertRaises(guard.GuardError):
-                guard.number(value)
-        self.assertEqual(5, guard.number('5'))
-
-    def test_used_number_and_lower_holes_are_rejected(self):
-        for value in ['1', '3', '4']:
-            with self.assertRaisesRegex(guard.GuardError, 'must exceed'):
-                guard.validate(value, [build()], [upload('1', 'FAILED')])
-
-    def test_next_candidate_accepts_complete_and_failed_history(self):
-        self.assertEqual(4, guard.validate('5', [build('4'), build('2')],
-                                         [upload('4'), upload('1', 'FAILED')]))
-
-    def test_upload_only_higher_number_counts_even_if_failed(self):
-        with self.assertRaises(guard.GuardError):
-            guard.validate('5', [build()], [upload('5', 'FAILED')])
-        self.assertEqual(5, guard.validate('6', [build()], [upload('5', 'FAILED')]))
-
-    def test_processing_or_unknown_build_state_stops(self):
-        for state in ['PROCESSING', None, 'NEW_STATE']:
-            with self.assertRaises(guard.GuardError):
-                guard.validate('5', [build(state=state)], [])
-
-    def test_pending_unknown_and_malformed_upload_states_stop(self):
-        for state in ['UPLOADING', 'PROCESSING', None, 'NEW_STATE']:
-            with self.assertRaises(guard.GuardError):
-                guard.validate('5', [], [upload(state=state)])
-        with self.assertRaises(guard.GuardError):
-            guard.validate('5', [], [{'attributes': {'platform': 'IOS', 'state': 'COMPLETE'}}])
-        with self.assertRaises(guard.GuardError):
-            guard.validate('5', [], [upload(platform='MAC_OS')])
-
-    def test_missing_credentials_stop_without_subprocess_or_network(self):
-        with patch.object(guard.subprocess, 'run') as process:
-            with self.assertRaisesRegex(guard.GuardError, 'credentials unavailable'):
-                guard.check({'SHELF_IOS_BUILD_NUMBER': '5'})
-            process.assert_not_called()
-
-    def test_read_only_app_scope_and_safe_output(self):
-        class Api:
-            def __init__(self): self.paths=[]
-            def get(self, path):
-                self.paths.append(path)
-                return {'data': {'id': guard.APP, 'attributes': {'bundleId': guard.BUNDLE}}}
-            def listed(self, path):
-                self.paths.append(path)
-                return [upload()] if path.endswith('buildUploads') else [build()]
-        api=Api()
+class CliCheckTests(unittest.TestCase):
+    def run_cli(self, value='4', code=0, chosen='5'):
+        runner=Mock(return_value=subprocess.CompletedProcess(guard.COMMAND, code, value, 'synthetic-private-error'))
         with contextlib.redirect_stdout(io.StringIO()) as output:
-            guard.check({'SHELF_IOS_BUILD_NUMBER': '5'}, api)
-        self.assertEqual(['/v1/apps/'+guard.APP, '/v1/apps/'+guard.APP+'/builds',
-                          '/v1/apps/'+guard.APP+'/buildUploads'], api.paths)
-        self.assertIn('chosen iOS build 5', output.getvalue())
+            guard.check({'SHELF_IOS_BUILD_NUMBER':chosen},runner)
+        return runner,output.getvalue()
 
-    def test_wrong_app_identity_stops(self):
-        from unittest.mock import Mock
-        api=Mock(); api.get.return_value={'data': {'id': 'other', 'attributes': {'bundleId': guard.BUNDLE}}}
-        with self.assertRaises(guard.GuardError): guard.check({'SHELF_IOS_BUILD_NUMBER':'5'}, api)
-        api.listed.assert_not_called()
+    def test_explicit_number_no_run_index_or_fallback(self):
+        for value in ['', '0', '04', ' 5', '5\n', '5.0', '-1', None]:
+            with self.assertRaises(guard.GuardError):guard.number(value)
+        runner=Mock()
+        with self.assertRaises(guard.GuardError):guard.check({'BUILD_NUMBER':'8','PROJECT_BUILD_NUMBER':'8'},runner)
+        runner.assert_not_called()
 
-    def test_bounded_pagination_and_no_foreign_key_forwarding(self):
-        api=guard.Apple.__new__(guard.Apple)
-        path='/v1/apps/'+guard.APP+'/buildUploads'
-        pages=[{'data':[upload('3')],'links':{'next':guard.BASE+path+'?cursor=2'},'meta':{'paging':{'total':2}}},
-               {'data':[upload('4')],'links':{'next':None},'meta':{'paging':{'total':2}}}]
-        with patch.object(api,'get',side_effect=pages): self.assertEqual(2,len(api.listed(path)))
-        for next_url in ['https://attacker.test/x',guard.BASE+'/v1/apps/other/buildUploads?x=1',
-                         guard.BASE+path+'?limit=200', 7]:
-            with patch.object(api,'get',return_value={'data':[],'links':{'next':next_url},'meta':{'paging':{'total':2}}}):
-                with self.assertRaises(guard.GuardError): api.listed(path)
-        with patch.object(api,'get',return_value={'data':[],'links':{}}):
-            with self.assertRaises(guard.GuardError): api.listed(path)
+    def test_documented_cli_scope_and_no_secret_arguments(self):
+        runner,output=self.run_cli()
+        self.assertEqual(guard.COMMAND,runner.call_args.args[0])
+        self.assertIn('--pre-release-version=1.0.0',guard.COMMAND)
+        self.assertIn('--platform=IOS',guard.COMMAND)
+        self.assertIn('latest 4; chosen build 5',output)
+        self.assertNotIn('--private-key',guard.COMMAND)
+        self.assertIn('Pending uploads require separate server preflight',output)
 
-    def test_actual_terminal_links_shape_requires_matching_total(self):
-        api=guard.Apple.__new__(guard.Apple)
-        page={'data':[upload()],'links':{'self':'withheld'},'meta':{'paging':{'total':1}}}
-        with patch.object(api,'get',return_value=page):
-            self.assertEqual(1,len(api.listed('/v1/apps/'+guard.APP+'/buildUploads')))
-        page['meta']['paging']['total']=2
-        with patch.object(api,'get',return_value=page):
-            with self.assertRaisesRegex(guard.GuardError,'truncated'): api.listed('/v1/apps/'+guard.APP+'/buildUploads')
+    def test_cli_resolves_access_without_wrapper_secret_variable_check(self):
+        self.run_cli() # Only chosen number is in env; CLI resolves its own access.
 
-    def test_http_auth_failure_stops_without_response_or_token_output(self):
-        api=guard.Apple.__new__(guard.Apple);api.token='synthetic-private-token'
-        error=urllib.error.HTTPError(guard.BASE,403,'private-provider-message',{},None)
-        with patch.object(guard.urllib.request,'build_opener') as opener:
-            opener.return_value.open.side_effect=error
-            with self.assertRaisesRegex(guard.GuardError,'HTTP 403') as caught: api.get('/v1/apps/'+guard.APP)
-        self.assertNotIn('synthetic-private-token',str(caught.exception))
-        self.assertNotIn('private-provider-message',str(caught.exception))
+    def test_used_or_lower_number_stops(self):
+        for chosen in ['3','4']:
+            with self.assertRaisesRegex(guard.GuardError,'must exceed'):self.run_cli(chosen=chosen)
+        with self.assertRaises(guard.GuardError):self.run_cli(value='5')
 
-    def test_workflow_places_guard_before_preparation_and_signed_compile(self):
+    def test_auth_failure_private_output_withheld(self):
+        with self.assertRaises(guard.GuardError) as error:self.run_cli(code=1)
+        self.assertNotIn('synthetic-private-error',str(error.exception))
+        self.assertIn('Validate existing integration CLI access',str(error.exception))
+
+    def test_malformed_empty_cli_result_stops(self):
+        for value in ['', 'null', 'No builds', '4\n5', '{"value":4}']:
+            with self.assertRaises(guard.GuardError):self.run_cli(value=value)
+
+    def test_missing_tool_or_timeout_stops(self):
+        for failure in [FileNotFoundError(),subprocess.TimeoutExpired(guard.COMMAND,120)]:
+            with self.assertRaises(guard.GuardError):
+                guard.check({'SHELF_IOS_BUILD_NUMBER':'5'},Mock(side_effect=failure))
+
+    def test_workflow_uses_same_nonpublishing_credential_path(self):
         root=Path(__file__).resolve().parents[2]
-        workflow=yaml.safe_load((root/'codemagic.yaml').read_text())['workflows']['ios-testflight-internal']
-        scripts=workflow['scripts'];guard_index=next(i for i,s in enumerate(scripts) if s['script']=='python3 ../scripts/ios/check_build_number.py')
-        self.assertLess(guard_index,next(i for i,s in enumerate(scripts) if 'flutter ' in s['script']))
-        compile_script=next(s['script'] for s in scripts if 'flutter build ipa' in s['script'])
-        self.assertLess(compile_script.index('check_build_number.py'),compile_script.index('flutter build ipa'))
-        self.assertIn('--build-number="$SHELF_IOS_BUILD_NUMBER"',compile_script)
-        self.assertNotIn('${SHELF_IOS_BUILD_NUMBER:-',compile_script)
-        self.assertEqual('shelf_app_store_connect',workflow['integrations']['app_store_connect'])
-        self.assertFalse(workflow['publishing']['app_store_connect']['submit_to_testflight'])
-        for step in scripts:
-            result=subprocess.run(['bash','-n'],input=step['script'],text=True,capture_output=True)
-            self.assertEqual(0,result.returncode,step['name'])
+        workflows=yaml.safe_load((root/'codemagic.yaml').read_text())['workflows']
+        signed=workflows['ios-testflight-internal'];probe=workflows['ios-asc-access-check']
+        self.assertEqual(signed['integrations'],probe['integrations'])
+        self.assertEqual(signed['environment']['groups'],probe['environment']['groups'])
+        self.assertNotIn('publishing',probe);self.assertNotIn('artifacts',probe)
+        self.assertNotIn('ios_signing',probe['environment']);self.assertNotIn('triggering',probe)
+        self.assertEqual([{'name':'Validate existing integration CLI access and explicit build candidate',
+                          'script':'python3 ../scripts/ios/check_build_number.py'}],probe['scripts'])
+        self.assertEqual(1,sum('check_build_number.py' in x['script'] for x in signed['scripts']))
+        index=next(i for i,s in enumerate(signed['scripts']) if 'check_build_number.py' in s['script'])
+        self.assertLess(index,next(i for i,s in enumerate(signed['scripts']) if 'flutter ' in s['script']))
+        self.assertEqual('shelf_app_store_connect',signed['integrations']['app_store_connect'])
+        for workflow in [signed,probe]:
+            for step in workflow['scripts']:
+                result=subprocess.run(['bash','-n'],input=step['script'],text=True,capture_output=True)
+                self.assertEqual(0,result.returncode,step['name'])
 
 
-if __name__=='__main__': unittest.main(verbosity=2)
+if __name__=='__main__':unittest.main(verbosity=2)

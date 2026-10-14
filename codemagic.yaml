@@ -68,7 +68,7 @@ workflows:
           test "$SHELF_API_BASE_URL" = "https://shelf.services/api/"
           : "${SHELF_IOS_BUILD_NUMBER:?Set an unused positive iOS build number in shelf_ios_testflight}"
           case "$SHELF_IOS_BUILD_NUMBER" in ''|*[!0-9]*|0*) exit 1 ;; esac
-      - name: Reject used or uploading Apple build numbers before preparation
+      - name: Check explicit build number with documented Codemagic TestFlight CLI
         script: python3 ../scripts/ios/check_build_number.py
       - name: Check photo-library purpose strings before building
         script: |
@@ -106,7 +106,6 @@ workflows:
           : "${CM_BUILD_DIR:?Codemagic clone directory required}"
           cd "$CM_BUILD_DIR/mobile"
           printf 'iOS working directory: %s\n' "$PWD"
-          python3 ../scripts/ios/check_build_number.py
           flutter build ipa --release --no-pub \
             --build-name=1.0.0 --build-number="$SHELF_IOS_BUILD_NUMBER" \
             --export-options-plist="$HOME/export_options.plist" \
@@ -188,6 +187,23 @@ workflows:
         # Upload on a separately authorized manual run; assign owner internally in ASC.
         submit_to_testflight: false
         submit_to_app_store: false
+
+  ios-asc-access-check:
+    name: Shelf ASC CLI access check — no compile or publishing
+    instance_type: mac_mini_m2
+    max_build_duration: 5
+    working_directory: mobile
+    integrations:
+      app_store_connect: shelf_app_store_connect
+    environment:
+      groups:
+        - shelf_ios_foundation
+        - shelf_ios_testflight
+    # Manual only. Test the identical CLI path before any full signed build.
+    # No Flutter, dependencies, signing, artifacts, publishing or tester changes.
+    scripts:
+      - name: Validate existing integration CLI access and explicit build candidate
+        script: python3 ../scripts/ios/check_build_number.py
 
   artifact-collection-diagnostic:
     name: Shelf artifact collection diagnostic — text only

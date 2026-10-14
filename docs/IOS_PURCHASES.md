@@ -1,5 +1,121 @@
 # Shelf — one-book Apple sandbox setup
 
+## Run #8 credential failure — documented CLI path prepared, NOT cloud-verified
+
+14 October 2026. Started clean at **1116317bedde0402a6516c175d66bbf6073e2df2**.
+Owner confirms run #8 stopped before compilation because the custom guard could
+not access its expected ASC credential environment variables; owner subsequently
+saved **SHELF_IOS_BUILD_NUMBER=5**. Run #7's duplicate-4 rejection remains recorded.
+Existing integration supports signing/publishing; that fact does not establish
+private-variable availability to Python scripts or CLI access in this workflow.
+No run, upload, deployment, activation or provider change performed here.
+
+### Actual dependency and official findings
+
+Inspected signed **ios-testflight-internal**: integration name exactly
+**shelf_app_store_connect**; variable groups exactly **shelf_ios_foundation** and
+**shelf_ios_testflight**. Previously, Python required raw
+APP_STORE_CONNECT_KEY_IDENTIFIER / APP_STORE_CONNECT_ISSUER_ID /
+APP_STORE_CONNECT_PRIVATE_KEY before making its own JWT/API requests. Both hooks
+ran before a signed build; the first stopped #8. This direct credential-exposure
+assumption is unsupported by the observed account behavior and is removed.
+
+[Codemagic build versioning](https://docs.codemagic.io/knowledge-codemagic/build-versioning/)
+documents existing publishing-integration reuse and the official CLI.
+[Publishing](https://docs.codemagic.io/yaml-publishing/app-store-connect/) distinguishes
+integration authentication from explicitly supplied credential variables.
+[CLI action](https://github.com/codemagic-ci-cd/cli-tools/blob/master/docs/app-store-connect/get-latest-testflight-build-number.md)
+supports Apple app ID **6821471140**, **--platform=IOS** and
+**--pre-release-version=1.0.0**. CLI authentication still needs authorized ASC
+access; its documented resolution uses configured key/issuer/private-key options,
+environment or supported private-key files. There is no documented per-command
+integration-name flag to invent. Server cannot prove how this Codemagic worker
+exposes its existing integration; neither successful publishing nor server API
+success proves the custom CLI call works. That limitation remains explicit.
+
+Codemagic **BUILD_NUMBER / PROJECT_BUILD_NUMBER** count workflow/project runs;
+run indexes **7/8** are not Apple's CFBundleVersion. Shelf retains explicit
+owner-selected **SHELF_IOS_BUILD_NUMBER** with no run-index/numeric fallback.
+The CLI's latest TestFlight number is not proof about pending/rejected upload
+records; no claim that it reserves numbers or covers all in-progress uploads.
+
+### Refreshed Apple read-only evidence
+
+Existing protected server key, bounded app-scoped builds/uploads GETs **200** at
+**2026-10-14 19:23:55 UTC**: received **2,3,4 VALID**; uploads **1 FAILED /
+2 COMPLETE / 3 COMPLETE / 4 COMPLETE**, **IOS / 1.0.0**, no pending upload or 5.
+**Candidate remains 1.0.0 (5)**. Before any later full run, repeat those two GETs,
+require no processing build/pending upload, selected number greater than every
+received/uploaded number, and no competing Codemagic signed run. This separates
+complete upload evidence from CLI latest-TestFlight evidence. No public endpoint,
+credential relay or speculative extra automatic guard was introduced.
+
+### Minimal source correction and focused verification
+
+Replaced only unsupported custom credential/JWT/REST behavior with a small
+wrapper invoking:
+
+```bash
+app-store-connect get-latest-testflight-build-number 6821471140 --platform=IOS --pre-release-version=1.0.0 --disable-jwt-cache --silent
+```
+
+CLI output must be one positive integer; explicit chosen number must exceed it.
+Missing CLI, timeout, auth/read failure or malformed result stops; no silent
+fallback or raw credential precheck. Logs show only number/safe result; captured
+provider output stays withheld. Removed the redundant second pre-compile custom
+hook. The single check stays before dependency/configuration/compilation steps.
+Signing integration, certificate/profile, internal-only export, publisher,
+post-export version check, application/purchase/entitlement source are unchanged.
+
+Prepared manual **ios-asc-access-check** with the exact same integration/groups,
+working directory **mobile**, mac_mini_m2 and **5-minute** maximum. Its sole script
+runs the same wrapper. **No ios_signing, Flutter/dependency commands, artifacts,
+publishing, triggers or tester actions**. This is a prepared diagnostic workflow,
+not a started build/run. It does not consume an Apple build number.
+
+**8 synthetic tests passed** through
+`SHELF_TOOL_TEST_SCOPE=ios-build-number scripts/run_tests.sh`: explicit number/no
+run-index fallback, exact CLI scope/no secret arguments, delegated credential
+resolution, duplicate/stale choice denial, withheld auth errors, malformed result,
+missing CLI/timeout and identical nonpublishing integration/group path. YAML
+parse/signed and diagnostic shell syntax, scoped diff checks passed. No purchase,
+backend, Flutter suite or macOS compilation repeated. Synthetic runner responses
+are not proof of live Codemagic CLI access.
+
+### Non-publishing validation procedure and remaining limitation
+
+Under separate diagnostic-run authorization, select existing Shelf app,
+**ios/foundation at this new source**, workflow **ios-asc-access-check** only.
+Keep saved **SHELF_IOS_BUILD_NUMBER=5** and existing integration/groups unchanged.
+Expected safe result: CLI TestFlight **IOS/1.0.0 latest 4**, chosen **5**, exit 0.
+Confirm the exact source and no publishing steps. Stop on unexpected number/auth/
+CLI error; do not try a full signed run to discover whether this path works.
+Server-side read-only inspection and synthetic tests cannot verify the worker's
+integration injection, installed CLI version or permissions; only this bounded
+nonpublishing diagnostic establishes that account-specific path.
+
+If it reports unavailable authentication, the smallest documented configuration
+is **reuse the same existing authorized ASC key**, privately from the retained
+original, adding only **APP_STORE_CONNECT_KEY_IDENTIFIER**, **APP_STORE_CONNECT_ISSUER_ID**
+and **APP_STORE_CONNECT_PRIVATE_KEY** as protected Secret variables to existing
+**shelf_ios_testflight**, as described in the official publishing/environment
+variable guides. Do not generate/rotate keys, change integration/signing, print
+values, copy secrets to Git, assume saved dashboard secrets can be retrieved, or
+ask for a new Apple account. This is a conditional supported plan, **not executed
+or claimed necessary yet**: first test the documented existing-integration CLI.
+After any approved credential exposure correction, repeat only the diagnostic.
+A full signed build requires successful diagnostic evidence, fresh upload/queue
+preflight and separate owner authorization. **Not READY for another full build.**
+
+**Exactly one safe next owner action:** authorize one **ios-asc-access-check**
+nonpublishing diagnostic run from the new ios/foundation source, not a signed
+build or upload. No repeated build-number setup request; saved 5 is owner-confirmed.
+
+Checkout/Apple sandbox/owned-test/real/sign-in gates OFF; France exclusion,
+internal-only testing, Apple/Google entitlements, Android/UI pause, Apple auth/relay,
+pricing-sync, second-phone restore, small improvements and joint launch hold
+preserved. Deployed backend remains c8c2662. No cloud access success inferred.
+
 ## Codemagic run #7 duplicate build incident — guarded source fix, 14 October 2026
 
 Owner reports run **#7**, source **9c41c3281480465ef79ec27cdfc5649894ec3ed7**,
