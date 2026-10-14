@@ -584,6 +584,127 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Next signed internal TestFlight build — prepared 14 October 2026, NOT STARTED
+
+**Exact reviewed candidate source: 14c392c17ab13a3a59bde3e159cc625c0f0a6456**,
+branch **ios/foundation**. Checkout was clean at that SHA. All intended owner
+Apple Book 3 Flutter changes from **c8c2662** are included byte-for-byte;
+`git diff c8c2662 14c392c -- mobile codemagic.yaml` is empty. This documentation
+follow-up changes only the two records and retains the reviewed application/YAML.
+The reviewed immutable SHA remains a valid build candidate; if Codemagic selects
+the later documentation-only branch tip, record its exact clone SHA and verify
+application/YAML equality to this candidate before accepting the artifact.
+
+### Actual Apple build-number evidence
+
+Authenticated read-only GET **2026-10-14 18:03:10 UTC**: received builds **2, 3, 4**
+are **VALID**, **INTERNAL_ONLY**, **IOS / 1.0.0**. App-scoped uploads GET **200**
+at **18:04:03 UTC** returned **1 FAILED / 2 COMPLETE / 3 COMPLETE / 4 COMPLETE**,
+all IOS/1.0.0, no pending upload and no 5 in either bounded complete list.
+**Next unused candidate: 1.0.0 (5)**. No number was reserved or variable changed.
+Recheck builds/uploads immediately before the separately authorized start; stop
+on collision or competing upload. Existing protected ASC key reused; no key,
+identifier credential or JWT printed/copied. An initial collection-level uploads
+GET returned 403; the documented app-scoped
+[Apple uploads route](https://developer.apple.com/documentation/appstoreconnectapi/get-v1-apps-_id_-builduploads)
+returned 200. The inspection assertion initially treated Apple's nested state
+object as a scalar; complete readback establishes the states above. Neither
+inspection issue changed provider state or requires new permissions.
+
+### Signed workflow readiness
+
+Workflow **ios-testflight-internal**, Codemagic existing Shelf application,
+**mac_mini_m2**, Flutter **3.47.2**, working directory **mobile**, release IPA,
+bundle **services.shelf.app**, Team **YSLWJQDH8B**, version **1.0.0** explicitly
+supplied by the build command. Shared `pubspec.yaml` remains **1.0.4+13**; workflow
+build-name/build-number overrides determine this iOS artifact. No Android version
+change needed. Existing integration **shelf_app_store_connect**, certificate
+**shelf_ios_distribution**, profile **shelf_ios_app_store**, groups
+**shelf_ios_foundation / shelf_ios_testflight** retained; no automatic trigger.
+
+YAML parse, every signed-workflow shell script's `bash -n`, inline Python syntax,
+plist purpose strings, native bundle/team/IAP capability and explicit signing/
+artifact guards passed without executing build steps. Internal-only export
+**testFlightInternalTestingOnly=true**, **manageAppVersionAndBuildNumber=false**,
+strict codesign/team/bundle/version checks, `ditto` preservation and explicit
+`$CM_BUILD_DIR` artifact/evidence paths intact. Publisher uses existing integration,
+**submit_to_testflight=false / submit_to_app_store=false**: the signed manual
+workflow uploads the IPA but does not automatically assign testers or submit
+public review. Existing successful build-4 signing/export evidence reused;
+no new macOS compile, signing credential introspection or binary validation claimed.
+
+RevenueCat dependency remains locked **purchases_flutter 10.13.2**, enforced
+lockfile resolution; native iOS selects only **appl_** server-supplied SDK config,
+original numeric Shelf reader identity and Book 3 allowlist. No purchase key goes
+in a build variable. **SHELF_TEST_MODE=false** and
+**SHELF_INTERNAL_TEST_PURCHASES=false** remain correct: native iOS chooses sandbox
+while server configuration/consent independently controls availability. Owner
+already-owned Book 3 test action, explicit owned-book test consent, server echo,
+independent Apple confirmation and normal duplicate protection are present.
+Server **SHELF_APPLE_OWNED_BOOK3_TEST_ENABLED=false** and
+**SHELF_APPLE_SANDBOX_ENABLED=false** remain OFF; no client override opens them.
+
+Minimal backend recheck passed: release-state still records staging/production
+**c8c266221d972d409ffa947ca87397293c69c004**, maintenance absent, runtime Apple
+sandbox/owned-test/real-checkout/sign-in/relay false, Apple proof disabled,
+production HTTPS app-config healthy and iOS purchase config false with SDK key
+null. Reused completed 56 PHP tests/511 assertions, 15 Flutter tests, staging
+isolation, ownership/accounting/history, webhook and verified backup evidence.
+No broad test, deployment, migration, backup drill or provider audit repeated.
+
+### Exact single-run settings and owner steps — later authorization only
+
+1. Before the authorized run, Codex rechecks the two bounded Apple build/upload
+   lists and exact branch application/YAML. In **Codemagic → existing Shelf app**,
+   confirm no other queued/running signed build or upload. Existing access does
+   not independently expose Codemagic queue/saved variable values here; no token
+   search, credential creation or duplicate pipeline is required.
+2. **Team settings → Environment variables → existing shelf_ios_testflight**:
+   set only **SHELF_IOS_BUILD_NUMBER=5**. Retain existing
+   **SHELF_API_BASE_URL=https://shelf.services/api/** in **shelf_ios_foundation**,
+   existing Google iOS configuration, groups/integration/signing and all other
+   variables. This task has not changed any dashboard value.
+3. **Shelf app → Start new build**: select **ios/foundation**, workflow
+   **ios-testflight-internal**, reviewed commit above where commit selection is
+   available; otherwise use only its verified documentation-only descendant tip.
+   Start **once**, under the next explicit build/upload authorization. Do not
+   choose unsigned/diagnostic workflows, main/default branch or a PR target.
+4. After that later upload, Codex inspects exact clone SHA/IPA/signing/version **5**
+   and processing/export-compliance status before any acceptance claim. Assignment
+   remains only to existing **Shelf Owner** under the applicable authorization;
+   no tester/group/membership changes or external/public distribution. Do not
+   restart merely because Apple processing is pending or the test button is absent.
+
+### Pending phone procedure
+
+Once the new build is received, cleared and assigned, install/update via existing
+TestFlight without uninstalling or clearing account/download data; confirm **1.0.0
+(5)** and basic launch. With gates OFF, Book 3 remains readable through existing
+Play ownership and the Apple test action remains hidden. This establishes only
+installation/launch, not purchase acceptance. Do not request an Apple sign-in or
+relay test, or make a purchase, at this stage.
+
+Later separate activation/transaction authorization must verify tracking OFF /
+original App User ID and open both Apple gates with the existing backup/checkpoint
+procedure. Use existing owner reader email/password, refresh Library, open Book 3,
+read sample and agree through **Test Apple purchase — no charge**. Under that
+window's exact authorization, cancellation must preserve Play access; at most one
+new verified sandbox purchase must show independent Apple server confirmation,
+Test-only immutable history and unchanged Play ownership. Product unavailable or
+missing confirmation: stop and report, do not repeat buying/change providers.
+Actual notification delivery versus REST, restore/refund/reversal and iPhone
+rendering remain pending separate evidence; second-phone restore stays deferred.
+
+No preparation blocker found. Cloud queue/variable checks and final build-number
+recheck are start-time prerequisites, not claims of completion. Product title
+metadata/genuine review image/public readiness stay open. France excluded/ANSSI
+cancelled, Android/UI pause, pricing-sync, second-phone restore, Apple auth/relay,
+small improvements and joint Android/iOS public-launch hold all preserved.
+
+**Exactly one next action:** authorize one manual **ios-testflight-internal**
+build/upload **1.0.0 (5)** from the verified candidate/identical documentation-only
+branch tip, after the immediate collision/queue recheck, all purchase gates OFF.
+
 ## Owner Apple Book 3 exception — disabled backend rollout passed, 14 October 2026
 
 Owner authorized the smallest staging-first, backed-up backend rollout, keeping
