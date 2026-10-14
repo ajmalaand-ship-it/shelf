@@ -584,6 +584,107 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Owner Apple Book 3 exception — disabled backend rollout passed, 14 October 2026
+
+Owner authorized the smallest staging-first, backed-up backend rollout, keeping
+all purchase activation gates OFF. **Staging and production now run exact source
+c8c266221d972d409ffa947ca87397293c69c004.** Release-state confirms both copies;
+prior deployed/rollback source is **560ef50ac35aa2db78492b1c7bfb92ee72a69f76**.
+No build, upload, transaction, refund, provider setting or public release occurred.
+
+### Backups and preservation
+
+- Fresh production preflight backup:
+  `/home/shelf/backups/shelf/20261014-175255/`.
+- Private preservation checkpoint:
+  `/home/shelf/backups/shelf/20261014-175255/owner-apple-rollout-checkpoint/`.
+  Retains the existing cPanel handler and restricted verification fingerprints;
+  no secret values or reader data printed or committed.
+- Staging backup before deploying the exact source:
+  `/home/shelf/backups/shelf-staging/20261014-175413/`.
+- Fresh production promotion backup:
+  `/home/shelf/backups/shelf/20261014-175454/`.
+  Includes `promotion-notes.txt` with prior code and preservation-aware rollback.
+
+All three backups passed SQL completion, ZIP integrity and SHA-256 verification.
+This is backup-artifact verification, not a new restore drill. Production's sole
+unrelated modification was the recognized cPanel `public/.htaccess` handler;
+workflow preservation and final checkpoint comparison passed. Both .env files and
+existing private Apple webhook authorization/metadata files are byte-unchanged.
+Google configuration remains unchanged with the complete production .env;
+no provider writes or repeated provider setup checks were made.
+
+### Staging and production verification
+
+Reused **56 passed PHP tests / 511 assertions and 15 passed Flutter tests** from
+c8c2662; no suite or Flutter build repeated. Necessary rollout-validator source
+**c9f6728** updates the historical test-reuse gate to this exact validated source,
+checks deployed purchase-path bytes, no pending migrations and both Apple gates
+OFF, and directly exercises closed consent paths using an unsaved synthetic
+reader. Python and embedded PHP syntax plus diff checks passed. This operator
+fix runs from the isolated checkout; it is **not a different deployed revision**.
+
+Staging passed at **2026-10-14 17:54:28 UTC**: all compared purchase source/test
+paths match c8c2662; independent shelf_staging database/storage, private access
+key, noindex/TEST COPY, logged mail/null queue, absent production Apple purchase
+credentials, locked paid text, private files denied, accounts/Library protected,
+HTTPS health and disabled webhook guards passed. Check evidence is
+`/home/shelf/staging-runtime/checks-c8c266221d972d409ffa947ca87397293c69c004.log`,
+SHA-256 **0352122603f19e878e3700f1ed2576eb0442ce31195b25d17900c4baae34eefc**.
+Promotion required the same staged commit and unchanged evidence hash.
+
+Production promotion passed the existing workflow: backup before maintenance,
+fast-forward to the identical source, dependencies/autoload/cache/asset handling,
+purchase/accounting/owner-share health checks, history comparison and maintenance
+lifted. No new schema migration or data migration; both copies have no pending
+migrations and retain the already-applied Apple store-scope schema. Final direct
+HTTPS production catalogue/locked-poem checks confirm non-owner paid body remains
+null. iOS purchase config returns enabled/sandbox/production false and no SDK key;
+Apple webhook is guarded **503 production / 403 staging** before processing.
+The new owned-book3 exception and existing Apple sandbox gates are runtime false;
+real checkout, Apple sign-in/relay and Play sync remain OFF. Direct consent probes
+deny a non-owner, another book and ordinary Apple consent (503 while disabled),
+and reject the exception flag on a Google path (422). Owner-only restrictions
+with gates configured are covered by the reused passed scoped tests; no gate was
+opened even temporarily on either server.
+
+Final private before/after fingerprints match all **11** reader/account/token,
+purchase/event/ledger/entitlement/consent/agreement/accounting tables. Existing
+owner Play book-3 purchase and valid access independently confirmed, exception
+permission false, no Apple purchase history. Test income remains excluded from
+ordinary revenue/author totals; all six existing D10 agreements pass. Public
+handler, env files, webhook files and packaged APK/AAB/IPA inventory unchanged.
+Tracked Flutter source follows the repository revision, but no compiled mobile
+artifact was built, uploaded or added to production by this backend rollout.
+
+### Rollback and remaining work
+
+Prior staging release remains at
+`/home/shelf/apps/shelf-staging-releases/560ef50ac35aa2db78492b1c7bfb92ee72a69f76/`.
+Any separately authorized code rollback uses the prior production revision with
+both Apple gates closed, preserving the checkpointed cPanel handler, private
+configuration, schema and all later reader/payment history. No blanket SQL
+restore or migration-down; rollback notes require considering later activity.
+No rollback was needed or executed.
+
+**A new internal TestFlight build is still required.** Installed **1.0.0 (4)**
+lacks the owner test action/client confirmation changes. Build preparation must
+verify exact branch application/workflow source and the next unused Apple build
+number; none reserved or assumed here. Actual iPhone rendering, product retrieval,
+Apple sandbox purchase/notification delivery, restore/refund/reversal acceptance
+remain pending. Tracking OFF / original App User ID confirmation remains required
+before any later separately authorized activation/transaction window. Both Apple
+switches need that later explicit authorization; this rollout does not grant it.
+
+France remains excluded and ANSSI work cancelled. Product title discrepancy,
+MISSING_METADATA/genuine review image and public-release requirements remain open.
+Apple authentication/relay checks, Android/UI pause, pricing sync, second-phone
+restore, small improvements and joint Android/iOS public-launch hold preserved.
+
+**Exactly one next action:** prepare one new internal TestFlight build from the
+validated application source, verifying the next unused build number and existing
+signing/workflow settings, with all purchase gates OFF and without starting it.
+
 ## Recovered owner test for an already-owned Book 3 — completed 14 October 2026
 
 Resumed interrupted work at **29d9f32** in `/home/shelf/tmp/shelf-ios-foundation`,
