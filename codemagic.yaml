@@ -68,6 +68,8 @@ workflows:
           test "$SHELF_API_BASE_URL" = "https://shelf.services/api/"
           : "${SHELF_IOS_BUILD_NUMBER:?Set an unused positive iOS build number in shelf_ios_testflight}"
           case "$SHELF_IOS_BUILD_NUMBER" in ''|*[!0-9]*|0*) exit 1 ;; esac
+      - name: Reject used or uploading Apple build numbers before preparation
+        script: python3 ../scripts/ios/check_build_number.py
       - name: Check photo-library purpose strings before building
         script: |
           set -eu
@@ -104,6 +106,7 @@ workflows:
           : "${CM_BUILD_DIR:?Codemagic clone directory required}"
           cd "$CM_BUILD_DIR/mobile"
           printf 'iOS working directory: %s\n' "$PWD"
+          python3 ../scripts/ios/check_build_number.py
           flutter build ipa --release --no-pub \
             --build-name=1.0.0 --build-number="$SHELF_IOS_BUILD_NUMBER" \
             --export-options-plist="$HOME/export_options.plist" \

@@ -584,6 +584,104 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Codemagic run #7 duplicate build incident — guarded source fix, 14 October 2026
+
+Owner reports run **#7**, source **9c41c3281480465ef79ec27cdfc5649894ec3ed7**,
+produced a signed **Shelf.ipa** but publishing failed **409
+ENTITY_ERROR.ATTRIBUTE.INVALID.DUPLICATE**: cfBundleVersion must exceed
+**previousBundleVersion=4**. Intended number was **5**. No successful new Apple
+receipt/installation/purchase is inferred from signed artifact creation.
+
+### Confirmed findings and uncertainty
+
+The exact signed YAML has **no numeric build-number fallback**. Its required
+`SHELF_IOS_BUILD_NUMBER` is passed directly to Flutter `--build-number`; any
+positive integer passed the old guard, including already-used **4**. Mandatory
+export inspection compared CFBundleVersion with that same effective environment
+variable; export **manageAppVersionAndBuildNumber=false** remained intact.
+Thus the workflow did not enforce the previously verified unused number and
+allowed a stale dashboard/run environment value through. The reported upload
+error is consistent with effective build number **4**; the run's IPA/logs and
+Codemagic saved/run-level variable values are not independently available here.
+Do not claim which saved group, app override or run override supplied it, or that
+Codemagic itself rewrote the number. The unsafe behavior was acceptance of any
+positive number without current Apple collision evidence, not an invented YAML
+fallback. Unsigned foundation's fixed number 1 is outside the signed workflow and
+unchanged; no automatic increment/fallback was introduced.
+
+### Current Apple evidence and correct candidate
+
+Existing protected-key read-only GETs **2026-10-14 18:43:13 UTC**, scoped to
+**6821471140 / services.shelf.app**, both **200**: received builds **2, 3, 4 VALID**;
+upload records **1 FAILED / 2 COMPLETE / 3 COMPLETE / 4 COMPLETE**, all
+**IOS / 1.0.0**. Complete bounded lists contain no pending upload or build **5**.
+**Correct next candidate remains 1.0.0 (5)**, not assumed from previous inspection.
+No number reservation, dashboard change, upload retry or provider write occurred.
+Collision/processing checks run again in the later authorized cloud run.
+
+### Implemented fail-closed safeguard
+
+New `scripts/ios/check_build_number.py` runs before build preparation and again
+immediately before signed IPA compilation. It requires the explicit positive
+`SHELF_IOS_BUILD_NUMBER`, existing Codemagic App Store Connect integration access,
+exact Apple app/bundle identity and complete bounded GET evidence from both
+`/v1/apps/6821471140/builds` and `/v1/apps/6821471140/buildUploads`. Chosen number
+must exceed every used/uploaded number, including failed upload numbers. Pending
+upload, processing build, unknown/malformed state/number, incomplete pagination,
+foreign/repeated page, identity mismatch, missing credentials, auth/transport/
+parsing failure all stop clearly. No automatic fallback, number selection or API
+write. Only chosen/highest number and a safe status are logged, never credentials.
+
+Reuses documented integration-provided **APP_STORE_CONNECT_KEY_IDENTIFIER**,
+**APP_STORE_CONNECT_ISSUER_ID**, **APP_STORE_CONNECT_PRIVATE_KEY**; signing
+integration/certificate/profile/publisher are unchanged. Private JWT signing uses
+a short-lived restricted temporary file, removed before API checks finish; no
+secret is written into artifacts or repository. If the integration does not
+expose its existing API credentials to custom scripts, the guard stops with a
+clear unavailable-credentials message; do not bypass it or create/rotate a key.
+[Codemagic's existing-integration guidance](https://docs.codemagic.io/knowledge-codemagic/build-versioning/)
+documents reuse without adding separate environment secrets when configured.
+Actual custom-script credential exposure in this cloud account remains a later
+run-time check, not claimed proved by the server's separate authenticated access.
+
+The two checks reduce stale-number and concurrent-upload risk but do not reserve
+a number. Maintain one signed build/upload at a time; no concurrent pipeline or
+retry. Apple remains authoritative at upload. Existing post-export number,
+internal-only signing and artifact verification are retained.
+
+### Focused verification and exact minimal dashboard action
+
+**13 synthetic tests passed**, through
+`SHELF_TOOL_TEST_SCOPE=ios-build-number scripts/run_tests.sh`. They cover explicit
+number parsing, stale/lower numbers, failed-upload collision, successful next
+number, processing/pending/unknown states, missing credentials, HTTP denial with
+private details withheld, exact read-only app paths/identity, trusted bounded
+pagination (including actual terminal links with matching meta.paging.total)
+and both workflow placements. A bounded live response-shape check confirmed
+Apple omits links.next on terminal pages; the guard requires final item count to
+match the reported total, and rejects changed/missing totals or truncated lists.
+YAML/signed shell syntax passed;
+`git diff --check` passed. No PHP/Flutter suite repeated; no build/upload/provider
+call made by the synthetic tests. Prior app, entitlement, accounting, backup and
+deployment evidence reused. Changes are limited to the guard, its tests, wrapper
+scope, two YAML hooks and these records. Reverting those source changes is possible
+in isolation but must not be used to bypass a later failed collision check.
+
+**Exactly one next owner action:** in **Codemagic → Team settings → Environment
+variables → shelf_ios_testflight**, edit existing **SHELF_IOS_BUILD_NUMBER** to
+**5** and save. Ensure the same name is not overridden to 4 in the Shelf app/run
+settings; the effective next run must be 5. Keep API/groups/signing and every other
+value unchanged. **Do not start/retry run #7 or upload its existing IPA.** A later
+separately authorized run must select the new guarded ios/foundation source;
+missing API access or any collision stops before compilation.
+
+Backend remains deployed at **c8c2662**; this task performs no deployment or
+activation. Apple sandbox/owned-test/real-checkout/sign-in gates remain OFF.
+France excluded/ANSSI cancelled, Android/UI pause, Apple auth/relay deferrals,
+pricing-sync, second-phone restore, small improvements and joint Android/iOS
+public-launch hold preserved. New internal build/processing/install and actual
+owner sandbox purchase/notification acceptance remain pending.
+
 ## Next signed internal TestFlight build — prepared 14 October 2026, NOT STARTED
 
 **Exact reviewed candidate source: 14c392c17ab13a3a59bde3e159cc625c0f0a6456**,
