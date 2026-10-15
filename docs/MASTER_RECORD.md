@@ -584,6 +584,67 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Build 5 Apple receipt and internal readiness — verified 14 October local / 15 October 2026 UTC
+
+Owner reports Codemagic signed internal TestFlight run **#9**, ID
+**6acfddac546ce6236ceea2d5**, succeeded on 14 October from source
+**8283badf674f94c8cc7e18a5371e35cdc67d5d1c**, producing **Shelf.ipa (29.55 MB)**,
+intended **1.0.0 (5)**. That cloud/artifact evidence is owner-reported; Codex did
+not independently inspect the IPA, signing output or Codemagic worker logs.
+Local clean branch HEAD matched that exact source before this documentation edit.
+Apple receipt and readiness below are independently verified, not inferred from
+Codemagic success. Earlier candidate/no-upload/diagnostic-next-action entries are
+historical and superseded by this receipt; no diagnostic rerun or upload retry is
+requested.
+
+Authenticated **GET-only** inspection using the existing protected ASC key at
+**2026-10-15 00:01:23–00:02:01 UTC** (14 October local):
+
+| Evidence | Actual Apple value |
+| --- | --- |
+| App | **6821471140 / Shelf - شیلف / services.shelf.app** |
+| Build/upload ID | **76e0e894-e322-49bc-9874-fbfc770b8a80** |
+| Version/platform | **1.0.0 (5) / IOS**, independently confirmed through preReleaseVersion |
+| Upload | **COMPLETE**, errors/warnings/infos all empty; uploadedDate **2026-10-14T13:02:02-07:00** (20:02:02 UTC) |
+| Build processing | **VALID**, uploadedDate **2026-10-14T13:02:54-07:00** (20:02:54 UTC), expired **false** |
+| Audience | **INTERNAL_ONLY** |
+| Internal eligibility | **internalBuildState=MISSING_EXPORT_COMPLIANCE** |
+| External state | **NOT_APPLICABLE** |
+| Encryption field | **usesNonExemptEncryption=null**, not false |
+| Encryption declaration | GET **200 / data=null** |
+| Shelf Owner group | **1511a217-4f89-4dc7-8b8d-4679ce8a6226**, isInternalGroup **true**, hasAccessToAllBuilds **false** |
+| Group assignment | Complete group-side build list contains **4, 3, 2**, **not 5** |
+| Existing testers | Complete group tester relationship list contains **one**; identity withheld, membership untouched |
+
+All nine Apple GET routes returned **200**; bounded app uploads/builds/groups
+and group builds/tester lists reached terminal pages. Uploads are **1 FAILED /
+2 COMPLETE / 3 COMPLETE / 4 COMPLETE / 5 COMPLETE**; received builds **2–5 VALID**.
+The initial sandboxed connection failed DNS resolution; the approved network
+inspection succeeded. No Apple error, provider mutation or credential change.
+
+**Build 5 has finished processing. It is not ready for internal installation:**
+export compliance is missing, and it has not been assigned to Shelf Owner.
+[Apple's beta-compliance guidance](https://developer.apple.com/help/app-store-connect/test-a-beta-version/provide-export-compliance-information-for-beta-builds/)
+requires the build's compliance information before testing. Build 4's previously
+cleared declaration does not establish Build 5 clearance. Existing approved
+non-France encryption inventory/declaration evidence is retained for a later
+specifically authorized compliance action; no encryption answer is saved here.
+No public App Review acceptance, installed-build acceptance, purchase acceptance
+or notification delivery is claimed.
+
+Only these two requested records changed; scoped diff/whitespace checks replace
+an unnecessary source/test/build rerun. No compliance PATCH, tester/build
+assignment, invitation, group creation, deployment, gate change, new build,
+upload, notification test or transaction occurred. Checkout, Apple sandbox,
+owned-book3 test and Apple sign-in/relay remain OFF. France exclusion/ANSSI
+cancellation, Android/UI pause, pricing-sync, second-phone restore, Apple auth/
+relay and small-improvement deferrals and joint Android/iOS public-launch hold
+remain binding. Backend deployment remains c8c2662.
+
+**Exactly one next action:** authorize clearing **only Build 5 export compliance**
+using the existing approved non-France declaration, with readback verification
+and all checkout gates OFF. Group assignment remains a later separate action.
+
 ## Run #8 credential failure — documented CLI path prepared, NOT cloud-verified
 
 14 October 2026. Started clean at **1116317bedde0402a6516c175d66bbf6073e2df2**.
