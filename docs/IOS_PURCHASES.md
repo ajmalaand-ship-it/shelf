@@ -1,5 +1,149 @@
 # Shelf — one-book Apple sandbox setup
 
+## Confirmed RevenueCat settings and complete sandbox path review — 14 October local / 15 October 2026 UTC
+
+Resumed clean **cb6cb498efd4266802ecf8ad40246ce38e965d70**. Owner supplies
+screenshot-verified existing dashboard observations, **no settings changed**:
+
+- Shelf Apple app **Track new purchases from server-to-server notifications OFF**.
+- Project **Transferring purchases seen on multiple App User IDs: Keep with
+  original App User ID**; **Use a different behavior for sandbox OFF**. Sandbox
+  therefore inherits Keep with original App User ID.
+- Separate **Allow testing entitlements and in-app currency for: Anybody**.
+
+The two previously unverified dashboard values are now **OWNER-VERIFIED**, not
+API-verified; no repeat screenshot/access request needed. Build 5 basic iPhone
+installation/launch acceptance remains recorded; purchase acceptance pending.
+
+### Actual meaning of Anybody
+
+Current official [RevenueCat Sandbox Testing Access](https://www.revenuecat.com/docs/projects/sandbox-access)
+says Anybody allows non-production purchases to grant configured RevenueCat
+entitlements/currency to every App User ID. It covers platform sandboxes as well
+as Test Store. This is **not dashboard staff permission**, and does not authorize
+Shelf API access. Changing to an allowlist still records sandbox purchases; it
+can remove existing nonqualifying sandbox entitlements and leaves already-granted
+currency. Consequently do not change this project-wide setting casually or treat
+an owner-only allowlist as authentication. No currency feature is implemented by
+this Shelf test, and its platform app key is not a RevenueCat Test Store key.
+
+RevenueCat may grant a sandbox entitlement **independently of Shelf consent**.
+That is a real provider-level grant/identity-pollution risk. Shelf's normal client
+does not use CustomerInfo to unlock books, so this is **not evidence of
+unauthorized Shelf paid-text access**. Restriction is in authenticated server
+consent, store proof and book access, not in the public SDK key or SDK UI.
+
+### Every relevant path evaluated
+
+Reused cb6cb49 runtime/private-owner/Play-sale/provider/disabled-config findings,
+56 PHP tests/511 assertions, 15 Flutter tests and same-source rollout evidence.
+Narrow read-only comparison at **2026-10-15 00:38:02 UTC** confirms deployed
+purchase/proof/exception/consent/webhook/access/ledger/accounting/API route bytes
+match **c8c266221d972d409ffa947ca87397293c69c004**; both Apple gates and real
+checkout remain false, no Apple purchase exists. No broad audit/test or synthetic
+transaction rerun. Findings below are source/path analysis, not a live exploit.
+
+| Path | Actual safeguard and limitation |
+| --- | --- |
+| Normal SDK buy | Authenticated consent, explicit owned-test server echo, both gates and fresh owner/book3 eligibility precede SDK buy; CustomerInfo alone never unlocks. |
+| Direct SDK calls | Public app key and client-selected App User ID can bypass Shelf's UI/consent to obtain a **RevenueCat** sandbox entitlement under Anybody. Shelf does not control StoreKit or RevenueCat recording through these calls. A caller using their own nonowner ID is rejected by Shelf owner/proof checks. Numeric owner-ID impersonation has the attribution limitation below. |
+| Restore | SDK restore may restore RevenueCat state; it grants no Shelf access by itself. Authenticated library/restore uses server reconciliation, exact current/original reader and app/product/SANDBOX proof; Keep-original discourages transfer but does not authenticate SDK IDs. Apple recovery cannot transfer history to another Shelf reader. |
+| Webhook | Private distinct Apple authorization, configured gate, app/store/environment/product, numeric identity, exact transaction/time and independent V2 proof; locked owner/fresh test consent rechecked for a new overlapping purchase. Nonowner events rejected; duplicate events/transactions idempotent. Provider webhook authentication proves delivery origin, not that the SDK user ID was chosen by the authenticated owner. |
+| Server confirm/Library | Reader-authenticated routes, independent permanent entitlement and transaction proof; no reliance on client receipt or cached SDK entitlement. Ordinary duplicates remain blocked; overlapping test requires existing Play access and no prior Apple purchase. Gate-closure defect below prevents successful Library refresh after Apple history. |
+| Account switching/offline | Client clears configuration/test permission/confirmation, serializes SDK sign-out, uses reader/generation checks and per-reader encrypted downloads. Late responses do not cross Shelf accounts. Server token determines paid-text identity; provider aliases/entitlements do not override it. |
+| Paid text/audio/media | Authenticated reader middleware and BookAccessService check active server entitlement/reviewer grant. No direct RevenueCat entitlement grants a new server entitlement; existing server entitlement is not itself erased by closing Apple gates. Direct content paths do not run the Library reconciliation guard. |
+| Play/accounting | Existing Play sale/access preserved and union-of-valid-store access remains during open-window reconciliation. Apple records forced SANDBOX/Test, excluded by real-income scope; accounting rejects Test owed/payment/real reversal entries. Unique sale/event keys and second-overlap rejection prevent duplicated real royalties. |
+
+### Two remaining safety problems — activation NOT CLEARED
+
+**1. SDK identity is not authenticated purchase intent.**
+[RevenueCat's identity guidance](https://www.revenuecat.com/docs/customers/identifying-customers)
+allows client-supplied App User IDs; Shelf uses the numeric reader ID and exposes
+the SDK key in public purchase config when enabled. Matching current/original
+RevenueCat ID and a genuine transaction proves provider attribution, **not**
+that a Shelf-authenticated owner initiated that transaction. A modified client
+could choose the owner's numeric ID. If a genuine sandbox purchase is attributed
+to that ID inside the owner's fresh consent window, current server checks do
+not bind the specific transaction to a secret owner test session. This is an
+inferred attribution/race risk, not a reproduced exploit or demonstrated paid-text
+disclosure: the caller still lacks the owner's Shelf token. It can contaminate
+owner provider/history or consume the single test slot. Anybody does not fix it;
+allowlisting the same numeric owner ID alone does not fix impersonation either.
+
+**Smallest scoped security correction proposal:** bind the single Apple test to
+an unpredictable server-issued owner/Book3 purchase-session identity or supported
+StoreKit account token, delivered only after authenticated consent; verify that
+binding in confirmation **and webhook** before recording. Do not trust a
+client-selected numeric ID as purchase-session authentication. Preserve existing
+numeric Play identity/history, strict Apple original/current identity and permanent
+proof, and prohibit unbound new Apple sales. Exact SDK/provider support and any
+reversible schema/client change need a separately approved implementation task;
+no invented API or migration is proposed as already available. Do not silently
+switch existing identities or rely on secret public API keys.
+
+**2. Closing Apple gates blocks valid Play Library refresh.** In deployed
+AppleSandboxPurchases::reconcile, any recorded APP_STORE purchase with the gate
+OFF causes **503**, before PurchaseService performs Play reconciliation and before
+Library returns books/lease. This also affects refunded recorded Apple history.
+The existing test explicitly expects 503 for recorded Apple history with the gate
+OFF. For this dual-store owner, after one accepted Apple transaction, the planned
+closure would leave the Play sale/entitlement intact but fail Library/confirm/
+restore and download refresh. Earlier cb6cb49's statement that valid Play access
+remains was accurate about records/direct entitlement, **insufficient about normal
+Library operation**. No such live failure exists now because no Apple purchase
+has been made; no data changed to demonstrate it.
+
+**Smallest scoped closure correction proposal:** make disabled-Apple handling
+store-aware: independently verify/return valid Play-backed books and leases while
+refusing new Apple processing, stale Apple-only grants or Apple-only lease renewal.
+Apply the same distinction to direct content authorization; do not expose stale
+Apple-only text merely by skipping reconciliation. Preserve all immutable Apple
+history and valid Play ownership. Focused regressions must cover overlapping
+Play+Apple, Apple-only, refunded Apple history, closure and direct paid-content
+requests. No blanket entitlement removal, history deletion, SQL restoration or
+provider refund is a valid shortcut.
+
+**Activation is not safe to approve yet.** Confirmed dashboard settings resolve
+that earlier blocker; they do not resolve these two code-path issues. No genuine
+revenue or duplicate real royalties found, and no ordinary nonowner Shelf unlock
+found, but provider entitlement retention and attribution and correct post-test
+closure are not fully controlled. A sandbox non-consumable/provider entitlement
+and immutable Test purchase can persist after disabling Shelf gates. Closing
+checkout is **not refund/revocation** or removal of provider ownership.
+
+### Future bounded activation/cleanup — blocked plan only
+
+Retain the prior exact two-flag backup/encrypted-checkpoint, atomic .env and
+runtime verification procedure, but **do not execute it** until the scoped fixes
+are approved, tested, staged/promoted and compatible with the installed client
+(or separately accepted replacement where needed). Then a separately authorized
+window should have a recorded hard deadline **30 minutes after activation**,
+with Codex arranging verified automatic closure of both flags before opening them.
+That closure mechanism is **not implemented or installed in this task**; no cron,
+queue or scheduled task created. It must survive an interrupted interactive
+session, refuse concurrent/unexpected config changes and report closure failure.
+Close earlier on the first mismatch or completed single test; no automatic reopen.
+
+Only the verified owner and Book3, one cancellation then at most one genuine
+TestFlight sandbox transaction under explicit approval; no repeats on pending
+confirmation. Verify server-bound transaction, Test-only records, real totals and
+Play history. At deadline/end set both gates false, clear config, verify disabled
+config/proof/webhook guard **and successful independent Play Library/download
+refresh and denial of stale Apple-only direct content**. Remove only window-created
+closure scheduling after verified closure; retain evidence/checkpoint and all
+purchase/refund/consent history. Leave RevenueCat and Play configuration untouched.
+Refund/reversal and removal of provider sandbox ownership require separate explicit
+scope; do not promise that timer cleanup erases Apple/RevenueCat non-consumables.
+
+Only these two records changed; no activation, purchase/refund, provider edit,
+deployment/migration, build/upload, tester invitation, Play/accounting modification
+or public release. France exclusion/ANSSI cancellation, Apple sign-in/relay,
+Android/UI pause, pricing-sync, second-phone restore, small-improvement deferrals
+and joint Android/iOS launch hold preserved.
+
+**Exactly one next action:** authorize a focused isolated correction of Apple
+purchase-session binding and store-aware gate closure before any activation.
+
 ## Build 5 installed; final owner Apple purchase preflight — 14 October local / 15 October 2026 UTC
 
 Resumed clean **bdd550af3fc256e756b8ba5a0afe9828b02425ce**. Owner confirms
