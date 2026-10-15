@@ -1,5 +1,65 @@
 # Shelf — one-book Apple sandbox setup
 
+## Build 5 assigned to existing Shelf Owner — 14 October local / 15 October 2026 UTC
+
+Resumed clean **b662fbd33107471963b59fd5b2b7c7e4e5ca34c9** under explicit owner
+authorization to add **only 1.0.0 (5)** to the existing internal **Shelf Owner**
+group. Existing protected ASC key reused; no credentials or tester details printed.
+
+Preflight **2026-10-15 00:12:07 UTC**, authenticated GETs **200**: exact build
+**76e0e894-e322-49bc-9874-fbfc770b8a80**, app **6821471140 / services.shelf.app**,
+preReleaseVersion **IOS / 1.0.0**, build version **5**, **VALID / INTERNAL_ONLY**,
+expired false, usesNonExemptEncryption false and **READY_FOR_BETA_TESTING**.
+Compliance decision/readback from the previous task reused without change/audit.
+
+Existing group **1511a217-4f89-4dc7-8b8d-4679ce8a6226 / Shelf Owner** is internal,
+linked to that exact app, with all settings equal to the accepted Build 4 private
+snapshot. Complete tester GET contains **one** tester; both ID and email exactly
+match the recorded owner in
+**/home/shelf/tmp/shelf-build4-group-before-20261013.json**. Identity withheld.
+Complete group-build list initially contained **4, 3, 2**; Build 5 was absent.
+Private pre-write snapshot saved **0600**, outside Git, at
+**/home/shelf/tmp/shelf-build5-group-before-20261015.json**.
+
+Only provider mutation:
+**POST /v1/betaGroups/1511a217-4f89-4dc7-8b8d-4679ce8a6226/relationships/builds**,
+body data containing one resource, type **builds**, ID
+**76e0e894-e322-49bc-9874-fbfc770b8a80**; HTTP **204**. This is additive; no
+replacement/removal, tester invitation, membership edit or group setting sent.
+Already-present handling skips this POST; no repeated write or retry occurred.
+
+**Readback completed 2026-10-15 00:12:14 UTC:**
+
+- Group-side builds and builds relationship GETs both independently confirm
+  **5, 4, 3, 2**, exactly the previous build IDs plus Build 5.
+- **internalBuildState=IN_BETA_TESTING**, external **NOT_APPLICABLE**;
+  existing autoNotifyEnabled true unchanged.
+- Build 5 remains **VALID / INTERNAL_ONLY**, all build attributes exactly unchanged,
+  including the cleared compliance field.
+- Group settings exactly unchanged; the same sole tester ID/email retained.
+
+Private sanitized readback retained **0600** at
+**/home/shelf/tmp/shelf-build5-group-after-20261015.json**. All provider readbacks
+returned **200**. Assignment and internal testing availability are verified;
+installation/launch and Apple purchase/notification acceptance remain pending.
+Only the two requested documentation files changed, with scoped diff/whitespace
+checks; no source/test change, broad suite or completed-audit rerun.
+
+No build/upload, compliance change, tester invitation, purchase activation,
+ownership change, metadata/territory edit, deployment, email or public release.
+Real checkout, Apple sandbox/owned-book3 test and Apple sign-in/relay remain OFF.
+France exclusion/ANSSI cancellation, pricing-sync and second-phone-restore
+deferrals, deferred Apple authentication/relay checks, Android/UI pause,
+small-improvement deferrals and joint Android/iOS public-launch hold preserved.
+Backend remains c8c2662. The existing auto-notification setting was preserved,
+not deliberately changed or used to claim delivery.
+
+**Exactly one next action:** owner opens **TestFlight → Shelf → Update/Install**
+for **1.0.0 (5)**, using **Previous Builds → 1.0.0 → build 5** if needed.
+Keep the existing installation/account/data; no uninstall or data clearing.
+Confirm Build 5 installs and launches; this does not authorize a purchase or
+Apple sign-in test. No dashboard assignment or new build is needed.
+
 ## Build 5 export compliance cleared — 14 October local / 15 October 2026 UTC
 
 Resumed clean **ada8bc557855f9af37b681b30015ac26278ce6c1** under explicit owner
