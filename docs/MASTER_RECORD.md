@@ -584,6 +584,179 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Build 5 installed; final owner Apple purchase preflight — 14 October local / 15 October 2026 UTC
+
+Resumed clean **bdd550af3fc256e756b8ba5a0afe9828b02425ce**. Owner confirms
+**TestFlight 1.0.0 (5) installed on their iPhone and opens correctly**. Record
+basic installation/launch acceptance only; no product retrieval, purchase,
+restore/refund/reversal or notification acceptance follows from this evidence.
+
+### Current read-only evidence
+
+At **2026-10-15 00:23:29 UTC**, production HEAD and staging/production release
+state match **c8c266221d972d409ffa947ca87397293c69c004**. Deployed exception, proof,
+Apple event handler, consent controller, purchase config and accounting service
+bytes match the validated source. Reused **56 PHP tests / 511 assertions, 15
+Flutter tests**, exact staging/promotion and backup/history-preservation evidence.
+No broad tests, full provider audit, build or deployment repeated.
+
+Private production queries verified one owner admin and one exact-email reader;
+reader verified, buying allowed, owner predicate true. Book **3 / shelf_book_3**
+is Published with positive price. Existing unrefunded/unrevoked **PLAY_STORE sale**
+and active book access remain intact; no APP_STORE purchase exists. No reader
+ID/email, purchase history or entitlement changed or printed.
+
+Runtime **Apple sandbox OFF, owned-book3 test OFF, real checkout OFF, Apple
+sign-in/relay OFF, Play sync OFF**. Exception is unavailable while OFF. A separate
+CLI process set both Apple flags **in memory only** and confirmed configured
+provider prerequisites and exact owner eligibility; nonowner, blocked owner and
+another book denied. No .env/cache writes, saved models, consent calls or provider
+proof calls occurred in that process. Staging separately confirms active staging,
+both Apple gates OFF, proof disabled and real checkout OFF. Public production
+**GET /api/purchases/config?platform=ios** returned **200**, all checkout fields
+false and SDK key null at **00:24:55 UTC**. Disabled webhook guard evidence from
+rollout reused; no test event or POST sent in this preflight.
+
+Existing credentials: RevenueCat bounded GETs **200** confirm Apple app
+**app8ef018b95b / services.shelf.app**, non-consumable product
+**prod0d084e901f / shelf_book_3**, and **whintgr769cb03ff2**, app-scoped sandbox,
+URL **https://shelf.services/api/purchases/webhook?source=apple**, exact
+non_renewing_purchase/cancellation/expiration/refund_reversed events. Local
+protected webhook authorization matches runtime. Apple product GET **200** at
+**00:25:13 UTC** confirms **6822080809 / shelf_book_3 / NON_CONSUMABLE /
+MISSING_METADATA**. Saved metadata state is not actual StoreKit retrieval;
+existing title discrepancy/genuine review image remain separate pending work.
+France exclusion evidence and notification V2 configuration reused unchanged.
+
+Ordinary owned-book consent remains **409** for Apple without the explicit test
+exception and for Play. Client normal purchase still refuses owned books. The
+exception requires both gates, production checkout OFF, non-staging, exact
+verified/unblocked owner, active Play sale/access, book3 and no prior Apple book3
+purchase. Consent rechecks locked reader/book, uses explicit test wording and
+requires the server echo before SDK buy. Existing fresh-consent/time/transaction,
+original numeric reader and independent APP_STORE/SANDBOX permanent entitlement
+proof remain mandatory; SDK success or Play access alone cannot confirm Apple.
+Apple sale/event keys prevent duplicate journal entries and a second overlapping
+Apple purchase. Apple records use **SANDBOX / Test**; ordinary ledger scope excludes
+them and accounting rejects real earnings/owed/payment entries for Test history.
+Thus this path cannot create real revenue or duplicate real author royalties.
+Play records and valid union-of-store access remain untouched, including on
+Apple cancellation/refund. These safeguards reuse the passed implementation tests.
+
+### Remaining blocker: two saved RevenueCat values are not API-exposed
+
+Used existing V2 credentials before requesting manual inspection. Actual Apple
+app response exposes only app metadata and app_store fields **bundle_id,
+app_store_connect_api_key_configured, app_store_connect_vendor_number,
+custom_url_scheme, subscription_key_configured**. Shelf project list GET **200**
+exposes **object, id, name, created_at, icon_url, icon_url_large**. Neither contains
+Apple **Track new purchases from server-to-server notifications**, restore
+behavior, or sandbox-override fields. Current documented
+[app](https://www.revenuecat.com/docs/api-v2/app) and
+[project](https://www.revenuecat.com/docs/api-v2/project) resources do not provide
+these settings. Unsupported project-detail GETs with/without trailing slash
+returned **404**; documented project-list GET succeeded. No settings-write probe,
+private dashboard endpoint, token search or provider change was attempted.
+
+**Both actual values remain unverified:** Apple new-purchase notification tracking
+must be **OFF**; effective sandbox restore behavior must be **Keep with original
+App User ID**. Do not infer defaults from missing fields or subscription-key
+configuration. RevenueCat's
+[notification guidance](https://www.revenuecat.com/docs/platform-resources/server-notifications/apple-server-notifications)
+and [restore guidance](https://www.revenuecat.com/docs/projects/restore-behavior)
+explain the numeric-ID/anonymous-ingestion risk and optional sandbox override.
+Technical owner isolation is ready, but **not cleared to activate yet** while
+these required values remain unknown. No activation or transaction authorized.
+
+Minimum dashboard inspection, **read-only**, existing Shelf project:
+
+1. **Apps & providers → existing Shelf iOS (App Store) → Apple Server to Server
+   notification settings**: read **Track new purchases from server-to-server
+   notifications**. Required OFF; do not toggle or Save.
+2. **Project settings → General → Restore behavior**: read the main selection and
+   **Use a different restore behavior for sandbox**. If override is enabled, read
+   the sandbox selection; otherwise main selection applies. Required effective
+   sandbox value **Keep with original App User ID**. Do not change any setting.
+
+Report those saved values in text; no screenshot or credential request. An
+unexpected value needs a separately approved correction, not silent adjustment.
+
+### Safe activation procedure — plan only, NOT EXECUTED
+
+After that blocker is resolved and explicit one-owner/one-book sandbox-window
+approval is given, Codex performs the existing fresh verified production backup
+and encrypted .env checkpoint under **/home/shelf/backups/shelf/**, records private
+pre-test reader/Play entitlement/purchase/event/ledger/accounting fingerprints,
+and rechecks deployed source, owner eligibility, provider mapping and OFF gates.
+Stop before activation if backup/checkpoint or any prerequisite fails.
+
+As shelf, atomically change **only** these existing production .env flags:
+**SHELF_APPLE_SANDBOX_ENABLED=false → true** and
+**SHELF_APPLE_OWNED_BOOK3_TEST_ENABLED=false → true**. Require regular file/no
+symlink, shelf ownership/0600, exactly one occurrence per field, expected before
+values and unchanged content since reading; preserve every other setting. Run
+**php artisan config:clear** in **/home/shelf/apps/shelf**. No config helper prepare,
+migration, deployment, new key or provider setting change is needed.
+
+Verify actual runtime proof configured and both flags true; exact owner eligible,
+nonowner/blocked/other-book denied, real checkout/sign-in/relay/sync false and
+staging OFF. Private iOS config GET must advertise sandbox true, production false,
+allowlist exactly **[shelf_book_3]**, correct app/store/SDK mapping. Public config
+readiness is global, not reader-specific; server consent/proof enforce the
+restriction. Close both gates immediately on mismatch; no purchase follows.
+
+### Exact iPhone procedure — later approved window only
+
+Use the installed **TestFlight 1.0.0 (5)** and existing verified **Shelf reader
+email/password**, not admin/Apple/relay/anonymous/new account. Keep existing
+Apple/TestFlight account, app and downloads. No new sandbox tester or sign-out of
+Media & Purchases is needed for this basic TestFlight case. TestFlight uses
+sandbox with production Apple Accounts
+([RevenueCat](https://www.revenuecat.com/docs/test-and-launch/sandbox/apple-app-store));
+no charge is incurred by a genuine sandbox transaction.
+
+After Codex verifies activation, open Shelf, sign in if needed and refresh
+My Library. Open **book3**, read its sample and use the separate
+**Test Apple purchase — no charge** action. Accept the explicit agreement on the
+Apple sandbox test screen. Inspect Apple's purchase sheet for the intended book
+and test/no-charge context; authenticate only through the genuine Apple sheet
+if requested. If identity/product/environment is unclear, or product unavailable,
+stop without confirming; do not change storefronts/providers or repeat buying.
+Within explicit test authorization, cancel once to verify existing Play access
+stays intact, then complete **at most one** sandbox purchase. This planned
+cancellation is not a second transaction. Wait for the app's **Apple sandbox
+purchase confirmed** message; do not treat existing Read book access as proof.
+If confirmation fails/pends, report it and do not buy again.
+
+Codex then independently checks exact Apple transaction/time, original reader,
+RevenueCat SANDBOX proof and permanent entitlement, Shelf Test-only immutable
+purchase/event/journal, unchanged Play history/access and real accounting totals.
+Record actual webhook delivery separately from REST reconciliation; one does not
+prove the other. Restore/refund/reversal/full phone acceptance remain separate;
+no second-phone restore or Apple sign-in/relay test is requested.
+
+### Disable and verify afterward — plan only, NOT EXECUTED
+
+Codex atomically returns **both** production flags to false with the same
+permissions/concurrency checks, runs **php artisan config:clear**, and verifies
+runtime proof/exception OFF; iOS config enabled/sandbox/production false and SDK
+key null; staging OFF and real/sign-in/relay/sync OFF. Under that later window's
+verification scope, incomplete unauthenticated Apple webhook guard must stop
+**503 production / 403 staging** before processing. Keep provider keys/webhooks,
+all Play/Apple consent/purchase/refund/journal history, schema and downloads.
+Never restore SQL or run migration down merely to close the window. Gate closure
+is not a refund. Disabled Apple proof cannot renew an Apple-only offline lease;
+existing valid Play access remains. Any unconfirmed Apple reconciliation needs a
+later authorized window; do not erase transaction history or initiate another buy.
+
+Only requested records changed. All gates stayed OFF; no transactions, provider
+settings, build/upload/tester changes, ownership deletion or public release.
+France exclusion, pricing-sync, second-phone restore, Apple authentication/relay,
+Android/UI and small-improvement deferrals and joint-launch hold preserved.
+
+**Exactly one next action:** inspect the two RevenueCat settings in the existing
+dashboard using the read-only paths above and report their saved values.
+
 ## Build 5 assigned to existing Shelf Owner — 14 October local / 15 October 2026 UTC
 
 Resumed clean **b662fbd33107471963b59fd5b2b7c7e4e5ca34c9** under explicit owner
