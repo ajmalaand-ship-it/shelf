@@ -1,5 +1,80 @@
 # Shelf — one-book Apple sandbox setup
 
+## Build 5 export compliance cleared — 14 October local / 15 October 2026 UTC
+
+Resumed clean **ada8bc557855f9af37b681b30015ac26278ce6c1** under explicit owner
+authorization for **Build 5 only**, reusing the accepted Build 4 non-France
+standard-encryption decision. Build 5 source remains owner-reported Codemagic
+**8283badf674f94c8cc7e18a5371e35cdc67d5d1c**; no new artifact or binary audit.
+
+### Focused encryption comparison
+
+Compared documented Build 4 source **2702fbb** with Build 5 **8283bad**. All
+mobile production changes are confined to owner purchase-test permission,
+confirmation and UI in library_controller.dart, purchase_screen.dart and
+collection_detail_screen.dart; reviewed diffs introduce no encryption primitive,
+key handling or general-purpose encryption feature. Test changes are separate.
+Dependency declarations/lockfile, native iOS tree, account/Keychain implementation,
+audio cache, repository and **purchases/download_store.dart** are byte-identical.
+Thus the documented **cryptography 2.9.0 / AES-256-GCM**, per-reader generated
+key, Keychain storage, HTTPS/SDK transport and SHA-256 cache naming assessment
+remains applicable. Full prior audit and source test suites were not repeated.
+This comparison does not claim independent inspection of Codemagic's IPA.
+
+Rechecked [Apple's current documentation table](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)
+and [BuildUpdateRequest attributes](https://developer.apple.com/documentation/appstoreconnectapi/buildupdaterequest/data-data.dictionary/attributes-data.dictionary).
+The accepted standard-algorithm/non-France no-document answer remains supported:
+**usesNonExemptEncryption=false**. This does not assert no encryption or OS-only
+encryption. The recorded accurate basis remains encryption Yes, standard outside
+OS Yes, proprietary No, France No. No ANSSI research, filing or email resumed.
+
+### Actual provider write and independent readback
+
+Existing private ASC key reused. Preflight GETs confirmed app **6821471140 /
+services.shelf.app**, **IOS / 1.0.0 (5)**, build
+**76e0e894-e322-49bc-9874-fbfc770b8a80**, **VALID / INTERNAL_ONLY**, flag null,
+encryption declaration null and **MISSING_EXPORT_COMPLIANCE**. Availability
+readback at **2026-10-15 00:08:03 UTC** confirms **174 territories / FRA absent**
+for shelf_book_3. App-wide availability remains previously verified unconfigured;
+no list was created or changed. Future app distribution must exclude France.
+An initial availability GET used v1 and returned **404 PATH_ERROR**; corrected
+existing v2 route and complete territory read returned **200**, no provider change.
+
+Private before-state saved **0600**, outside Git:
+**/home/shelf/tmp/shelf-build5-compliance-before-20261015.json**.
+Immediately rechecked unchanged build attributes and missing-compliance status.
+Only mutation: **PATCH /v1/builds/76e0e894-e322-49bc-9874-fbfc770b8a80**,
+data type builds, attributes **usesNonExemptEncryption=false**, HTTP **200**.
+No relationships or other attributes sent; no retry or other provider write.
+
+**Readback verified by 2026-10-15 00:08:39 UTC:**
+
+- **usesNonExemptEncryption=false**; all other build attributes exactly unchanged.
+- **processingState=VALID**, **buildAudienceType=INTERNAL_ONLY**, expired false.
+- **internalBuildState=READY_FOR_BETA_TESTING**: MISSING_EXPORT_COMPLIANCE cleared.
+- **externalBuildState=NOT_APPLICABLE**, existing autoNotifyEnabled true unchanged.
+- Encryption declaration GET **200 / null**, consistent with the no-document route.
+- Existing **Shelf Owner / 1511a217-4f89-4dc7-8b8d-4679ce8a6226** remains internal;
+  complete group-build GET contains **4, 3, 2**, not 5. Sole tester count **one**;
+  tester identity withheld and membership untouched.
+
+Private sanitized after-state retained **0600** at
+**/home/shelf/tmp/shelf-build5-compliance-after-20261015.json**.
+Compliance is cleared; **Build 5 is still unassigned and installation is pending**.
+No government certification, public-review acceptance, phone purchase acceptance
+or notification delivery is claimed. Only requested documentation changes,
+scoped comparison and diff checks; no broad test or build rerun.
+
+All purchase/owned-test/real-checkout/sign-in/relay gates remain OFF. No deployment,
+build/upload, tester assignment/invitation, group creation, metadata/territory
+change, transaction, email or public release. France exclusion, pricing-sync and
+second-phone-restore deferrals, deferred Apple authentication/relay checks,
+Android/UI pause, small-improvement deferrals and joint Android/iOS launch hold
+remain binding. Backend remains c8c2662.
+
+**Exactly one next action:** authorize assigning existing **1.0.0 (5)** to existing
+**Shelf Owner** internal group only, preserving its one tester and all gates OFF.
+
 ## Build 5 Apple receipt and internal readiness — verified 14 October local / 15 October 2026 UTC
 
 Owner reports Codemagic signed internal TestFlight run **#9**, ID
