@@ -1,5 +1,110 @@
 # Shelf — one-book Apple sandbox setup
 
+## Session safety rollout — staging passed; production STOPPED — 15 October local / 16 October 2026 UTC
+
+Owner authorized the documented staging-first backed-up rollout of validated source
+**1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19**, all purchasing gates OFF.
+**Staging deployed that exact source; production was NOT promoted.** Production remains
+**c8c266221d972d409ffa947ca87397293c69c004**. This entry supersedes the preceding
+implementation entry's next-rollout instruction. Do not blindly rerun deployment or
+repeat completed checks; inspect the retained checkpoint and resolve the blocker first.
+
+### Backups and protected state
+
+- Fresh verified production preflight backup:
+  **/home/shelf/backups/shelf/20261016-004143/**.
+- Private preservation/evidence checkpoint:
+  **/home/shelf/backups/shelf/20261016-004143/apple-session-rollout-checkpoint/**.
+  AES256 configuration archive was decrypted in memory and compared exactly. It protects
+  production/staging .env and existing private provider authorization/metadata/key files;
+  cPanel handler, release state and aggregate history fingerprints were retained privately.
+  No secrets or reader identifiers were printed or committed.
+- Verified staging backup:
+  **/home/shelf/backups/shelf-staging/20261016-004455/**.
+- Both backups passed SQL completion, ZIP integrity and SHA-256 verification. No restore
+  drill repeated, production promotion backup taken or production maintenance entered.
+
+Only production's existing **public/.htaccess** cPanel handler was locally modified at
+preflight; it is preserved byte-for-byte. Isolated source started clean at 1d3dfa5.
+No source/migration/application change beyond the authorized validated source was deployed.
+
+### Exact staging source, migration and checks
+
+Staging **1d3dfa5** passed at **2026-10-16 00:45:13 UTC**. Migration
+**2026_10_15_010000_create_apple_purchase_sessions** applied in staging batch **12**;
+the new table is empty and no staging migrations are pending. Production has no session
+table or new migration applied; no migrations are pending in its retained c8c2662 source.
+
+The isolated operator helper needed a scoped preparation correction before deployment:
+recognize already-committed Codemagic/build-number tooling and reuse only exact validated
+**1d3dfa5** source/test bytes and its documented **64 PHP / 604 assertions, 16 Flutter
+purchase tests + 1 staging-identity** evidence. These unit suites were not rerun.
+The helper correction passed **12 mocked automation tests** via
+`SHELF_TOOL_TEST_SCOPE=apple-rollout scripts/run_tests.sh`; it rejects source/evidence
+mismatches and closed-runtime failures. Existing unrelated Python escape deprecation
+notice remains. The helper correction ran from the isolated checkout and is recorded
+with this rollout documentation; it was **not a different staged application revision**.
+
+Staging checks passed: independent database/storage/session/cache; forced-disabled Play
+sync; logged mail/null queue; synthetic account/isolation probes rolled back and temporary
+file cleaned; absent production Apple credentials; applied empty session schema; runtime
+Apple/owned-test/real-checkout/sign-in/relay/sync OFF; HTTPS private access/noindex/banner,
+catalogue/cover, locked paid text, account/Library protection and denied webhook/private
+files. No new provider transaction, session or ownership created. Check evidence:
+**/home/shelf/staging-runtime/checks-1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19.log**,
+SHA-256 **ec4faca3ecd88b1c0a498fc8b5732a8341a045ba180bc8bc86088cdfa0082723**.
+Additional standalone staging accounting/owner-share commands were **not reached**:
+the production preservation precondition stopped their wrapper first. Accounting source
+and passed regression evidence were reused, not a claim that those extra commands ran.
+
+### Stop condition: production entitlement timestamp mismatch
+
+An actual production Library controller/reconciliation probe confirmed existing verified
+owner Book3 **PLAY_STORE** sale/access and a successful Library/lease response using
+independent provider proof, with Apple controls closed, no duplicate sales and no Test
+income in real totals. It was enclosed in an outer database transaction with rollback
+in finally; no token, sale or sandbox purchase was created. **Do not claim complete
+preservation from its initial success message:** the subsequent independent whole-history
+checkpoint comparison failed before promotion.
+
+Read-only comparison isolates the mismatch to the existing **book_entitlements** row:
+row count is still **1**, reader/book/active ownership unchanged and active remains true.
+Only **checked_at, created_at, updated_at** differ from the verified SQL backup. All other
+protected table counts/fingerprints, including readers/tokens, purchases/events, consent,
+sales/refunds, agreements and accounting, still match the checkpoint. The table engine is
+InnoDB. The cause/attribution of timestamp drift is **not established**; do not assume
+concurrent activity or blame the verification probe without evidence. Rollback code ran,
+but full checkpoint preservation was not demonstrated. No repeat reconciliation probe,
+manual SQL repair, timestamp restoration, baseline relaxation or production promotion
+was attempted after the failure. Retained aggregate evidence includes
+`promotion-stopped.json` and `entitlement-column-comparison.json` in the checkpoint.
+
+Owner's explicit STOP rule was followed. Staging stays on the passed revision; production
+stays on the previous source. There is no failed production migration or maintenance to
+recover from. Do not discard staging or overwrite any existing records to resume.
+
+### Final read-only production state
+
+Production is **healthy and out of maintenance**; HTTPS app-config and iOS purchase-config
+both return **200**. iOS enabled/sandbox/production checkout fields are false and SDK key
+is null. Runtime **Apple sandbox OFF, owned-book3 test OFF, real checkout OFF, Apple
+sign-in/relay OFF and Play sync OFF** on both environments. Production/staging .env,
+private webhook authorization/metadata/key files and cPanel handler match the checkpoint.
+Bounded RevenueCat GETs returned **200** before/after: the complete saved webhook metadata
+matches, including Apple **whintgr769cb03ff2** (app-scoped sandbox, distinct Apple URL and
+four events) and Google **whintgr75a4892970** (Both). No provider settings changed.
+
+**New TestFlight build still required** for the session protocol before any future Apple
+purchase test. None started or uploaded; installed build 5 unchanged. Durable automatic
+closure remains unimplemented; activation/phone acceptance remain separately gated.
+France exclusion/ANSSI cancellation, Apple authentication/relay and stopped relay work,
+Android/UI pause, pricing-sync, second-phone restore and small-improvement deferrals,
+and joint Android/iOS public-launch hold remain unchanged. No activation, transaction,
+ownership repair or public release performed.
+
+**Exactly one next action:** investigate the unexpected entitlement timestamp discrepancy
+under a separately authorized focused recovery task before resuming production promotion.
+
 ## Apple session binding and store-aware gate closure — 15 October local / 16 October 2026 UTC
 
 Owner authorized only the two corrections assessed at **212cd1cc5f6c83d5b827326c200a192af268ac0d**,

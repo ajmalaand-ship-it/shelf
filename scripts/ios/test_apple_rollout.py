@@ -116,26 +116,29 @@ class SessionRolloutSafety(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 self.w.apple_safety_checked(self.app, 'synthetic', [self.session])
 
-    def test_focused_tests_and_disabled_runtime_required_before_pass_record(self):
+    def test_exact_source_and_disabled_runtime_required_before_pass_record(self):
+        evidence = '64 PHP tests / 604 assertions; 16 Flutter purchase tests + 1 staging-identity'
         with patch.object(self.w.subprocess, 'run', return_value=Mock(stdout=b'synthetic', returncode=0)) as process, \
-            patch.object(Path, 'read_bytes', return_value=b'synthetic'), \
+            patch.object(Path, 'read_bytes', return_value=b'synthetic'), patch.object(self.w, 'run', side_effect=['', evidence]) as run, \
             patch.object(self.w, 'artisan') as artisan, patch.object(self.w, 'apple_purchase_runtime_checks') as runtime, \
             patch.object(self.w, 'https_checks'), patch.object(self.w, 'current_state', return_value={}), \
             patch.object(self.w, 'save_state') as save:
-            self.assertTrue(self.w.apple_safety_checked(self.app, 'synthetic', [self.session]))
-            test_call = process.call_args_list[-1]
-            self.assertEqual(test_call.args[0], ['bash', 'scripts/run_tests.sh'])
-            self.assertEqual(test_call.kwargs['env']['SHELF_PHP_TEST_FILTER'], 'AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest')
-            self.assertNotIn('SHELF_TOOL_TEST_SCOPE', test_call.kwargs['env'])
+            self.assertTrue(self.w.apple_safety_checked(self.app, 'synthetic', [self.session, 'codemagic.yaml', 'scripts/ios/check_build_number.py']))
+            self.assertTrue(all(c.args[0][:2] == ['git', 'show'] for c in process.call_args_list))
+            self.assertIn('1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19', run.call_args_list[0].args[0])
             artisan.assert_called_once_with(self.app, 'shelf:check-staging')
             runtime.assert_called_once_with(self.app)
             self.assertEqual(save.call_args.args[0]['checks']['scope'], 'apple-session-safety-disabled')
             save.reset_mock()
+            run.side_effect = ['', evidence]
             runtime.side_effect = RuntimeError('synthetic closed-guard mismatch')
             with self.assertRaises(RuntimeError): self.w.apple_safety_checked(self.app, 'synthetic', [self.session])
             save.assert_not_called()
             runtime.side_effect = None
-            process.return_value.returncode = 1
+            run.side_effect = ['changed-source']
+            with self.assertRaises(RuntimeError): self.w.apple_safety_checked(self.app, 'synthetic', [self.session])
+            save.assert_not_called()
+            run.side_effect = ['', 'missing test record']
             with self.assertRaises(RuntimeError): self.w.apple_safety_checked(self.app, 'synthetic', [self.session])
             save.assert_not_called()
 

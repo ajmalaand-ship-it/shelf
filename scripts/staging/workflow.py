@@ -380,7 +380,7 @@ echo json_encode($out,JSON_THROW_ON_ERROR);"""))
 
 
 def apple_safety_checked(app, commit, changes):
-    """New session source must run focused tests; never reuse the pre-binding evidence."""
+    """Reuse only exact validated session source; never the pre-binding evidence."""
     session = 'app/Services/Purchases/ApplePurchaseSession.php'
     backend = {p for p in changes if not p.startswith(('docs/', 'mobile/')) and p != 'AGENTS.md'}
     if session not in backend:
@@ -396,6 +396,7 @@ def apple_safety_checked(app, commit, changes):
         'tests/Feature/AppleSandboxPurchasesTest.php', 'tests/Feature/BookPurchasesTest.php',
         'scripts/staging/workflow.py', 'scripts/run_tests.sh', 'scripts/ios/configure_apple_sandbox.py',
         'scripts/ios/test_apple_rollout.py', 'scripts/ios/test_asc_key_upload.py',
+        'codemagic.yaml', 'scripts/ios/check_build_number.py', 'scripts/ios/test_build_number.py',
     }
     if not backend <= scope:
         raise RuntimeError('Unreviewed backend changes in Apple session rollout; stop for scope review.')
@@ -403,25 +404,34 @@ def apple_safety_checked(app, commit, changes):
         expected = subprocess.run(['git', 'show', commit + ':' + path], cwd=SOURCE, capture_output=True, check=True).stdout
         if (app / path).read_bytes() != expected:
             raise RuntimeError('Staged Apple safety path differs from selected commit: ' + path)
+    source = '1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19'
+    reuse_scope = (scope - {'scripts/staging/workflow.py', 'scripts/ios/test_apple_rollout.py'}) | {
+        'tests/Feature/AccountingTest.php', 'mobile/lib/purchases/book_purchase_provider.dart',
+        'mobile/lib/purchases/library_controller.dart', 'mobile/test/ios_purchases_test.dart',
+        'mobile/pubspec.yaml', 'mobile/pubspec.lock',
+    }
+    if run(['git', 'diff', '--name-only', source, commit, '--', *sorted(reuse_scope)]).strip():
+        raise RuntimeError('Validated Apple safety source changed; focused retesting required.')
+    evidence = run(['git', 'show', source + ':docs/MASTER_RECORD.md'])
+    if '64 PHP tests / 604 assertions' not in evidence or '16 Flutter purchase tests + 1 staging-identity' not in evidence:
+        raise RuntimeError('Validated Apple safety test record missing.')
+    for path in sorted(reuse_scope):
+        expected = subprocess.run(['git', 'show', source + ':' + path], cwd=SOURCE, capture_output=True, check=True).stdout
+        if (app / path).read_bytes() != expected:
+            raise RuntimeError('Staged safety source differs from completed test evidence: ' + path)
     log = RUNTIME / ('checks-' + commit + '.log')
-    test_env = os.environ.copy()
-    test_env['SHELF_PHP_TEST_FILTER'] = 'AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest'
-    test_env.pop('SHELF_TOOL_TEST_SCOPE', None)
-    test_env.pop('SHELF_MOBILE_TEST_SCOPE', None)
-    with log.open('w') as output:
-        result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
-            stdout=output, stderr=subprocess.STDOUT, env=test_env)
-    if result.returncode:
-        raise RuntimeError('Focused staged Apple safety tests failed; private log: ' + str(log))
     artisan(app, 'shelf:check-staging')
     apple_purchase_runtime_checks(app)
     https_checks()
+    private_write(log, json.dumps({'tested_source': source, 'php_tests_reused':64, 'php_assertions_reused':604,
+        'flutter_tests_reused':16, 'staging_identity_tests_reused':1, 'source_bytes_match':True,
+        'runtime_checks_passed':True, 'record_sha256':hashlib.sha256(evidence.encode()).hexdigest()}, indent=2)+'\n')
     state = current_state()
     state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
         'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
         'scope':'apple-session-safety-disabled', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
     save_state(state)
-    print('PASS: focused staged Apple session/gate-closure regressions; session schema empty; all gates OFF.', flush=True)
+    print('PASS: exact validated Apple safety evidence reused; staged session schema empty; all gates OFF.', flush=True)
     return True
 
 
