@@ -333,10 +333,14 @@ echo json_encode([
  'stage_isolated'=>DB::connection()->getDatabaseName()==='shelf_staging'
    && realpath(storage_path())!==realpath('/home/shelf/apps/shelf/storage')
    && config('mail.default')==='log' && config('queue.default')==='null',
+ 'session_schema'=>!class_exists(App\Services\Purchases\ApplePurchaseSession::class)
+   || (Schema::hasColumns('apple_purchase_sessions',['reader_id','collection_id','consent_id','provider_identity','issued_at_ms','expires_at_ms','revoked_at_ms','transaction_id','store_purchased_at_ms'])
+     && DB::table('migrations')->where('migration','2026_10_15_010000_create_apple_purchase_sessions')->exists()
+     && !DB::table('apple_purchase_sessions')->exists()),
  'stage_private'=>!filled(config('purchases.apple_webhook_authorization'))
    && !filled(config('purchases.apple_public_sdk_key')) && !filled(config('purchases.metadata_key_path')),
 ],JSON_THROW_ON_ERROR);"""))
-    required=('gate_off','owned_gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history')
+    required=('gate_off','owned_gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history','session_schema')
     if not all(result.get(k) is True for k in required) or result['stage']==production:
         raise RuntimeError('Apple purchase disabled rollout/schema checks failed; details withheld.')
     if not production and not (result['stage_private'] and result['stage_isolated']):
@@ -373,6 +377,52 @@ echo json_encode($out,JSON_THROW_ON_ERROR);"""))
     if status!=(503 if production else 403):
         raise RuntimeError('Disabled Apple webhook guard returned an unexpected status.')
     print('PASS: Apple purchase schema; sandbox/real checkout/sign-in/sync OFF; iOS HTTPS config disabled; webhook guard closed; no Apple history.',flush=True)
+
+
+def apple_safety_checked(app, commit, changes):
+    """New session source must run focused tests; never reuse the pre-binding evidence."""
+    session = 'app/Services/Purchases/ApplePurchaseSession.php'
+    backend = {p for p in changes if not p.startswith(('docs/', 'mobile/')) and p != 'AGENTS.md'}
+    if session not in backend:
+        return False
+    scope = {
+        session, 'app/Http/Controllers/LibraryController.php', 'app/Http/Controllers/PurchaseWebhookController.php',
+        'app/Services/BookAccessService.php', 'app/Services/Purchases/ApplePurchaseProof.php',
+        'app/Services/Purchases/AppleSandboxPurchases.php', 'app/Services/Purchases/OwnerAppleSandboxTest.php',
+        'app/Services/Purchases/PurchaseService.php', 'app/Services/Purchases/RevenueCatClient.php',
+        'app/Services/Purchases/PurchaseRecoveryService.php', 'app/Models/Purchase.php', 'app/Models/PurchaseEvent.php',
+        'config/purchases.php', 'database/migrations/2026_10_12_120000_add_purchase_event_store_scope.php',
+        'database/migrations/2026_10_15_010000_create_apple_purchase_sessions.php',
+        'tests/Feature/AppleSandboxPurchasesTest.php', 'tests/Feature/BookPurchasesTest.php',
+        'scripts/staging/workflow.py', 'scripts/run_tests.sh', 'scripts/ios/configure_apple_sandbox.py',
+        'scripts/ios/test_apple_rollout.py', 'scripts/ios/test_asc_key_upload.py',
+    }
+    if not backend <= scope:
+        raise RuntimeError('Unreviewed backend changes in Apple session rollout; stop for scope review.')
+    for path in sorted(scope | {'tests/Feature/AccountingTest.php'}):
+        expected = subprocess.run(['git', 'show', commit + ':' + path], cwd=SOURCE, capture_output=True, check=True).stdout
+        if (app / path).read_bytes() != expected:
+            raise RuntimeError('Staged Apple safety path differs from selected commit: ' + path)
+    log = RUNTIME / ('checks-' + commit + '.log')
+    test_env = os.environ.copy()
+    test_env['SHELF_PHP_TEST_FILTER'] = 'AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest'
+    test_env.pop('SHELF_TOOL_TEST_SCOPE', None)
+    test_env.pop('SHELF_MOBILE_TEST_SCOPE', None)
+    with log.open('w') as output:
+        result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+            stdout=output, stderr=subprocess.STDOUT, env=test_env)
+    if result.returncode:
+        raise RuntimeError('Focused staged Apple safety tests failed; private log: ' + str(log))
+    artisan(app, 'shelf:check-staging')
+    apple_purchase_runtime_checks(app)
+    https_checks()
+    state = current_state()
+    state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+        'scope':'apple-session-safety-disabled', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: focused staged Apple session/gate-closure regressions; session schema empty; all gates OFF.', flush=True)
+    return True
 
 
 def apple_purchase_checked(app, commit, changes):
@@ -426,6 +476,8 @@ echo json_encode(array_values(array_diff(array_keys($app->make('migrator')->getM
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    if apple_safety_checked(app, commit, changes):
+        return
     if apple_purchase_checked(app, commit, changes):
         return
     ios_auth_scope = {
@@ -847,7 +899,7 @@ def promote(commit):
     artisan(PRODUCTION,'shelf:check-owner-shares')
     if state['checks'].get('scope') == 'ios-auth-backend-disabled':
         ios_auth_runtime_checks(PRODUCTION, production=True)
-    if state['checks'].get('scope') == 'apple-purchase-backend-disabled':
+    if state['checks'].get('scope') in ('apple-purchase-backend-disabled', 'apple-session-safety-disabled'):
         apple_purchase_runtime_checks(PRODUCTION, production=True)
     https_checks()
     state.update(production_commit=commit,last_backup=str(saved),previous_production_commit=previous)

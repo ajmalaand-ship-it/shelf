@@ -584,6 +584,139 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple session binding and store-aware gate closure — 15 October local / 16 October 2026 UTC
+
+Owner authorized only the two corrections assessed at **212cd1cc5f6c83d5b827326c200a192af268ac0d**,
+focused validation, deployment/rollback preparation, records and push to **ios/foundation**.
+Started from that exact clean checkpoint. **Implemented in isolation only; NOT deployed,
+NOT activated.** This entry supersedes the assessment's request to authorize implementation;
+it does not clear activation or claim live purchase acceptance.
+
+### Correction 1 — authenticated purchase-session binding
+
+Apple consent now requires protocol **purchase_session_version=1**. Inside the existing
+reader/book transaction and locks, verified owner/Book3/store/mode/publication/price and
+normal duplicate or explicit owned-test consent checks remain mandatory. The server
+creates a 256-bit random **shelf_apple_** identity bound to that reader, Book3 and the
+specific consent, with a **15-minute** lifetime. A fresh consent invalidates earlier
+unconsumed identities. A consumed session or any existing Apple purchase prevents issuing
+a second session. The identity is a private capability: do not log, publish or copy it;
+authenticated consent responses use the existing private/no-store middleware.
+
+The client validates protocol, reader, book, mode, store and expiry before identifying
+the Apple SDK with that session and buying. Numeric Play identity and all existing Play
+history remain unchanged. Numeric identification is still used to initialize/list Apple
+products, but native Apple buy refuses numeric IDs. Direct identified-to-identified SDK
+login is supported without merging customers by [RevenueCat identity guidance](https://www.revenuecat.com/docs/customers/identifying-customers).
+No SDK/dependency or provider setting change; no invented StoreKit account-token API.
+
+Confirmation and webhook independently require matching RevenueCat **current AND original
+session identity**, exact transaction and millisecond purchase time, app/product mapping,
+APP_STORE/SANDBOX/purchased/quantity-one and permanent active entitlement. Session ownership,
+consent and expiry are checked before recording and again under lock. The first verified
+transaction atomically consumes the session, retaining its exact transaction/time for
+historical proof/refund handling. Wrong reader/book/session, revoked/replaced/expired
+unconsumed sessions, numeric impersonation and second transactions fail closed. Exact
+historical duplicate events/confirmations remain idempotent; they cannot add a sale or
+renew a lease without the existing independent reconciliation. Existing pre-session
+numeric Apple history can only be independently reconciled/corrected, never used to
+create a new unbound sale. No such live history was claimed or created here.
+
+Server confirmation discovers only the authenticated reader's sessions. The consumed
+identity is returned privately to that same reader for native restore while configured;
+it is never in public config or persisted in the download manifest. Account changes
+clear it. Strict original/current identity validation remains authoritative if the
+provider aliases or transfers anything. Expired/unbound late purchases are not silently
+accepted: preserve their provider evidence for explicit review, never repeat a pending buy.
+
+New reversible migration **2026_10_15_010000_create_apple_purchase_sessions** creates only
+an empty table. It records consent/reader/book, private identity, validity/revocation and
+unique consumed transaction/time; no old reader, consent, purchase or money row is rewritten.
+No cascade deletes evidence. Down migration refuses any retained session evidence and
+requires an approved preservation plan; empty-table reversal is tested. **No live migration run.**
+
+### Correction 2 — Play refresh survives Apple closure
+
+Disabled Apple verification returns to the normal independent Play reconciliation rather
+than throwing 503 solely because Apple history exists. Library uses the same book-access
+filter as direct paid-text/content/cover/audio/artwork requests. With Apple unavailable,
+Apple-only historical grants are excluded from Library/download renewal and direct access;
+valid Play ownership or an existing reviewer grant still works. Shared entitlement rows
+and immutable Apple history are not deleted or rewritten just to close gates. Failed Play
+proof cannot fall back to disabled Apple history. Reconciliation with an enabled but
+unavailable provider continues to fail closed; no fresh lease is fabricated.
+
+Apple sandbox and owned-book test flags retain existing default **false**. Real checkout
+remains OFF. Apple sales/corrections remain forced SANDBOX/Test, excluded from real income
+and confirmed author earnings; duplicate/replayed transactions cannot multiply sales or
+royalties. These fixes do not erase provider sandbox ownership or historical Test records.
+
+### Focused validation (synthetic only)
+
+- `SHELF_PHP_TEST_FILTER='AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest' scripts/run_tests.sh`:
+  **64 PHP tests / 604 assertions passed**, temporary/in-memory data only.
+- `SHELF_PHP_TEST_FILTER='AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest' SHELF_MOBILE_TEST_SCOPE=ios-purchases scripts/run_tests.sh --mobile`:
+  **16 Flutter purchase tests + 1 staging-identity test passed**; PHP at that point
+  **63 / 594** (the subsequently added failed-Play-proof case accounts for the final 64 / 604).
+  Flutter analysis: no errors/warnings, **21 style infos**. Completed Flutter checks reused
+  after the final backend-only case; no broad suite or Android artifact build.
+- `SHELF_TOOL_TEST_SCOPE=apple-rollout scripts/run_tests.sh`: **12 mocked automation tests passed**.
+  Existing Python cPanel-handler byte-literal escape deprecation notice remains unrelated;
+  no runtime handler changed. Tests exercise scoped staging selection, source-byte mismatch,
+  test/guard failure refusal and passing evidence only after focused tests/disabled guards.
+- Covers nonowner/wrong book, missing/incorrect consent version, numeric/wrong-account/
+  cross-session proof, expiry/replacement/replay, exact duplicate idempotency, independent
+  proof rejection, Test-only ledger/refund/reversal, closed-gate overlapping Play+Apple and
+  refunded Apple history, Play failure, Apple-only Library and direct-content denial,
+  account change while consent waits and reversible/evidence-preserving schema.
+
+### Prepared rollout and rollback — instructions only, not executed
+
+1. Obtain separate authorization for **disabled staging-first backend rollout**. Record
+   the selected verified commit and previous deployed release from the existing release
+   state, preserve unrelated runtime changes, inspect current holds and verify both Apple
+   flags, real checkout, sign-in/relay and sync remain false. Use `docs/STAGING.md`.
+2. From this trusted isolated checkout, under that later authorization run
+   `python3 -B scripts/staging/workflow.py deploy VERIFIED_COMMIT`. Existing workflow backs
+   up staging before migration. The prepared **apple-session-safety-disabled** path compares
+   deployed source bytes to that commit, runs only the focused PHP purchase/accounting tests,
+   validates the applied empty session schema, disabled runtime/HTTPS guards and staging
+   isolation. No production Apple credentials are copied to staging. Reuse this commit's
+   passed Flutter evidence; do not activate sandbox on staging or manufacture a transaction.
+3. Only after passing staging evidence and explicit production authorization, run
+   `python3 -B scripts/staging/workflow.py promote VERIFIED_COMMIT`. It requires the same
+   verified commit/log, makes a fresh verified production backup under
+   `/home/shelf/backups/shelf/`, preserves reader/payment/agreement history, applies the
+   committed additive migration and checks disabled runtime/HTTPS guards. Stop on first
+   live failure; maintenance is lifted by the workflow's finally block. Do not run the
+   old provider-configuration helper or recreate the existing webhook.
+4. Before any Apple sessions/history, rollback may return to the **recorded prior deployed
+   revision**, keeping all gates OFF and preserving runtime configuration/handler. The
+   additive empty table can safely remain. An explicitly approved migration rollback must
+   be limited to this empty table after backup; never blanket-roll back a mixed batch.
+   After any sessions or Apple history, preserve the schema and these access/session guards;
+   do not restore old code that reintroduces stale Apple-only access, drop evidence or
+   restore SQL over later activity. Use a separately reviewed forward correction instead.
+
+**A new TestFlight build IS required before any future Apple test.** Installed 1.0.0 (5)
+lacks session protocol/SDK identity handling and is intentionally rejected at consent by
+the corrected backend. No build number reserved, build/upload or phone test performed.
+Actual RevenueCat/StoreKit identity/proof shapes, product retrieval, purchase/restore/
+refund/reversal and delivery acceptance still require separately authorized phone work.
+The durable 30-minute automatic-closure mechanism remains **unimplemented** and must be
+prepared and verified before a separately authorized activation window. These fixes do
+not authorize or perform that activation or closure scheduling.
+
+Owner-verified RevenueCat settings stay recorded unchanged: notification tracking OFF;
+Keep with original App User ID; different sandbox behavior OFF; Anybody entitlement access.
+France exclusion/ANSSI cancellation, Apple authentication/relay and stopped relay task,
+Android/UI pause, pricing-sync, second-phone restore and small-improvement deferrals,
+and the joint Android/iOS public-launch hold are preserved. No deployment, live migration,
+provider edit, purchase, checkout activation, build/upload or public release in this task.
+
+**Exactly one next action:** authorize the disabled staging-first backend rollout of
+this verified correction commit, with purchasing kept OFF.
+
 ## Confirmed RevenueCat settings and complete sandbox path review — 14 October local / 15 October 2026 UTC
 
 Resumed clean **cb6cb498efd4266802ecf8ad40246ce38e965d70**. Owner supplies

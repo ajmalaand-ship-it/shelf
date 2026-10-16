@@ -34,6 +34,10 @@ class AppleApi implements LibraryService {
       appleConfirmed = false,
       confirmApple = true,
       echoTestAuthorization = true;
+  String sessionIdentity = 'shelf_apple_${'a' * 64}';
+  int sessionReader = 1;
+  bool expiredSession = false, oldSessionVersion = false;
+  Future<void> Function()? beforeConsent;
   final paths = <String>[];
   Map<String, dynamic>? consent;
   @override
@@ -47,6 +51,7 @@ class AppleApi implements LibraryService {
     if (path.startsWith('purchases/config'))
       return {
         'enabled': enabled,
+        'purchase_session_version': oldSessionVersion ? 0 : 1,
         'store': 'APP_STORE',
         'public_sdk_key': 'appl_synthetic',
         'production_checkout_enabled': false,
@@ -55,6 +60,7 @@ class AppleApi implements LibraryService {
       };
     if (path.endsWith('/consent')) {
       consent = data;
+      await beforeConsent?.call();
       return {
         'accepted': true,
         'owned_book_sandbox_test':
@@ -62,7 +68,12 @@ class AppleApi implements LibraryService {
         'store': consentStoreMatches ? 'APP_STORE' : 'PLAY_STORE',
         'checkout_mode': 'sandbox',
         'product_id': 'shelf_book_3',
-        'app_user_id': '1',
+        'purchase_session_version': oldSessionVersion ? 0 : 1,
+        'reader_id': sessionReader,
+        'session_expires_at_ms': DateTime.now()
+            .add(Duration(minutes: expiredSession ? -1 : 15))
+            .millisecondsSinceEpoch,
+        'app_user_id': sessionIdentity,
       };
     }
     if (path == 'library/confirm') {
@@ -183,6 +194,8 @@ void main() {
       expect(api.consent?['store'], 'APP_STORE');
       expect(api.consent?['checkout_mode'], 'sandbox');
       expect(provider.buys, 1);
+      expect(provider.user, api.sessionIdentity);
+      expect(api.consent?['purchase_session_version'], 1);
       expect(api.paths, contains('library/confirm'));
       expect(library.owns(3), true);
     },
@@ -470,5 +483,67 @@ void main() {
       debugDefaultTargetPlatformOverride = null;
     },
     timeout: const Timeout(Duration(seconds: 45)),
+  );
+  test('unbound numeric, wrong reader, expired and incompatible session consent never buys', () async {
+    for (final identity in ['1', 'shelf_apple_short']) {
+      api.sessionIdentity = identity;
+      await expectLater(
+        library.purchase(
+          appleBook,
+          const StoreBookProduct('shelf_book_3', 'USD2.99'),
+          true,
+        ),
+        throwsA(isA<Exception>()),
+      );
+    }
+    api.sessionIdentity = 'shelf_apple_${'b' * 64}';
+    api.sessionReader = 99;
+    await expectLater(
+      library.purchase(
+        appleBook,
+        const StoreBookProduct('shelf_book_3', 'USD2.99'),
+        true,
+      ),
+      throwsA(isA<Exception>()),
+    );
+    api.sessionReader = 1;
+    api.expiredSession = true;
+    await expectLater(
+      library.purchase(
+        appleBook,
+        const StoreBookProduct('shelf_book_3', 'USD2.99'),
+        true,
+      ),
+      throwsA(isA<Exception>()),
+    );
+    api.expiredSession = false;
+    api.oldSessionVersion = true;
+    await expectLater(
+      library.purchase(
+        appleBook,
+        const StoreBookProduct('shelf_book_3', 'USD2.99'),
+        true,
+      ),
+      throwsA(isA<Exception>()),
+    );
+    expect(provider.buys, 0);
+  });
+
+  test(
+    'account change while awaiting session cannot start old owner SDK buy',
+    () async {
+      api.beforeConsent = () => accounts.signOut();
+      await expectLater(
+        library.purchase(
+          appleBook,
+          const StoreBookProduct('shelf_book_3', 'USD2.99'),
+          true,
+        ),
+        throwsA(isA<Exception>()),
+      );
+      expect(provider.buys, 0);
+      expect(library.readerId, null);
+      expect(library.appleBook3Confirmed, false);
+    },
   );
 }

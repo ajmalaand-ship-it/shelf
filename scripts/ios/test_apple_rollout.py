@@ -91,4 +91,53 @@ class FileSafety(unittest.TestCase):
             with self.assertRaises(RuntimeError):m.exclusive(link/'synthetic.secret',b'synthetic-only')
 
 
+class SessionRolloutSafety(unittest.TestCase):
+    def setUp(self):
+        spec = importlib.util.spec_from_file_location('staging_safety', Path(__file__).parents[1]/'staging/workflow.py')
+        self.w = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.w)
+        self.temp = tempfile.TemporaryDirectory(dir=os.environ['SHELF_TEST_TMP'])
+        self.addCleanup(self.temp.cleanup)
+        self.app = Path(self.temp.name)
+        self.w.RUNTIME = self.app
+        self.session = 'app/Services/Purchases/ApplePurchaseSession.php'
+
+    def test_older_rollout_is_not_silently_reclassified(self):
+        self.assertFalse(self.w.apple_safety_checked(self.app, 'synthetic', ['docs/IOS_PURCHASES.md']))
+
+    def test_unrelated_backend_change_refuses_focused_gate(self):
+        with patch.object(self.w.subprocess, 'run') as process:
+            with self.assertRaises(RuntimeError):
+                self.w.apple_safety_checked(self.app, 'synthetic', [self.session, 'app/Unrelated.php'])
+            process.assert_not_called()
+
+    def test_staged_byte_mismatch_cannot_reuse_test_record(self):
+        with patch.object(self.w.subprocess, 'run', return_value=Mock(stdout=b'expected')), patch.object(Path, 'read_bytes', return_value=b'changed'):
+            with self.assertRaises(RuntimeError):
+                self.w.apple_safety_checked(self.app, 'synthetic', [self.session])
+
+    def test_focused_tests_and_disabled_runtime_required_before_pass_record(self):
+        with patch.object(self.w.subprocess, 'run', return_value=Mock(stdout=b'synthetic', returncode=0)) as process, \
+            patch.object(Path, 'read_bytes', return_value=b'synthetic'), \
+            patch.object(self.w, 'artisan') as artisan, patch.object(self.w, 'apple_purchase_runtime_checks') as runtime, \
+            patch.object(self.w, 'https_checks'), patch.object(self.w, 'current_state', return_value={}), \
+            patch.object(self.w, 'save_state') as save:
+            self.assertTrue(self.w.apple_safety_checked(self.app, 'synthetic', [self.session]))
+            test_call = process.call_args_list[-1]
+            self.assertEqual(test_call.args[0], ['bash', 'scripts/run_tests.sh'])
+            self.assertEqual(test_call.kwargs['env']['SHELF_PHP_TEST_FILTER'], 'AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest')
+            self.assertNotIn('SHELF_TOOL_TEST_SCOPE', test_call.kwargs['env'])
+            artisan.assert_called_once_with(self.app, 'shelf:check-staging')
+            runtime.assert_called_once_with(self.app)
+            self.assertEqual(save.call_args.args[0]['checks']['scope'], 'apple-session-safety-disabled')
+            save.reset_mock()
+            runtime.side_effect = RuntimeError('synthetic closed-guard mismatch')
+            with self.assertRaises(RuntimeError): self.w.apple_safety_checked(self.app, 'synthetic', [self.session])
+            save.assert_not_called()
+            runtime.side_effect = None
+            process.return_value.returncode = 1
+            with self.assertRaises(RuntimeError): self.w.apple_safety_checked(self.app, 'synthetic', [self.session])
+            save.assert_not_called()
+
+
 if __name__=='__main__':unittest.main()

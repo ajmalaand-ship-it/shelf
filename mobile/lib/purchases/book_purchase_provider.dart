@@ -2,10 +2,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 
 import '../services/api_config.dart';
+
 import 'package:purchases_flutter/purchases_flutter.dart';
 
-bool get applePurchasePlatform => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
-String get purchaseStoreName => applePurchasePlatform ? 'App Store' : 'Google Play';
+bool get applePurchasePlatform =>
+    !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+String get purchaseStoreName =>
+    applePurchasePlatform ? 'App Store' : 'Google Play';
 
 class StoreBookProduct {
   const StoreBookProduct(this.id, this.price, [this.native]);
@@ -28,7 +31,10 @@ class RevenueCatBookProvider implements BookPurchaseProvider {
   @override
   Future<void> identify(String key, String readerId) async {
     if (!key.startsWith(applePurchasePlatform ? 'appl_' : 'goog_') ||
-        !RegExp(shelfTestMode ? r'^staging_[1-9][0-9]*$' : r'^[1-9][0-9]*$').hasMatch(readerId)) {
+        !(RegExp(shelfTestMode ? r'^staging_[1-9][0-9]*$' : r'^[1-9][0-9]*$')
+                .hasMatch(readerId) ||
+            (applePurchasePlatform &&
+                RegExp(r'^shelf_apple_[a-f0-9]{64}$').hasMatch(readerId)))) {
       throw StateError('Shelf purchase configuration is unavailable');
     }
     if (_key == null) {
@@ -63,6 +69,8 @@ class RevenueCatBookProvider implements BookPurchaseProvider {
   @override
   Future<StorePurchaseResult> buy(StoreBookProduct product) async {
     if (_reader == null ||
+        (applePurchasePlatform &&
+            !RegExp(r'^shelf_apple_[a-f0-9]{64}$').hasMatch(_reader!)) ||
         await Purchases.appUserID != _reader ||
         product.native == null)
       return StorePurchaseResult.failed;

@@ -18,7 +18,7 @@ class PurchaseWebhookController extends Controller
             'event' => ['required', 'array'], 'event.id' => ['required', 'string', 'max:255'],
             'event.type' => ['required', 'string', 'max:40'], 'event.environment' => ['required', 'string'],
             'event.store' => ['required', 'string'], 'event.app_id' => ['required', 'string'],
-            'event.app_user_id' => ['required', 'regex:/^[1-9][0-9]*$/'],
+            'event.app_user_id' => ['required', $apple ? 'regex:/^(?:[1-9][0-9]*|shelf_apple_[a-f0-9]{64})$/D' : 'regex:/^[1-9][0-9]*$/'],
             'event.product_id' => ['required', 'string', 'max:255'], 'event.transaction_id' => ['required', 'string', 'max:255'],
             'event.purchased_at_ms' => ['required', 'integer', 'min:1'], 'event.event_timestamp_ms' => ['required', 'integer', 'min:1'],
             'event.currency' => ['sometimes', 'nullable', 'regex:/^[A-Z]{3}$/'],

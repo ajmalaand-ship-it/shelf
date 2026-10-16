@@ -78,7 +78,8 @@ class ApplePurchaseProof
     public function validate(array $p, int $reader, ?string $transaction = null, ?int $purchasedAt = null): array
     {
         abort_unless(($p['object'] ?? null) === 'purchase' && is_string($p['id'] ?? null)
-            && ($p['customer_id'] ?? null) === (string) $reader && ($p['original_customer_id'] ?? null) === (string) $reader
+            && ($p['customer_id'] ?? null) === ApplePurchaseSession::identity($reader, $transaction ?? (string) ($p['store_purchase_identifier'] ?? ''), $purchasedAt ?? (int) ($p['purchased_at'] ?? 0))
+            && ($p['original_customer_id'] ?? null) === ($p['customer_id'] ?? null)
             && ($p['product_id'] ?? null) === config('purchases.apple_product_id')
             && ($p['store'] ?? null) === 'app_store' && ($p['environment'] ?? null) === 'sandbox'
             && ($p['ownership'] ?? null) === 'purchased' && ($p['quantity'] ?? null) === 1
@@ -107,7 +108,17 @@ class ApplePurchaseProof
     public function purchases(Reader $reader): array
     {
         $this->mapping();
-        $items = $this->list($this->prefix().'/customers/'.rawurlencode((string) $reader->id).'/purchases', ['environment' => 'sandbox']);
+        $identities = \Illuminate\Support\Facades\DB::table('apple_purchase_sessions')->where('reader_id', $reader->id)
+            ->whereNull('revoked_at_ms')->where(fn ($q) => $q->whereNotNull('transaction_id')
+                ->orWhere('expires_at_ms', '>=', now()->getTimestampMs()))->pluck('provider_identity')->all();
+        if (\App\Models\Purchase::where('reader_id', $reader->id)->where('store', 'APP_STORE')
+            ->whereNotIn('transaction_id', \Illuminate\Support\Facades\DB::table('apple_purchase_sessions')->whereNotNull('transaction_id')->select('transaction_id'))->exists()) {
+            $identities[] = (string) $reader->id;
+        }
+        $items = [];
+        foreach ($identities as $identity) {
+            $items = array_merge($items, $this->list($this->prefix().'/customers/'.rawurlencode($identity).'/purchases', ['environment' => 'sandbox']));
+        }
         $result = [];
         foreach ($items as $p) {
             abort_unless(is_array($p), 503);

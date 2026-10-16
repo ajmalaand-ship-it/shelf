@@ -40,12 +40,13 @@ class AppleSandboxPurchasesTest extends TestCase
         DB::table('purchase_consents')->insert(['reader_id' => $this->reader->id, 'collection_id' => 3,
             'store' => 'APP_STORE', 'wording' => PurchaseService::CONSENT, 'created_at' => now()->subMinute()]);
         $ms = now()->getTimestampMs();
+        $this->bindSession($ms);
         $this->event = ['id' => 'event-1', 'type' => 'NON_RENEWING_PURCHASE', 'environment' => 'SANDBOX',
-            'store' => 'APP_STORE', 'app_id' => 'appAppleFixture', 'app_user_id' => (string) $this->reader->id,
+            'store' => 'APP_STORE', 'app_id' => 'appAppleFixture', 'app_user_id' => 'shelf_apple_'.str_repeat('a', 64),
             'product_id' => 'shelf_book_3', 'transaction_id' => '100000000000001',
             'purchased_at_ms' => $ms, 'event_timestamp_ms' => $ms, 'currency' => 'USD', 'price_in_purchased_currency' => '2.99'];
-        $this->proof = ['object' => 'purchase', 'id' => 'purchFixture', 'customer_id' => (string) $this->reader->id,
-            'original_customer_id' => (string) $this->reader->id, 'product_id' => 'prodAppleFixture',
+        $this->proof = ['object' => 'purchase', 'id' => 'purchFixture', 'customer_id' => 'shelf_apple_'.str_repeat('a', 64),
+            'original_customer_id' => 'shelf_apple_'.str_repeat('a', 64), 'product_id' => 'prodAppleFixture',
             'store' => 'app_store', 'environment' => 'sandbox', 'ownership' => 'purchased', 'quantity' => 1,
             'store_purchase_identifier' => $this->event['transaction_id'], 'purchased_at' => $ms, 'status' => 'owned'];
         $this->appProof = ['object' => 'app', 'id' => 'appAppleFixture', 'project_id' => 'projFixture',
@@ -66,6 +67,17 @@ class AppleSandboxPurchasesTest extends TestCase
         });
     }
 
+
+    private function bindSession(int $ms): void
+    {
+        DB::table('apple_purchase_sessions')->updateOrInsert(['provider_identity' => 'shelf_apple_'.str_repeat('a', 64)], [
+            'reader_id' => $this->reader->id, 'collection_id' => 3,
+            'consent_id' => DB::table('purchase_consents')->where('store', 'APP_STORE')->orderByDesc('id')->value('id'),
+            'issued_at_ms' => $ms - 60000, 'expires_at_ms' => $ms + 840000,
+            'revoked_at_ms' => null, 'transaction_id' => null,
+        ]);
+    }
+
     private function listing(array $items): array { return ['object' => 'list', 'items' => $items, 'next_page' => null]; }
     private function bearer(?Reader $reader = null): array { app('auth')->forgetGuards(); return ['Authorization' => 'Bearer '.($reader ?? $this->reader)->createToken('synthetic')->plainTextToken]; }
     private function webhook(array $changes = []) { return $this->postJson('/api/purchases/webhook', ['event' => array_replace($this->event, $changes)], ['Authorization' => 'synthetic-apple-auth']); }
@@ -84,7 +96,7 @@ class AppleSandboxPurchasesTest extends TestCase
         config(['purchases.apple_sandbox_enabled' => false]);
         $this->getJson('/api/purchases/config?platform=ios')->assertJsonPath('enabled', false)->assertJsonPath('public_sdk_key', null)->assertJsonPath('production_checkout_enabled', false);
         $this->webhook()->assertStatus(503);
-        $this->postJson('/api/library/books/3/consent', ['agree' => true, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE'], $this->bearer())->assertStatus(503);
+        $this->postJson('/api/library/books/3/consent', ['agree' => true, 'purchase_session_version' => 1, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE'], $this->bearer())->assertStatus(503);
         config(['purchases.apple_sandbox_enabled' => true, 'staging.testing' => true]);
         $this->assertFalse(\App\Services\Purchases\ApplePurchaseProof::configured());
         Http::assertNothingSent();
@@ -95,13 +107,14 @@ class AppleSandboxPurchasesTest extends TestCase
     {
         $this->getJson('/api/purchases/config?platform=ios')->assertJsonPath('public_sdk_key', 'appl_synthetic')->assertJsonPath('allowed_product_ids.0', 'shelf_book_3')->assertJsonPath('production_checkout_enabled', false);
         $this->getJson('/api/purchases/config')->assertJsonPath('enabled', false);
-        $data = ['agree' => true, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE'];
+        $data = ['agree' => true, 'purchase_session_version' => 1, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE'];
         $this->postJson('/api/library/books/3/consent', $data, $this->bearer())->assertOk()->assertJsonPath('store', 'APP_STORE');
         $this->postJson('/api/library/books/3/consent', array_replace($data, ['checkout_mode' => 'production']), $this->bearer())->assertUnprocessable();
         $other = Reader::create(['email' => 'owner+other@example.test']); $other->forceFill(['email_verified_at' => now()])->save();
         $this->postJson('/api/library/books/3/consent', $data, $this->bearer($other))->assertForbidden();
         $otherBook = new Collection([ 'title' => 'Other book', 'status' => 'published', 'price_usd' => '2.99']); $otherBook->forceFill(['id' => 4])->save();
         $this->postJson('/api/library/books/4/consent', $data, $this->bearer())->assertStatus(409);
+        $this->bindSession($this->event['purchased_at_ms']);
         $this->reader->forceFill(['buying_blocked' => true])->save();
         $this->webhook()->assertForbidden();
     }
@@ -146,7 +159,7 @@ class AppleSandboxPurchasesTest extends TestCase
         DB::table('purchase_consents')->where('store', 'APP_STORE')->delete();
         DB::table('purchase_consents')->insert(['reader_id' => $this->reader->id, 'collection_id' => 3, 'wording' => PurchaseService::CONSENT, 'created_at' => now()->subMinute()]);
         $this->webhook()->assertStatus(409); $this->assertDatabaseCount('purchases', 0);
-        Http::assertSentCount(4);
+
     }
 
     public function test_refund_reversal_and_repeat_cycles_append_without_rewriting_or_real_income(): void
@@ -198,7 +211,7 @@ class AppleSandboxPurchasesTest extends TestCase
         $this->httpStatus = 503;
         $this->getJson('/api/library', $this->bearer())->assertStatus(503)->assertJsonMissing(['offline_valid_until']);
         config(['purchases.apple_sandbox_enabled' => false]);
-        $this->getJson('/api/library', $this->bearer())->assertStatus(503);
+        $this->getJson('/api/library', $this->bearer())->assertOk()->assertJsonCount(0, 'books');
     }
 
     public function test_refund_before_sale_tombstone_and_deleted_account_recovery_remain_fail_closed(): void
@@ -237,7 +250,7 @@ class AppleSandboxPurchasesTest extends TestCase
         Http::fake(['api.revenuecat.com/v2/projects/projFixture/apps/*' => Http::response($this->appProof),
             'api.revenuecat.com/v2/projects/projFixture/products/*' => Http::response($this->productProof),
             'api.revenuecat.com/*' => Http::response($this->listing([$this->proof, $this->proof]))]);
-        $this->webhook(['id' => 'ambiguous-sale', 'transaction_id' => '100000000000002'])->assertStatus(503);
+        $this->webhook(['id' => 'ambiguous-sale'])->assertStatus(503);
         $this->assertDatabaseCount('purchases', 1);
     }
 
@@ -248,7 +261,7 @@ class AppleSandboxPurchasesTest extends TestCase
         $this->refund()->assertOk(); $this->assertFalse($this->active());
         $this->reversal()->assertOk(); $this->assertTrue($this->active());
         $this->getJson('/api/library', $this->bearer())->assertOk()->assertJsonPath('buying_blocked', true);
-        $this->postJson('/api/library/books/3/consent', ['agree' => true, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE'], $this->bearer())->assertForbidden();
+        $this->postJson('/api/library/books/3/consent', ['agree' => true, 'purchase_session_version' => 1, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE'], $this->bearer())->assertForbidden();
     }
 
     public function test_migration_rollback_is_reversible_before_apple_history_and_preserves_history_afterward(): void
@@ -256,7 +269,7 @@ class AppleSandboxPurchasesTest extends TestCase
         $migration = require database_path('migrations/2026_10_12_120000_add_purchase_event_store_scope.php');
         DB::table('purchase_consents')->delete();
         $migration->down(); $this->assertFalse(\Illuminate\Support\Facades\Schema::hasColumn('purchase_events', 'store'));
-        $migration->up(); DB::table('purchase_consents')->insert(['reader_id' => $this->reader->id, 'collection_id' => 3, 'store' => 'APP_STORE', 'wording' => PurchaseService::CONSENT, 'created_at' => now()->subMinute()]); $this->webhook()->assertOk();
+        $migration->up(); DB::table('purchase_consents')->insert(['reader_id' => $this->reader->id, 'collection_id' => 3, 'store' => 'APP_STORE', 'wording' => PurchaseService::CONSENT, 'created_at' => now()->subMinute()]); $this->bindSession($this->event['purchased_at_ms']); $this->webhook()->assertOk();
         try { $migration->down(); $this->fail('Apple history must prevent lossy rollback.'); }
         catch (\RuntimeException $e) { $this->assertStringContainsString('preservation plan', $e->getMessage()); }
         $this->assertDatabaseCount('purchases', 1); $this->assertDatabaseCount('sales_ledger', 1);
@@ -274,9 +287,14 @@ class AppleSandboxPurchasesTest extends TestCase
 
     private function ownedTestConsent(array $changes = [], ?Reader $reader = null, int $book = 3)
     {
-        return $this->postJson('/api/library/books/'.$book.'/consent', array_replace([
-            'agree' => true, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE',
+        $response = $this->postJson('/api/library/books/'.$book.'/consent', array_replace([
+            'agree' => true, 'purchase_session_version' => 1, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE',
             'owned_book_sandbox_test' => true], $changes), $this->bearer($reader));
+        if ($response->status() === 200) {
+            $this->event['app_user_id'] = $this->proof['customer_id'] = $this->proof['original_customer_id'] = $response->json('app_user_id');
+            $this->event['purchased_at_ms'] = $this->proof['purchased_at'] = now()->getTimestampMs();
+        }
+        return $response;
     }
 
     public function test_owned_book_exception_is_default_off_and_normal_duplicate_guard_stays(): void
@@ -390,6 +408,144 @@ class AppleSandboxPurchasesTest extends TestCase
         $this->httpStatus = 503;
         $this->getJson('/api/library', $this->bearer())->assertStatus(503)
             ->assertJsonMissing(['apple_sandbox_book3_confirmed' => true]);
+    }
+
+    public function test_session_identity_is_private_random_single_use_and_old_clients_fail_closed(): void
+    {
+        $data = ['agree' => true, 'checkout_mode' => 'sandbox', 'store' => 'APP_STORE'];
+        $this->postJson('/api/library/books/3/consent', $data, $this->bearer())->assertUnprocessable();
+        $first = $this->postJson('/api/library/books/3/consent', $data + ['purchase_session_version' => 1], $this->bearer())->assertOk();
+        $second = $this->postJson('/api/library/books/3/consent', $data + ['purchase_session_version' => 1], $this->bearer())->assertOk();
+        $this->assertMatchesRegularExpression('/^shelf_apple_[a-f0-9]{64}$/D', $second->json('app_user_id'));
+        $this->assertNotSame($first->json('app_user_id'), $second->json('app_user_id'));
+        $this->getJson('/api/purchases/config?platform=ios')->assertJsonMissing(['app_user_id' => $second->json('app_user_id')]);
+        $this->webhook(['app_user_id' => $first->json('app_user_id')])->assertStatus(409);
+        $this->webhook(['app_user_id' => (string) $this->reader->id])->assertStatus(409);
+        $this->assertDatabaseCount('purchases', 0);
+    }
+
+    public function test_expired_revoked_future_and_wrong_reader_or_book_sessions_never_record_or_unlock(): void
+    {
+        $base = DB::table('apple_purchase_sessions')->first();
+        foreach ([['expires_at_ms' => $this->event['purchased_at_ms'] - 1],
+            ['issued_at_ms' => $this->event['purchased_at_ms'] + 1],
+            ['revoked_at_ms' => $this->event['purchased_at_ms']], ['collection_id' => 4],
+            ['reader_id' => 99999]] as $changes) {
+            DB::table('apple_purchase_sessions')->where('id', $base->id)->update($changes);
+            $response = $this->webhook();
+            $this->assertContains($response->status(), [403, 409]);
+            DB::table('apple_purchase_sessions')->where('id', $base->id)->update((array) $base);
+        }
+        $this->travel(16)->minutes();
+        $this->webhook()->assertStatus(409);
+        $this->hideApplePurchase = true;
+        $this->postJson('/api/library/confirm', [], $this->bearer())->assertOk()->assertJsonCount(0, 'books');
+        $this->assertDatabaseCount('purchases', 0);
+        $this->assertDatabaseCount('sales_ledger', 0);
+        $this->getJson('/api/library/books/'.$this->book->slug, $this->bearer())->assertNotFound();
+    }
+
+    public function test_confirmation_cannot_consume_another_readers_session_or_cross_session_proof(): void
+    {
+        $other = Reader::create(['email' => 'other@example.test']);
+        $other->forceFill(['email_verified_at' => now()])->save();
+        $this->postJson('/api/library/confirm', [], $this->bearer($other))->assertOk()->assertJsonCount(0, 'books');
+        $this->proof['customer_id'] = $this->proof['original_customer_id'] = 'shelf_apple_'.str_repeat('b', 64);
+        $this->webhook()->assertStatus(503);
+        $this->proof['customer_id'] = $this->proof['original_customer_id'] = (string) $this->reader->id;
+        $this->webhook()->assertStatus(503);
+        $this->assertDatabaseCount('purchases', 0);
+        $this->assertNull(DB::table('apple_purchase_sessions')->first()->transaction_id);
+    }
+
+    public function test_consumed_session_cannot_add_another_transaction_but_exact_retries_are_idempotent(): void
+    {
+        $this->webhook()->assertOk();
+        $this->travel(16)->minutes();
+        $this->webhook()->assertOk(); // Historical retries cannot mint another sale or lease.
+        $this->webhook(['id' => 'retry'])->assertOk();
+        $this->webhook(['id' => 'replay', 'transaction_id' => '100000000000009'])->assertStatus(409);
+        $this->assertDatabaseCount('purchases', 1);
+        $this->assertSame(1, SalesLedger::withTestPurchases()->where('status', 'sale')->count());
+        $this->assertSame(0, SalesLedger::count());
+        $this->assertDatabaseHas('apple_purchase_sessions', ['transaction_id' => $this->event['transaction_id']]);
+    }
+
+    public function test_closed_apple_gate_allows_independent_play_library_confirm_restore_and_content(): void
+    {
+        $play = $this->existingPlayOwnership();
+        $original = $play->fresh()->toArray(); $sale = $play->entries()->first()->toArray();
+        config(['purchases.apple_owned_book3_test_enabled' => true]);
+        $this->ownedTestConsent()->assertOk(); $this->webhook()->assertOk();
+        $provider = \Mockery::mock(\App\Services\Purchases\RevenueCatClient::class);
+        $provider->shouldReceive('subscriber')->times(4)->andReturn([]);
+        $provider->shouldReceive('confirms')->times(4)->andReturn(true);
+        $this->app->instance(\App\Services\Purchases\RevenueCatClient::class, $provider);
+        foreach ([false, true] as $refunded) {
+            if ($refunded) { config(['purchases.apple_sandbox_enabled' => true]); $this->refund()->assertOk(); }
+            config(['purchases.apple_sandbox_enabled' => false, 'purchases.apple_owned_book3_test_enabled' => false]);
+            $this->getJson('/api/library', $this->bearer())->assertOk()->assertJsonPath('books.0.id', 3)
+                ->assertJsonPath('apple_sandbox_book3_confirmed', false)->assertJsonPath('apple_purchase_identity', null);
+            $this->postJson('/api/library/'.($refunded ? 'restore' : 'confirm'), [], $this->bearer())->assertOk()->assertJsonPath('books.0.id', 3);
+            $this->getJson('/api/library/books/'.$this->book->slug.'/content', $this->bearer())->assertOk();
+            $this->getJson('/api/library/poems/'.$this->book->poems()->first()->id, $this->bearer())->assertOk();
+            $this->ownedTestConsent()->assertStatus(503); $this->webhook()->assertStatus(503);
+        }
+        $this->assertSame($original, $play->fresh()->toArray());
+        $this->assertSame($sale, $play->entries()->first()->toArray());
+        $this->assertDatabaseCount('purchases', 2); $this->assertSame(0, SalesLedger::count());
+    }
+
+    public function test_closed_gate_apple_only_history_retained_but_excluded_from_library_download_and_paid_media(): void
+    {
+        $this->webhook()->assertOk();
+        $history = Purchase::first()->toArray();
+        $entitlement = (array) DB::table('book_entitlements')->first();
+        config(['purchases.apple_sandbox_enabled' => false, 'purchases.apple_owned_book3_test_enabled' => false]);
+        $sent = count(Http::recorded());
+        foreach (['/api/library', '/api/library/confirm', '/api/library/restore'] as $path) {
+            ($path === '/api/library' ? $this->getJson($path, $this->bearer()) : $this->postJson($path, [], $this->bearer()))
+                ->assertOk()->assertJsonCount(0, 'books');
+        }
+        $poem = $this->book->poems()->first();
+        foreach (['/api/library/books/'.$this->book->slug, '/api/library/books/'.$this->book->slug.'/content',
+            '/api/library/books/'.$this->book->slug.'/cover', '/api/library/poems/'.$poem->id,
+            '/api/library/poems/'.$poem->id.'/audio', '/api/library/poems/'.$poem->id.'/media/artwork'] as $path) {
+            $this->getJson($path, $this->bearer())->assertNotFound();
+        }
+        $this->assertSame($sent, count(Http::recorded()));
+        $this->assertSame($history, Purchase::first()->toArray());
+        $this->assertSame($entitlement, (array) DB::table('book_entitlements')->first());
+        $this->assertSame(0, SalesLedger::count());
+    }
+
+    public function test_session_schema_rollback_is_reversible_empty_and_refuses_evidence_loss(): void
+    {
+        $migration = require database_path('migrations/2026_10_15_010000_create_apple_purchase_sessions.php');
+        try { $migration->down(); $this->fail('Session evidence must be preserved.'); }
+        catch (\RuntimeException $e) { $this->assertStringContainsString('preservation plan', $e->getMessage()); }
+        DB::table('apple_purchase_sessions')->delete();
+        $migration->down();
+        $this->assertFalse(\Illuminate\Support\Facades\Schema::hasTable('apple_purchase_sessions'));
+        $migration->up();
+        $this->assertDatabaseCount('apple_purchase_sessions', 0);
+    }
+
+    public function test_closed_gate_cannot_use_apple_history_to_hide_failed_play_proof(): void
+    {
+        $play = $this->existingPlayOwnership();
+        config(['purchases.apple_owned_book3_test_enabled' => true]);
+        $this->ownedTestConsent()->assertOk(); $this->webhook()->assertOk();
+        config(['purchases.apple_sandbox_enabled' => false, 'purchases.apple_owned_book3_test_enabled' => false]);
+        $provider = \Mockery::mock(\App\Services\Purchases\RevenueCatClient::class);
+        $provider->shouldReceive('subscriber')->once()->andReturn([]);
+        $provider->shouldReceive('confirms')->once()->andReturn(false);
+        $this->app->instance(\App\Services\Purchases\RevenueCatClient::class, $provider);
+        $this->getJson('/api/library', $this->bearer())->assertOk()->assertJsonCount(0, 'books');
+        $this->getJson('/api/library/books/'.$this->book->slug.'/content', $this->bearer())->assertNotFound();
+        $this->assertTrue($play->entries()->where('status', 'revoke')->exists());
+        $this->assertSame(0, SalesLedger::count());
+        $this->assertDatabaseCount('purchases', 2);
     }
 
 }

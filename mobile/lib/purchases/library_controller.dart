@@ -44,7 +44,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
   final DateTime Function() clock;
   Timer? _timer;
   int? readerId;
-  String? _identityToken;
+  String? _identityToken, _appleIdentity;
   int _generation = 0;
   List<PoetryCollection> books = [];
   Set<int> downloaded = {};
@@ -94,6 +94,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
     _identityToken = accounts.readerToken;
     final generation = ++_generation;
     configuration = {};
+    _appleIdentity = null;
     _ownedAppleTestAllowed = false;
     _appleBook3Confirmed = false;
     buyingBlocked = false;
@@ -226,6 +227,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
       buyingBlocked = data['buying_blocked'] == true;
       _ownedAppleTestAllowed = data['apple_owned_book3_test_allowed'] == true;
       _appleBook3Confirmed = data['apple_sandbox_book3_confirmed'] == true;
+      _appleIdentity = data['apple_purchase_identity'] as String?;
       message = null;
       refreshFailed = false;
       initialized = true;
@@ -279,7 +281,8 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
     if (configuration['enabled'] != true ||
         (applePurchasePlatform &&
             (configuration['store'] != 'APP_STORE' ||
-                configuration['production_checkout_enabled'] != false)))
+                configuration['production_checkout_enabled'] != false ||
+                configuration['purchase_session_version'] != 1)))
       throw const AccountFailure(503);
     await provider.identify(
       configuration['public_sdk_key'] as String,
@@ -289,6 +292,13 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
       ),
     );
     assertIdentity(reader, generation);
+    if (applePurchasePlatform && _appleIdentity != null) {
+      await provider.identify(
+        configuration['public_sdk_key'] as String,
+        _appleIdentity!,
+      );
+      assertIdentity(reader, generation);
+    }
   }
 
   Future<StoreBookProduct?> product(PoetryCollection book) async {
@@ -336,6 +346,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
           'agree': true,
           'checkout_mode': checkoutMode,
           if (applePurchasePlatform) 'store': 'APP_STORE',
+          if (applePurchasePlatform) 'purchase_session_version': 1,
           if (ownedBookSandboxTest) 'owned_book_sandbox_test': true,
         },
       );
@@ -346,12 +357,26 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
           consent['accepted'] != true ||
           consent['checkout_mode'] != checkoutMode ||
           consent['product_id'] != product.id ||
-          consent['app_user_id'] !=
-              shelfPurchaseIdentity(
-                reader,
-                configuration['identity_prefix'] as String? ?? '',
-              )) {
+          (applePurchasePlatform
+              ? (consent['purchase_session_version'] != 1 ||
+                    consent['reader_id'] != reader ||
+                    !RegExp(r'^shelf_apple_[a-f0-9]{64}$')
+                        .hasMatch(consent['app_user_id'] as String? ?? '') ||
+                    (consent['session_expires_at_ms'] as int? ?? 0) <=
+                        clock().millisecondsSinceEpoch)
+              : consent['app_user_id'] !=
+                    shelfPurchaseIdentity(
+                      reader,
+                      configuration['identity_prefix'] as String? ?? '',
+                    ))) {
         throw const AccountFailure(503);
+      }
+      if (applePurchasePlatform) {
+        await provider.identify(
+          configuration['public_sdk_key'] as String,
+          consent['app_user_id'] as String,
+        );
+        assertIdentity(reader, generation);
       }
       final result = await provider.buy(product);
       assertIdentity(reader, generation);
