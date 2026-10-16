@@ -584,6 +584,86 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Build 6 internal TestFlight readiness completed — 16 October 2026
+
+Owner reports Codemagic run **#10 / 6ad249367550aed8108f53d9** succeeded from
+**b16a8d88a2b2778fbb3ebc2b89edc94a7331ba4b**, producing **Shelf.ipa**, intended
+**1.0.0 (6)**. Cloud success/artifact remains owner-reported; Apple receipt and
+readiness below were independently verified using the existing protected ASC key.
+This supersedes the earlier preparation-only/next-unused-6 status; no new build,
+upload, diagnostic or credential setup is needed for this received build.
+
+Authenticated Apple GETs confirmed app **6821471140 / services.shelf.app**, build
+and upload **c77637e1-7e7e-4f7c-81dc-94cada28c9a2**, preReleaseVersion
+**IOS / 1.0.0**, build **6**, upload **COMPLETE** with empty errors/warnings/infos,
+processing **VALID**, audience **INTERNAL_ONLY**, expired false. Upload date was
+**2026-10-16T09:05:24-07:00** (16:05:24 UTC); build uploadedDate
+**2026-10-16T09:06:08-07:00**. Initial internal state was
+**MISSING_EXPORT_COMPLIANCE**, usesNonExemptEncryption null, declaration GET null.
+
+### Approved compliance reused after focused source comparison
+
+Compared accepted Build 5 **8283bad** with Build 6 **b16a8d8**. Mobile production
+changes are only purchase-session identity/consent checks in
+book_purchase_provider.dart and library_controller.dart. No encryption primitive,
+key handling or general-purpose encryption feature was introduced. Dependencies,
+lockfile, native iOS tree, account/Keychain, repository, audio cache and encrypted
+download store are byte-identical. Existing **cryptography 2.9.0 / AES-256-GCM**,
+per-reader generated key, Keychain storage, HTTPS/SDK transport and SHA-256 cache
+naming assessment remains applicable. This is a source comparison, not an IPA audit.
+Rechecked [Apple's encryption documentation table](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption/)
+and [build update attributes](https://developer.apple.com/documentation/appstoreconnectapi/buildupdaterequest/data-data.dictionary/attributes-data.dictionary).
+Approved basis retained: encryption Yes, standard outside OS Yes, proprietary No,
+France No; **usesNonExemptEncryption=false** is the accepted non-France no-document
+route, not a claim of no encryption or OS-only encryption.
+
+Complete current Book 3 availability GET verified **174 territories / FRA absent**.
+No availability changed; app-wide availability remains previously unconfigured,
+and future app distribution must exclude France. ANSSI cancellation preserved.
+
+Only compliance mutation: **PATCH /v1/builds/c77637e1-7e7e-4f7c-81dc-94cada28c9a2**,
+attributes **usesNonExemptEncryption=false**, HTTP **200**. Independent readback
+confirmed **READY_FOR_BETA_TESTING**, false flag and every other build attribute
+unchanged before assignment. Declaration GET remains null, consistent with the
+accepted no-document route.
+
+### Existing group preserved; additive assignment verified
+
+Verified existing **Shelf Owner / 1511a217-4f89-4dc7-8b8d-4679ce8a6226** belongs
+to the exact Shelf app and is internal. All group attributes match the accepted
+Build 5 snapshot. Complete tester list contains the same sole owner ID/email,
+compared privately; identity withheld. Initial complete builds were **5, 4, 3, 2**.
+
+Only assignment mutation: **POST /v1/betaGroups/1511a217-4f89-4dc7-8b8d-4679ce8a6226/relationships/builds**,
+one builds resource ID **c77637e1-7e7e-4f7c-81dc-94cada28c9a2**, HTTP **204**.
+No replacement/removal, invitation, membership edit or setting change.
+
+Final readback **2026-10-16 20:44:19 UTC** independently verified group builds and
+builds relationship both contain exactly prior IDs plus Build 6 (**6, 5, 4, 3, 2**),
+**internalBuildState=IN_BETA_TESTING**, external **NOT_APPLICABLE**, same sole tester,
+unchanged group attributes and autoNotifyEnabled true. Build remains
+**VALID / INTERNAL_ONLY** with all attributes unchanged except cleared compliance.
+Every provider GET returned **200**; bounded complete lists reached terminal pages.
+Private **0600**, outside-Git before/after evidence:
+**/home/shelf/tmp/shelf-build6-before-20261016.json** and
+**/home/shelf/tmp/shelf-build6-after-20261016.json**.
+
+**Owner can now install Build 6 through TestFlight.** Open **TestFlight → Shelf →
+Update/Install**; if needed use **Previous Builds → 1.0.0 → build 6**. Preserve the
+existing installation/account/data. Installation/launch is not yet owner-confirmed;
+no notification delivery, purchase acceptance or public-review approval is claimed.
+
+Only these two documentation files changed; scoped diff/whitespace/source checks,
+no repeated source tests, build or broad suite. No deployment, upload, new testers,
+product/territory change, transaction, purchase activation or public release.
+All purchase/owned-test/real-checkout/sign-in/relay gates remain OFF. Backend stays
+**1d3dfa5**; France exclusion, pricing-sync and second-phone-restore deferrals,
+Android/UI pause, Apple authentication/relay and small-improvement deferrals and
+joint Android/iOS public-launch hold remain binding.
+
+**Next:** owner installs and checks Build 6 launch/version and existing account/
+Book 3 Library/paid access with checkout closed; no purchase or Apple sign-in test.
+
 ## Purchase-session TestFlight preparation — 15 October local / 16 October 2026 UTC
 
 **Preparation only; no build or upload started.** Clean starting checkpoint and exact
