@@ -584,6 +584,147 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Entitlement timestamp investigation — read-only findings, 15 October local / 16 October 2026 UTC
+
+Resumed clean **b1523eca563ca028e161c2436920380d71d9e6b3** under the owner's
+read-only investigation authorization. **No deployment, migration, data repair, provider
+change or validator/enforcement change.** Only these two documentation files are changed.
+Production remains **c8c266221d972d409ffa947ca87397293c69c004**; staging remains
+**1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19**, session migration batch **12**, with
+its existing passed rollout evidence. This entry resolves the preceding timestamp-cause
+uncertainty; it does not authorize production promotion.
+
+### Findings: real routine refresh, plus a timezone display difference
+
+Verified the SHA-256 of **/home/shelf/backups/shelf/20261016-004143/database.sql**
+against its manifest. Parsed the original SQL in memory without restoring/executing it.
+There is exactly **one** entitlement row, safe internal entitlement **id 5**. Its id,
+reader/book association and **active=true** match the backup. No reader identifier or
+personal information was printed. Only **checked_at, created_at, updated_at** changed.
+
+The backup's `mysqldump --single-transaction` writes TIMESTAMP values under
+**TIME_ZONE='+00:00'**. Current Laravel query-builder reads use database session/global
+**SYSTEM**, system **AST (UTC−04:00)**, while application timezone is **UTC**.
+All three columns are **TIMESTAMP(0)**: second precision, no fractional rounding.
+The backup prints **2026-10-16 04:30:27 UTC**, equivalent to the original application/
+session representation **2026-10-16 00:30:27**. The stopped comparison subsequently saw
+**00:45:01** in that same session representation (database UTC **04:45:01**).
+After normalization the stored time really advanced **874 seconds (14m34s)**.
+Thus timezone display alone does not explain the changed checkpoint fingerprint.
+Do not change database/application timezones or rewrite historical timestamps in this task.
+
+`production_history_snapshot()` uses query-builder rows, ordered by primary id, then
+PHP `json_encode` and SHA-256; it does not apply Eloquent date casting. It compares the
+same session representation before/after. Reconstructing the backup entitlement with
+correct numeric/null types, original column order and explicit UTC→AST conversion
+reproduces the **exact original preflight entitlement hash**. With one row, row ordering
+cannot explain the mismatch. There is no demonstrated precision, serialization or
+ordering defect causing this particular failure.
+
+### Demonstrated writer path and operational evidence
+
+The existing ***/15 * * * *** cron entry runs **scripts/run_play_refunds.sh**. Its
+existing lock is **storage/framework/play-refunds.lock**. The runner calls
+`shelf:check-play-refunds`; no scheduler, job or transaction was manually invoked here.
+
+At **2026-10-16 00:45:01 UTC**, application log and persisted **play_refund_runs id 1337**
+record **completed, seen=1, duplicate=1, refunded=0, unmatched=0, conflict=0**.
+The run starts/finishes in the same logged second as the changed application timestamps.
+Source chain on deployed c8c2662 is:
+
+`VoidedPurchaseService::apply` → `PurchaseService::recordGoogleRefund` → `refreshAccess`.
+
+`recordGoogleRefund()` recognizes the existing refund event/ledger entry, but still calls
+`refreshAccess()` for that reader/book before returning the duplicate outcome. The
+refresh uses `updateOrInsert` with **active, checked_at, created_at, updated_at** in its
+update values. It therefore rewrites even `created_at` on an existing row. That field
+currently is not a stable original-creation marker. Changing that behavior is outside
+this documentation-only task; do not silently repair its historical values.
+
+Read-only queries confirm exactly one already-refunded Play purchase and its existing
+Google refund event for the same entitlement association, plus a separate valid Play
+sale. Recalculation keeps the entitlement active. Purchase/refund/ledger rows do not
+change when this duplicate is processed. The scheduled poll can therefore change only
+these entitlement timestamps without changing the reader's actual ownership or income.
+
+While this investigation remained read-only, the next natural scheduled run,
+**id 1338 at 01:00:02 UTC**, again recorded completed/seen=1/duplicate=1/refunded=0/
+unmatched=0/conflict=0; all three entitlement timestamps advanced together to **01:00:02**.
+This repeated observation, exact cron timing, persisted run audits and deployed code
+establish the routine duplicate-refund refresh as the supported cause. No per-statement
+binary-log trace was retrieved; attribution is based on those correlated records/code.
+No entitlement trigger exists; table engine is InnoDB.
+
+The prior Library probe file was created at **00:45:34 UTC**, after the observed
+**00:45:01** change, so that probe cannot explain this stopped checkpoint mismatch.
+There is no evidence here of failed transaction rollback. Available production access-log
+slice showed earlier successful Library requests at **00:30:20/00:30:27 UTC**, consistent
+with the backup's earlier refresh time; that slice is not a complete SQL/writer audit.
+
+### Ownership and financial integrity verified
+
+Direct full-row comparison against the verified SQL backup, after only TIMESTAMP display
+normalization and numeric/null type preservation, matches exactly:
+
+| Table | Backup/current rows | Full rows equal |
+| --- | --- | --- |
+| purchases | 2 / 2 | Yes |
+| purchase_events | 3 / 3 | Yes |
+| sales_ledger | 3 / 3 | Yes |
+| purchase_consents | 3 / 3 | Yes |
+| author_share_agreements | 6 / 6 | Yes |
+| accounting_entries | 0 / 0 | Yes |
+| accounting_shares | 0 / 0 | Yes |
+
+The saved preflight fingerprints for readers, account actions and access tokens also
+still match. Entitlement association/status is unchanged; one valid Play sale remains,
+one historical refunded purchase remains refunded, and no APP_STORE purchase exists.
+There are **zero duplicate sale groups, zero ordinary real-income rows and zero ordinary
+accounting entries**. No reset, refund reversal, regrant or ownership modification was
+performed. Financial and ownership integrity remain verified within these comparisons.
+
+### Required future promotion gate — proposal only, enforcement unchanged
+
+Safe promotion is **supportable after a scoped validator/operator correction**, not
+cleared under the still-strict historical timestamp comparison. Do not merely omit
+`book_entitlements`, forgive arbitrary metadata drift or replace the failed checkpoint.
+A separately approved correction should implement and focus-test this narrow rule:
+
+1. Compare the complete entitlement row set by stable id and reader/book association;
+   require exact row counts, ids, every non-timestamp field and **active**, including
+   null semantics. Financial/consent/purchase/refund/agreement/accounting rows remain
+   exact comparisons. Normalize TIMESTAMP displays explicitly at their actual precision;
+   do not shift DATETIME fields or reinterpret application wall times as database UTC.
+2. For this rollout, permit only metadata changes on existing entitlement **id 5**, and
+   only when all three new timestamps are equal, nondecreasing and match a persisted
+   completed duplicate-only refund run (seen=duplicate, refunded=unmatched=conflict=0,
+   no error), uniquely attributable to its already-recorded same-reader/book refund.
+   Retain the original checkpoint plus exact field differences and run evidence.
+   Missing/ambiguous audit evidence, changed ownership or any financial difference stops
+   promotion. No tolerance window for arbitrary timestamps or allowance for other rows.
+3. After this historical preflight is accepted, obtain a **fresh verified backup** and
+   a fresh coherent baseline. For the bounded promotion/verification window acquire the
+   existing refund-runner lock non-blockingly, fail safely if busy, use maintenance to
+   stop new reader requests and release the lock in finally. Do not edit cron or kill
+   jobs. Capture the baseline after writers are quiescent. Preserve the existing strict
+   before/after comparison of **all fields, including all entitlement timestamps** for
+   the actual migration/promotion window. Release maintenance on every failure.
+4. Reuse existing exact staging/unit evidence, finish any unreached required staging
+   health checks, verify the selected source and configuration, then promote only under
+   separate authorization. A validator correction must be tested in isolation and must
+   not substitute a different unverified application/migration source.
+
+No validator, lock behavior, schedule or deployment enforcement was changed in this
+investigation. No unit/phone suite repeated and no Library reconciliation/probe executed.
+Production is out of maintenance; **Apple sandbox OFF, owned-book3 test OFF, real checkout
+OFF** remain verified. France exclusion/ANSSI cancellation, Apple auth/relay and stopped
+relay work, Android/UI pause, pricing-sync, second-phone restore/small-improvement deferrals
+and joint Android/iOS public-launch hold remain intact. A new TestFlight build remains
+required later; no build/upload/activation/purchase/settings change occurred.
+
+**Exactly one next action:** authorize the isolated, focused-tested validator/operator
+correction above; keep production promotion and all purchase activation OFF meanwhile.
+
 ## Session safety rollout — staging passed; production STOPPED — 15 October local / 16 October 2026 UTC
 
 Owner authorized the documented staging-first backed-up rollout of validated source
