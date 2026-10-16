@@ -1,5 +1,130 @@
 # Shelf — one-book Apple sandbox setup
 
+## Promotion validator and operator safety — implemented in isolation, 15 October local / 16 October 2026 UTC
+
+Owner authorized implementation/testing of the scoped correction documented at
+**e523c7b047558dbe6ee2b4f99d687fec29894d62**, with no deployment or production changes.
+Started from that exact clean checkpoint. **Implemented and synthetically tested only.**
+This supersedes the investigation's request to authorize validator implementation;
+production promotion still requires a separate task. No application, migration, mobile,
+purchase/provider configuration or scheduled-job source changed.
+
+### Narrow historical acceptance; strict actual promotion
+
+New isolated operator module **scripts/staging/promotion_safety.py** is called only by
+the protected Apple-safety promotion path. It requires explicit
+**--preservation-checkpoint**, exactly the reviewed checkpoint at
+**/home/shelf/backups/shelf/20261016-004143/apple-session-rollout-checkpoint/**,
+selected application source **1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19** and prior
+production source **c8c266221d972d409ffa947ca87397293c69c004**. There is no general
+entitlement-table exemption or automatic acceptance of another rollout.
+
+The original verification.json is pinned to SHA-256
+**a9ff66431e3a031a1c7e960594a46e8b2358855b90b757328c044a5dc0ae425d**,
+preventing silent rebaselining. Loading verifies private ownership/modes/canonical paths,
+original source/provenance, SQL SHA-256 against the Shelf manifest and all original
+configuration/private-webhook-file/cPanel fingerprints. SQL is parsed as data only;
+no backup SQL is executed or restored. The only production-side artifact read during
+this implementation was that existing checkpoint's fingerprint; no live DB query or
+promotion command was run.
+
+The future gate captures ownership/audit evidence and the complete existing protected
+history fingerprints in one database read transaction, always rolled back. Dump
+TIMESTAMP(0) values are parsed as UTC; live entitlement/audit TIMESTAMP values use
+**UNIX_TIMESTAMP**, avoiding AST/UTC string mismatches. Precision/schema are verified,
+and the historical SYSTEM/AST offset must still be the measured **−14400 seconds**;
+other session semantics fail for explicit review. DATETIME fields are not shifted.
+Original and current entitlement raw fingerprints must reproduce their corresponding
+canonical row data, with correct numeric/null values and column ordering.
+
+Only the reviewed entitlement **id 5**, with unchanged row count/id/reader/book/**active**
+and all non-timestamp fields, can have metadata accepted. All three new timestamps must
+be equal and nondecreasing and match exactly one newly recorded completed HTTP-200 run:
+**seen=duplicate=1, pages=1, refunded=unmatched=conflict=0, error=null**. The run must
+uniquely link to the one preserved refunded Play purchase/Google refund event for that
+association and its separate valid Play sale. Existing refund-run audit rows must match
+the backup exactly. Missing/ambiguous audit, partial/backward/null/unexplained timestamps,
+wrong row/book/account/status/schema or any other protected-table fingerprint difference
+stops. Purchase/refund/sales/accounting/consent/agreement/reader/token comparisons stay
+exact. The module never updates entitlement timestamps or ownership.
+
+After accepted historical evidence, the actual migration/promotion still compares a
+fresh before/after snapshot of **every protected field, including all three entitlement
+timestamps**. The old strict fingerprint logic is shared, not weakened. A protected
+private report in the new promotion backup records accepted historical columns, safe
+entitlement/run ids and UTC epochs while retaining the original checkpoint reference.
+No secret values or reader identifiers are logged.
+
+### Bounded refund-polling exclusion without changing schedules
+
+The protected promotion acquires the existing **storage/framework/play-refunds.lock**
+non-blockingly before any fresh backup or maintenance. Busy/missing/unsafe/symlink locks
+refuse work; no job is killed to obtain a lock. It preserves the lock inode and checks
+ownership/mode. Cron is **never edited, disabled, reinstalled or rescheduled**, so there
+is no scheduling file/state to restore. Polling resumes through the unchanged cron once
+the kernel lock is released. Existing production maintenance or open/deferred controls
+are refused before backup; unrelated maintenance is not lifted.
+
+Future ordering is: verify unchanged staged commit/evidence → refund lock/closed-state
+preflight → fresh verified production backup → arm cleanup before maintenance down →
+coherent historical preservation gate → fresh strict baseline → existing source/migration/
+health workflow → exact history/configuration comparison → maintenance up → runtime/HTTPS
+verification → release-state success, then lock release. Failed preservation cannot merge
+source or run migrations. Successful runtime checks remain required before release-state
+success is recorded. The module is an isolated operator correction; it does not change
+the already-validated/staged application source.
+
+The operator window is bounded to **10 minutes**. External commands run in isolated
+process groups with an independent **/usr/bin/timeout**, at most 120 seconds plus a
+5-second kill grace. Signals **INT/TERM/HUP** and deadline expiry abort, stop/reap the
+active child group, attempt maintenance-up with a separate bounded 30-second cleanup
+budget and release the lock in finally. Repeated signals cannot skip that cleanup;
+prior signal handlers are restored. Cleanup failure reports the original failure type
+and stops without success evidence. Lock ownership is inherited by independently timed
+children: after an uncatchable operator **SIGKILL**, an orphan command retains exclusion
+only until its own bounded timeout, then the kernel releases it. No permanent watchdog,
+cron edit or scheduled cleanup job is created.
+
+**Limit:** SIGKILL/power loss cannot execute Python maintenance cleanup. Scheduling-lock
+release remains kernel/child-timeout controlled, but after such a hard interruption the
+operator must inspect the retained backup and maintenance/source state before resuming;
+do not claim maintenance-up completed or blindly retry. No synthetic test establishes
+live server recovery from such an interruption.
+
+### Focused evidence and next authorized operation
+
+`SHELF_TOOL_TEST_SCOPE=apple-rollout scripts/run_tests.sh` passed **45 focused tests**:
+existing 12 operator safeguards plus 33 new validator/window/integration cases. Tests
+use fixtures, mock all promotion/DB/backup/migration/provider operations and use real
+processes/locks/signals only inside the runner's disposable **/home/shelf/tmp** directory.
+Coverage includes allowed/unchanged metadata; ownership/financial/row-set rejection;
+null/backward/partial timestamps; timezone/precision/schema errors; dump extended/multiline
+formats; checksum/original-checkpoint tampering; wrong/missing/ambiguous audit/link;
+busy/unsafe locks; deadline/child timeout; INT/TERM/HUP; cleanup failure and second signal;
+SIGKILL with and without an inherited-lock child; strict final timestamp drift; backup,
+preservation, staging-evidence and migration failures; and existing-maintenance refusal.
+Generated coherent-evidence PHP passed syntax checking without execution. Diff checks
+passed. Existing unrelated Python cPanel-handler escape deprecation notices remain.
+No PHP app/Flutter suite repeated: validated **64 PHP / 604 assertions, 16 Flutter +
+1 staging identity** and existing exact-source staging evidence remain reusable.
+
+No deployment, promotion, migration, live data/ownership write, scheduling control,
+provider setting, transaction, build/upload or public release occurred. Last verified
+runtime state remains production **c8c2662**, staging **1d3dfa5** (batch 12), Apple sandbox/
+owned-book3/real checkout OFF. These are retained evidence, not fresh live checks in this
+task. France exclusion/ANSSI cancellation, Apple auth/relay and stopped relay work,
+Android/UI pause, pricing-sync, second-phone restore/small-improvement deferrals and
+joint Android/iOS public-launch hold remain unchanged. New TestFlight build is still
+required later; activation/automatic Apple-test closure remain separately gated.
+
+After separate approval, run the trusted isolated operator (not the old deployed helper):
+`python3 -B scripts/staging/workflow.py promote 1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19 --preservation-checkpoint /home/shelf/backups/shelf/20261016-004143/apple-session-rollout-checkpoint`.
+Recheck current state and finish any unreached required staging health checks first.
+No redeployment or new test transaction is needed merely to repeat completed evidence.
+
+**Exactly one next action:** authorize resuming the backed-up production promotion of
+already-staged **1d3dfa5** using this verified isolated operator, all purchasing gates OFF.
+
 ## Entitlement timestamp investigation — read-only findings, 15 October local / 16 October 2026 UTC
 
 Resumed clean **b1523eca563ca028e161c2436920380d71d9e6b3** under the owner's

@@ -143,4 +143,12 @@ class SessionRolloutSafety(unittest.TestCase):
             save.assert_not_called()
 
 
+def load_tests(loader, tests, pattern):
+    spec = importlib.util.spec_from_file_location('promotion_safety_tests', Path(__file__).parents[1]/'staging/test_promotion_safety.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    tests.addTests(loader.loadTestsFromModule(module))
+    return tests
+
+
 if __name__=='__main__':unittest.main()
