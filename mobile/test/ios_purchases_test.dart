@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'dart:ui' as ui;
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shelf/repository/poetry_repository.dart';
 import 'package:shelf/screens/collection_detail_screen.dart';
 import 'package:shelf/purchases/purchase_screen.dart';
+import 'package:shelf/purchases/library_screen.dart';
 import 'package:shelf/settings/reader_settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf/accounts/account_controller.dart';
@@ -19,7 +23,7 @@ import 'book_purchases_test.dart' show FakeBookStore, MemoryDownloads;
 
 const appleBook = PoetryCollection(
   id: 3,
-  title: 'Test book',
+  title: 'څپو کې انځورونه',
   slug: 'test',
   sortOrder: 1,
   productId: 'shelf_book_3',
@@ -36,7 +40,7 @@ class AppleApi implements LibraryService {
       echoTestAuthorization = true;
   String sessionIdentity = 'shelf_apple_${'a' * 64}';
   int sessionReader = 1;
-  bool expiredSession = false, oldSessionVersion = false;
+  bool expiredSession = false, oldSessionVersion = false, configFails = false;
   Future<void> Function()? beforeConsent;
   final paths = <String>[];
   Map<String, dynamic>? consent;
@@ -48,6 +52,9 @@ class AppleApi implements LibraryService {
     Map<String, dynamic>? data,
   }) async {
     paths.add(path);
+    if (path.startsWith('purchases/config') && configFails) {
+      throw StateError('Synthetic config unavailable');
+    }
     if (path.startsWith('purchases/config'))
       return {
         'enabled': enabled,
@@ -137,6 +144,69 @@ void main() {
   tearDown(() {
     library.dispose();
     accounts.dispose();
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  test('fresh owned Library discovers and clears Apple action without a product request', () async {
+    api.owned = api.ownedTestAllowed = true;
+    library.configuration = {};
+    await library.refresh();
+    expect(library.canTestOwnedAppleBook(appleBook), true);
+    api.enabled = false;
+    await library.refresh();
+    expect(library.canTestOwnedAppleBook(appleBook), false);
+    expect(library.owns(3), true);
+    api.enabled = true;
+    await library.refresh();
+    api.configFails = true;
+    await library.refresh();
+    expect(library.canTestOwnedAppleBook(appleBook), false);
+    expect(library.owns(3), true);
+    expect(library.refreshFailed, false);
+  });
+
+  testWidgets('Library card exposes owned Apple test without entering the reader', (tester) async {
+    api.owned = api.ownedTestAllowed = true;
+    library.configuration = {};
+    await tester.runAsync(() => library.refresh());
+    SharedPreferences.setMockInitialValues({});
+    final settings = await ReaderSettings.load(await SharedPreferences.getInstance());
+    await tester.runAsync(() async {
+      for (final family in ['Vazirmatn', 'Roboto', 'ScheherazadeNew']) {
+        await (FontLoader(family)..addFont(rootBundle.load('assets/fonts/vazirmatn/Vazirmatn-wght.ttf'))).load();
+      }
+    });
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    await tester.pumpWidget(RepaintBoundary(
+      key: const Key('library-capture'),
+      child: AccountScope(
+        controller: accounts,
+        child: LibraryScope(controller: library, child: MaterialApp(
+          theme: ThemeData(fontFamily: 'Vazirmatn'),
+          home: Scaffold(body: PurchasedLibraryScreen(settings: settings)),
+        )),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    final entry = find.byKey(const Key('library-owner-apple-sandbox-test'));
+    await tester.ensureVisible(entry);
+    expect(find.text('Test Apple purchase — no charge'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    final boundary = tester.renderObject<RenderRepaintBoundary>(find.byKey(const Key('library-capture')));
+    await tester.runAsync(() async {
+      final image = await boundary.toImage();
+      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+      await File('/home/shelf/tmp/shelf-apple-button-library.png').writeAsBytes(bytes!.buffer.asUint8List());
+      image.dispose();
+    });
+    await tester.tap(entry);
+    await tester.pumpAndSettle();
+    expect(tester.widget<PurchaseScreen>(find.byType(PurchaseScreen)).ownedBookSandboxTest, true);
+    expect(find.text('Apple sandbox test'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+    settings.dispose();
+    await tester.binding.setSurfaceSize(null);
     debugDefaultTargetPlatformOverride = null;
   });
 

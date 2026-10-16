@@ -13,6 +13,7 @@ import '../models/poetry_collection.dart';
 import '../screens/collection_detail_screen.dart';
 import '../settings/reader_settings.dart';
 import 'library_controller.dart';
+import 'purchase_screen.dart';
 import 'owned_book_repository.dart';
 import '../widgets/bookstore_widgets.dart';
 
@@ -238,6 +239,30 @@ class _PurchasedLibraryScreenState extends State<PurchasedLibraryScreen> {
                                   ),
                             child: Text(_t('Read book', 'کتاب ولولئ')),
                           ),
+                          if (c.canTestOwnedAppleBook(book))
+                            Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: OutlinedButton(
+                                key: const Key('library-owner-apple-sandbox-test'),
+                                style: OutlinedButton.styleFrom(
+                                  minimumSize: const Size.fromHeight(52),
+                                ),
+                                onPressed: busy
+                                    ? null
+                                    : () => Navigator.of(context).push(
+                                        MaterialPageRoute<void>(
+                                          builder: (_) => PurchaseScreen(
+                                            book: book,
+                                            settings: widget.settings,
+                                            ownedBookSandboxTest: true,
+                                          ),
+                                        ),
+                                      ),
+                                child: const Text(
+                                  'Test Apple purchase — no charge',
+                                ),
+                              ),
+                            ),
                           if (!c.downloaded.contains(book.id))
                             OutlinedButton.icon(
                               icon: const ShelfActionIcon('download'),

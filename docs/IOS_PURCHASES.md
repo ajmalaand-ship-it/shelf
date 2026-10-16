@@ -1,5 +1,142 @@
 # Shelf — one-book Apple sandbox setup
 
+## Missing Apple test action fixed in source; gates CLOSED — 16 October 2026
+
+On the owner's missing-button report, **first closed both production Apple sandbox
+flags**, preserving every unrelated .env value, and cleared config. Runtime and HTTPS
+readback verify sandbox/owned-test OFF, proof disabled, real checkout OFF, SDK key null.
+This supersedes the earlier OPEN window below. No Apple sessions or purchases existed
+at inspection; no successful transaction is claimed. Prior uncommitted records preserved.
+
+Actual database/catalogue **Book ID 3** is published **څپو کې انځورونه**, slug
+**څپو-کې-انځورونه**, product **shelf_book_3**. Existing owner reader is verified,
+unblocked and has active Play access. Those IDs are technical identifiers, not the
+reader-facing title. Previous instructions incorrectly used “Book 3” as its displayed
+name and assumed the test entry was on a Library card.
+
+**Demonstrated Build 6 client defect:** canTestOwnedAppleBook requires checkoutAvailable
+from LibraryController.configuration. Login clears that map; Library refresh fetched
+ownership and server owner-test permission but never checkout config. My Library did
+not load prices/products. Its Read book path uses ownedMode=true, suppressing the
+BookPriceLabel that otherwise calls product/configureStore. Thus the owned-book route
+cannot discover checkout readiness and hides its test button. The Library card itself
+also had no test action. Store details could incidentally warm config via price loading,
+but this was not a reliable entry path; configureStore did not notify listeners. Existing
+widget tests concealed the cold-state defect by calling product() in shared setup.
+This code-path finding explains the reported route; the phone's authenticated state
+was not remotely inspected. No new provider-configuration investigation was performed.
+
+**Scoped source fix:** iOS Library refresh now fetches checkout visibility config without
+SDK identification/product loading or a transaction; validates APP_STORE, production OFF
+and session protocol 1, and publishes it with refreshed server authorization. Failed
+config clears stale purchase controls while independent Play Library access still refreshes.
+The existing owner/Book3/ownership/authorization/not-confirmed predicate is unchanged.
+Added the same guarded **Test Apple purchase — no charge** entry directly beneath
+Read book on the title's My Library card, opening the existing explicit-consent test
+purchase screen. Existing detail-screen action also benefits from refreshed flags.
+No backend, product, ownership, financial, source-book text or permission change.
+
+Focused `scripts/run_tests.sh --mobile`, PHP filter AppleSandboxPurchasesTest and mobile
+scope ios-purchases: **27 PHP / 301 assertions, 18 Flutter purchase tests + 1 staging
+identity test passed**. New regression begins with empty checkout config, verifies
+visibility after Library refresh and hiding on closed/unavailable config with Play
+ownership retained; widget test opens existing consent screen directly from Library.
+Analysis has no errors/warnings, existing 21 style infos. Inspected font-loaded synthetic
+390×844 render **/home/shelf/tmp/shelf-apple-button-library.png**: exact copied catalogue
+title and complete LTR button label fit the RTL Library card without overflow. This is
+widget-render evidence, not acceptance of a new installed iPhone build.
+
+**New iOS build required: YES** for this Dart UI/controller fix. No build/upload or
+backend deployment performed. The action remains intentionally hidden with gates OFF;
+phone accessibility of the corrected build remains pending. Do not reactivate or transact
+until that entry is confirmed accessible under the owner's later explicit instructions.
+
+**One next action:** authorize one updated internal TestFlight build from this scoped
+fix, with all purchase gates OFF. France exclusion, all deferrals, automatic-closure
+waiver and joint public-launch hold preserved; no watchdog introduced.
+
+## Owner-authorized single Book 3 sandbox window OPEN — 16 October 2026
+
+Owner explicitly withdrew the automatic 30-minute gate-closure prerequisite and
+prohibited implementing it. That decision supersedes the prior automatic-closure
+blocker below. Owner authorizes **one genuine shelf_book_3 Apple sandbox purchase**
+using accepted installed TestFlight **1.0.0 (6)**; no public checkout or second buy.
+
+Activated **2026-10-16 21:10:23 UTC** after verified SQL/media/hash backup
+**/home/shelf/backups/shelf/20261016-210933/** and verified encrypted exact .env
+checkpoint plus private pre-test history fingerprints and preserved uncommitted
+records in **apple-book3-window/** within that backup. Production remains **1d3dfa5**.
+Initial format check stopped before changes: existing sandbox flag was quoted false,
+owned-book3 flag absent/default false. Atomic update preserved unrelated settings,
+set sandbox true and added the existing owned-book3 control explicitly true; no code,
+infrastructure, provider, product or ownership change. Ran config:clear.
+
+Runtime verifies both gates ON, exact verified owner/Book3 eligible with existing
+Play sale/access intact, nonowner/blocked owner/other-book denied, real checkout,
+sign-in/relay and sync OFF; staging both gates/real checkout OFF. Actual HTTPS iOS
+config verifies enabled/sandbox true, production false, APP_STORE, allowlist exactly
+[shelf_book_3] and session protocol 1. Existing provider/security evidence reused.
+
+**Awaiting owner iPhone action/result; no successful purchase claimed.** Owner was
+instructed to refresh Library, open Book 3, use **Test Apple purchase — no charge**,
+accept agreement and confirm exactly one genuine Apple sandbox transaction; stop
+on unclear sheet/error/pending, never retry a buy. After owner result, verify actual
+session-bound Apple/RevenueCat proof, permanent entitlement, webhook outcome and
+Test-only accounting; immediately close both gates whether success or failure,
+verify OFF and preserve Play ownership/all financial history. No watchdog installed.
+France exclusion, all deferrals and joint public-launch hold remain unchanged.
+
+## Build 6 launch accepted; sandbox activation blocked by automatic closure — 16 October 2026
+
+Owner confirms **TestFlight iOS 1.0.0 (6)** installed and launches correctly on the
+owner's iPhone. This is **installation/launch acceptance only**, not product retrieval,
+purchase, restore/refund/reversal, notification delivery or Apple sign-in acceptance.
+Reused Build 6 Apple receipt/compliance/group readback and completed backend/security/
+provider evidence; no new build, broad tests or repeated provider-settings audit.
+
+Focused read-only production check completed by **2026-10-16 20:52 UTC**, starting
+from clean **4cdd177**. Production HEAD remains approved purchase-session source
+**1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19**; inspected deployed session/proof/owner
+exception/purchase service/controller/config bytes match that commit. **Zero pending
+migrations**, session table present and empty, no APP_STORE purchases. Both Apple
+flags, real checkout, Apple sign-in/relay and Play sync remain **OFF**. Public HTTPS
+iOS config returns enabled/sandbox/production false and SDK key null.
+
+Private queries confirm the same sole owner admin has one exact-email verified,
+unblocked reader. Closed exception denies access. A separate CLI process changed
+flags **in memory only**, verifying existing provider prerequisites and owner Book 3
+eligibility, including existing active Play access and unrefunded/unrevoked Play sale.
+Nonowner, blocked owner and other book denied. No model save, consent creation,
+provider proof request, persistent flag/config change or purchase occurred.
+
+Existing RevenueCat webhook **whintgr769cb03ff2** GET **200** confirms Apple app
+**app8ef018b95b**, sandbox environment, existing Shelf Apple webhook URL and exactly
+non_renewing_purchase/cancellation/expiration/refund_reversed events. Protected local
+webhook authorization matches runtime; configured app/product IDs match. Reused owner-
+verified notification tracking OFF, Keep with original App User ID, sandbox override
+OFF and existing entitlement protection. No settings changed; actual delivery remains
+unverified. No private identity, secret or purchase record printed in these checks.
+
+**NOT READY TO ACTIVATE:** required durable **30-minute automatic closure of both
+Apple gates is still unimplemented/uninstalled**. Source/config/scheduler inspection
+and current crontab show no Apple window closure mechanism. The existing 15-minute
+purchase-session expiry limits individual consent; it does not expire gates or prevent
+issuing later consent. Manual closure alone does not meet the recorded safety rule.
+Stop before activation; no executable activation/test sequence is cleared.
+
+Existing backup/encrypted checkpoint, atomic two-flag changes, config-clear and manual
+close/readback plan remains applicable, but must be supplemented by verified automatic
+closure armed before opening gates, surviving an interrupted interactive session,
+refusing unexpected/concurrent configuration changes and reporting failure. Close early
+on completion/mismatch; never automatically reopen. Closing gates preserves all Play
+ownership and Apple/Test history and is not a refund. No backup or recovery rerun now.
+
+**One next action:** authorize scoped implementation and verification of that automatic
+closure safeguard with both gates kept OFF; activation/transaction remains a separate
+explicit authorization. No source implementation or deployment is authorized by this
+readiness inspection. France exclusion, all existing deferrals and joint Android/iOS
+public-launch hold remain unchanged. Only the two requested records updated.
+
 ## Build 6 internal TestFlight readiness completed — 16 October 2026
 
 Owner reports Codemagic run **#10 / 6ad249367550aed8108f53d9** succeeded from

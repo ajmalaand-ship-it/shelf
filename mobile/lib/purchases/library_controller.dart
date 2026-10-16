@@ -199,6 +199,23 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
         operation,
         method: operation == 'library' ? 'GET' : 'POST',
       );
+      // Library must discover checkout visibility without loading a store product.
+      // A closed/unavailable checkout must never prevent refreshing owned books.
+      if (applePurchasePlatform) {
+        Map<String, dynamic> nextConfiguration = {};
+        try {
+          final value = await service.request('purchases/config?platform=ios');
+          if (value['store'] == 'APP_STORE' &&
+              value['production_checkout_enabled'] == false &&
+              value['purchase_session_version'] == 1) {
+            nextConfiguration = value;
+          }
+        } catch (_) {
+          // Clear stale purchase controls while retaining independent book access.
+        }
+        assertIdentity(reader, generation);
+        configuration = nextConfiguration;
+      }
       final nextBooks = (data['books'] as List)
           .map((b) => PoetryCollection.fromJson(b as Map<String, dynamic>))
           .toList();
