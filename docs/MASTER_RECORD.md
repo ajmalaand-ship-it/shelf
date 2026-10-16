@@ -584,6 +584,94 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple purchase-session safety — production promotion completed, 15 October local / 16 October 2026 UTC
+
+Owner authorized resuming the already-staged application rollout using the isolated
+promotion operator at **71c56cf7ff1dc479ebdb4cdd5433aa4d36f92534**. Started from that
+exact clean `ios/foundation` checkout. **Production and staging now both run application
+source 1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19**. This entry supersedes the earlier
+stopped-promotion and separate-promotion-authorization status; historical evidence below
+is retained. The operator correction remains in the trusted isolated checkout; production
+was advanced only to the intended application source, not to the later operator/docs commits.
+
+### Preflight, backup and bounded safeguards
+
+Verified production initially at **c8c266221d972d409ffa947ca87397293c69c004**, healthy and
+out of maintenance; the only local change was the recognized cPanel PHP handler.
+Staging remained at exact **1d3dfa5**, migration **batch 12**, zero pending migrations.
+Reused the passing staged log SHA-256
+**ec4faca3ecd88b1c0a498fc8b5732a8341a045ba180bc8bc86088cdfa0082723**.
+Finished the previously unreached staging purchase/accounting/owner-share health commands;
+Apple schema/closed-gate and real HTTPS/private-boundary checks all passed. No broad
+unit or mobile suite rerun: prior **64 PHP / 604 assertions, 16 Flutter + 1 staging
+identity** and **45 focused operator tests** remain the source-validation evidence.
+Backup storage readiness and the pinned historical checkpoint/configuration passed.
+Both existing provider webhook configurations matched their original verified fingerprint
+by read-only RevenueCat GET (HTTP 200), before and after promotion.
+
+Fresh production backup **/home/shelf/backups/shelf/20261016-021356/** passed SQL,
+ZIP `unzip -t` and SHA-256 verification before maintenance/source/migration changes.
+It contains `promotion-notes.txt`, the rollback source and
+`entitlement-refresh-verification.json`. The original encrypted private-configuration
+checkpoint remains **/home/shelf/backups/shelf/20261016-004143/apple-session-rollout-checkpoint/**;
+its pinned provenance/hash and all protected private-file fingerprints passed again.
+The new backup is the current release-state backup; prior rollback source is **c8c2662**.
+
+The operator acquired the existing refund lock non-blockingly before backup and held it
+through the promotion checks, under the documented 10-minute window and bounded child
+commands/maintenance cleanup. Cron was never edited or disabled. Historical acceptance
+was limited to entitlement **id 5**'s `checked_at`, `created_at`, `updated_at`, independently
+linked to completed duplicate-only refund audit **1342**. UTC epoch normalization verified
+the backup/live SYSTEM/AST offset without changing stored timestamps. All identity,
+active-status, ownership, reader, purchase/refund, ledger, consent, agreement and accounting
+comparisons remained strict. The fresh actual-promotion before/after comparison included
+all three timestamps and passed exactly; no table-wide exemption or rebaseline was used.
+
+### Production results and resumed scheduling
+
+Fast-forward promotion succeeded. Apple purchase-session migration
+**2026_10_15_010000_create_apple_purchase_sessions** applied in production **batch 29**;
+zero pending migrations, zero sessions, no Apple purchase history. Production purchase,
+accounting and all six owner-share checks passed. Maintenance was lifted and HTTPS
+health, locked paid content/Library for unauthenticated requests, webhook guards and
+staging isolation passed. Release state records source **1d3dfa5** on both environments.
+
+The existing verified owner's Book 3 Play ownership and paid access passed. The actual
+Library controller reconciliation performed independent read-only provider proof and
+returned Book 3, its lease and all Apple denials correctly. This verification ran inside
+a database transaction that was rolled back, under the same refund lock. Strict protected
+history snapshots before/after matched exactly: no persistent ownership, timestamp,
+purchase, refund, consent, ledger or accounting change was made by the probe. No duplicate
+sale or Test income in ordinary real-income queries was found.
+
+The lock was released and the original crontab fingerprint was unchanged. Natural
+scheduled refund audit **1343** completed at **2026-10-16 02:15:02 UTC**, HTTP **200**,
+**pages=1, seen=duplicate=1, refunded=unmatched=conflict=0**. No manual refund run was
+started. A subsequent coherent comparison against the original backup again verified
+strict ownership/financial history and accepted only the same three metadata columns,
+now independently linked to audit 1343. Private final evidence is in the fresh backup's
+`post-promotion-verification.json`; no reader identity or provider secret is published.
+
+Production `.env`, staging private `.env`, Apple webhook authorization/metadata, provider
+key and cPanel handler fingerprints are unchanged. Existing Apple and Google RevenueCat
+webhooks are unchanged. Production's sole local change remains its preserved cPanel
+handler. **Both Apple sandbox gates OFF; real checkout OFF; Apple sign-in/relay gates
+OFF; pricing sync OFF. Production healthy and out of maintenance.** No rollback was
+needed. If a later rollback is authorized, follow `docs/STAGING.md` and this backup's
+notes: inspect migration batch/evidence first; never restore over subsequent reader or
+money activity. No database restore or migration rollback was performed.
+
+No TestFlight build/upload, purchase, provider-setting edit, gate activation or public
+release occurred. France exclusion/ANSSI cancellation, authentication/relay deferrals,
+Android/UI pause, pricing-sync and second-phone-restore deferrals, and the joint
+Android/iOS public-launch hold remain unchanged. A **new internal TestFlight build is
+required** because installed build 5 lacks the purchase-session identity protocol;
+backend promotion does not update that app. Apple activation and automatic test closure
+remain separately gated; this rollout authorizes neither.
+
+**Exactly one next action:** authorize a new internal TestFlight build containing the
+validated purchase-session protocol, keeping all purchasing gates OFF.
+
 ## Promotion validator and operator safety — implemented in isolation, 15 October local / 16 October 2026 UTC
 
 Owner authorized implementation/testing of the scoped correction documented at
