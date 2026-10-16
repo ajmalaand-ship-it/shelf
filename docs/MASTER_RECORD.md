@@ -584,6 +584,98 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Purchase-session TestFlight preparation — 15 October local / 16 October 2026 UTC
+
+**Preparation only; no build or upload started.** Clean starting checkpoint and exact
+candidate application/workflow source:
+**1bde4f0dbe2d278723d749d3c714fd851c1314cf**, branch **ios/foundation**.
+Select that exact revision for a later authorized run; this preparation commit changes
+only records. `mobile/` is byte-identical to validated/deployed **1d3dfa5**. The client
+requires session protocol version 1, validates authenticated consent's reader/product/
+mode and unexpired `shelf_apple_` random identity, identifies RevenueCat with that identity
+before buying, checks account-generation changes and confirms through the server.
+It does not grant access from the SDK response. Existing consent and server proof remain.
+Reuse **64 PHP tests / 604 assertions, 16 Flutter tests + 1 staging identity**, **45 operator
+tests**, successful backend batch **29**, zero pending migrations and strict preservation/
+Play Library evidence recorded above. No broad suite, native compile or dependency install
+was repeated.
+
+### Build number independently checked
+
+Existing protected ASC inspection key used for **GET only**, at
+**2026-10-16 02:37:12 UTC**. App **6821471140 / services.shelf.app** verified.
+Complete paginated builds and app buildUploads lists reached terminal pages, HTTP **200**:
+received **2, 3, 4, 5**, all **VALID / INTERNAL_ONLY**; uploads **1 FAILED**, **2–5 COMPLETE**,
+all **IOS / 1.0.0**. No processing build or pending upload and no 6-or-higher record.
+**Next unused number is 6**, not reserved. Private bounded evidence:
+**/home/shelf/tmp/shelf-testflight-preparation-20261016.json**. Before a later run, repeat
+only this receipt/pending check and confirm no competing signed Codemagic/GitHub run;
+stop on changed evidence rather than assuming 6 remains available.
+
+### Exact workflow and credential evidence limit
+
+Use existing Shelf application, **ios-testflight-internal**, candidate SHA above,
+**1.0.0 (6)**. Required later Codemagic variable setting is
+**SHELF_IOS_BUILD_NUMBER=6** in existing **shelf_ios_testflight**; not changed here.
+Keep **shelf_ios_foundation**, approved HTTPS API, **shelf_app_store_connect** integration,
+**shelf_ios_distribution** certificate and **shelf_ios_app_store** profile unchanged.
+Team **YSLWJQDH8B**, bundle **services.shelf.app**; no new key/profile/account.
+
+Workflow and `scripts/ios/check_build_number.py` are byte-identical to owner-reported
+successful signed build-5 source **8283badf674f94c8cc7e18a5371e35cdc67d5d1c**, run #9
+**6acfddac546ce6236ceea2d5**. The mandatory official CLI guard remains before compilation,
+delegating credential resolution to Codemagic's CLI, with explicit positive number,
+latest-number comparison, bounded timeout and fail-closed authentication/read errors.
+No unsupported raw-credential prerequisite or fallback was reintroduced.
+
+**Evidence gap:** repository records still label the standalone **ios-asc-access-check**
+diagnostic NOT cloud-verified; no diagnostic success log/run ID or exact working private
+variable configuration was found. Build 5's reported successful run with the same mandatory
+guard is indirect success evidence, not an independently inspected diagnostic log.
+No Codemagic connector/token access is available to inspect worker logs, current variables,
+certificate expiry, dashboard signing state or competing queued/running jobs. Do not claim
+those checked or ask to rotate/recreate credentials. Inspect the existing successful run's
+CLI output and retained credential configuration before clearing this readiness gap;
+no diagnostic rerun is requested merely to reproduce an existing success.
+
+Static YAML parse, each signed script's shell syntax, native team/bundle/entitlements,
+photo-library strings, source comparisons and upload/build-number checks passed.
+Workflow SHA-256 **3270bff39673c47cdf88b62b29464aab97b85559bc99e04bc2546956eab8a149**.
+Export retains **testFlightInternalTestingOnly=true**, automatic version management false,
+checkout/test Dart flags false, publishing auth integration, **submit_to_testflight=false**
+and **submit_to_app_store=false**. A later separately authorized signed run uploads via
+publisher without tester assignment or public submission. Mandatory IPA checks cover bundle/
+version/build number, archive integrity, strict signature and team entitlements. Explicit
+artifact collection requires one nonempty IPA, matching SHA-256, source commit, export
+options, entitlements, Podfile.lock and privacy-manifest paths; dSYMs are collected too.
+These are verified workflow requirements, not an inspection of a nonexistent new IPA.
+
+### Planned acceptance, no activation now
+
+After a separately authorized build/upload, independently verify Apple receipt, processing,
+INTERNAL_ONLY audience and compliance. Any compliance save or assignment to existing Shelf
+Owner requires its own authorization; no tester change here. Phone acceptance then checks
+version/build, launch, existing account/Book 3 Library/paid access, refresh and closed checkout.
+Apple sign-in/relay acceptance remains deferred. Do not purchase during these checks.
+
+A later explicitly authorized single owner/Book 3 sandbox test additionally requires the
+existing documented automatic bounded gate-closure mechanism, still unimplemented, before
+activation. Verify owner, preserved Play access, consent/session identity, one sandbox
+transaction and independent Apple proof; reject wrong account/book, expired/replayed/
+cross-session confirmations. Close both gates on completion/mismatch/deadline, verify
+Play access/Library survives and no real income, duplicate royalties or unintended permanent
+Apple ownership. Do not reset ownership or retry purchase to resolve ambiguity. This is a
+plan only, not permission to enable gates or transact.
+
+All purchase/sign-in gates remain OFF. No deployment, provider/product/territory/tester
+change, build, upload or transaction occurred. France exclusion, authentication/relay,
+Android/UI pause, pricing-sync and second-phone-restore deferrals, and joint Android/iOS
+public-launch hold remain binding.
+
+**Exactly one next owner action:** inspect/share the existing successful Codemagic run's
+CLI-guard result and confirm no competing signed run, to close the cloud-readiness evidence
+gap before authorizing a single build. Do not start a run in this preparation task.
+
 ## Apple purchase-session safety — production promotion completed, 15 October local / 16 October 2026 UTC
 
 Owner authorized resuming the already-staged application rollout using the isolated
