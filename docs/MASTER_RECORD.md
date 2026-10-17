@@ -584,6 +584,76 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple public-review preparation — 17 October 2026
+
+Batch 1 authorized metadata/assets and release-access preparation only. Apple API
+before/after evidence: `/home/shelf/tmp/shelf-asc-submission-20261017/` (private
+0600 files). Parts 7/10 govern completion; no separate Completion Plan file found.
+
+**Saved/read back:** app 6821471140 / services.shelf.app identity unchanged;
+USES_THIRD_PARTY_CONTENT; Books category; subtitle “Pashto and Farsi books”;
+English description/keywords, support URL to existing privacy/contact page and
+privacy-choices URL to account/delete; copyright “2026 Ajmal Aand”; approved free
+app price USD 0. Version 1.0 stays PREPARE_FOR_SUBMISSION, release control now
+MANUAL instead of AFTER_APPROVAL, preserving joint launch. Book 3 title correction
+retained: څپو کې انځورونه / شعري ټولګه, ar-SA.
+
+**Six approved paid books need six non-consumables.** Existing shelf_book_3:
+6822080809. Created draft shelf_book_4 **6824083153**, shelf_book_5 **6824083087**,
+shelf_book_6 **6824083088**, shelf_book_7 **6824083193**, shelf_book_8 **6824083291**.
+Exact catalogue titles/subtitles (Book 6: existing poetry classification), ar-SA
+matching Book 3, approved USD 2.99 USA base prices verified. All MISSING_METADATA;
+review captures absent. New drafts have no assigned availability (404). Book 3's
+174 territories/FRA exclusion unchanged. App-level availability also returns 404;
+no regions selected, no assumed worldwide rights, no RevenueCat mapping change.
+
+**Access:** reviewer login/me/Library 200, all six Library books; normal logout 204.
+Six public contents endpoints 200, two sample items each. Privacy/deletion page
+200; prior deletion evidence reused, no deletion or email sent. Apple rejected
+review-details creation (409 required/invalid contactPhone), so reviewer credentials
+were NOT saved. Known name/email/instructions available; genuine contact phone missing.
+Partial factual age answers also rejected (409 remaining required attributes);
+readback confirms none saved. Literary-content frequency answers require owner facts.
+
+**Privacy/legal limits:** official Apple OpenAPI 4.5.1 exposes no App Privacy label,
+DSA, agreement/tax/banking or Digital Goods questionnaire endpoints. Published eight
+privacy types/active financial agreements remain owner-confirmed, not independently
+reread; earlier DSA In Review unconfirmed today. Source/prior hosting evidence
+requires label review for name, email, private photos, user IDs, purchases, searches,
+request interactions, IP-derived country statistics and service diagnostics;
+actual published types/purposes/linkage and onward integrations cannot be certified
+through this API. No speculative label edits. Digital Goods is UI-only/conditional
+if displayed; EU choices lock 12 months, no irreversible choice made.
+
+**Assets missing:** no App Store screenshot sets, TestFlight feedback screenshots
+or genuine local iOS captures; widget renders/artwork and an unavailable-state phone
+photo are unsuitable. Linux has no xcrun/simulator/connected capture route. Need
+original device or accurately running simulator captures: iPhone e.g.1320×2868 or
+1290×2796; iPad 13-inch 2064×2752 or 2048×2732 (device family 1,2), opaque PNG/JPEG;
+plus genuine Book 3 purchase-offer review capture. Nothing uploaded or processed.
+Do not enable checkout/restart deferred tests to manufacture a capture.
+[Apple specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/).
+
+**Demonstrated purchase blocker:** mobile forces iOS sandbox; LibraryController
+returns production_checkout_enabled=false/only shelf_book_3; ApplePurchaseProof
+and AppleSandboxPurchases require owner-only Book-3 SANDBOX evidence. Normal
+customer/reviewer six-book Apple purchase/restore and deleted-account Apple recovery
+are not supplied by this source. No development started. Apple transaction,
+entitlement/webhook/accounting verification **DEFERRED, NOT PASSED**; authentication/
+relay deferrals preserved. Public config confirms production/sandbox checkout OFF,
+Apple sign-in OFF, email/Google account config available. No transaction attempted.
+
+**Minimal eligible-build change, not executed:** all received builds 2–7 VALID /
+INTERNAL_ONLY, uploads through 7, no 8. HEAD 26864fa mobile matches accepted Build 7
+eafea353 (empty diff). Change codemagic.yaml testFlightInternalTestingOnly true→false
+(line 101) and matching assertion (102); retain app-store signing, identity checks,
+manageAppVersionAndBuildNumber=false and submission switches false. Freshly verify
+unused number (8 candidate), upload once only when authorized and require Apple
+buildAudienceType=APP_STORE_ELIGIBLE. Packaging alone does not resolve purchase,
+capture, age, review-phone, availability or UI-only declaration/access gaps above.
+No source/workflow edits, build, deployment, submission or launch; no existing book
+price/territory changes. Joint Android/iOS hold and France exclusion preserved.
+
 ## D14 reporting/disclosures deployed — 16 October local / 17 October UTC 2026
 
 Completed application commit **4aa2f613778d58a3ced8034dd95921cfea092bd6**
