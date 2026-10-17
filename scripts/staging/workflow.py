@@ -489,9 +489,69 @@ echo json_encode(array_values(array_diff(array_keys($app->make('migrator')->getM
     return True
 
 
+def financial_retention_checked(app, commit, changes):
+    allowed = {
+        'app/Models/FinancialRetentionRecord.php', 'app/Services/Accounting/FinancialRetention.php',
+        'app/Filament/Pages/FinancialRetention.php', 'app/Console/Commands/CheckFinancialRetention.php',
+        'database/migrations/2026_10_16_230000_create_financial_retention_records.php',
+        'resources/views/filament/pages/financial-retention.blade.php',
+        'resources/views/privacy.blade.php', 'resources/views/account/delete.blade.php',
+        'tests/Feature/FinancialRetentionTest.php', 'tests/Feature/PrivacyPolicyTest.php',
+        'tests/Feature/PrivacySupportTest.php', 'scripts/staging/workflow.py',
+    }
+    if 'app/Services/Accounting/FinancialRetention.php' not in changes:
+        return False
+    # Existing post-production rollout tools are prerequisites, not new purchase work.
+    prior_tools = {'scripts/ios/test_apple_rollout.py', 'scripts/staging/promotion_safety.py',
+                   'scripts/staging/test_promotion_safety.py'}
+    if run(['git', 'diff', '--name-only', 'eafea353d45f4dac82c3454e9f37d702cb621004', commit, '--', *sorted(prior_tools)]).strip():
+        raise RuntimeError('Previously verified rollout prerequisites changed during retention work.')
+    allowed |= prior_tools
+    backend = {p for p in changes if not p.startswith(('docs/', 'mobile/')) and p != 'AGENTS.md'}
+    if not backend <= allowed:
+        raise RuntimeError('Unreviewed source changes outside the authorized retention rollout scope.')
+    log = RUNTIME / ('checks-' + commit + '.log')
+    env = os.environ.copy()
+    env['SHELF_PHP_TEST_FILTER'] = 'FinancialRetentionTest|PrivacyPolicyTest|PrivacySupportTest|AccountingTest|D14PolicyTest'
+    with log.open('w') as output:
+        result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+            stdout=output, stderr=subprocess.STDOUT, env=env)
+    if result.returncode:
+        raise RuntimeError('Focused financial retention checks failed; private log: ' + str(log))
+    artisan(app, 'shelf:check-staging')
+    artisan(app, 'shelf:check-financial-retention')
+    https_checks()
+    financial_disclosure_checks(app, staging=True)
+    state = current_state()
+    state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+        'scope':'financial-retention-report-only', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: focused D14 report/disclosures/accounting/recovery checks; no Apple purchase test or mobile build.', flush=True)
+    return True
+
+
+def financial_disclosure_checks(app, staging=False):
+    base = 'https://staging.shelf.services' if staging else 'https://shelf.services'
+    headers = {'X-Shelf-Test-Key': settings(app)['SHELF_STAGING_ACCESS_KEY']} if staging else {}
+    for path in ('/privacy', '/account/delete'):
+        with urllib.request.urlopen(urllib.request.Request(base+path, headers=headers), timeout=20) as response:
+            body = response.read().decode()
+            if response.status != 200 or not all(phrase in body for phrase in (
+                'three years after the relevant tax return is actually filed',
+                'Automatic financial expiry is not implemented',
+                'Apple deleted-account purchase recovery is not yet available')):
+                raise RuntimeError('Published financial retention disclosures do not match approved behavior.')
+            if 'Financial retention is still under review' in body:
+                raise RuntimeError('Outdated financial-policy disclosure remains published.')
+    print('PASS: actual HTTPS privacy and deletion pages disclose approved policy and implementation limits.', flush=True)
+
+
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    if financial_retention_checked(app, commit, changes):
+        return
     if apple_safety_checked(app, commit, changes):
         return
     if apple_purchase_checked(app, commit, changes):
@@ -991,6 +1051,9 @@ def promote(commit, checkpoint=None):
             ios_auth_runtime_checks(PRODUCTION, production=True)
         if state['checks'].get('scope') in ('apple-purchase-backend-disabled', 'apple-session-safety-disabled'):
             apple_purchase_runtime_checks(PRODUCTION, production=True)
+        if state['checks'].get('scope') == 'financial-retention-report-only':
+            artisan(PRODUCTION, 'shelf:check-financial-retention')
+            financial_disclosure_checks(PRODUCTION)
         https_checks()
         state.update(production_commit=commit,last_backup=str(saved),previous_production_commit=previous)
         save_state(state)

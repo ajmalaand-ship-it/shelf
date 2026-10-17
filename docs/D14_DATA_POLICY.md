@@ -1,3 +1,65 @@
+# Current implementation — 16 October 2026
+
+Owner authorized the release-required Admin reporting/disclosure batch, with all
+expiry/deletion execution and purchase gates OFF. The historical approved plan
+below remains the policy source; its “not authorized” statements describe 8 October.
+
+Implemented append-only `financial_retention_records` metadata, owner-only
+Admin → Sales and readers → Financial retention. Record evidenced filed returns
+(period, jurisdiction, actual filing date and private reference), complete mappings
+of purchase/correction groups to all relevant returns, scoped legal/dispute/unpaid
+holds, and evidenced hold resolutions. Corrections are new records. Latest mapping
+is used; new ledger/journal corrections invalidate it until reviewed/remapped.
+Missing/unknown evidence blocks eligibility. No filing dates, jurisdictions,
+completed tax filings or existing-record mappings are seeded or inferred.
+
+Report uses counts/IDs, shows Test exclusion, financial/share/correction IDs, shared
+agreement references, provider-event/recovery-audit counts and protected recovery
+dependencies. Three calendar years use no-overflow February 29 → February 28;
+the full anniversary day is retained in UTC. All relevant returns must pass their
+windows. Unknown or nonzero author balances block review eligibility. Overdue
+holds remain active until an owner records evidenced resolution. “Eligible” means
+**preservation review only**, never approval or capability to delete.
+
+Public `/privacy` and `/account/delete` now describe the approved period and
+exceptions, continuing recovery proof, no automatic financial expiry, current
+retained-history behavior, and the current Google-only deleted-account recovery
+limit. Real checkout and Apple sandbox checkout remain disabled. No store/provider
+settings or mobile source/build changed.
+
+## Preservation boundary before any future disposal
+
+- Financial detail compartment: immutable ledger, journal, shares, confirmations,
+  adjustments/reversals, payment evidence, agreement snapshots and supporting
+  references remain untouched. Shared agreements/events cannot expire while any
+  retained group depends on them. No foreign keys or immutability protections weaken.
+- Protected recovery compartment: original purchase ID, original provider reader,
+  book/product/store/environment, exact transaction and purchase time (including
+  Apple millisecond proof where present), refund/revocation evidence and original
+  provider linkage remain. `PurchaseRecoveryService` depends on original Play
+  purchase and live Google/RevenueCat evidence; `PurchaseService` and
+  `VoidedPurchaseService` require purchase/event/refund references. Recovery audit,
+  proof hashes, unique claim and independent deletion/recovery journals remain.
+  The report never displays tokens, provider payloads, profile names or emails.
+- This is a logical dependency separation in reporting, not physical minimisation.
+  No financial originals, provider events, customers, ownership or recovery data
+  are removed/moved. Current recovery behavior is preserved; Apple deleted-account
+  recovery is not implemented by this batch.
+- Future expiry requires a separately reviewed field-by-field preservation/disposal
+  plan and R8 resolution before any original is removed, shared-dependency checks,
+  minimum-proof/recovery validation, auditable disposal receipts and older-backup
+  replay/suppression checks. No scheduler, delete button or expiry executor exists.
+  Existing 14-local-copy / 90-day protected-last-set backup policy is unchanged.
+- Migration rollback drops the new table only while empty; after evidence exists,
+  rollback refuses its loss. Code rollback may retain this additive table. Never
+  restore an older database over later customer/financial activity.
+
+Actual financial minimisation/expiry, actual provider metadata erasure, external
+privacy evidence and remaining operational/device/store acceptance are not claimed
+complete. No reader deletion or provider cleanup was executed for evidence.
+
+---
+
 # D14 — approved 7 October 2026; financial policy approved 8 October 2026
 
 Financial policy is approved below; financial expiry is NOT IMPLEMENTED. No financial rows, agreement snapshots,

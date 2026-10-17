@@ -584,6 +584,80 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Authorized D14 Admin reporting and disclosure batch — 16 October 2026
+
+Owner authorized completion of the remaining release-required filing/mapping,
+scoped holds, owner-only financial-retention reporting and public privacy/deletion
+disclosures. Implemented in isolated ios/foundation; the two pre-existing
+uncommitted 16 October status entries below are preserved without alteration.
+Additive append-only metadata only; no existing financial/customer/ownership data
+is mapped, changed or deleted. Actual financial expiry/minimisation remains OFF
+and unimplemented; reporting eligibility is preservation review only. Approved
+three-years-after-filing policy and scoped exceptions unchanged. See
+[D14_DATA_POLICY.md](D14_DATA_POLICY.md) for behavior, recovery dependencies and
+future disposal boundary. Deployment/evidence is recorded after passing rollout.
+All release holds, France exclusion, owner deferrals and checkout/Apple gates OFF
+remain binding. No Apple purchase testing, mobile build or unrelated security work.
+
+
+## Purchase UI accepted; testing closed; return to joint release plan — 16 October 2026
+
+Owner confirms installed TestFlight **1.0.0 (7)** demonstrated the Apple purchase
+screen/button and accepts that UI for now. This is **UI acceptance**, not purchase
+acceptance. Owner directs closing testing and moving toward public release; no purchase
+development, builds, safeguards or repeated tests authorized.
+
+Immediately returned both existing production Apple sandbox flags to **false**,
+preserving unrelated .env values, then config:clear. Runtime and actual HTTPS iOS
+config verify both gates OFF, real checkout OFF, enabled/sandbox/production false
+and SDK key null. One brief read-only count found **zero APP_STORE / SANDBOX /
+collection_id=3 purchases**. **Actual transaction/entitlement/webhook/accounting
+verification is DEFERRED, NOT PASSED.** No transaction initiated, history changed,
+provider setting edited or test repeated. Earlier open-window instructions are closed.
+
+Reviewed the governing Part 7 completion batches and Part 10 four-area remaining-work
+list. No separately named Completion Plan file was found in this repository; no
+unseen plan is claimed read. Admin financial-retention construction/disclosure alignment
+remains unfinished; Android public-release/current Play-installed acceptance remains
+unconfirmed, iOS is internal TestFlight with accepted purchase UI and deferred transaction/
+authentication evidence, and shared Review 3 UX remains accepted with further changes
+paused. Store reviews/final joint acceptance and explicit launch approval remain open.
+
+**Proposed one next milestone:** finish the remaining Admin financial-retention foundation
+and accurate privacy/deletion disclosures before final joint-release acceptance, using
+the approved three-years-after-filing policy. **One next action for owner agreement:**
+authorize the existing scoped filing/mapping, exception-hold and owner-only retention
+dry-run/disclosure task from D14_DATA_POLICY.md, with financial expiry/deletion and
+all purchase gates OFF. No new development starts until agreed. Preserve France exclusion,
+all existing deferrals and the joint Android/iOS public-launch hold.
+
+## Build 7 available in internal TestFlight — 16 October 2026
+
+Owner-reported Codemagic **#12 / 6ad29daf7550aed8108f6b83** succeeded from
+**eafea353d45f4dac82c3454e9f37d702cb621004**. Independently verified Apple app
+**6821471140 / services.shelf.app**, **IOS / 1.0.0 (7)**, build/upload ID
+**ab8f1ac9-3c85-4351-b466-fe9c2d4db5b7**: upload **COMPLETE**, processing **VALID**,
+**INTERNAL_ONLY**, not expired. Compared source against accepted Build 6 b16a8d8:
+only Library controller/button and test changes; dependencies, native iOS, Keychain
+and encryption implementation unchanged. Reused accepted non-France declaration.
+Build-7-only **PATCH usesNonExemptEncryption=false / HTTP 200** cleared missing
+compliance; independent readback **READY_FOR_BETA_TESTING** before assignment.
+
+Additive **POST /betaGroups/1511a217-4f89-4dc7-8b8d-4679ce8a6226/relationships/builds**
+containing only Build 7 returned **204**. Final readback **2026-10-16 22:16:46 UTC**:
+**IN_BETA_TESTING**, VALID / INTERNAL_ONLY, external NOT_APPLICABLE; group-side
+builds and relationship preserve every older ID plus 7, group settings and sole
+owner tester ID/email unchanged. Only compliance field changed on build attributes.
+Private 0600 snapshots: **/home/shelf/tmp/shelf-build7-before-20261016.json** and
+**/home/shelf/tmp/shelf-build7-after-20261016.json**. All Apple GETs returned 200.
+
+**Build 7 is available to install:** TestFlight → Shelf → Update/Install **1.0.0 (7)**
+(or Previous Builds → 1.0.0 → 7). Installation, button-on-phone and purchase acceptance
+remain unverified. Production runtime independently confirms both sandbox gates and
+real checkout **OFF**. No build, source change, tests, infrastructure, product/settings
+change or public release. France exclusion, existing deferrals, owner automatic-closure
+waiver and joint public-launch hold preserved. Only this existing Master Record updated.
+
 ## Missing Apple test action fixed in source; gates CLOSED — 16 October 2026
 
 On the owner's missing-button report, **first closed both production Apple sandbox
