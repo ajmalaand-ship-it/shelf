@@ -1,3 +1,57 @@
+## D14 reporting/disclosures deployed — 16 October local / 17 October UTC 2026
+
+Completed application commit **4aa2f613778d58a3ced8034dd95921cfea092bd6**
+is identical on staging and production, as recorded in release-state.json.
+Owner-only Admin: https://shelf.services/admin/financial-retention
+Public owner-review pages: https://shelf.services/privacy and
+https://shelf.services/account/delete . No store declaration/provider setting saved.
+
+Evidence: isolated wrapper **41 tests / 241 assertions**, including staging workflow
+gate; identical staged application **40 focused tests / 240 assertions** covering
+retention, public wording, accounting and existing D14 recovery/deletion behavior
+with synthetic/mocked providers. No mobile files changed in this task, no mobile
+suite/build and no Apple purchase test. Actual deployed Admin HTTP-kernel route
+rendered on both copies with an in-memory owner session only; real page, report,
+evidence history and actions present, no persistent login or live metadata write.
+Public privacy/deletion HTTPS returned matching approved wording on both copies.
+This is server-render verification, not a claimed interactive browser/owner review.
+
+Verified backup before staging migration:
+`/home/shelf/backups/shelf-staging/20261017-003109/`.
+Verified production backup before maintenance/migration/promotion:
+`/home/shelf/backups/shelf/20261017-003141/` (SQL, ZIP and SHA-256 passed).
+New metadata migration is production **batch 30**; **zero metadata rows** were
+seeded or entered. Report: **2 purchase groups, 0 eligible, 2 blocked/retained**.
+Strict existing reader/token/purchase/refund/ledger/entitlement/agreement/journal/
+share fingerprints matched across promotion. Production healthy and maintenance
+lifted; cPanel handler preserved as the sole pre-existing production working edit.
+Required runtime flags (real checkout, Apple sandbox and owned-book exception,
+price sync) verified OFF. No deletion, provider cleanup or expiry executed.
+A sandbox-denied optional migration-batch read was repeated with approved server
+access and passed; no database/service failure occurred.
+
+Append-only filing/mapping/hold/report foundation and disclosure construction are
+complete for this batch. Current approved policy is unchanged. No tax filing date,
+jurisdiction or mapped financial evidence invented; owner can enter real evidence
+when available. Financial minimisation/expiry remains **unimplemented/OFF** and
+requires the separately reviewed preservation/disposal plan before any later
+execution. Actual provider metadata erasure remains unverified, conditional on
+genuine approved work; external privacy evidence, operational/device acceptance
+and store/final joint-release requirements remain as recorded. D14 is not declared
+fully complete. Apple purchase testing remains closed/deferred, no builds, France
+exclusion and every existing release hold preserved.
+
+Rollback: previous production code **1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19**;
+retain additive metadata/evidence if reverting code. Empty-table migration rollback
+is tested; populated rollback refuses data loss. Never restore over later reader
+or financial activity. Existing source/recovery data and journals unchanged.
+
+**One next release milestone:** joint Android/iOS release-readiness acceptance and
+store-review readiness, preserving owner-deferred tests and requiring separate
+explicit launch authorization. No next milestone work started by this batch.
+
+---
+
 # Current implementation — 16 October 2026
 
 Owner authorized the release-required Admin reporting/disclosure batch, with all
