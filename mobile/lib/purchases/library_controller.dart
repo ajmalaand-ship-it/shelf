@@ -31,7 +31,11 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
   }
   final bool internalTestCheckout;
   String get checkoutMode =>
-      applePurchasePlatform || internalTestCheckout ? 'sandbox' : 'production';
+      (applePurchasePlatform
+          ? configuration['customer_mode'] != true
+          : internalTestCheckout)
+      ? 'sandbox'
+      : 'production';
   bool get checkoutAvailable =>
       configuration['enabled'] == true &&
       configuration['${checkoutMode}_checkout_enabled'] == true &&
@@ -298,8 +302,8 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
     if (configuration['enabled'] != true ||
         (applePurchasePlatform &&
             (configuration['store'] != 'APP_STORE' ||
-                configuration['production_checkout_enabled'] != false ||
-                configuration['purchase_session_version'] != 1)))
+                configuration['purchase_session_version'] !=
+                    (configuration['customer_mode'] == true ? 2 : 1))))
       throw const AccountFailure(503);
     await provider.identify(
       configuration['public_sdk_key'] as String,
@@ -309,7 +313,9 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
       ),
     );
     assertIdentity(reader, generation);
-    if (applePurchasePlatform && _appleIdentity != null) {
+    if (applePurchasePlatform &&
+        configuration['customer_mode'] != true &&
+        _appleIdentity != null) {
       await provider.identify(
         configuration['public_sdk_key'] as String,
         _appleIdentity!,
@@ -332,7 +338,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
 
   bool _allowedProduct(String id) =>
       !applePurchasePlatform ||
-      (id == 'shelf_book_3' &&
+      (RegExp(r'^shelf_book_[3-8]$').hasMatch(id) &&
           (configuration['allowed_product_ids'] as List? ?? []).contains(id));
 
   Future<StorePurchaseResult> purchase(
@@ -363,7 +369,10 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
           'agree': true,
           'checkout_mode': checkoutMode,
           if (applePurchasePlatform) 'store': 'APP_STORE',
-          if (applePurchasePlatform) 'purchase_session_version': 1,
+          if (applePurchasePlatform)
+            'purchase_session_version': configuration['customer_mode'] == true
+                ? 2
+                : 1,
           if (ownedBookSandboxTest) 'owned_book_sandbox_test': true,
         },
       );
@@ -371,10 +380,14 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
       if ((ownedBookSandboxTest &&
               consent['owned_book_sandbox_test'] != true) ||
           (applePurchasePlatform && consent['store'] != 'APP_STORE') ||
+          (applePurchasePlatform &&
+              configuration['customer_mode'] == true &&
+              (consent['purchase_session_version'] != 2 ||
+                  consent['reader_id'] != reader)) ||
           consent['accepted'] != true ||
           consent['checkout_mode'] != checkoutMode ||
           consent['product_id'] != product.id ||
-          (applePurchasePlatform
+          (applePurchasePlatform && configuration['customer_mode'] != true
               ? (consent['purchase_session_version'] != 1 ||
                     consent['reader_id'] != reader ||
                     !RegExp(r'^shelf_apple_[a-f0-9]{64}$')

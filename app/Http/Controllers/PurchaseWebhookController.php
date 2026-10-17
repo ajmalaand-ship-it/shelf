@@ -11,7 +11,12 @@ class PurchaseWebhookController extends Controller
     {
         abort_if(\App\Support\Staging::active(), 403, 'Test copy uses REST confirmation; webhooks are disabled.');
         $apple = $request->input('event.store') === 'APP_STORE';
-        abort_unless($apple ? \App\Services\Purchases\ApplePurchaseProof::configured() : RevenueCatClient::configured(), 503);
+        $appleReady = $apple && (\App\Services\Purchases\ApplePurchaseProof::configured()
+            || \App\Services\Purchases\ApplePurchaseProof::customersConfigured()
+            || (\App\Services\Purchases\ApplePurchaseProof::credentialsConfigured()
+                && \App\Models\Purchase::where('store', 'APP_STORE')->where('transaction_id', $request->input('event.transaction_id'))
+                    ->get()->contains(fn ($p) => \App\Services\Purchases\ApplePurchaseProof::customerPurchase($p))));
+        abort_unless($apple ? $appleReady : RevenueCatClient::configured(), 503);
         $authorization = config($apple ? 'purchases.apple_webhook_authorization' : 'purchases.webhook_authorization');
         abort_unless(hash_equals((string) $authorization, (string) $request->header('Authorization')), 401);
         $data = $request->validate([

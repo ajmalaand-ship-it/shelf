@@ -70,7 +70,8 @@ class RevenueCatBookProvider implements BookPurchaseProvider {
   Future<StorePurchaseResult> buy(StoreBookProduct product) async {
     if (_reader == null ||
         (applePurchasePlatform &&
-            !RegExp(r'^shelf_apple_[a-f0-9]{64}$').hasMatch(_reader!)) ||
+            !RegExp(r'^(?:[1-9][0-9]*|shelf_apple_[a-f0-9]{64})$')
+                .hasMatch(_reader!)) ||
         await Purchases.appUserID != _reader ||
         product.native == null)
       return StorePurchaseResult.failed;

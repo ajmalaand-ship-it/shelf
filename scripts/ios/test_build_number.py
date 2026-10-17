@@ -58,7 +58,11 @@ class CliCheckTests(unittest.TestCase):
     def test_workflow_uses_same_nonpublishing_credential_path(self):
         root=Path(__file__).resolve().parents[2]
         workflows=yaml.safe_load((root/'codemagic.yaml').read_text())['workflows']
-        signed=workflows['ios-testflight-internal'];probe=workflows['ios-asc-access-check']
+        signed=workflows['ios-app-store-release'];probe=workflows['ios-asc-access-check']
+        export = next(x['script'] for x in signed['scripts'] if 'xcode-project use-profiles' in x['script'])
+        self.assertIn('"testFlightInternalTestingOnly":false', export)
+        self.assertIn('p["testFlightInternalTestingOnly"] is False', export)
+        self.assertFalse(signed['publishing']['app_store_connect']['submit_to_app_store'])
         self.assertEqual(signed['integrations'],probe['integrations'])
         self.assertEqual(signed['environment']['groups'],probe['environment']['groups'])
         self.assertNotIn('publishing',probe);self.assertNotIn('artifacts',probe)

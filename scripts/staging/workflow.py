@@ -326,6 +326,7 @@ use Illuminate\Support\Facades\DB;
 echo json_encode([
  'stage'=>App\Support\Staging::active(),
  'gate_off'=>config('purchases.apple_sandbox_enabled')===false,
+ 'customers_off'=>config('purchases.apple_customers_enabled', false)===false,
  'owned_gate_off'=>config('purchases.apple_owned_book3_test_enabled',false)===false,
  'proof_off'=>!App\Services\Purchases\ApplePurchaseProof::configured(),
  'checkout_off'=>!config('purchases.production_enabled'), 'sync_off'=>!config('play_sync.enabled'),
@@ -346,7 +347,7 @@ echo json_encode([
  'stage_private'=>!filled(config('purchases.apple_webhook_authorization'))
    && !filled(config('purchases.apple_public_sdk_key')) && !filled(config('purchases.metadata_key_path')),
 ],JSON_THROW_ON_ERROR);"""))
-    required=('gate_off','owned_gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history','session_schema')
+    required=('gate_off','customers_off','owned_gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history','session_schema')
     if not all(result.get(k) is True for k in required) or result['stage']==production:
         raise RuntimeError('Apple purchase disabled rollout/schema checks failed; details withheld.')
     if not production and not (result['stage_private'] and result['stage_isolated']):
@@ -547,9 +548,43 @@ def financial_disclosure_checks(app, staging=False):
     print('PASS: actual HTTPS privacy and deletion pages disclose approved policy and implementation limits.', flush=True)
 
 
+def apple_customers_checked(app, commit, changes):
+    if 'tests/Feature/AppleCustomerPurchasesTest.php' not in changes:
+        return False
+    allowed = {'app/Http/Controllers/LibraryController.php', 'app/Http/Controllers/PurchaseWebhookController.php',
+        'app/Services/BookAccessService.php', 'app/Services/Purchases/ApplePurchaseProof.php',
+        'app/Services/Purchases/AppleSandboxPurchases.php', 'config/purchases.php', 'codemagic.yaml',
+        'scripts/run_tests.sh', 'scripts/staging/workflow.py', 'scripts/ios/test_build_number.py',
+        'tests/Feature/AppleCustomerPurchasesTest.php'}
+    backend = {p for p in changes if not p.startswith(('docs/', 'mobile/')) and p != 'AGENTS.md'}
+    if not backend <= allowed:
+        raise RuntimeError('Changes exceed the authorized six-book Apple customer rollout.')
+    log = RUNTIME / ('checks-' + commit + '.log')
+    env = os.environ.copy()
+    env['SHELF_PHP_TEST_FILTER'] = 'AppleCustomerPurchasesTest|AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest|ReviewerAccessTest'
+    env['SHELF_MOBILE_TEST_SCOPE'] = 'ios-purchases'
+    with log.open('w') as output:
+        result = subprocess.run(['bash', 'scripts/run_tests.sh', '--mobile'], cwd=app,
+            stdout=output, stderr=subprocess.STDOUT, env=env)
+    if result.returncode:
+        raise RuntimeError('Focused Apple customer checks failed; private log: ' + str(log))
+    artisan(app, 'shelf:check-staging')
+    apple_purchase_runtime_checks(app)
+    https_checks()
+    state = current_state()
+    state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':True,
+        'scope':'apple-customers-disabled', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: focused six-book Apple customer/restore/accounting and mobile checks; checkout remains OFF.', flush=True)
+    return True
+
+
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    if apple_customers_checked(app, commit, changes):
+        return
     if financial_retention_checked(app, commit, changes):
         return
     if apple_safety_checked(app, commit, changes):
@@ -1005,8 +1040,9 @@ def promote(commit, checkpoint=None):
         safety.require(checkpoint is not None, 'Reviewed preservation checkpoint is required for Apple safety promotion.')
     elif checkpoint is not None:
         raise RuntimeError('Historical allowance is not available for this rollout scope.')
+    customer_release = state['checks'].get('scope') == 'apple-customers-disabled'
     guard = safety.PromotionWindow(PRODUCTION/'storage/framework/play-refunds.lock',
-        lambda: artisan(PRODUCTION,'up')) if protected else nullcontext(None)
+        lambda: artisan(PRODUCTION,'up')) if (protected or customer_release) else nullcontext(None)
     with guard as window:
         if window:
             closed_production_preflight()
@@ -1016,7 +1052,7 @@ def promote(commit, checkpoint=None):
             window.arm_maintenance()
         try:
             artisan(PRODUCTION,'down')
-            preservation = preservation_gate(checkpoint,commit,previous,saved) if window else None
+            preservation = preservation_gate(checkpoint,commit,previous,saved) if protected else None
             unchanged=production_history_snapshot()
             run(['git','merge','--ff-only',commit],PRODUCTION)
             if (PRODUCTION/'public/.htaccess').read_bytes() != runtime_handler:
@@ -1049,7 +1085,7 @@ def promote(commit, checkpoint=None):
         artisan(PRODUCTION,'shelf:check-owner-shares')
         if state['checks'].get('scope') == 'ios-auth-backend-disabled':
             ios_auth_runtime_checks(PRODUCTION, production=True)
-        if state['checks'].get('scope') in ('apple-purchase-backend-disabled', 'apple-session-safety-disabled'):
+        if state['checks'].get('scope') in ('apple-purchase-backend-disabled', 'apple-session-safety-disabled', 'apple-customers-disabled'):
             apple_purchase_runtime_checks(PRODUCTION, production=True)
         if state['checks'].get('scope') == 'financial-retention-report-only':
             artisan(PRODUCTION, 'shelf:check-financial-retention')

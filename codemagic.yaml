@@ -1,5 +1,5 @@
 # Manual starts only. Signed build/upload requires separate owner authorization.
-# ios-foundation remains unsigned; ios-testflight-internal has no automatic trigger.
+# ios-foundation remains unsigned; ios-app-store-release has no automatic trigger.
 workflows:
   ios-foundation:
     name: Shelf iOS foundation — unsigned compile only
@@ -41,8 +41,8 @@ workflows:
       - mobile/build/ios/iphoneos/*.app
       - mobile/build/ios/iphoneos/*.app.dSYM
 
-  ios-testflight-internal:
-    name: Shelf iOS — signed internal TestFlight only
+  ios-app-store-release:
+    name: Shelf iOS — App Store eligible release (manual)
     instance_type: mac_mini_m2
     max_build_duration: 45
     working_directory: mobile
@@ -94,13 +94,13 @@ workflows:
           set -eu
           cd ios
           pod install
-      - name: Apply stored signing identities and internal-only export
+      - name: Apply stored signing identities and App Store eligible export
         script: |
           set -eu
           xcode-project use-profiles \
-            --custom-export-options='{"testFlightInternalTestingOnly":true,"manageAppVersionAndBuildNumber":false}'
-          python3 -c 'import os,plistlib; p=plistlib.load(open(os.path.expanduser("~/export_options.plist"),"rb")); assert p["testFlightInternalTestingOnly"] is True; assert p["manageAppVersionAndBuildNumber"] is False; assert p["teamID"] == "YSLWJQDH8B"; assert p["method"] in ("app-store", "app-store-connect")'
-      - name: Build signed internal TestFlight IPA with checkout OFF
+            --custom-export-options='{"testFlightInternalTestingOnly":false,"manageAppVersionAndBuildNumber":false}'
+          python3 -c 'import os,plistlib; p=plistlib.load(open(os.path.expanduser("~/export_options.plist"),"rb")); assert p["testFlightInternalTestingOnly"] is False; assert p["manageAppVersionAndBuildNumber"] is False; assert p["teamID"] == "YSLWJQDH8B"; assert p["method"] in ("app-store", "app-store-connect")'
+      - name: Build final App Store eligible IPA with checkout OFF
         script: |
           set -eu
           : "${CM_BUILD_DIR:?Codemagic clone directory required}"

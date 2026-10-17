@@ -14,7 +14,7 @@ class BookAccessService
         if (! $purchases->contains(fn ($p) => $p->store === 'APP_STORE')) { return true; }
         // Gate closure never mutates immutable history or the shared entitlement row.
         return $purchases->contains(fn ($p) => ($p->store !== 'APP_STORE'
-                || \App\Services\Purchases\ApplePurchaseProof::configured())
+                || \App\Services\Purchases\ApplePurchaseProof::canVerify($p))
             && \App\Services\Purchases\AppleSandboxPurchases::active($p))
             || \App\Models\Purchase::whereIn('id', DB::table('purchase_recovery_claims')->where('reader_id', $reader->id)->select('purchase_id'))
                 ->where('collection_id', $book->id)->where('store', 'PLAY_STORE')->get()

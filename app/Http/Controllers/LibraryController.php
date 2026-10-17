@@ -20,6 +20,14 @@ class LibraryController extends Controller
     public function config(Request $request)
     {
         if ($request->query('platform') === 'ios') {
+            if (config('purchases.apple_customers_enabled') === true) {
+                $ready = \App\Services\Purchases\ApplePurchaseProof::customersConfigured();
+                return response()->json(['enabled' => $ready, 'store' => 'APP_STORE', 'customer_mode' => true,
+                    'test_mode' => false, 'production_checkout_enabled' => \App\Services\Purchases\ApplePurchaseProof::customerCheckoutEnabled(),
+                    'sandbox_checkout_enabled' => false, 'public_sdk_key' => $ready ? config('purchases.apple_public_sdk_key') : null,
+                    'allowed_product_ids' => \App\Services\Purchases\ApplePurchaseProof::PRODUCTS, 'consent' => PurchaseService::CONSENT,
+                    'purchase_session_version' => 2, 'offline_days' => 30, 'identity_prefix' => '']);
+            }
             $ready = \App\Services\Purchases\ApplePurchaseProof::configured();
             return response()->json(['enabled' => $ready, 'store' => 'APP_STORE', 'test_mode' => true,
                 'production_checkout_enabled' => false, 'sandbox_checkout_enabled' => $ready,
@@ -57,6 +65,24 @@ class LibraryController extends Controller
     public function consent(Request $r, Collection $collection)
     {
         if ($r->input('store') === 'APP_STORE') {
+            if (config('purchases.apple_customers_enabled') === true) {
+                abort_unless(\App\Services\Purchases\ApplePurchaseProof::customerCheckoutEnabled(), 503);
+                $r->validate(['agree' => ['required', 'accepted'], 'checkout_mode' => ['required', 'in:production'],
+                    'purchase_session_version' => ['required', 'integer', 'in:2'], 'owned_book_sandbox_test' => ['prohibited']]);
+                DB::transaction(function () use ($r, $collection): void {
+                    $reader = \App\Models\Reader::whereKey($r->user()->id)->lockForUpdate()->firstOrFail();
+                    $book = Collection::whereKey($collection->id)->lockForUpdate()->firstOrFail();
+                    abort_unless(\App\Services\Purchases\ApplePurchaseProof::customerAllowed($reader), 403);
+                    abort_unless(in_array($book->product_id, \App\Services\Purchases\ApplePurchaseProof::PRODUCTS, true)
+                        && $book->product_id === 'shelf_book_'.$book->id && $book->isPublished() && $book->price_usd > 0, 409);
+                    abort_if(app(BookAccessService::class)->ownsBook($reader, $book), 409, 'This account already owns the book.');
+                    DB::table('purchase_consents')->insert(['reader_id' => $reader->id, 'collection_id' => $book->id,
+                        'store' => 'APP_STORE', 'wording' => PurchaseService::CONSENT, 'created_at' => now()]);
+                });
+                return response()->json(['accepted' => true, 'checkout_mode' => 'production', 'store' => 'APP_STORE',
+                    'product_id' => $collection->product_id, 'purchase_session_version' => 2,
+                    'reader_id' => $r->user()->id, 'app_user_id' => (string) $r->user()->id]);
+            }
             abort_unless(\App\Services\Purchases\ApplePurchaseProof::configured(), 503);
             abort_unless(\App\Services\Purchases\ApplePurchaseProof::owner($r->user()), 403);
             $r->validate(['agree' => ['required', 'accepted'], 'checkout_mode' => ['required', 'in:sandbox'],
