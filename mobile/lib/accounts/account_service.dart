@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,17 +17,20 @@ class ReaderAccount {
     required this.verified,
     required this.method,
     this.name,
+    this.hasAvatar = false,
   });
   factory ReaderAccount.fromJson(Map<String, dynamic> json) => ReaderAccount(
     id: json['id'] as int,
     email: json['email'] as String,
     name: json['name'] as String?,
+    hasAvatar: json['has_avatar'] == true,
     verified: json['email_verified'] as bool,
     method: json['sign_in_method'] as String,
   );
   final int id;
   final String email;
   final String? name;
+  final bool hasAvatar;
   final bool verified;
   final String method;
 }
@@ -34,11 +39,16 @@ class AccountConfiguration {
   const AccountConfiguration({
     this.enabled = false,
     this.googleEnabled = false,
+    this.appleEnabled = false,
     this.webClientId,
     this.ownerTestingOnly = false,
   });
-  final bool enabled, googleEnabled, ownerTestingOnly;
+  final bool enabled, googleEnabled, appleEnabled, ownerTestingOnly;
   final String? webClientId;
+}
+
+class AccountCancelled implements Exception {
+  const AccountCancelled();
 }
 
 class AccountFailure implements Exception {
@@ -68,7 +78,13 @@ class HttpAccountService implements AccountService {
     final json = await request('config', method: 'GET');
     return AccountConfiguration(
       enabled: json['enabled'] == true,
-      googleEnabled: json['google_enabled'] == true,
+      googleEnabled:
+          json['google_enabled'] == true &&
+          (defaultTargetPlatform != TargetPlatform.iOS ||
+              await iosGoogleClientId() != null),
+      appleEnabled:
+          json['apple_enabled'] == true &&
+          defaultTargetPlatform == TargetPlatform.iOS,
       webClientId: json['google_web_client_id'] as String?,
       ownerTestingOnly: json['owner_testing_only'] == true,
     );
@@ -109,6 +125,7 @@ class HttpAccountService implements AccountService {
               'name',
               'password',
               'current_password',
+              'id_token',
             ]) {
               final values = errors[field];
               if (values is List) messages.addAll(values.whereType<String>());
@@ -192,10 +209,22 @@ class PlatformGoogleAccountProvider implements GoogleAccountProvider {
   @override
   Future<String> idToken(String webClientId) async {
     if (!_initialized) {
-      await GoogleSignIn.instance.initialize(serverClientId: webClientId);
+      await GoogleSignIn.instance.initialize(
+        clientId: defaultTargetPlatform == TargetPlatform.iOS
+            ? await iosGoogleClientId()
+            : null,
+        serverClientId: webClientId,
+      );
       _initialized = true;
     }
-    final account = await GoogleSignIn.instance.authenticate();
+    GoogleSignInAccount account;
+    try {
+      account = await GoogleSignIn.instance.authenticate();
+    } on GoogleSignInException catch (error) {
+      if (error.code == GoogleSignInExceptionCode.canceled)
+        throw const AccountCancelled();
+      rethrow;
+    }
     final token = account.authentication.idToken;
     if (token == null) throw const AccountFailure(401);
     return token;
@@ -204,5 +233,40 @@ class PlatformGoogleAccountProvider implements GoogleAccountProvider {
   @override
   Future<void> signOut() async {
     if (_initialized) await GoogleSignIn.instance.signOut();
+  }
+}
+
+const _identityChannel = MethodChannel('services.shelf.app/identity');
+
+Future<String?> iosGoogleClientId() async {
+  try {
+    final value = await _identityChannel.invokeMethod<String>('googleClientId');
+    return value != null &&
+            RegExp(r'^[a-zA-Z0-9-]+\.apps\.googleusercontent\.com$')
+                .hasMatch(value)
+        ? value
+        : null;
+  } on PlatformException {
+    return null;
+  } on MissingPluginException {
+    return null;
+  }
+}
+
+abstract interface class AppleAccountProvider {
+  Future<Map<String, dynamic>?> credential(String nonce);
+}
+
+class PlatformAppleAccountProvider implements AppleAccountProvider {
+  const PlatformAppleAccountProvider();
+  @override
+  Future<Map<String, dynamic>?> credential(String nonce) async {
+    if (defaultTargetPlatform != TargetPlatform.iOS)
+      throw const AccountFailure(404);
+    final hashed = sha256.convert(utf8.encode(nonce)).toString();
+    return await _identityChannel.invokeMapMethod<String, dynamic>(
+      'apple',
+      hashed,
+    );
   }
 }

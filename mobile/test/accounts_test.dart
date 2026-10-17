@@ -310,18 +310,18 @@ void main() {
         await c.signIn('one', 'password');
         await tester.pageBack();
         await tester.pumpAndSettle();
-        await tester.tap(find.byIcon(Icons.local_library_outlined));
+        await tester.tap(find.byType(NavigationDestination).at(2));
         await tester.pumpAndSettle();
         expect(
           find.text(
-            BookstoreStrings(language == InterfaceLanguage.en).booksWillAppear,
+            BookstoreStrings(language == InterfaceLanguage.en, isDari: language == InterfaceLanguage.dari).booksWillAppear,
           ),
           findsOneWidget,
         );
         await c.signOut();
         await tester.pumpAndSettle();
         expect(
-          find.text(BookstoreStrings(language == InterfaceLanguage.en).signIn),
+          find.text(BookstoreStrings(language == InterfaceLanguage.en, isDari: language == InterfaceLanguage.dari).signIn),
           findsOneWidget,
         );
         expect(find.text(s.booksWillAppear), findsNothing);

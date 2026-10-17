@@ -33,7 +33,7 @@ class EmailActionController extends Controller
             }
             if ($purpose === 'reset') {
                 $reader->forceFill(['password' => $data['password'], 'email_verified_at' => now(),
-                    'sign_in_method' => $reader->google_subject_hash ? 'email_google' : 'email']);
+                    'sign_in_method' => $reader->apple_subject_hash ? 'email_apple' : ($reader->google_subject_hash ? 'email_google' : 'email')]);
                 $reader->tokens()->delete();
                 DB::table('reader_account_actions')->where('reader_id', $reader->id)->delete();
             }

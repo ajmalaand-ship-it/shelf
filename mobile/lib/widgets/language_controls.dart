@@ -31,6 +31,7 @@ class LanguageButton extends StatelessWidget {
       itemBuilder: (_) => const [
         PopupMenuItem(value: InterfaceLanguage.en, child: Text('English')),
         PopupMenuItem(value: InterfaceLanguage.ps, child: Text('پښتو')),
+        PopupMenuItem(value: InterfaceLanguage.dari, child: Text('دری')),
       ],
       child: SizedBox(
         height: 48,
@@ -41,7 +42,7 @@ class LanguageButton extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(settings?.isEnglish == true ? 'EN' : 'پښتو'),
+                Text((settings?.language ?? InterfaceLanguage.ps).label),
                 const Icon(Icons.arrow_drop_down, size: 20),
               ],
             ),
@@ -85,6 +86,18 @@ class LanguageChoiceScreen extends StatelessWidget {
                           InterfaceLanguage.ps,
                         ),
                   child: const Text(AppStrings.pashto),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  key: const Key('choose-dari'),
+                  onPressed: settings.saving
+                      ? null
+                      : () => chooseInterfaceLanguage(
+                          context,
+                          settings,
+                          InterfaceLanguage.dari,
+                        ),
+                  child: const Text('دری'),
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton(

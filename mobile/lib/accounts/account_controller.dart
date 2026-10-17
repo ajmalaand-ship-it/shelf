@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/widgets.dart';
 
 import 'account_service.dart';
@@ -8,13 +11,54 @@ class AccountController extends ChangeNotifier {
     required this.store,
     required this.google,
     this.identityStore,
+    this.apple = const PlatformAppleAccountProvider(),
   });
   final AccountService service;
   final AccountTokenStore store;
   final GoogleAccountProvider google;
+  final AppleAccountProvider apple;
   final AccountIdentityStore? identityStore;
   AccountConfiguration configuration = const AccountConfiguration();
   ReaderAccount? user;
+  Uint8List? avatar;
+
+  Future<void> loadAvatar() async {
+    final generation = _generation, token = _token;
+    final id = user?.id;
+    avatar = null;
+    if (token == null || user?.hasAvatar != true) return;
+    try {
+      final response = await service.request(
+        "avatar",
+        method: "GET",
+        token: token,
+      );
+      if (generation == _generation && token == _token && id == user?.id) {
+        final photo = response["photo"];
+        if (photo is String && photo.length <= 2796204)
+          avatar = base64Decode(photo);
+        notifyListeners();
+      }
+    } catch (_) {
+      /* Account remains usable when a photo cannot load. */
+    }
+  }
+
+  Future<void> replaceAvatar(Uint8List? bytes) => _run(() async {
+    if (_token == null) throw const AccountFailure(401);
+    if (bytes != null && bytes.length > 2 * 1024 * 1024)
+      throw const AccountFailure(422);
+    final generation = _generation, token = _token;
+    final response = await service.request(
+      "avatar",
+      method: bytes == null ? "DELETE" : "POST",
+      token: token,
+      data: bytes == null ? const {} : {"photo": base64Encode(bytes)},
+    );
+    if (generation != _generation || token != _token) return;
+    user = ReaderAccount.fromJson(response["user"] as Map<String, dynamic>);
+    await loadAvatar();
+  });
   String? _token;
   String? get readerToken => _token;
   bool busy = false, initialized = false;
@@ -64,6 +108,7 @@ class AccountController extends ChangeNotifier {
       }
     }
     if (generation == _generation) {
+      await loadAvatar();
       initialized = true;
       notifyListeners();
     }
@@ -71,6 +116,7 @@ class AccountController extends ChangeNotifier {
 
   Future<void> _clear() async {
     user = null;
+    avatar = null;
     _token = null;
     await store.clear();
     await identityStore?.clear();
@@ -99,6 +145,7 @@ class AccountController extends ChangeNotifier {
     final data = await service.request('me', method: 'GET', token: token);
     if (generation == _generation)
       user = ReaderAccount.fromJson(data['user'] as Map<String, dynamic>);
+    await loadAvatar();
   });
   Future<void> _authenticate(String path, Map<String, dynamic> data) =>
       _run(() async {
@@ -122,6 +169,7 @@ class AccountController extends ChangeNotifier {
         }
         _token = token;
         user = profile;
+        await loadAvatar();
       });
   Future<void> signIn(String email, String password) =>
       _authenticate('login', {'email': email, 'password': password});
@@ -130,8 +178,25 @@ class AccountController extends ChangeNotifier {
       throw const AccountFailure(404);
     // Remove a previous Google picker session so account switching is explicit.
     await google.signOut();
-    final idToken = await google.idToken(configuration.webClientId!);
-    await _authenticate('google', {'id_token': idToken});
+    try {
+      final idToken = await google.idToken(configuration.webClientId!);
+      await _authenticate('google', {'id_token': idToken});
+    } on AccountCancelled {
+      return;
+    }
+  }
+
+  Future<void> appleSignIn() async {
+    if (!configuration.appleEnabled) throw const AccountFailure(404);
+    final challenge = await service.request('apple-challenge');
+    final credential = await apple.credential(challenge['nonce'] as String);
+    if (credential == null)
+      return; // Cancelling the picker changes no reader session.
+    await _authenticate('apple', {
+      'challenge': challenge['challenge'],
+      'id_token': credential['id_token'],
+      'authorization_code': credential['authorization_code'],
+    });
   }
 
   Future<void> register(

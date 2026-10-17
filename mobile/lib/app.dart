@@ -51,7 +51,9 @@ class ShelfApp extends StatelessWidget {
             title: AppStrings.appName,
             theme: AppTheme.light,
             builder: (context, child) => Directionality(
-              textDirection: TextDirection.rtl,
+              textDirection: AppStrings.of(context).isEnglish
+                  ? TextDirection.ltr
+                  : TextDirection.rtl,
               child: (ownerPreviewMode || shelfTestMode)
                   ? Column(
                       children: [
@@ -68,7 +70,9 @@ class ShelfApp extends StatelessWidget {
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Text(
-                                  shelfTestMode ? 'TEST COPY — Shelf Test' : AppStrings.of(context).ownerPreview,
+                                  shelfTestMode
+                                      ? 'TEST COPY — Shelf Test'
+                                      : AppStrings.of(context).ownerPreview,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.white,

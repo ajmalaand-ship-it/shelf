@@ -52,6 +52,11 @@ class AccountActions
     {
         DB::transaction(function () use ($reader) {
             $reader = Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail();
+            // Revoke Apple authorization before erasing its encrypted recovery token.
+            if ($reader->apple_subject_hash) {
+                abort_unless(filled($reader->apple_refresh_token), 503);
+                app(AppleIdentity::class)->revoke($reader->apple_refresh_token);
+            }
             // Durability before erasure: an acknowledged request survives server loss
             // and an older database restore, even if this transaction later fails.
             $receipt = app(DeletionJournal::class)->record($reader);
@@ -64,6 +69,7 @@ class AccountActions
             // Money records are retained unchanged. These nullable identifiers have no
             // FK to the deleted identity; no names/emails are stored in accounting.
             $reader->delete();
+            DB::afterCommit(fn () => app(ReaderAvatar::class)->erase($reader));
         });
     }
 }

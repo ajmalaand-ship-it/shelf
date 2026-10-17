@@ -41,10 +41,32 @@ void main() {
     );
 
     expect(find.byKey(const Key('card-preview')), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const Key('share-line-1')));
     await tester.tap(find.byKey(const Key('share-line-1')));
     await tester.pump();
-    expect(find.text('2/۴'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('۲/۴'),
+      -80,
+      scrollable: find
+          .descendant(
+            of: find.byKey(const Key('share-controls-scroll')),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(find.text('۲/۴'), findsOneWidget);
 
+    await tester.scrollUntilVisible(
+      find.text('تياره'),
+      100,
+      scrollable: find
+          .descendant(
+            of: find.byKey(const Key('share-controls-scroll')),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('تياره'));
     await tester.pump();
     await tester.tap(find.text('روښانه'));
@@ -88,8 +110,8 @@ void main() {
       ),
     );
 
-    expect(find.text('Sample — نمونه'), findsOneWidget);
-    await tester.tap(find.text('Sample — نمونه'));
+    expect(find.text('بېلګه'), findsOneWidget);
+    await tester.tap(find.text('بېلګه'));
     await tester.pump();
     await _scrollToShare(tester);
     final shareButton = tester.widget<FilledButton>(
@@ -161,7 +183,7 @@ void main() {
     );
     await tester.pump();
     expect(output.savedCount, 1);
-    expect(find.textContaining('په ګالرۍ کې وساتل شول'), findsOneWidget);
+    expect(find.textContaining('کارتونه وساتل شول'), findsOneWidget);
   });
 }
 

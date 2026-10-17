@@ -2,6 +2,14 @@
 
 return [
     // Production acceptance remains off until an explicit owner-approved launch rollout.
+    // One-book Apple sandbox only; no Apple production switch exists in this batch.
+    'apple_owned_book3_test_enabled' => env('SHELF_APPLE_OWNED_BOOK3_TEST_ENABLED', false),
+    'apple_sandbox_enabled' => env('SHELF_APPLE_SANDBOX_ENABLED', false),
+    'apple_public_sdk_key' => env('SHELF_REVENUECAT_IOS_KEY'),
+    'apple_app_id' => env('SHELF_REVENUECAT_IOS_APP_ID'),
+    'apple_product_id' => env('SHELF_REVENUECAT_IOS_BOOK3_PRODUCT_ID'),
+    'apple_project_id' => env('SHELF_REVENUECAT_PROJECT_ID'),
+    'apple_webhook_authorization' => env('SHELF_REVENUECAT_IOS_WEBHOOK_AUTH'),
     'enabled' => env('SHELF_PURCHASES_ENABLED', false),
     'public_sdk_key' => env('SHELF_REVENUECAT_ANDROID_KEY'),
     'secret_key' => env('SHELF_REVENUECAT_SECRET_KEY'),

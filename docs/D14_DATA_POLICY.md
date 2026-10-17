@@ -1,9 +1,221 @@
-# D14 — approved 7 October 2026
+## D14 reporting/disclosures deployed — 16 October local / 17 October UTC 2026
 
-Financial expiry remains unresolved. No financial rows, agreement snapshots,
+Completed application commit **4aa2f613778d58a3ced8034dd95921cfea092bd6**
+is identical on staging and production, as recorded in release-state.json.
+Owner-only Admin: https://shelf.services/admin/financial-retention
+Public owner-review pages: https://shelf.services/privacy and
+https://shelf.services/account/delete . No store declaration/provider setting saved.
+
+Evidence: isolated wrapper **41 tests / 241 assertions**, including staging workflow
+gate; identical staged application **40 focused tests / 240 assertions** covering
+retention, public wording, accounting and existing D14 recovery/deletion behavior
+with synthetic/mocked providers. No mobile files changed in this task, no mobile
+suite/build and no Apple purchase test. Actual deployed Admin HTTP-kernel route
+rendered on both copies with an in-memory owner session only; real page, report,
+evidence history and actions present, no persistent login or live metadata write.
+Public privacy/deletion HTTPS returned matching approved wording on both copies.
+This is server-render verification, not a claimed interactive browser/owner review.
+
+Verified backup before staging migration:
+`/home/shelf/backups/shelf-staging/20261017-003109/`.
+Verified production backup before maintenance/migration/promotion:
+`/home/shelf/backups/shelf/20261017-003141/` (SQL, ZIP and SHA-256 passed).
+New metadata migration is production **batch 30**; **zero metadata rows** were
+seeded or entered. Report: **2 purchase groups, 0 eligible, 2 blocked/retained**.
+Strict existing reader/token/purchase/refund/ledger/entitlement/agreement/journal/
+share fingerprints matched across promotion. Production healthy and maintenance
+lifted; cPanel handler preserved as the sole pre-existing production working edit.
+Required runtime flags (real checkout, Apple sandbox and owned-book exception,
+price sync) verified OFF. No deletion, provider cleanup or expiry executed.
+A sandbox-denied optional migration-batch read was repeated with approved server
+access and passed; no database/service failure occurred.
+
+Append-only filing/mapping/hold/report foundation and disclosure construction are
+complete for this batch. Current approved policy is unchanged. No tax filing date,
+jurisdiction or mapped financial evidence invented; owner can enter real evidence
+when available. Financial minimisation/expiry remains **unimplemented/OFF** and
+requires the separately reviewed preservation/disposal plan before any later
+execution. Actual provider metadata erasure remains unverified, conditional on
+genuine approved work; external privacy evidence, operational/device acceptance
+and store/final joint-release requirements remain as recorded. D14 is not declared
+fully complete. Apple purchase testing remains closed/deferred, no builds, France
+exclusion and every existing release hold preserved.
+
+Rollback: previous production code **1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19**;
+retain additive metadata/evidence if reverting code. Empty-table migration rollback
+is tested; populated rollback refuses data loss. Never restore over later reader
+or financial activity. Existing source/recovery data and journals unchanged.
+
+**One next release milestone:** joint Android/iOS release-readiness acceptance and
+store-review readiness, preserving owner-deferred tests and requiring separate
+explicit launch authorization. No next milestone work started by this batch.
+
+---
+
+# Current implementation — 16 October 2026
+
+Owner authorized the release-required Admin reporting/disclosure batch, with all
+expiry/deletion execution and purchase gates OFF. The historical approved plan
+below remains the policy source; its “not authorized” statements describe 8 October.
+
+Implemented append-only `financial_retention_records` metadata, owner-only
+Admin → Sales and readers → Financial retention. Record evidenced filed returns
+(period, jurisdiction, actual filing date and private reference), complete mappings
+of purchase/correction groups to all relevant returns, scoped legal/dispute/unpaid
+holds, and evidenced hold resolutions. Corrections are new records. Latest mapping
+is used; new ledger/journal corrections invalidate it until reviewed/remapped.
+Missing/unknown evidence blocks eligibility. No filing dates, jurisdictions,
+completed tax filings or existing-record mappings are seeded or inferred.
+
+Report uses counts/IDs, shows Test exclusion, financial/share/correction IDs, shared
+agreement references, provider-event/recovery-audit counts and protected recovery
+dependencies. Three calendar years use no-overflow February 29 → February 28;
+the full anniversary day is retained in UTC. All relevant returns must pass their
+windows. Unknown or nonzero author balances block review eligibility. Overdue
+holds remain active until an owner records evidenced resolution. “Eligible” means
+**preservation review only**, never approval or capability to delete.
+
+Public `/privacy` and `/account/delete` now describe the approved period and
+exceptions, continuing recovery proof, no automatic financial expiry, current
+retained-history behavior, and the current Google-only deleted-account recovery
+limit. Real checkout and Apple sandbox checkout remain disabled. No store/provider
+settings or mobile source/build changed.
+
+## Preservation boundary before any future disposal
+
+- Financial detail compartment: immutable ledger, journal, shares, confirmations,
+  adjustments/reversals, payment evidence, agreement snapshots and supporting
+  references remain untouched. Shared agreements/events cannot expire while any
+  retained group depends on them. No foreign keys or immutability protections weaken.
+- Protected recovery compartment: original purchase ID, original provider reader,
+  book/product/store/environment, exact transaction and purchase time (including
+  Apple millisecond proof where present), refund/revocation evidence and original
+  provider linkage remain. `PurchaseRecoveryService` depends on original Play
+  purchase and live Google/RevenueCat evidence; `PurchaseService` and
+  `VoidedPurchaseService` require purchase/event/refund references. Recovery audit,
+  proof hashes, unique claim and independent deletion/recovery journals remain.
+  The report never displays tokens, provider payloads, profile names or emails.
+- This is a logical dependency separation in reporting, not physical minimisation.
+  No financial originals, provider events, customers, ownership or recovery data
+  are removed/moved. Current recovery behavior is preserved; Apple deleted-account
+  recovery is not implemented by this batch.
+- Future expiry requires a separately reviewed field-by-field preservation/disposal
+  plan and R8 resolution before any original is removed, shared-dependency checks,
+  minimum-proof/recovery validation, auditable disposal receipts and older-backup
+  replay/suppression checks. No scheduler, delete button or expiry executor exists.
+  Existing 14-local-copy / 90-day protected-last-set backup policy is unchanged.
+- Migration rollback drops the new table only while empty; after evidence exists,
+  rollback refuses its loss. Code rollback may retain this additive table. Never
+  restore an older database over later customer/financial activity.
+
+Actual financial minimisation/expiry, actual provider metadata erasure, external
+privacy evidence and remaining operational/device/store acceptance are not claimed
+complete. No reader deletion or provider cleanup was executed for evidence.
+
+---
+
+# D14 — approved 7 October 2026; financial policy approved 8 October 2026
+
+Financial policy is approved below; financial expiry is NOT IMPLEMENTED. No financial rows, agreement snapshots,
 Google records, source originals, credentials or keys are expired by these jobs.
 Real checkout remains OFF; manual Play products/prices remain approved for the
 first 100 books and automatic sync remains DEFERRED.
+
+## Financial retention approved — 8 October 2026
+
+Owner-approved policy (owner chat, not a claim of a universal statutory period):
+- Retain accounting and tax-supporting records for **three years after the relevant
+  tax return is filed**. The clock is the actual filing date, not purchase date,
+  account deletion, year-end, release date or the date this policy was approved.
+- Retain affected records longer where an applicable legal requirement, unresolved
+  dispute or unpaid author balance requires it. Exceptions apply to affected evidence,
+  not automatically to every record; document the basis and release condition.
+- Keep **only the minimum purchase proof needed while purchased-book recovery rights
+  continue**. The three-year period must not break those rights, including approved
+  support-assisted recovery after account deletion and refund/revocation checks.
+- The **seven-year proposal and one-year alternative are NOT APPROVED**. No blanket
+  permanent accounting archive or three-year post-rights period is approved here.
+
+**Approved policy versus implemented behavior:** policy decided; financial expiry
+NOT IMPLEMENTED. Existing accounting, tax-supporting and purchase/recovery records
+remain retained without automatic financial expiry. Current 03:45 maintenance covers
+approved log/backup retention and provider metadata retries, not financial records.
+There is no tax-return filing-date registry or approved financial eligibility job.
+Public policy still describes financial retention as under review; aligning deployed
+wording is a later scoped change, not performed by this documentation task. Earlier
+“financial expiry unresolved” entries remain historical; the policy is now approved,
+while implementation remains outstanding. D14 is not declared fully complete.
+
+Checkout **OFF**, pricing sync **DEFERRED / disabled**, reviewer access and completed
+work preserved. **Second-phone restore remains owner-deferred, not passed, not
+requested and not a launch blocker without a later owner decision.** No record
+expiry/deletion, production setting change, migration, rebuild or deployment here.
+
+## Scoped implementation plan — prepared, not authorized execution
+
+1. **Inventory and mapping (read-only/dry-run first).** Map accounting_entries,
+   accounting_shares, sales_ledger and supporting purchase_events/agreements to the
+   relevant tax return(s). Include confirmations, payments, adjustments/reversals
+   and supporting references/notes. Shared agreement snapshots or supporting records
+   cannot expire while another retained record needs them. Test history remains
+   labelled Test and excluded from real income; do not invent a one-year Test rule.
+2. **Filing evidence.** Propose a restricted owner-managed tax-return registry with
+   tax period/jurisdiction, actual filed date, evidence reference, recording owner/time,
+   and versioned record-to-return links. No dates inferred from transactions. For
+   multiple relevant returns, eligibility must wait until all applicable three-year
+   windows are satisfied. Missing/unknown filing or mapping holds the records and
+   reports the gap. Amended-return treatment needs verified applicable rules or a
+   specific owner decision; no automatic reset rule invented.
+3. **Scoped exceptions.** Propose append-only legal/dispute/unpaid-balance holds with
+   affected record IDs, source/case reference, reason, owner/time, review date and
+   documented release. Unknown net/owed or unsettled shares are held for review,
+   never presumed paid. A stale review date never silently releases a hold. Verify
+   actual legal requirements before recording a legal deadline; approval of three
+   years is not proof all jurisdictions accept it.
+4. **Separate recovery proof from expired financial detail.** Trace exact dependencies
+   in PurchaseRecoveryService, PurchaseService, RevenueCatClient and VoidedPurchaseService.
+   Candidate minimum: original provider reader ID, book/product/store/environment,
+   transaction/order reference and purchase time, necessary token/proof hashes,
+   refund/revocation state, recovery claim/audit and original-provider linkage. Validate
+   each field's need rather than retain full accounting notes/profile by default.
+   Current recovery requires the original purchase plus live provider evidence; do
+   not remove these dependencies first or delete the whole RevenueCat customer.
+   Keep deletion/recovery suppression journals independently protected. No financial
+   expiry may reset a claim, revive refunded access or prevent a valid recovery.
+5. **Eligibility report only initially.** Calculate three calendar years from evidenced
+   filing dates, with explicit date-boundary/leap-date handling tested. Report retained,
+   eligible and blocked record groups, reasons, linked returns, exceptions and recovery
+   dependencies, using counts/IDs rather than personal data or tokens. Initial tool
+   defaults to dry-run; no scheduler/automatic financial expiry enabled. Approval of
+   this policy/plan does not authorize deleting current rows.
+6. **Preservation and recovery design before any execution.** R8 append-only correction
+   rules, R3 reversible migrations and real-data preservation remain applicable. New
+   metadata structures and any scripted existing-record mapping require committed
+   reversible migrations, fresh backup and later authorized staged rollout. Existing
+   foreign-key restrictions/immutable models must not be bypassed or silently weakened.
+   Produce a separately reviewed disposal/preservation plan before any expiry that
+   removes financial originals; clarify any necessary R8 exception with the owner.
+   Future minimisation/expiry must have auditable receipts, preserve money corrections
+   during retention and minimum recovery proof, and avoid reintroducing expired data
+   after older-backup restoration. Existing local 14-copy/OneDrive 90-day protected-set
+   rules are unchanged; copying records to backups is not proof they have expired.
+7. **Necessary isolated checks and later rollout.** Through scripts/run_tests.sh with
+   focused PHP filters, prove filing/mapping gaps fail closed; three-year boundaries;
+   multiple returns; legal/dispute/unpaid holds; immutable correction chains; Test
+   exclusion; recovery after financial-detail minimisation; refund/revocation and
+   duplicate-claim safety; older-backup replay. No Flutter suite or rebuild unless
+   mobile changes are separately authorized. Then stage the same reviewed commit and
+   provide the dry-run/preservation result for approval before backed-up production
+   promotion or any separately authorized expiry activation. No rollout now.
+8. **Disclosures.** In that later approved task, align public privacy/deletion wording
+   and release documentation with the approved policy and actual implementation state.
+   Do not claim automatic expiry or provider erasure until verified. No store/provider
+   setting changes or real-money transactions are needed for this plan.
+
+**Next scoped task proposed:** implement filing-date mapping, exception metadata and
+an owner-only financial-retention dry-run report in isolation, with expiry OFF.
+A later task needs explicit approval; this task prepares its plan only. No filing
+information, legal jurisdiction, date or completed expiry invented.
 
 ## Deletion and recovery
 
@@ -75,7 +287,7 @@ V1 POST `/v1/subscribers/{reader_id}/attributes` null values, and verifies by V2
 read-back. No additional scope is established as necessary; V2 read_write is not
 used. Actual provider erasure remains unverified until genuine approved deleted-
 reader work exists. Immutable metadata is held for reviewed resolution; never
-remove whole-customer purchase/refund history. Financial expiry remains unresolved.
+remove whole-customer purchase/refund history. Financial policy now approved; financial expiry remains unimplemented.
 Prior focused tests reused, real checkout OFF, automatic Play sync DEFERRED.
 
 ## Retention and operation

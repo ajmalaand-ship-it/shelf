@@ -7,6 +7,7 @@ use App\Models\Collection;
 use App\Models\Reader;
 use App\Models\User;
 use App\Services\Accounts\AccountActions;
+use App\Services\Accounts\DeletionJournal;
 use App\Services\Accounts\GoogleIdentity;
 use Firebase\JWT\JWT;
 use Google\Auth\AccessToken;
@@ -27,7 +28,7 @@ class ReaderAccountsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mock(\App\Services\Accounts\DeletionJournal::class, function ($mock) {
+        $this->mock(DeletionJournal::class, function ($mock) {
             $mock->shouldReceive('record')->andReturnUsing(fn ($reader) => ['record_id' => str_repeat('a', 32)]);
         });
         config(['reader_auth.enabled' => true, 'reader_auth.public_registration' => true]);
@@ -218,29 +219,38 @@ class ReaderAccountsTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    public function test_google_links_only_verified_identity_and_defeats_unverified_account_pre_hijack(): void
+    public function test_google_never_automatically_links_matching_email(): void
     {
-        $reader = $this->reader('reader@gmail.com', false);
-        $old = $this->token($reader);
-        $this->google(['email' => $reader->email, 'email_verified' => true, 'sub' => 'subject']);
-        $this->postJson('/api/auth/google', ['id_token' => 'synthetic'])->assertOk()->assertJsonPath('user.sign_in_method', 'google');
-        $this->assertNull($reader->fresh()->password);
-        $this->getJson('/api/auth/me', $this->bearer($old))->assertUnauthorized();
-        $this->assertEquals(hash('sha256', 'subject'), $reader->fresh()->google_subject_hash);
-        $reader->forceFill(['password' => self::PASSWORD])->save();
-        $this->postJson('/api/auth/google', ['id_token' => 'synthetic'])->assertOk()->assertJsonPath('user.sign_in_method', 'email_google');
-        $this->google(['email' => $reader->email, 'email_verified' => true, 'sub' => 'wrong-subject']);
-        $this->postJson('/api/auth/google', ['id_token' => 'synthetic'])->assertConflict();
+        foreach ([true, false] as $verified) {
+            $reader = $this->reader($verified ? 'verified@gmail.com' : 'unverified@gmail.com', $verified);
+            $old = $this->token($reader);
+            $hash = $reader->password;
+            $this->google(['email' => $reader->email, 'email_verified' => true, 'sub' => 'subject']);
+            $this->postJson('/api/auth/google', ['id_token' => 'synthetic'])->assertConflict();
+            $this->assertSame($hash, $reader->fresh()->password);
+            $this->assertNull($reader->fresh()->google_subject_hash);
+            $this->getJson('/api/auth/me', $this->bearer($old))->assertOk();
+        }
     }
 
-    public function test_external_google_email_requires_a_fresh_email_confirmation(): void
+    public function test_existing_google_subject_remains_the_identity_when_email_changes(): void
     {
-        $reader = $this->reader();
-        $this->google(['email' => $reader->email, 'email_verified' => true, 'sub' => 'external']);
+        $reader = $this->reader('old@gmail.com');
+        $reader->forceFill(['google_subject_hash' => hash('sha256', 'subject'), 'sign_in_method' => 'email_google'])->save();
+        $this->google(['email' => 'new@gmail.com', 'email_verified' => true, 'sub' => 'subject']);
+        $this->postJson('/api/auth/google', ['id_token' => 'synthetic'])->assertOk()->assertJsonPath('user.id', $reader->id);
+        $this->assertSame('old@gmail.com', $reader->fresh()->email);
+        $this->assertDatabaseCount('readers', 1);
+    }
+
+    public function test_new_external_google_email_requires_a_fresh_email_confirmation(): void
+    {
+        $this->google(['email' => 'new@example.test', 'email_verified' => true, 'sub' => 'external']);
         $this->postJson('/api/auth/google', ['id_token' => 'synthetic'])->assertAccepted()->assertJsonPath('email_confirmation_required', true)->assertJsonMissingPath('token');
-        $this->assertNull($reader->fresh()->google_subject_hash);
+        $reader = Reader::firstOrFail();
+        $this->assertNull($reader->google_subject_hash);
         $this->postJson('/account/google', ['token' => $this->action('google')])->assertOk();
-        $this->assertTrue(Hash::check(self::PASSWORD, $reader->fresh()->password));
+        $this->assertNull($reader->fresh()->password);
         $this->postJson('/api/auth/google', ['id_token' => 'synthetic'])->assertOk();
     }
 

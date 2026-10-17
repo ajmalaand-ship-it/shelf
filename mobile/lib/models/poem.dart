@@ -2,6 +2,7 @@ class PoemSummary {
   const PoemSummary({
     required this.id,
     this.title,
+    this.firstLine,
     required this.workType,
     this.originalAuthor,
     this.translator,
@@ -19,6 +20,7 @@ class PoemSummary {
   factory PoemSummary.fromJson(Map<String, dynamic> json) => PoemSummary(
     id: _int(json, 'id', required: true)!,
     title: _string(json, 'title'),
+    firstLine: _string(json, 'first_line'),
     workType: _string(json, 'work_type') ?? 'ORIGINAL',
     originalAuthor: _string(json, 'original_author'),
     translator: _string(json, 'translator'),
@@ -39,6 +41,7 @@ class PoemSummary {
 
   final int id;
   final String? title;
+  final String? firstLine;
   final String workType;
   final String? originalAuthor;
   final String? translator;
@@ -55,11 +58,12 @@ class PoemSummary {
   bool get isTranslation => workType == 'TRANSLATION';
   bool get isUntitled => title == null || title!.trim().isEmpty;
   String get displayTitle =>
-      isUntitled ? firstNonEmptyLine(excerpt) : title!.trim();
+      isUntitled ? firstNonEmptyLine(firstLine ?? excerpt) : title!;
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
+    'first_line': firstLine,
     'work_type': workType,
     'original_author': originalAuthor,
     'translator': translator,

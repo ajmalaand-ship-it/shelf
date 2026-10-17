@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Account;
 use App\Http\Controllers\Controller;
 use App\Models\Reader;
 use App\Services\Accounts\AccountActions;
+use App\Services\Accounts\AppleIdentity;
 use App\Services\Accounts\GoogleIdentity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@ class AuthController extends Controller
 
         return response()->json(['enabled' => $enabled, 'google_enabled' => $google,
             'google_web_client_id' => $google ? config('reader_auth.google_web_client_id') : null,
-            'owner_testing_only' => false]);
+            'apple_enabled' => $enabled && AppleIdentity::enabled(), 'owner_testing_only' => false]);
     }
 
     private function email(Request $request): string
@@ -139,6 +140,59 @@ class AuthController extends Controller
         return response()->json(['message' => 'Confirm deletion using the email we sent you.'], 202);
     }
 
+    public function appleChallenge()
+    {
+        abort_unless(AppleIdentity::enabled(), 404);
+        $id = bin2hex(random_bytes(32));
+        $nonce = bin2hex(random_bytes(32));
+        DB::table('apple_login_challenges')->where('expires_at', '<=', now())->delete();
+        DB::table('apple_login_challenges')->insert(['id' => $id, 'nonce_hash' => hash('sha256', $nonce),
+            'expires_at' => now()->addMinutes(5)]);
+
+        return response()->json(['challenge' => $id, 'nonce' => $nonce]);
+    }
+
+    public function apple(Request $request, AppleIdentity $apple)
+    {
+        abort_unless(AppleIdentity::enabled(), 404);
+        $data = $request->validate(['challenge' => ['required', 'string', 'size:64'],
+            'id_token' => ['required', 'string', 'max:16384'],
+            'authorization_code' => ['required', 'string', 'max:4096']]);
+        // Consume before remote verification: failed attempts cannot replay a challenge.
+        $nonce = DB::transaction(function () use ($data) {
+            $entry = DB::table('apple_login_challenges')->where('id', $data['challenge'])->lockForUpdate()->first();
+            abort_unless($entry && now()->lt($entry->expires_at), 422, 'Apple sign-in expired. Please try again.');
+            DB::table('apple_login_challenges')->where('id', $data['challenge'])->delete();
+
+            return $entry->nonce_hash;
+        });
+        $claims = $apple->verify($data['id_token'], $nonce);
+        $subject = hash('sha256', $claims['sub']);
+        $reader = Reader::where('apple_subject_hash', $subject)->first();
+        if (! $reader) {
+            $email = is_string($claims['email'] ?? null) ? strtolower($claims['email']) : '';
+            abort_unless(filter_var($email, FILTER_VALIDATE_EMAIL) && strlen($email) <= 255
+                && in_array($claims['email_verified'] ?? null, [true, 'true'], true), 422);
+            abort_if(Reader::where('email', $email)->exists(), 409,
+                'Sign in using your existing account method. Accounts are not linked by email.');
+        }
+        $refresh = $apple->exchange($data['authorization_code'], $claims['sub']);
+        $reader = DB::transaction(function () use ($reader, $claims, $subject, $refresh) {
+            if (! $reader) {
+                $reader = Reader::create(['email' => strtolower($claims['email'])]);
+                $reader->forceFill(['apple_subject_hash' => $subject, 'sign_in_method' => 'apple',
+                    'email_verified_at' => now()]);
+            } else {
+                $reader = Reader::whereKey($reader->id)->lockForUpdate()->firstOrFail();
+            }
+            $reader->forceFill(['apple_refresh_token' => $refresh])->save();
+
+            return $reader;
+        });
+
+        return $this->session($reader);
+    }
+
     public function google(Request $request, GoogleIdentity $google)
     {
         abort_unless(GoogleIdentity::enabled(), 404);
@@ -146,7 +200,13 @@ class AuthController extends Controller
         $claims = $google->verify($data['id_token']);
         $email = strtolower($claims['email']);
         $subject = hash('sha256', $claims['sub']);
+        // Provider subject is the identity. Email equality alone never links accounts.
+        if ($linked = Reader::where('google_subject_hash', $subject)->first()) {
+            return $this->session($linked);
+        }
         $reader = Reader::where('email', $email)->first();
+        abort_if($reader !== null, 409,
+            'Sign in using your existing account method. Accounts are not linked by email.');
         if (! $reader) {
             $reader = Reader::create(['email' => $email]);
             $reader->forceFill(['sign_in_method' => 'google'])->save();

@@ -61,11 +61,14 @@ Route::prefix('owner-preview')
 Route::prefix('auth')->middleware([PrivateAccountResponse::class])->group(function (): void {
     Route::get('config', [AuthController::class, 'config'])->middleware('throttle:60,1');
     Route::middleware([AccountsEnabled::class, 'throttle:reader-auth'])->group(function (): void {
-        foreach (['register', 'login', 'google', 'forgot' => 'forgot-password'] as $method => $path) {
+        foreach (['register', 'login', 'google', 'apple', 'appleChallenge' => 'apple-challenge', 'forgot' => 'forgot-password'] as $method => $path) {
             $method = is_int($method) ? $path : $method;
             Route::post($path, [AuthController::class, $method]);
         }
         Route::middleware(['auth:reader', ReaderAccountAccess::class])->group(function (): void {
+            Route::get('avatar', [App\Http\Controllers\Account\AvatarController::class, 'show']);
+            Route::post('avatar', [App\Http\Controllers\Account\AvatarController::class, 'store']);
+            Route::delete('avatar', [App\Http\Controllers\Account\AvatarController::class, 'destroy']);
             Route::get('me', [AuthController::class, 'me']);
             Route::post('logout', [AuthController::class, 'logout']);
             Route::post('verify/resend', [AuthController::class, 'resend']);

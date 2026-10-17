@@ -1,3 +1,4 @@
+import '../widgets/shelf_assets.dart';
 import '../settings/privacy_support.dart';
 import '../accounts/account_controller.dart';
 import '../accounts/account_screen.dart';
@@ -47,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<BookCategory> _categories = [];
   bool _failed = false;
   int _tab = 0;
+  String? _storeType;
   @override
   void initState() {
     super.initState();
@@ -114,35 +116,29 @@ class _HomeScreenState extends State<HomeScreen> {
     animation: widget.readerSettings,
     builder: (context, _) => Scaffold(
       appBar: AppBar(
-        title: Text(
-          [
-            AppStrings.of(context).store,
-            AppStrings.of(context).search,
-            AppStrings.of(context).library,
-            AppStrings.of(context).settings,
-          ][_tab],
-        ),
+        title: _tab == 0
+            ? const ShelfLogo()
+            : Text(
+                [
+                  AppStrings.of(context).appName,
+                  AppStrings.of(context).search,
+                  AppStrings.of(context).library,
+                  AppStrings.of(context).settings,
+                ][_tab],
+              ),
         actions: [
           IconButton(
             key: const Key('store-account'),
             tooltip: AccountScope.of(context)?.user == null
-                ? 'Sign in / Create account'
-                : 'Signed in',
+                ? '${AppStrings.of(context).signIn} / ${AppStrings.of(context).createAccount}'
+                : AppStrings.of(context).account,
             onPressed: () => openAccount(context),
-            icon: Icon(
-              AccountScope.of(context)?.user == null
-                  ? Icons.person_outline
-                  : Icons.account_circle,
-            ),
+            icon: const ShelfActionIcon('account'),
           ),
-          if (_tab == 0)
-            const LanguageButton(key: Key('store-language-toggle')),
-          TextButton.icon(
+          ShelfFontButton(
             key: const Key('home-font-chooser'),
             onPressed: () =>
                 showReadingPreferences(context, widget.readerSettings),
-            icon: const Icon(Icons.text_fields_rounded),
-            label: Text(AppStrings.of(context).font),
           ),
         ],
       ),
@@ -151,19 +147,23 @@ class _HomeScreenState extends State<HomeScreen> {
         onDestinationSelected: (index) => setState(() => _tab = index),
         destinations: [
           NavigationDestination(
-            icon: Icon(Icons.storefront_outlined),
+            icon: ShelfActionIcon('store', inactive: true),
+            selectedIcon: ShelfActionIcon('store'),
             label: AppStrings.of(context).store,
           ),
           NavigationDestination(
-            icon: Icon(Icons.search),
+            icon: ShelfActionIcon('search', inactive: true),
+            selectedIcon: ShelfActionIcon('search'),
             label: AppStrings.of(context).search,
           ),
           NavigationDestination(
-            icon: Icon(Icons.local_library_outlined),
+            icon: ShelfActionIcon('library', inactive: true),
+            selectedIcon: ShelfActionIcon('library'),
             label: AppStrings.of(context).library,
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
+            icon: ShelfActionIcon('settings', inactive: true),
+            selectedIcon: ShelfActionIcon('settings'),
             label: AppStrings.of(context).settings,
           ),
         ],
@@ -194,7 +194,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return _failed
           ? BookstoreError(onRetry: _load)
           : const Center(child: CircularProgressIndicator());
-    final books = snapshot.collections;
+    final books = snapshot.collections
+        .where((book) => _storeType == null || book.bookType == _storeType)
+        .toList();
     final populated = _categories
         .where(
           (c) => books.any((b) => b.categories.any((bc) => bc.slug == c.slug)),
@@ -213,16 +215,48 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(20),
         children: [
-          Text(
-            AppStrings.of(context).appName,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineLarge,
+          const Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: LanguageButton(key: Key('store-language-toggle')),
           ),
-          const SizedBox(height: 10),
           Text(
             snapshot.config.slogan,
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            key: const Key('store-search-entry'),
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.white,
+              alignment: AlignmentDirectional.centerStart,
+            ),
+            onPressed: () => setState(() => _tab = 1),
+            icon: const ShelfActionIcon('search'),
+            label: Text(AppStrings.of(context).searchHint),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final type in [null, 'poetry', 'prose'])
+                ChoiceChip(
+                  selected: _storeType == type,
+                  label: Text(
+                    type == null
+                        ? AppStrings.of(context).all
+                        : AppStrings.of(context).typeName(type),
+                  ),
+                  labelStyle: TextStyle(
+                    fontFamily: 'Vazirmatn',
+                    color: _storeType == type
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.primary,
+                  ),
+                  onSelected: (_) => setState(() => _storeType = type),
+                ),
+            ],
           ),
           if (widget.qaMode)
             Padding(
@@ -239,10 +273,10 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           else if (populated.isEmpty) ...[
             SectionTitle(AppStrings.of(context).allBooks),
-            BookGrid(
+            BookList(
               books: books,
-              ownerPreview: widget.ownerPreviewMode,
               fontFamily: widget.readerSettings.fontFamily,
+              ownerPreview: widget.ownerPreviewMode,
               onTap: (b) => _navigation.openBook(context, b.slug),
             ),
           ] else ...[
@@ -288,6 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 8),
                           Text(
                             author.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                             maxLines: 2,
                             textDirection: TextDirection.rtl,
                             textAlign: TextAlign.right,
@@ -316,7 +351,7 @@ class LibraryScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.local_library_outlined, size: 56),
+          ShelfActionIcon('library', size: 56),
           SizedBox(height: 20),
           Text(
             AccountScope.of(context)?.user == null
@@ -337,7 +372,7 @@ class LibraryScreen extends StatelessWidget {
             ),
             child: Text(
               AccountScope.of(context)?.user == null
-                  ? 'Sign in / Create account'
+                  ? '${AppStrings.of(context).signIn} / ${AppStrings.of(context).createAccount}'
                   : AppStrings.of(context).account,
             ),
           ),
@@ -356,7 +391,7 @@ class SettingsScreen extends StatelessWidget {
     children: [
       ListTile(
         key: const Key('settings-account'),
-        leading: const Icon(Icons.person_outline),
+        leading: const ShelfActionIcon('account'),
         title: Text(AppStrings.of(context).account),
         subtitle: Text(
           AccountScope.of(context)?.user?.email ??
@@ -367,17 +402,16 @@ class SettingsScreen extends StatelessWidget {
       ListTile(
         title: Text(AppStrings.of(context).interfaceLanguage),
         subtitle: Text(
-          InterfaceLanguageScope.of(context)?.isEnglish == true
-              ? AppStrings.english
-              : AppStrings.pashto,
+          (InterfaceLanguageScope.of(context)?.language ?? InterfaceLanguage.ps)
+              .label,
         ),
         trailing: const LanguageButton(key: Key('settings-language-toggle')),
       ),
       const PrivacySupportEntries(),
       ListTile(
-        leading: const Icon(Icons.menu_book_outlined),
+        leading: const ShelfActionIcon('read-sample'),
         title: Text(AppStrings.of(context).readingPreferences),
-        trailing: const Icon(Icons.chevron_left),
+        trailing: const ShelfActionIcon('back', directional: true),
         onTap: () => showReadingPreferences(context, settings),
       ),
     ],

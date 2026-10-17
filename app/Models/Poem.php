@@ -126,6 +126,20 @@ class Poem extends Model
         return '';
     }
 
+    public function catalogueFirstLine(): ?string
+    {
+        $lines = array_values(array_filter(
+            preg_split('/\r\n|\r|\n/u', $this->body ?? ''),
+            fn (string $line): bool => trim($line) !== '',
+        ));
+        // A sole paid line is the complete body, not a safe catalogue preview.
+        if ($lines === [] || (! $this->hasSample() && count($lines) === 1)) {
+            return null;
+        }
+
+        return mb_substr($lines[0], 0, 240);
+    }
+
     public function sampleText(): ?string
     {
         return match ($this->sample_mode) {
