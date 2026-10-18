@@ -230,4 +230,29 @@ class AppleCustomerPurchasesTest extends TestCase
         $this->missingCustomer = true;
         $this->getJson('/api/library', $this->bearer())->assertOk()->assertJsonCount(0, 'books');
     }
+    public function test_sandbox_offers_for_all_six_keep_real_acceptance_off_and_play_unchanged(): void
+    {
+        config(['purchases.production_enabled' => false, 'purchases.apple_customer_sandbox_enabled' => true]);
+        $play = $this->getJson('/api/purchases/config')->json();
+        $this->getJson('/api/purchases/config?platform=ios')->assertOk()
+            ->assertJsonPath('enabled', true)->assertJsonPath('production_checkout_enabled', true)
+            ->assertJsonPath('real_checkout_enabled', false)->assertJsonPath('sandbox_only', true)
+            ->assertJsonCount(6, 'allowed_product_ids');
+        foreach (range(3, 8) as $id) {
+            $event = $this->prepare($id, 'SANDBOX');
+            $this->webhook(array_replace($event, ['environment' => 'PRODUCTION']))->assertStatus(503);
+            $this->webhook($event)->assertOk();
+        }
+        $this->assertDatabaseCount('purchases', 6);
+        $this->assertSame(0, SalesLedger::count());
+        $this->assertSame(6, SalesLedger::withTestPurchases()->count());
+        $this->assertSame($play, $this->getJson('/api/purchases/config')->json());
+        $this->reader->forceFill(['buying_blocked' => true])->save();
+        $this->consent(3)->assertForbidden();
+        $this->reader->forceFill(['buying_blocked' => false, 'email_verified_at' => null])->save();
+        $this->consent(3)->assertForbidden();
+        config(['staging.testing' => true]);
+        $this->assertFalse(ApplePurchaseProof::customerCheckoutEnabled());
+    }
+
 }

@@ -35,7 +35,8 @@ class AppleSandboxPurchases
             && is_string($event['transaction_id'] ?? null) && preg_match('/^[0-9]{1,255}$/D', $event['transaction_id']), 422);
         $type = $event['type'];
         abort_unless(in_array($type, ['NON_RENEWING_PURCHASE', 'CANCELLATION', 'EXPIRATION', 'REFUND_REVERSED'], true), 422);
-        abort_unless(! $customer || $existing || ApplePurchaseProof::customerCheckoutEnabled(), 503, 'Real purchases are not enabled.');
+        abort_unless(! $customer || $existing || (ApplePurchaseProof::customerCheckoutEnabled()
+            && ($environment === 'SANDBOX' || RevenueCatClient::productionEnabled())), 503, 'This purchase environment is not enabled.');
         $session = str_starts_with((string) $event['app_user_id'], 'shelf_apple_')
             ? ApplePurchaseSession::forIdentity($event['app_user_id']) : null;
         $readerId = $session ? (int) $session->reader_id : (int) $event['app_user_id'];

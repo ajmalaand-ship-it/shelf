@@ -584,6 +584,48 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple review sandbox offers — 18 October 2026
+
+Owner authorizes one batch: ordinary verified reviewer with no ownership, separate
+Apple sandbox offers while real checkout stays OFF, private App Store Connect login
+update, focused staging-first backend promotion and reuse of Build 8. Existing blocked
+reviewer/grants and Google Play must remain unchanged. Separate default-false
+SHELF_APPLE_CUSTOMER_SANDBOX_ENABLED opens the existing Build 8 customer protocol
+(the legacy production_checkout_enabled field means offer availability). Explicit
+real_checkout_enabled=false and sandbox_only=true distinguish runtime acceptance.
+New production transactions remain rejected before ledger/access changes; sandbox
+requires existing independent matching provider proof and remains Test income.
+No client change, migration, complimentary grant or special reader role. Rollback:
+close the two customer flags and use prior c8c4d74 code through release workflow;
+retain all account/purchase history. Deployed backend **fa2bec0** to staging then identical production commit. Staging
+backup `/home/shelf/backups/shelf-staging/20261018-150541/`; production promotion
+backup `/home/shelf/backups/shelf/20261018-150638/`. Focused wrapper passed
+**78 PHP tests / 843 assertions**; no mobile source change or Flutter rerun.
+Staging/production health/isolation/history checks passed. Separate pre-account/
+configuration backup `/home/shelf/backups/shelf/20261018-150908/` includes verified
+encrypted configuration rollback checkpoint. Existing customer/ownership rows compared
+unchanged; original reviewer 12 remains blocked with all six grants.
+
+New ordinary reviewer **19** registered through AuthController; normal verification
+mail dispatched and generated one-time token consumed through EmailActionController.
+Verified, unblocked, no grants/entitlements/purchases; no administrator or special
+ownership role. No suitable existing test login with known credentials was available;
+other zero-ownership accounts were not repurposed. Credentials remain only in protected
+`/home/shelf/secrets/apple-review-purchasing.json` and App Store Connect.
+Only SHELF_APPLE_CUSTOMERS_ENABLED and SHELF_APPLE_CUSTOMER_SANDBOX_ENABLED enabled;
+all unrelated configuration compared unchanged, real checkout remains OFF.
+
+Live HTTPS login/me/Library and **six successful per-book consent responses** verified
+for canonical products 3–8 on stable reader identity; Library remains empty, session
+revoked. Google Play public configuration compared unchanged. These prove server offer
+access, not native StoreKit price-sheet rendering or a purchase. App Store Connect
+reviewer login/accurate sandbox notes PATCH **200**, exact private GET readback **200**;
+existing review contact unchanged. Build **8** association independently reconfirmed;
+no rebuild/upload/submission/public release. Actual Apple sandbox purchase/restore/
+refund evidence remains **NOT VERIFIED**. One remaining action for this task:
+exercise an actual Apple sandbox purchase using the saved reviewer login on Build 8.
+
+
 ## Screenshot Back-navigation correction — 18 October UTC 2026
 
 Owner reports screenshot run #2 reached Book3 and failed at capture line78:

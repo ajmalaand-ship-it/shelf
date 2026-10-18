@@ -2,7 +2,8 @@
 
 return [
     // Production acceptance remains off until an explicit owner-approved launch rollout.
-    // Ordinary Apple customers use the existing real-checkout gate; both default OFF.
+    // Ordinary Apple sandbox offers are separate from production acceptance; default OFF.
+    'apple_customer_sandbox_enabled' => env('SHELF_APPLE_CUSTOMER_SANDBOX_ENABLED', false),
     'apple_customers_enabled' => env('SHELF_APPLE_CUSTOMERS_ENABLED', false),
     'apple_owned_book3_test_enabled' => env('SHELF_APPLE_OWNED_BOOK3_TEST_ENABLED', false),
     'apple_sandbox_enabled' => env('SHELF_APPLE_SANDBOX_ENABLED', false),

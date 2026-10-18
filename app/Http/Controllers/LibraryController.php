@@ -23,7 +23,10 @@ class LibraryController extends Controller
             if (config('purchases.apple_customers_enabled') === true) {
                 $ready = \App\Services\Purchases\ApplePurchaseProof::customersConfigured();
                 return response()->json(['enabled' => $ready, 'store' => 'APP_STORE', 'customer_mode' => true,
-                    'test_mode' => false, 'production_checkout_enabled' => \App\Services\Purchases\ApplePurchaseProof::customerCheckoutEnabled(),
+                    // Build 8 calls its customer protocol 'production'; this field opens offers, never receipt acceptance.
+                    'test_mode' => ! RevenueCatClient::productionEnabled(),
+                    'real_checkout_enabled' => RevenueCatClient::productionEnabled(),
+                    'sandbox_only' => ! RevenueCatClient::productionEnabled(), 'production_checkout_enabled' => \App\Services\Purchases\ApplePurchaseProof::customerCheckoutEnabled(),
                     'sandbox_checkout_enabled' => false, 'public_sdk_key' => $ready ? config('purchases.apple_public_sdk_key') : null,
                     'allowed_product_ids' => \App\Services\Purchases\ApplePurchaseProof::PRODUCTS, 'consent' => PurchaseService::CONSENT,
                     'purchase_session_version' => 2, 'offline_days' => 30, 'identity_prefix' => '']);
