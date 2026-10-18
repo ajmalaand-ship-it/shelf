@@ -584,6 +584,68 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Normal iOS customer purchases and restore — 17 October local / 18 October UTC 2026
+
+Owner authorized six-book customer purchase/restore implementation, focused checks,
+staging/production rollout with real checkout OFF, final eligible-build preparation
+only, and commit/push. Prior uncommitted Apple submission record preserved in its
+own commit **f27808c**. Implementation **d685f6a**, mixed-store correction and final
+application **c8c4d74383292069f5f58583610eaef88da9b423**.
+
+Ordinary verified readers use authenticated consent version 2 and their stable
+numeric Shelf/RevenueCat identity for all six canonical Apple non-consumables.
+Existing independent V2 store/app/product/customer/time/environment/entitlement
+proof, shared access and append-only sale/refund/reversal ledger extended; each
+book retains its purchase-time author agreement. Actual sandbox evidence stays
+Test, unknown production net remains unknown. Restore uses native restore followed
+by server proof for all six, including delayed webhook confirmation. No receipt or
+SDK CustomerInfo grants access by itself. Checkout closure preserves legitimate
+customer purchase history/access and refund reconciliation. Existing Play ownership
+and complimentary grants prevent another checkout; legitimate in-flight proof is
+retained. Demonstrated same-customer/same-time mixed-store case fixed by excluding
+Apple rows from Play proof. Owner-only session experiment retained disabled, not
+reopened. No schema change or historical-data rewrite.
+
+RevenueCat Apple products mapped to existing same-book entitlements, retaining
+prior Play links: book 3 prod0d084e901f unchanged; book 4 prod9312fbe695,
+5 prod37f03f5fd7, 6 prodee1160bb99, 7 prod80d1364794, 8 prod0a2413becd.
+Existing Apple webhook **whintgr769cb03ff2** changed only environment sandbox→null
+(Both); GET/POST/GET 200, other fields/integrations compared unchanged. No test
+notification sent; actual production delivery remains unverified. Evidence:
+`/home/shelf/tmp/shelf-ios-customers-20261017/` (private sanitized mapping/webhook
+records); existing credentials unchanged.
+
+Focused wrapper checks passed locally and on final staging commit: **77 PHP tests /
+806 assertions, 36 Flutter purchase tests plus 1 staging-identity test**; existing
+build-route wrapper **8 tests** passed. Test development failures corrected; no
+broad audit, Android build or Apple transaction. Staging backup
+`/home/shelf/backups/shelf-staging/20261018-002655/`; final staging checks passed.
+Production backup `/home/shelf/backups/shelf/20261018-003336/` SQL/ZIP/SHA-256 verified;
+identical **c8c4d74** promoted. Strict prior reader/token/purchase/refund/ledger/
+entitlement/agreement fingerprints unchanged, cPanel handler preserved, maintenance
+lifted and production/staging HTTPS/isolation/access checks passed. Existing bounded
+refund-runner lock reused; no cron changes or historical preservation allowance.
+Rollback code: prior production **4aa2f613778d58a3ced8034dd95921cfea092bd6** through
+existing release procedure; retain all later financial/reader history, no bulk restore.
+
+**Runtime gates remain OFF:** real checkout, new default-false
+SHELF_APPLE_CUSTOMERS_ENABLED, both legacy Apple sandbox gates, pricing sync and
+Apple sign-in/relay. Staging forces Apple off. No checkout activation, build,
+submission, price/territory/rights change or public release. France exclusion and
+joint Android/iOS hold preserved. Existing Apple products still need their recorded
+review assets/availability and other store metadata; those are not transaction proof.
+
+**One final build prepared, NOT STARTED:** manual Codemagic workflow
+`ios-app-store-release`, export testFlightInternalTestingOnly=false and matching
+assertion, existing signing/identity/explicit unused-number checks and both review
+submission switches false. No new dependencies/native code. Recheck unused number
+when separately authorized (8 was the existing candidate), then require Apple's
+APP_STORE_ELIGIBLE readback. Source implementation is complete; signed-build/device
+and live purchase/restore/refund acceptance are not claimed. Apple sandbox transaction,
+entitlement/webhook/accounting acceptance remains **DEFERRED, NOT PASSED**.
+Next action: authorize the single final App Store-eligible build from completed
+`ios/foundation` source; do not start another intermediate build.
+
 ## Apple public-review preparation — 17 October 2026
 
 Batch 1 authorized metadata/assets and release-access preparation only. Apple API
