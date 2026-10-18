@@ -584,6 +584,26 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Build 8 ready for owner sandbox transaction — 18 October 2026
+
+Owner authorizes existing Build 8 TestFlight availability, private reviewer credential
+access, six-offer readiness and ONE owner iPhone Book 3 sandbox purchase; no rebuild,
+audit, screenshot work or development. Apple GET confirmed Build 8 VALID/unexpired,
+APP_STORE_ELIGIBLE and READY_FOR_BETA_TESTING, absent from Shelf Owner internal group
+1511a217-4f89-4dc7-8b8d-4679ce8a6226. Authorized group relationship POST returned 204;
+GET confirmed Build 8 assigned, all builds 2–7 preserved, IN_BETA_TESTING. Reversal
+would remove only this build/group association, without changing other memberships.
+
+Ordinary reviewer 19 live HTTPS login/me/empty Library/unblocked and six product
+consents reverified; real_checkout_enabled=false, sandbox_only=true, Play config
+unchanged, temporary verification session revoked. App Store Connect's existing
+reviewer email/password compared exactly in memory with protected mode-0600 file;
+private retrieval through Distribution → iOS 1.0 → App Review Information.
+No credential value printed, copied to Git or rotated. No purchase attempted.
+STOP: ready for owner's ONE Book 3 transaction (څپو کې انځورونه) on TestFlight
+1.0.0 (8). Actual native purchase/entitlement/restore PASS awaits owner report
+and independent provider/server evidence. No claim that all six were purchased.
+
 ## Apple review sandbox offers — 18 October 2026
 
 Owner authorizes one batch: ordinary verified reviewer with no ownership, separate
