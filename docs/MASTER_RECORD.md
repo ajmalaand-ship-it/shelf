@@ -584,6 +584,30 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple Book 3 sandbox purchase — PASS, 18 October 2026
+
+Owner confirms successful iPhone TestFlight Build 8 purchase with ordinary reviewer
+19. Independent read-only RevenueCat V2 transaction proof confirms exact reader/
+original reader, purchase time **2026-10-18 16:28:39 UTC**, APP_STORE / sandbox,
+owned non-consumable **shelf_book_3**, correct Shelf Apple app/bundle/product and
+active same-book provider entitlement. Evidence uses the existing server-to-server
+Apple transaction validation through RevenueCat; no separately downloaded raw
+Apple receipt/JWS is claimed. Server purchase **7**, Book **3**, SANDBOX; authenticated
+webhook event **20** processed at **16:28:46 UTC** (rest_observation=false), independent
+REST observation **21** also recorded. Exactly one sale ledger row **16**, USD 2.99,
+**Test**, null estimated/confirmed earnings, **zero ordinary real-income rows, zero
+accounting entries and zero royalty shares** for this purchase. Active server
+entitlement **6**, no complimentary grants. Normal bearer-authenticated Library route
+returns **200**, Book IDs **[3]**, and BookAccessService confirms access. Temporary
+verification token/read refresh rolled back; existing phone sessions preserved.
+
+**PASS for this Book 3 sandbox purchase/webhook/entitlement/Library/Test exclusion**;
+not a claim that Books 4–8, native reinstall restore or refunds were tested. Reviewer
+sandbox access preserved; real checkout remains OFF. No new transaction, build,
+deployment, provider setting or application change. Next toward submission: run the
+already prepared corrected ios-submission-screenshots workflow to complete the
+pending genuine listing and six IAP review assets; no new App Store build.
+
 ## Build 8 ready for owner sandbox transaction — 18 October 2026
 
 Owner authorizes existing Build 8 TestFlight availability, private reviewer credential
