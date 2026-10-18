@@ -584,6 +584,147 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple age/review saved; simulator asset workflow ready — 18 October UTC 2026
+
+Owner authorized simulator-only captures on existing Codemagic Macs, genuine listing
+and IAP asset upload, factual age assessment, private contact lookup and DSA read-only.
+Read all 342 published works across books3–8 (81/67/57/74/22/41), 74 existing Book6
+artwork pages and six covers; no source/content changed. Verified recurrent drug/
+alcohol, weapons, war/realistic violence and mature themes; occasional mild language,
+fear and romantic intimacy. No gambling/contests, public UGC/chat/social feed,
+advertising, unrestricted embedded browser, age assurance/parental controls or
+medical/wellness advice functionality. Owner specifically confirmed prolonged
+graphic/sadistic realistic violence **NONE** after poem51 was identified. Other
+explicit/graphic sexual and fantasy-violence descriptors NONE. Questionnaire PATCH
+**200**, related GET **200**; Apple normalizes frequency enums to legacy equivalents.
+Calculated API appStoreAgeRating **SEVENTEEN_PLUS**, Brazil **EIGHTEEN**; overrides
+unchanged. The initial incomplete PATCH 409 saved nothing; completed questionnaire
+supersedes earlier missing-age entries. No unsupported all-None classification.
+
+Private search of 110 authorized store JSON records and relevant docs found no
+verified phone. Owner then supplied/confirmed contact phone; saved only to Apple,
+not Git. Existing verified reviewer credentials reused from protected file in memory.
+Review-detail POST **201**, GET **200**, exact contact/login/notes readback verified
+without printing private values. Notes honestly disclose complimentary six-book
+reader access, samples, email-confirmed deletion and checkout currently disabled.
+No remaining contact or content input requested.
+
+New manual workflow **ios-submission-screenshots** / **Shelf — genuine iPhone and
+iPad screenshots (simulator only)** uses existing Mac/integration/groups. Real
+production app/catalogue navigation and native iOS screenshots; debug capture
+entrypoint selects existing public data source, no fixtures or mocked app UI.
+Build8 mobile tree **1aecaddba930910a4110a660612365bf4abf8d84** asserted unchanged;
+release source/workflows untouched. Capture-only SDK instrumentation is worker-local.
+Existing reviewer variables are reused if already available; public catalogue and
+book-detail captures do not require login. No new credential setup/transfer needed.
+Screenshot-only uploader reuses the proven CLI credential-resolution route and its
+official ephemeral JWT cache, not the prior unsupported raw-key environment assumption.
+Uploads listing captures and six phone IAP images via official asset APIs, compares
+checksums, polls COMPLETE and preserves existing completed assets; no build upload,
+signing, submission or publishing. Native iPhone/iPad dimensions validated, no resize
+or invented screens. Image-generation/widget-render fixtures are never store assets.
+
+Focused capture Dart analysis **no issues**; wrapper **4 synthetic upload checks
+passed**, covering all images/six IAPs, existing-asset preservation, processing failure
+and existing CLI auth-cache resolution. Work-in-progress selector/import/fixture
+issues corrected. Existing workflows and mobile source compared unchanged. No
+repeat app suites. **Mac run/captures/Apple image processing NOT YET PERFORMED**:
+agent still lacks Codemagic API token/connector. Owner starts exactly this workflow
+once on the latest `ios/foundation`; it automatically captures/uploads/verifies assets.
+No new release build. DSA availability readback still **TRADER_STATUS_NOT_PROVIDED
+in 26 selected EU territories**; underlying account verification is not exposed by
+available API, no declaration/country change. Build8 association, compliance, prices,
+territories, privacy and MANUAL release preserved. Checkout OFF; Apple transaction
+verification remains **DEFERRED, NOT PASSED**. No submission/publication.
+
+## Remaining Apple fields automated — 18 October UTC 2026
+
+Saved and independently read back app availability and products 4–8 availability:
+exact **174-territory existing Apple Book 3 set**, France excluded, new territories
+opt-in false. Book 3's existing set preserved and compared with prior captured set;
+all six match. App creation first returned 409 requiring explicit excluded-territory
+rows; corrected request includes all Apple territories with only approved 174 true,
+POST 201. Five IAP POSTs 201; all readbacks match. No price/rights changes.
+Build 8 PATCH 200 / GET confirms **usesNonExemptEncryption=false**, VALID and
+APP_STORE_ELIGIBLE. Reused approved standard outside-OS AES-256-GCM/non-France
+no-document basis; dependency/native/encryption implementation unchanged. Version
+1.0 remains PREPARE_FOR_SUBMISSION / MANUAL with Build 8 attached.
+
+Actual app availability statuses include **TRADER_STATUS_NOT_PROVIDED in the 26
+selected EU territories** (France excluded), and generic **CANNOT_SELL in all 174**;
+API gives no further cause for generic status, no guessed tax/agreement diagnosis.
+Owner must complete/resolve the DSA trader declaration in App Store Connect;
+legal declaration cannot be invented or saved through available public API.
+
+Outstanding inputs remain: real contact phone with international country code
+(known verified name/email/reviewer credentials reusable; Apple requires phone to
+save review details); catalogue-wide content frequencies for age rating (profanity,
+horror, alcohol/drugs/tobacco, mature/suggestive, sexual/nudity, graphic sexual,
+cartoon/fantasy violence, realistic violence, prolonged graphic/sadistic violence,
+weapons, medical/treatment, gambling references/simulation and contests; wellness
+recommendations yes/no). Known app feature answers retained, not guessed catalogue
+answers; prior API refusal to save incomplete questionnaire reused, not repeated.
+
+Source targets **iPhone and iPad (1,2)**. Linux has no xcrun/xcodebuild/simulator,
+connected iOS capture or authenticated remote Mac route; no suitable genuine local
+screenshots. Need original PNG/JPEG listing captures at iPhone 1320x2868 or1290x2796
+and iPad 2064x2752 or2048x2732, plus actual book-detail/purchase-area review capture
+for each of books3–8. No invented images, resizing, gate activation, rebuild or
+upload of unsuitable assets. No listing/IAP assets uploaded. Manual inputs can be
+supplied together; existing Apple reviewer/account evidence reused, no broad audit.
+No submission/publication, checkout change, tests or app edits. Sandbox transaction
+verification remains **DEFERRED, NOT PASSED**. Prior uncommitted record preserved.
+
+## Build 8 attached to public-review draft — 18 October UTC 2026
+
+Owner reports successful Codemagic run **6ad41bb47550aed8108fb7e5**, workflow
+`ios-app-store-release`, source **47f0e8e**. Apple API independently confirms
+**1.0.0 (8)** upload **COMPLETE** (no errors/warnings), processing **VALID**, audience
+**APP_STORE_ELIGIBLE**; build ID **5e4b0e7d-2e6f-44cf-94fa-c9d9ee40d000**.
+Authorized draft build association PATCH returned **204**; GET verified that exact
+build on version **1.0**, ID **47de1d04-6b51-4338-be3a-1e26343a057a**. Version
+remains **PREPARE_FOR_SUBMISSION**, release **MANUAL**. Prior association was empty.
+
+Current API-visible submission gaps: en-US listing has **zero screenshot sets**;
+age declaration frequency/feature answers null and no calculated age rating;
+App Review details null (contact/login not saved; prior genuine phone missing);
+all six `shelf_book_3`–`shelf_book_8` non-consumables **MISSING_METADATA**, with no
+review screenshots; products 4–8 availability absent (404), Book 3 present;
+app availability absent (404). Build 8 **usesNonExemptEncryption=null**: export
+compliance answer remains unresolved. No speculative additional blockers: published
+privacy, agreements/tax/banking and UI-only legal questionnaires were not independently
+revalidated through unavailable APIs. Existing approved rights/prices/France exclusion
+unchanged. Next action: obtain genuine iPhone/iPad listing captures and purchase-offer
+review captures from Build 8 to fill the confirmed missing assets.
+
+Only build association and this record changed. No rebuild/tests/checkout activation,
+review submission or publication. Apple sandbox transaction verification remains
+**DEFERRED, NOT PASSED**; build eligibility is not purchase acceptance.
+
+## Single App Store-eligible build authorization — 17 October local / 18 October UTC 2026
+
+Owner authorized ONE release build from **47f0e8e1ecf4ec5825f8c05d20231e229f7e04cf**,
+branch `ios/foundation`. Clean source verified. Existing `ios-app-store-release`
+already exports testFlightInternalTestingOnly=false with explicit verification;
+no source/workflow changes or repeat tests needed. Existing signing and passed
+six-book tests/backend reused. Both review submission switches remain false.
+
+Apple API readback **18 October 2026 00:59:28 UTC**: build and build-upload lists
+HTTP 200; uploads 1–7 consumed, builds 2–7 VALID / INTERNAL_ONLY; no build/upload 8.
+**Next unused number: 8 (not reserved).** No new build started or uploaded and
+APP_STORE_ELIGIBLE / VALID cannot yet be claimed. No Codemagic token environment,
+stored Codemagic credential or authenticated connector is available to this agent;
+existing dashboard signing authorization is not API access.
+
+Unavoidable owner action: in https://codemagic.io/ open existing Shelf app, set
+existing `shelf_ios_testflight` variable `SHELF_IOS_BUILD_NUMBER=8`, then start
+exactly ONE build on `ios/foundation` at **47f0e8e** using workflow
+`ios-app-store-release` (Shelf iOS — App Store eligible release (manual)). Retain
+existing integration/signing/environment groups. Return its run link for Apple
+receipt/audience/processing verification. No alternate/internal build. Checkout
+remains OFF; no submission/publication. Apple sandbox transaction verification
+remains **DEFERRED, NOT PASSED**. Only this record changed; build source stays pinned.
+
 ## Normal iOS customer purchases and restore — 17 October local / 18 October UTC 2026
 
 Owner authorized six-book customer purchase/restore implementation, focused checks,

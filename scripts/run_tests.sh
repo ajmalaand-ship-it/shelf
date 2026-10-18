@@ -68,6 +68,10 @@ elif [[ "${SHELF_TOOL_TEST_SCOPE:-}" == 'ios-build-number' ]]; then
     if "$run_mobile"; then echo 'Tool scope cannot run mobile tests.' >&2; exit 2; fi
     python3 -B scripts/ios/test_build_number.py
     exit 0
+elif [[ "${SHELF_TOOL_TEST_SCOPE:-}" == 'ios-submission-capture' ]]; then
+    if "$run_mobile"; then echo 'Tool scope cannot run mobile tests.' >&2; exit 2; fi
+    python3 -B scripts/ios/test_submission_capture.py
+    exit 0
 elif [[ -n "${SHELF_TOOL_TEST_SCOPE:-}" ]]; then
     echo 'Unknown tool test scope.' >&2; exit 2
 fi
