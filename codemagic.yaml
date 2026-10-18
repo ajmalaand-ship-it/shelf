@@ -52,6 +52,8 @@ workflows:
       groups:
         - shelf_ios_foundation
         - shelf_ios_testflight
+      vars:
+        SHELF_IOS_BUILD_NUMBER: "9"
       flutter: 3.47.2
       xcode: latest
       cocoapods: default
@@ -119,7 +121,7 @@ workflows:
           cd "$CM_BUILD_DIR/mobile"
           printf 'iOS working directory: %s\n' "$PWD"
           mkdir -p build/ios-testflight-evidence
-          python3 -c 'import glob,os,plistlib,zipfile; files=glob.glob("build/ios/ipa/*.ipa"); assert len(files)==1; z=zipfile.ZipFile(files[0]); names=[n for n in z.namelist() if n.startswith("Payload/") and n.count("/")==2 and n.endswith(".app/Info.plist")]; assert len(names)==1; p=plistlib.loads(z.read(names[0])); assert p["CFBundleIdentifier"]=="services.shelf.app"; assert p["CFBundleShortVersionString"]=="1.0.0"; assert p["CFBundleVersion"]==os.environ["SHELF_IOS_BUILD_NUMBER"]; assert not z.testzip()'
+          python3 -c 'import glob,os,plistlib,zipfile; files=glob.glob("build/ios/ipa/*.ipa"); assert len(files)==1; z=zipfile.ZipFile(files[0]); names=[n for n in z.namelist() if n.startswith("Payload/") and n.count("/")==2 and n.endswith(".app/Info.plist")]; assert len(names)==1; p=plistlib.loads(z.read(names[0])); assert p["CFBundleIdentifier"]=="services.shelf.app"; assert p["CFBundleShortVersionString"]=="1.0.0"; assert p["CFBundleVersion"]==os.environ["SHELF_IOS_BUILD_NUMBER"]; assert p["UIDeviceFamily"]==[1], "Exported IPA must be iPhone-only"; assert not z.testzip()'
           # Preserve executable permissions and framework symlinks for codesign.
           python3 -c 'import glob,subprocess; subprocess.run(["ditto","-x","-k",glob.glob("build/ios/ipa/*.ipa")[0],"build/ios-testflight-evidence/exported"],check=True)'
           app_path=$(find build/ios-testflight-evidence/exported/Payload -maxdepth 1 -name '*.app' -type d)

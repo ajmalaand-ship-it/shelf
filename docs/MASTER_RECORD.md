@@ -584,6 +584,25 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## iPhone-only replacement authorized — 18 October 2026
+
+Owner approves iPhone and Android first; native iPad support deferred to a later
+update. Supersedes the prior iPad capture task: no screenshot workflows or new
+purchase tests. Runner Debug/Profile/Release device family restricted to 1;
+existing manual ios-app-store-release on ios/foundation assigns 1.0.0 (9) and
+checks exported IPA UIDeviceFamily == [1] before publishing. Signing, identity,
+checkout OFF and existing features preserved. Revert this commit to undo source.
+Apple API readback: latest processed build 8 VALID; build 9 absent. buildUploads
+read returned HTTP 403 FORBIDDEN_ERROR, so pending-upload inventory is unavailable.
+Codemagic existing workflow still checks the candidate against latest TestFlight.
+No Codemagic connector or credential available; manual trigger required. No
+replacement archive/upload/processing or removed iPad requirement claimed yet.
+After processing: select replacement, retain five accepted iPhone images and
+saved review details, add app and ready products 3/6/7/8 to existing draft.
+Products 4/5 remain optional MISSING_METADATA. Preserve MANUAL public release,
+174 countries with France excluded, real checkout OFF. Never submit for review
+without subsequent owner approval. Existing DSA account-holder action remains.
+
 ## Direct Codemagic iPad capture authorization — 18 October 2026
 
 Owner authorizes exactly one bounded Codemagic macOS simulator-only compile/capture,
