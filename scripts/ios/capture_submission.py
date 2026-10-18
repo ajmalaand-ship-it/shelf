@@ -41,8 +41,9 @@ def prepare():
     (MOBILE / 'integration_test').mkdir(exist_ok=True)
     (MOBILE / 'test_driver').mkdir(exist_ok=True)
     shutil.copyfile(ROOT / 'scripts/ios/submission_capture.dart', MOBILE / 'integration_test/submission_capture_test.dart')
+    shutil.copyfile(ROOT / 'scripts/ios/capture_navigation.dart', MOBILE / 'integration_test/capture_navigation.dart')
     shutil.copyfile(ROOT / 'scripts/ios/submission_capture_driver.dart', MOBILE / 'test_driver/submission_capture_driver.dart')
-    run(['flutter', 'analyze', '--no-pub', 'integration_test/submission_capture_test.dart', 'test_driver/submission_capture_driver.dart', 'lib/shelf_capture_main.dart'], cwd=MOBILE)
+    run(['flutter', 'analyze', '--no-pub', 'integration_test/submission_capture_test.dart', 'integration_test/capture_navigation.dart', 'test_driver/submission_capture_driver.dart', 'lib/shelf_capture_main.dart'], cwd=MOBILE)
 
 
 def main():

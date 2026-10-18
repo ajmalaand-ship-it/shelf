@@ -584,6 +584,31 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Screenshot capture navigation fix — 18 October UTC 2026
+
+Owner supplied failed Codemagic run **6ad430b17550aed8108fbaee**, workflow
+**ios-submission-screenshots**, source **93ba607**. The line60 wait timed out on
+Search-result title/key matching. Store readiness and its capture had already
+returned; optional reviewer login had not been reached. The excerpt does not
+establish why the Search result was absent. Exact six-title public API queries
+returned the correct books; a focused keyboard-open portrait reproduction also
+found the old predicate. No keyboard/backend diagnosis is claimed.
+
+Capture automation now opens actual visible Store titles by canonical book IDs
+3–8, using live model slugs and checking the resulting detail route. Removed the
+unnecessary Search dependency; timeout errors identify the capture stage/device.
+Focused wrapper checks: Dart analysis **no issues**, **2 tests passed**, exercising
+all six books on iPhone 430x932 and iPad 1032x1376 layouts, scrolling/returning and
+zero Search requests. Test fixtures are regression inputs only, never store assets.
+Mobile source tree remains **1aecaddba930910a4110a660612365bf4abf8d84**; Build8,
+Apple metadata/settings, checkout OFF and release workflows unchanged.
+
+**Corrected Mac capture/upload remains pending**, not passed: no authenticated
+Codemagic execution access is available here. One owner start of
+**ios-submission-screenshots** on the corrected `ios/foundation` commit will run
+the existing genuine screenshot capture/upload/processing checks. No release build
+or submission. Apple sandbox transaction verification remains **DEFERRED, NOT PASSED**.
+
 ## Apple age/review saved; simulator asset workflow ready — 18 October UTC 2026
 
 Owner authorized simulator-only captures on existing Codemagic Macs, genuine listing
