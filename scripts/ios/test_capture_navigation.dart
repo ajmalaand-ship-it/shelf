@@ -18,6 +18,61 @@ import 'test_support.dart';
 import 'capture_navigation.dart';
 
 void main() {
+  testWidgets('Pop only active route with two visible Back buttons', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => Scaffold(
+                    appBar: AppBar(leading: const BackButton()),
+                    body: Column(
+                      children: [
+                        const BackButton(),
+                        TextButton(
+                          key: const Key('details-marker'),
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => Scaffold(
+                                appBar: AppBar(leading: const BackButton()),
+                                body: const Column(
+                                  children: [
+                                    BackButton(),
+                                    Text('Sample', key: Key('sample-marker')),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          child: const Text('Open sample'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              child: const Text('Store'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Store'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('details-marker')));
+    await tester.pumpAndSettle();
+    expect(find.byType(BackButton), findsNWidgets(2));
+    await popCaptureRoute(tester, find.byKey(const Key('sample-marker')));
+    expect(find.byKey(const Key('details-marker')), findsOneWidget);
+    expect(find.byType(BackButton), findsNWidgets(2));
+    await popCaptureRoute(tester, find.byKey(const Key('details-marker')));
+    expect(find.text('Store'), findsOneWidget);
+    expect(find.byType(BackButton), findsNothing);
+  });
   for (final size in [const Size(430, 932), const Size(1032, 1376)]) {
     testWidgets('Capture all six visible Store cards at $size without Search', (
       tester,
@@ -100,7 +155,10 @@ void main() {
           find.byKey(const Key('read-sample')).hitTestable(),
           findsOneWidget,
         );
-        await tester.pageBack();
+        await popCaptureRoute(
+          tester,
+          find.byKey(const Key('collection-detail-title')),
+        );
         await tester.pumpAndSettle();
       }
       expect(searchRequests, 0);

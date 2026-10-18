@@ -43,3 +43,23 @@ Future<PoetryCollection> openCaptureBook(WidgetTester tester, int id) async {
   await tester.pumpAndSettle();
   return book;
 }
+
+// Resolve the navigator from a known active screen, never from Back-button count.
+Future<void> popCaptureRoute(WidgetTester tester, Finder screen) async {
+  final context = tester.element(screen);
+  final route = ModalRoute.of(context);
+  expect(route, isNotNull, reason: 'Capture screen must belong to a route');
+  expect(
+    route!.isCurrent,
+    isTrue,
+    reason: 'Only the active capture route may pop',
+  );
+  final navigator = Navigator.of(context);
+  expect(
+    navigator.canPop(),
+    isTrue,
+    reason: 'Capture route must have a parent',
+  );
+  expect(await navigator.maybePop(), isTrue);
+  await tester.pumpAndSettle();
+}

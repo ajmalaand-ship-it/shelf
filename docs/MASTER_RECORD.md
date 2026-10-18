@@ -584,6 +584,20 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Screenshot Back-navigation correction — 18 October UTC 2026
+
+Owner reports screenshot run #2 reached Book3 and failed at capture line78:
+`tester.pageBack()` found two Back buttons. Replaced all three capture Back calls
+(sample, book details and optional signed-in account) with navigator pops resolved
+from the known active screen route, asserting that route is current. No global
+Back-button finder remains. Existing screenshot capture/upload logic unchanged.
+Focused wrapper analysis: **no issues**. **3 checks passed**: duplicate visible
+Back buttons with nested sample/details routes, plus six-book iPhone and iPad
+navigation. Mobile source, purchases, dependencies, signing and Apple settings
+unchanged; Build8 preserved and checkout OFF. Corrected cloud screenshots/upload
+remain pending; retry **ios-submission-screenshots** on corrected `ios/foundation`.
+No new App Store build or submission. Sandbox transactions remain DEFERRED, not passed.
+
 ## Screenshot capture navigation fix — 18 October UTC 2026
 
 Owner supplied failed Codemagic run **6ad430b17550aed8108fbaee**, workflow

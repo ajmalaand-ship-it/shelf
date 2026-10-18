@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:shelf/shelf_capture_main.dart' as app;
 import 'package:shelf/screens/collection_detail_screen.dart';
+import 'package:shelf/screens/poem_reader_screen.dart';
 import 'package:shelf/widgets/bookstore_widgets.dart';
 
 import 'capture_navigation.dart';
@@ -69,13 +70,16 @@ void main() {
           const Duration(seconds: 30),
         );
         await capture('listing-sample');
-        await tester.pageBack();
+        await popCaptureRoute(tester, find.byType(PoemReaderScreen));
         await waitFor(
           find.byKey(const Key('collection-detail-title')),
           'sample-back',
         );
       }
-      await tester.pageBack();
+      await popCaptureRoute(
+        tester,
+        find.byKey(const Key('collection-detail-title')),
+      );
       await waitFor(find.byType(BookPresentation), 'store-back-$id');
     }
     // Existing runner secrets are optional; public listing/review captures never
@@ -97,7 +101,7 @@ void main() {
         find.byKey(const Key('account-sign-out')),
         'reviewer-signed-in',
       );
-      await tester.pageBack();
+      await popCaptureRoute(tester, find.byKey(const Key('account-sign-out')));
       await tester.tap(find.byType(NavigationDestination).at(2));
       await capture('listing-library');
     }
