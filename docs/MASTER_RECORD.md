@@ -584,6 +584,36 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Supplied Apple screenshot uploads — 18 October 2026
+
+Owner authorized existing ZIP inspection and asset-only API uploads; no Codemagic
+workflow restart, build, application change, pricing/territory change or submission.
+Read README/manifest; inspected all five candidates and all 13 reference originals.
+Five prepared iPhone PNGs are **1290×2796, RGB**, readable and free of private account
+information. Owner-provenanced resized copies of genuine TestFlight screenshots,
+not native-resolution captures; visual and image comparisons matched original
+IMG_0007/0008/0009/0010/0017. No new image editing or fabricated content.
+
+Version **1.0**, existing **en-US / APP_IPHONE_67**: all **five listing screenshots**
+uploaded and independently verified **COMPLETE**, exact source MD5 checksums matched.
+Private IAP review images for **shelf_book_3, shelf_book_6, shelf_book_7, shelf_book_8**
+also **COMPLETE** with matching readback checksums. Book 3 uses genuine details
+with Buy button. Books 6–8 use the unaltered genuine Store screenshot showing
+complete matching covers/titles/credits/prices for those three products; this is
+explicitly a multi-book Store image, not a fabricated per-book purchase screen.
+These are Apple asset-processing results, not App Review approval.
+
+**Still missing:** Books **4–5** review purchase-offer images (supplied originals
+show absent price or incomplete product cards), and genuine **iPad listing** capture.
+No private account/email/payment-sheet/sandbox-confirmation original uploaded to
+public or review assets. All originals retained privately, outside Git/web root;
+source ZIP moved unchanged from /home/shelf/tmp into private mode-0700 directory
+`/home/shelf/tmp/shelf-apple-screenshots-20261018/`; extracted images mode 0600.
+Private before-state and upload/checksum evidence: same directory. No existing
+assets deleted/replaced, no review submission; Build 8, real checkout OFF and
+reviewer sandbox access preserved. One next action: provide the remaining genuine
+capture set (iPad listing plus Books 4–5 details with visible purchase offers).
+
 ## Apple Book 3 sandbox purchase — PASS, 18 October 2026
 
 Owner confirms successful iPhone TestFlight Build 8 purchase with ordinary reviewer
