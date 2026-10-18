@@ -584,6 +584,52 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Same-day Apple submission completion — 18 October 2026
+
+Owner authorizes existing Build 8/six-book review completion only, one bounded direct
+simulator attempt, fresh ordinary reviewer if needed, verified-fact metadata/DSA
+inspection and draft submission; no rebuild, application change or real checkout.
+Reused all prior purchase and asset evidence. Current Apple readback: **Build 8 VALID,
+APP_STORE_ELIGIBLE, encryption=false, attached to 1.0, MANUAL release**; **five iPhone
+listing images COMPLETE**; review images for **3,6,7,8 COMPLETE**, those four IAPs
+**READY_TO_SUBMIT**. Books **4–5 MISSING_METADATA** due to absent suitable review
+images; prior supplied originals still lack complete corresponding purchase offers.
+No images replaced or uploaded again. One bounded direct simulator attempt stopped
+with **FileNotFoundError: xcrun unavailable on Linux**; no configured Mac access,
+no workflow restart/retry/build. Minimum capture set remains **one genuine 13-inch
+iPad Store screenshot (2064×2752 or 2048×2732 portrait), plus two iPhone Book 4/5
+details/purchase screenshots clearly showing the respective title and Buy offer**.
+
+Fresh ordinary reviewer **20**, verified/unblocked/no purchases/entitlements/grants,
+created through normal registration/email/one-time confirmation after verified backup
+`/home/shelf/backups/shelf/20261018-173353/`; all existing customer/ownership rows
+compared unchanged. Existing reviewer **19** and Book 3 purchase **7** preserved.
+Normal login and Book 3 new-checkout consent **200**; verification session/consent
+rolled back, no transaction initiated. Fresh login and truthful instructions saved
+to App Store Connect review details **PATCH 200 / exact private GET 200**, existing
+contact unchanged. Private credentials `/home/shelf/secrets/apple-review-submission.json`;
+previous credential files retained. Real checkout OFF and sandbox review access unchanged.
+
+Current app availability still exactly **174 selected territories**, new-territory
+opt-in false, France excluded; statuses include **AVAILABLE_FOR_SALE_UNRELEASED_APP
+and CANNOT_SELL in all 174**, **TRADER_STATUS_NOT_PROVIDED in 26 selected EU territories**.
+No guessed trader declaration or changed country. Current age rating and listing/
+review/contact/compliance metadata retained. Account-holder action: App Store Connect
+**Business → Agreements → Compliance → Digital Services Act → Complete Compliance
+Requirements**; supply truthful status and complete Apple's contact/document verification.
+Public API provides no corresponding DSA declaration/verification write endpoint.
+
+Apple review draft **e914a36d-ff45-4012-99c0-f1df83ae84d0** created **HTTP 201**, state
+**READY_FOR_REVIEW**, submittedDate=null (empty draft, not submitted). Adding the
+existing app version/Build 8 returned **HTTP 409 STATE_ERROR.ENTITY_STATE_INVALID**,
+associated **STATE_ERROR.SCREENSHOT_REQUIRED.IPAD_13_PROFILE**, title **App screenshot
+missing (IPAD_13_PROFILE)**. App item not added; six-IAP draft not falsely claimed
+complete, no partial catalogue submitted, submitted switch untouched. **Submit for
+Review is NOT currently possible.** No other mandatory error was returned in this
+validation; further checks may follow after the missing image is supplied. Private
+API validation/draft evidence in `/home/shelf/tmp/shelf-submission-final-20261018/`.
+This is a provider-validation blocker, not another development cycle.
+
 ## Supplied Apple screenshot uploads — 18 October 2026
 
 Owner authorized existing ZIP inspection and asset-only API uploads; no Codemagic
