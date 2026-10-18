@@ -47,7 +47,13 @@ class _BookPriceLabelState extends State<BookPriceLabel> {
 }
 
 class PurchaseScreen extends StatefulWidget {
-  const PurchaseScreen({required this.book, required this.settings, super.key});
+  const PurchaseScreen({
+    required this.book,
+    required this.settings,
+    this.ownedBookSandboxTest = false,
+    super.key,
+  });
+  final bool ownedBookSandboxTest;
   final PoetryCollection book;
   final ReaderSettings settings;
   @override
@@ -87,12 +93,13 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         setState(() {
           product = value;
           if (value == null)
-            message = 'This book is not available in Google Play yet.';
+            message = 'This book is not available in $purchaseStoreName yet.';
         });
     } catch (_) {
       if (mounted)
         setState(
-          () => message = 'Purchases are unavailable. Please check again later.',
+          () =>
+              message = 'Purchases are unavailable. Please check again later.',
         );
     } finally {
       if (mounted) setState(() => loading = false);
@@ -104,26 +111,44 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     if (library == null || product == null || loading || !agreed) return;
     setState(() {
       loading = true;
-      message = 'Opening Google Play…';
+      message = 'Opening $purchaseStoreName…';
     });
     try {
-      final result = await library.purchase(widget.book, product!, agreed);
+      final result = await library.purchase(
+        widget.book,
+        product!,
+        agreed,
+        ownedBookSandboxTest: widget.ownedBookSandboxTest,
+      );
       if (!mounted) return;
-      if (library.owns(widget.book.id)) {
+      if (!widget.ownedBookSandboxTest && library.owns(widget.book.id)) {
         await openOwnedBook(context, library, widget.book, widget.settings);
         if (mounted) Navigator.of(context).pop();
         return;
       }
       setState(
-        () => message = switch (result) {
-          StorePurchaseResult.cancelled =>
-            'Purchase cancelled. Your book was not unlocked.',
-          StorePurchaseResult.pending => 'Payment is pending with Google Play. Your book will appear after the store and Shelf confirm it.',
-          StorePurchaseResult.failed => 'The purchase did not finish. No book was unlocked. Please try again.',
-          StorePurchaseResult.confirming =>
-            library.message ??
-                'Confirming… Check My Library shortly; do not buy again.',
-        },
+        () => message = widget.ownedBookSandboxTest
+            ? switch (result) {
+                StorePurchaseResult.cancelled =>
+                  'Test cancelled. Your existing book stays available.',
+                StorePurchaseResult.pending =>
+                  'Apple test is pending. Your existing book stays available.',
+                StorePurchaseResult.failed => 'Apple test did not finish. Your existing book stays available.',
+                StorePurchaseResult.confirming =>
+                  library.appleBook3Confirmed && !library.refreshFailed
+                      ? 'Apple sandbox purchase confirmed. Your existing book stays available.'
+                      : library.message ?? 'Waiting for Apple test confirmation. Your existing book stays available.',
+              }
+            : switch (result) {
+                StorePurchaseResult.cancelled =>
+                  'Purchase cancelled. Your book was not unlocked.',
+                StorePurchaseResult.pending =>
+                  'Payment is pending with $purchaseStoreName. Your book will appear after the store and Shelf confirm it.',
+                StorePurchaseResult.failed => 'The purchase did not finish. No book was unlocked. Please try again.',
+                StorePurchaseResult.confirming =>
+                  library.message ??
+                      'Confirming… Check My Library shortly; do not buy again.',
+              },
       );
     } on AccountFailure catch (e) {
       if (mounted)
@@ -152,7 +177,13 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Buy this book')),
+        appBar: AppBar(
+          title: Text(
+            widget.ownedBookSandboxTest
+                ? 'Apple sandbox test'
+                : 'Buy this book',
+          ),
+        ),
         body: ListView(
           padding: const EdgeInsets.all(20),
           children: [
@@ -163,11 +194,19 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 20),
-            Text(library?.checkoutAvailable != true
-                ? 'Purchases are not available yet. You can still read the free sample.'
-                : library!.internalTestCheckout
-                    ? 'Owner test — use only Google Play test payment methods.'
-                    : 'Google Play will confirm your payment.'),
+            if (widget.ownedBookSandboxTest)
+              const Text(
+                'You already own this book. This Apple test will not charge you or change your Google Play ownership.',
+              ),
+            Text(
+              library?.checkoutAvailable != true
+                  ? 'Purchases are not available yet. You can still read the free sample.'
+                  : library!.checkoutMode == 'sandbox'
+                  ? applePurchasePlatform
+                        ? 'Owner Apple sandbox test — no real checkout.'
+                        : 'Owner test — use only Google Play test payment methods.'
+                  : '$purchaseStoreName will confirm your payment.',
+            ),
             const SizedBox(height: 16),
             if (account == null) ...[
               const Text(
@@ -227,13 +266,16 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                         product == null ||
                         library?.checkoutAvailable != true ||
                         library?.busy == true ||
-                        library?.owns(widget.book.id) == true
+                        (widget.ownedBookSandboxTest
+                            ? library?.canTestOwnedAppleBook(widget.book) !=
+                                  true
+                            : library?.owns(widget.book.id) == true)
                     ? null
                     : _buy,
                 child: Text(
                   loading
                       ? 'Confirming…'
-                      : 'Buy${product == null ? '' : ' · ${product!.price}'}',
+                      : '${widget.ownedBookSandboxTest ? 'Test Apple purchase' : 'Buy'}${product == null ? '' : ' · ${product!.price}'}',
                 ),
               ),
               if (product == null && !loading)

@@ -1,5 +1,11 @@
 # Shelf single-book purchases — owner-only test setup
 
+> **12 October 2026 — iOS source preparation:** default-off, owner-only Apple
+> sandbox support for `shelf_book_3` is prepared on `ios/foundation`, not deployed
+> or phone-accepted. See [Apple setup and pending checks](IOS_PURCHASES.md).
+> Existing Android evidence and configuration are preserved. No provider changes
+> or purchases occurred; real checkout stays OFF.
+
 > Production server verification construction (7 October 2026) is now built
 > behind an OFF-by-default gate. Synthetic focused tests pass; no actual real
 > purchase or launch approval. See [verification and remaining launch gates](PRODUCTION_PURCHASE_VERIFICATION.md).

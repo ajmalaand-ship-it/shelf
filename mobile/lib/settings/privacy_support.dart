@@ -1,3 +1,5 @@
+import '../widgets/shelf_assets.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -102,7 +104,7 @@ class PrivacySupportEntries extends StatelessWidget {
         ),
         ListTile(
           key: const Key('settings-support'),
-          leading: const Icon(Icons.help_outline),
+          leading: const ShelfActionIcon('help'),
           title: Text(s.support),
           subtitle: const Text(supportEmail, textDirection: TextDirection.ltr),
           onTap: () =>

@@ -1,0 +1,303 @@
+# Manual starts only. Signed build/upload requires separate owner authorization.
+# ios-foundation remains unsigned; ios-app-store-release has no automatic trigger.
+workflows:
+  ios-foundation:
+    name: Shelf iOS foundation — unsigned compile only
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+    working_directory: mobile
+    environment:
+      groups:
+        - shelf_ios_foundation
+      flutter: 3.47.2
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Require an explicitly supplied HTTPS API address
+        script: |
+          set -eu
+          : "${SHELF_API_BASE_URL:?Set SHELF_API_BASE_URL in Codemagic before an authorized build}"
+          case "$SHELF_API_BASE_URL" in https://*) ;; *) exit 1 ;; esac
+      - name: Resolve locked Flutter dependencies
+        script: flutter pub get --enforce-lockfile
+      - name: Inspect shared source
+        script: flutter analyze --no-fatal-infos --no-fatal-warnings lib
+      - name: Generate native Flutter configuration
+        script: flutter build ios --config-only --release --no-codesign --no-pub
+      - name: Install native plugins
+        script: |
+          set -eu
+          cd ios
+          pod install
+      - name: Compile unsigned iOS foundation
+        script: |
+          set -eu
+          flutter build ios --release --no-codesign --no-pub \
+            --build-name=1.0.0 --build-number=1 \
+            --dart-define="SHELF_API_BASE_URL=$SHELF_API_BASE_URL" \
+            --dart-define=SHELF_TEST_MODE=false \
+            --dart-define=SHELF_INTERNAL_TEST_PURCHASES=false
+    artifacts:
+      - mobile/build/ios/iphoneos/*.app
+      - mobile/build/ios/iphoneos/*.app.dSYM
+
+  ios-app-store-release:
+    name: Shelf iOS — App Store eligible release (manual)
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+    working_directory: mobile
+    integrations:
+      app_store_connect: shelf_app_store_connect
+    environment:
+      groups:
+        - shelf_ios_foundation
+        - shelf_ios_testflight
+      vars:
+        SHELF_IOS_BUILD_NUMBER: "9"
+      flutter: 3.47.2
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        certificates:
+          - shelf_ios_distribution
+        provisioning_profiles:
+          - shelf_ios_app_store
+    scripts:
+      - name: Require approved API and explicit unused iOS build number
+        script: |
+          set -eu
+          : "${SHELF_API_BASE_URL:?Retain the approved production API in shelf_ios_foundation}"
+          test "$SHELF_API_BASE_URL" = "https://shelf.services/api/"
+          : "${SHELF_IOS_BUILD_NUMBER:?Set an unused positive iOS build number in shelf_ios_testflight}"
+          case "$SHELF_IOS_BUILD_NUMBER" in ''|*[!0-9]*|0*) exit 1 ;; esac
+      - name: Check explicit build number with documented Codemagic TestFlight CLI
+        script: python3 ../scripts/ios/check_build_number.py
+      - name: Check photo-library purpose strings before building
+        script: |
+          set -eu
+          python3 - <<'PYTHON'
+          import plistlib
+          from pathlib import Path
+          plist = plistlib.loads(Path('ios/Runner/Info.plist').read_bytes())
+          for key in ('NSPhotoLibraryUsageDescription', 'NSPhotoLibraryAddUsageDescription'):
+              value = plist.get(key)
+              if not isinstance(value, str) or not value.strip():
+                  raise SystemExit(f'Missing or empty photo-library purpose string: {key}')
+          print('PASS: photo-library purpose strings are present and nonempty')
+          PYTHON
+      - name: Configure optional Google iOS client and callback
+        script: python3 ../scripts/ios/configure_google.py
+      - name: Resolve locked Flutter dependencies
+        script: flutter pub get --enforce-lockfile
+      - name: Generate native Flutter configuration
+        script: flutter build ios --config-only --release --no-codesign --no-pub
+      - name: Install native plugins
+        script: |
+          set -eu
+          cd ios
+          pod install
+      - name: Apply stored signing identities and App Store eligible export
+        script: |
+          set -eu
+          xcode-project use-profiles \
+            --custom-export-options='{"testFlightInternalTestingOnly":false,"manageAppVersionAndBuildNumber":false}'
+          python3 -c 'import os,plistlib; p=plistlib.load(open(os.path.expanduser("~/export_options.plist"),"rb")); assert p["testFlightInternalTestingOnly"] is False; assert p["manageAppVersionAndBuildNumber"] is False; assert p["teamID"] == "YSLWJQDH8B"; assert p["method"] in ("app-store", "app-store-connect")'
+      - name: Build final App Store eligible IPA with checkout OFF
+        script: |
+          set -eu
+          : "${CM_BUILD_DIR:?Codemagic clone directory required}"
+          cd "$CM_BUILD_DIR/mobile"
+          printf 'iOS working directory: %s\n' "$PWD"
+          flutter build ipa --release --no-pub \
+            --build-name=1.0.0 --build-number="$SHELF_IOS_BUILD_NUMBER" \
+            --export-options-plist="$HOME/export_options.plist" \
+            --dart-define="SHELF_API_BASE_URL=$SHELF_API_BASE_URL" \
+            --dart-define=SHELF_TEST_MODE=false \
+            --dart-define=SHELF_INTERNAL_TEST_PURCHASES=false
+      - name: Verify exported signing identity and preserve native dependency evidence
+        script: |
+          set -eu
+          : "${CM_BUILD_DIR:?Codemagic clone directory required}"
+          cd "$CM_BUILD_DIR/mobile"
+          printf 'iOS working directory: %s\n' "$PWD"
+          mkdir -p build/ios-testflight-evidence
+          python3 -c 'import glob,os,plistlib,zipfile; files=glob.glob("build/ios/ipa/*.ipa"); assert len(files)==1; z=zipfile.ZipFile(files[0]); names=[n for n in z.namelist() if n.startswith("Payload/") and n.count("/")==2 and n.endswith(".app/Info.plist")]; assert len(names)==1; p=plistlib.loads(z.read(names[0])); assert p["CFBundleIdentifier"]=="services.shelf.app"; assert p["CFBundleShortVersionString"]=="1.0.0"; assert p["CFBundleVersion"]==os.environ["SHELF_IOS_BUILD_NUMBER"]; assert p["UIDeviceFamily"]==[1], "Exported IPA must be iPhone-only"; assert not z.testzip()'
+          # Preserve executable permissions and framework symlinks for codesign.
+          python3 -c 'import glob,subprocess; subprocess.run(["ditto","-x","-k",glob.glob("build/ios/ipa/*.ipa")[0],"build/ios-testflight-evidence/exported"],check=True)'
+          app_path=$(find build/ios-testflight-evidence/exported/Payload -maxdepth 1 -name '*.app' -type d)
+          test -n "$app_path"
+          codesign --verify --deep --strict "$app_path"
+          codesign -d --entitlements :- "$app_path" > build/ios-testflight-evidence/entitlements.plist 2>/dev/null
+          python3 -c 'import plistlib; p=plistlib.load(open("build/ios-testflight-evidence/entitlements.plist","rb")); assert p["com.apple.developer.team-identifier"]=="YSLWJQDH8B"; assert p["application-identifier"]=="YSLWJQDH8B.services.shelf.app"; assert p.get("get-task-allow",False) is False; assert p["com.apple.developer.applesignin"]==["Default"]'
+          cp ios/Podfile.lock build/ios-testflight-evidence/Podfile.lock
+          cp "$HOME/export_options.plist" build/ios-testflight-evidence/export-options.plist
+          git rev-parse HEAD > build/ios-testflight-evidence/source-commit.txt
+          find "$app_path" -name PrivacyInfo.xcprivacy -print > build/ios-testflight-evidence/privacy-manifest-paths.txt
+      - name: Stage verified IPA and check explicit collection paths
+        script: |
+          set -eu
+          : "${CM_BUILD_DIR:?Codemagic clone directory required}"
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, os, shutil
+          root = Path(os.environ['CM_BUILD_DIR']).resolve()
+          source = root / 'mobile/build/ios/ipa'
+          evidence = root / 'mobile/build/ios-testflight-evidence'
+          output = root / 'shelf-ios-artifacts'
+          def require(ok, message):
+              if not ok:
+                  raise SystemExit(message)
+          print(f'IPA export directory: {source}', flush=True)
+          print(f'Artifact collection directory: {output}', flush=True)
+          ipas = sorted(source.glob('*.ipa'))
+          require(len(ipas) == 1, f'Expected exactly one exported IPA; found {len(ipas)} in {source}')
+          ipa = ipas[0]
+          require(ipa.is_file() and ipa.stat().st_size > 0, f'Missing or empty exported IPA: {ipa}')
+          names = ('entitlements.plist', 'export-options.plist', 'source-commit.txt',
+                   'privacy-manifest-paths.txt', 'Podfile.lock')
+          for name in names:
+              path = evidence / name
+              require(path.is_file(), f'Missing verification evidence: {path}')
+              require(name == 'privacy-manifest-paths.txt' or path.stat().st_size > 0,
+                      f'Empty verification evidence: {path}')
+          require(not output.exists(), f'Refusing stale artifact directory: {output}')
+          (output / 'evidence').mkdir(parents=True)
+          target = output / ipa.name
+          shutil.copy2(ipa, target)
+          digest = hashlib.sha256(ipa.read_bytes()).hexdigest()
+          require(target.stat().st_size == ipa.stat().st_size and
+                  hashlib.sha256(target.read_bytes()).hexdigest() == digest,
+                  'Staged IPA size/hash mismatch')
+          for name in names:
+              shutil.copy2(evidence / name, output / 'evidence' / name)
+          manifest = {'ipa': str(target), 'bytes': target.stat().st_size,
+                      'sha256': digest, 'source_commit': (evidence / 'source-commit.txt').read_text().strip(),
+                      'signature_verification': 'preceding mandatory step completed'}
+          (output / 'collection-manifest.json').write_text(json.dumps(manifest, indent=2))
+          print(json.dumps(manifest, indent=2), flush=True)
+          print('PASS: nonempty verified IPA staged; required evidence files present', flush=True)
+          PY
+    # Absolute paths remove any collector working-directory ambiguity.
+    artifacts:
+      - $CM_BUILD_DIR/shelf-ios-artifacts/*.ipa
+      - $CM_BUILD_DIR/shelf-ios-artifacts/evidence/*
+      - $CM_BUILD_DIR/shelf-ios-artifacts/collection-manifest.json
+      - $CM_BUILD_DIR/mobile/build/ios/archive/*.xcarchive/dSYMs/*.dSYM
+    publishing:
+      app_store_connect:
+        auth: integration
+        # Upload on a separately authorized manual run; assign owner internally in ASC.
+        submit_to_testflight: false
+        submit_to_app_store: false
+
+  ios-asc-access-check:
+    name: Shelf ASC CLI access check — no compile or publishing
+    instance_type: mac_mini_m2
+    max_build_duration: 5
+    working_directory: mobile
+    integrations:
+      app_store_connect: shelf_app_store_connect
+    environment:
+      groups:
+        - shelf_ios_foundation
+        - shelf_ios_testflight
+    # Manual only. Test the identical CLI path before any full signed build.
+    # No Flutter, dependencies, signing, artifacts, publishing or tester changes.
+    scripts:
+      - name: Validate existing integration CLI access and explicit build candidate
+        script: python3 ../scripts/ios/check_build_number.py
+
+  artifact-collection-diagnostic:
+    name: Shelf artifact collection diagnostic — text only
+    instance_type: mac_mini_m2
+    max_build_duration: 5
+    working_directory: mobile
+    # Manual only; no environment groups, tool installs, signing or publishing.
+    scripts:
+      - name: Diagnostic 1 — create harmless collection probes
+        script: |
+          set -eu
+          echo 'SHELF_ARTIFACT_DIAGNOSTIC_STEP_1_STARTED'
+          : "${CM_BUILD_DIR:?Codemagic clone directory required}"
+          printf 'Script 1 working directory: %s\n' "$(pwd -P)"
+          printf 'CM_BUILD_DIR: %s\n' "$CM_BUILD_DIR"
+          printf 'Source commit: %s\n' "$(git rev-parse HEAD)"
+          expected=$(cd "$CM_BUILD_DIR/mobile" && pwd -P)
+          test "$(pwd -P)" = "$expected"
+          probe_dir=build/ios/ipa/shelf-artifact-diagnostic
+          test ! -e "$probe_dir"
+          mkdir -p "$probe_dir"
+          printf 'Harmless clone-relative probe; script 1 executed.\n' > "$probe_dir/clone-relative-probe.txt"
+          printf 'Harmless explicit-path probe; script 1 executed.\n' > "$probe_dir/explicit-path-probe.txt"
+          for name in clone-relative-probe.txt explicit-path-probe.txt; do
+            file="$CM_BUILD_DIR/mobile/$probe_dir/$name"
+            test -s "$file"
+            printf 'EXISTS: %s\n' "$file"
+          done
+          echo 'SHELF_ARTIFACT_DIAGNOSTIC_STEP_1_COMPLETED'
+      - name: Diagnostic 2 — prove execution and inspect collection paths
+        script: |
+          set -eu
+          echo 'SHELF_ARTIFACT_DIAGNOSTIC_STEP_2_STARTED'
+          : "${CM_BUILD_DIR:?Codemagic clone directory required}"
+          printf 'Script 2 working directory: %s\n' "$(pwd -P)"
+          expected=$(cd "$CM_BUILD_DIR/mobile" && pwd -P)
+          test "$(pwd -P)" = "$expected"
+          probe_dir="$CM_BUILD_DIR/mobile/build/ios/ipa/shelf-artifact-diagnostic"
+          echo 'Clone-relative pattern: mobile/build/ios/ipa/shelf-artifact-diagnostic/clone-relative-*.txt'
+          printf 'Resolved clone-relative pattern: %s/mobile/build/ios/ipa/shelf-artifact-diagnostic/clone-relative-*.txt\n' "$CM_BUILD_DIR"
+          printf 'Explicit pattern: %s/explicit-path-*.txt\n' "$probe_dir"
+          for name in clone-relative-probe.txt explicit-path-probe.txt; do
+            file="$probe_dir/$name"
+            test -s "$file"
+            printf 'Script 2 executed and confirmed file existence.\n' >> "$file"
+            printf 'EXISTS: %s\n' "$file"
+            ls -l "$file"
+            cat "$file"
+          done
+          echo 'SHELF_ARTIFACT_DIAGNOSTIC_STEP_2_COMPLETED'
+    artifacts:
+      - mobile/build/ios/ipa/shelf-artifact-diagnostic/clone-relative-*.txt
+      - $CM_BUILD_DIR/mobile/build/ios/ipa/shelf-artifact-diagnostic/explicit-path-*.txt
+
+  ios-submission-screenshots:
+    name: Shelf — genuine iPhone and iPad screenshots (simulator only)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    working_directory: mobile
+    integrations:
+      app_store_connect: shelf_app_store_connect
+    environment:
+      groups:
+        - shelf_ios_foundation
+        - shelf_ios_testflight
+      flutter: 3.47.2
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Capture real app and six books with checkout OFF; no store upload
+        script: python3 ../scripts/ios/capture_submission.py
+      - name: Upload genuine screenshot assets and verify Apple processing only
+        script: python3 ../scripts/ios/upload_submission_screenshots.py
+    artifacts:
+      - submission-captures/**/*.png
+      - submission-captures/capture-evidence.json
+      - submission-captures/apple-upload-results.json
+
+  ios-ipad-store-direct:
+    name: Shelf — one direct 13-inch iPad Store capture (simulator only)
+    instance_type: mac_mini_m2
+    max_build_duration: 20
+    working_directory: mobile
+    environment:
+      groups:
+        - shelf_ios_foundation
+      flutter: 3.47.2
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Compile simulator only and take one native Store screenshot
+        script: python3 ../scripts/ios/direct_ipad_store_capture.py
+    artifacts:
+      - direct-ipad-store-capture/ipad-13-store.png
+      - direct-ipad-store-capture/evidence.json

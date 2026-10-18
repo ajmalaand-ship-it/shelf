@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../reading/reading_position.dart';
+
+enum ReadingMode { scroll, pages }
+
 enum ReaderPalette { light, sepia, dark }
 
 enum ReaderFont { vazirmatn, naskh, literary }
@@ -11,19 +15,30 @@ class ReaderSettings extends ChangeNotifier {
     this._palette,
     this._font,
     this._fontSize,
+    this._readingMode,
   );
 
+  static const _readingModeKey = 'reader.mode';
   static const _paletteKey = 'reader.palette';
   static const _fontKey = 'reader.font';
   static const _fontSizeKey = 'reader.font_size';
   static const defaultFontSize = 16.0;
-  static const minimumFontSize = 18.0;
+  static const minimumFontSize = 16.0;
   static const maximumFontSize = 38.0;
 
   final SharedPreferences _preferences;
   ReaderPalette _palette;
   ReaderFont _font;
   double _fontSize;
+  ReadingMode _readingMode;
+  ReadingMode get readingMode => _readingMode;
+  ReadingPositions get positions => ReadingPositions(_preferences);
+
+  Future<void> setReadingMode(ReadingMode mode) async {
+    _readingMode = mode;
+    notifyListeners();
+    await _preferences.setString(_readingModeKey, mode.name);
+  }
 
   ReaderPalette get palette => _palette;
   ReaderFont get font => _font;
@@ -56,6 +71,9 @@ class ReaderSettings extends ChangeNotifier {
       savedFontSize == null
           ? defaultFontSize
           : savedFontSize.clamp(minimumFontSize, maximumFontSize),
+      preferences.getString(_readingModeKey) == 'pages'
+          ? ReadingMode.pages
+          : ReadingMode.scroll,
     );
   }
 

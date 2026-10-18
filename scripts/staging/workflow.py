@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Private staging lifecycle. Secrets stay in memory/private files, never output."""
 import argparse
+import importlib.util
+from contextlib import nullcontext
 import base64
 from datetime import datetime, timezone
 import fcntl
@@ -27,10 +29,14 @@ RELEASES = Path('/home/shelf/apps/shelf-staging-releases')
 STATE = RUNTIME / 'release-state.json'
 SOURCE = Path(__file__).resolve().parents[2]
 SHARES = '2026_10_01_040000_record_owner_book_shares.php'
+_safety_spec = importlib.util.spec_from_file_location('shelf_promotion_safety', Path(__file__).with_name('promotion_safety.py'))
+safety = importlib.util.module_from_spec(_safety_spec)
+_safety_spec.loader.exec_module(safety)
 
 
 def run(args, cwd=SOURCE, input=None):
-    result = subprocess.run(args, cwd=cwd, input=input, capture_output=True, text=True)
+    result = (safety.ACTIVE.process(args, cwd=cwd, input=input) if safety.ACTIVE is not None
+              else subprocess.run(args, cwd=cwd, input=input, capture_output=True, text=True))
     if result.returncode:
         # Provider/process output can contain passwords or personal data.
         raise RuntimeError('Command failed: ' + Path(args[0]).name + ' (details withheld; no later live steps run).')
@@ -260,9 +266,393 @@ def https_checks():
     print('PASS: real HTTPS/private gate, noindex, API marker, banner, catalogue/cover, locked paid text, accounts, locked Library, denied webhook/private files; production healthy.',flush=True)
 
 
+def ios_auth_runtime_checks(app, production=False):
+    # Read-only checks against the actual deployed schema/config; never expose IDs/keys.
+    result = json.loads(php(app, r'''$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+$stage=App\Support\Staging::active();
+echo json_encode([
+ 'stage'=>$stage, 'accounts'=>(bool)config('reader_auth.enabled'),
+ 'apple_disabled'=>!config('reader_auth.apple_enabled') && !config('reader_auth.apple_relay_ready') && !App\Services\Accounts\AppleIdentity::enabled(),
+ 'checkout_off'=>!config('purchases.production_enabled'), 'sync_off'=>!config('play_sync.enabled'),
+ 'subject_column'=>Schema::hasColumn('readers','apple_subject_hash'),
+ 'token_column'=>Schema::hasColumn('readers','apple_refresh_token'),
+ 'challenges'=>Schema::hasTable('apple_login_challenges'),
+ 'migration'=>DB::table('migrations')->where('migration','2026_10_11_120000_add_apple_reader_identity')->exists(),
+ 'no_apple_credentials'=>!filled(config('reader_auth.apple_private_key_path')) && !filled(config('reader_auth.apple_key_id')) && !filled(config('reader_auth.apple_team_id')),
+ 'logged_mail'=>config('mail.default')==='log', 'null_queue'=>config('queue.default')==='null',
+ 'google_present'=>filled(config('reader_auth.google_web_client_id')),
+],JSON_THROW_ON_ERROR);'''))
+    required = ('accounts', 'apple_disabled', 'checkout_off', 'sync_off',
+                'subject_column', 'token_column', 'challenges', 'migration')
+    if not all(result.get(key) is True for key in required) or result['stage'] == production:
+        raise RuntimeError('Deployed iOS auth schema/disabled controls failed; details withheld.')
+    if production:
+        if not result['google_present']:
+            raise RuntimeError('Existing production Google web configuration missing.')
+    elif not all(result[key] for key in ('no_apple_credentials', 'logged_mail', 'null_queue')):
+        raise RuntimeError('Staging Apple credential/mail/queue isolation failed.')
+    base = 'https://shelf.services' if production else 'https://staging.shelf.services'
+    headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+    if not production:
+        headers['X-Shelf-Test-Key'] = settings(app)['SHELF_STAGING_ACCESS_KEY']
+    for path, method in (('/api/auth/config', 'GET'), ('/api/auth/apple-challenge', 'POST'), ('/api/auth/apple', 'POST')):
+        request = urllib.request.Request(base + path, headers=headers, method=method,
+                                         data=b'{}' if method == 'POST' else None)
+        try:
+            with urllib.request.urlopen(request, timeout=20) as response:
+                status, body = response.status, response.read()
+        except urllib.error.HTTPError as response:
+            status, body = response.code, response.read()
+        if method == 'GET':
+            data = json.loads(body)
+            if status != 200 or data.get('apple_enabled') is not False or data.get('enabled') is not True:
+                raise RuntimeError('Apple API advertisement was not disabled.')
+            if production and data.get('google_enabled') is not True:
+                raise RuntimeError('Existing production Google API advertisement changed.')
+        elif status != 404:
+            raise RuntimeError('Disabled Apple endpoint did not fail closed.')
+    print('PASS: deployed Apple migration/schema, both gates false, HTTPS Apple endpoints 404, existing account controls and isolation.', flush=True)
+
+
+
+def apple_purchase_runtime_checks(app, production=False):
+    result = json.loads(php(app, r"""$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+echo json_encode([
+ 'stage'=>App\Support\Staging::active(),
+ 'gate_off'=>config('purchases.apple_sandbox_enabled')===false,
+ 'customers_off'=>config('purchases.apple_customers_enabled', false)===false,
+ 'owned_gate_off'=>config('purchases.apple_owned_book3_test_enabled',false)===false,
+ 'proof_off'=>!App\Services\Purchases\ApplePurchaseProof::configured(),
+ 'checkout_off'=>!config('purchases.production_enabled'), 'sync_off'=>!config('play_sync.enabled'),
+ 'signin_off'=>!config('reader_auth.apple_enabled') && !config('reader_auth.apple_relay_ready'),
+ 'migration'=>DB::table('migrations')->where('migration','2026_10_12_120000_add_purchase_event_store_scope')->exists(),
+ 'schema'=>Schema::hasColumns('purchase_events',['store','app_id','event_timestamp_ms'])
+   && Schema::hasColumn('purchases','store_purchased_at_ms') && Schema::hasColumn('purchase_consents','store'),
+ 'no_apple_history'=>!DB::table('purchases')->where('store','APP_STORE')->exists()
+   && !DB::table('purchase_events')->where('store','APP_STORE')->exists()
+   && !DB::table('purchase_consents')->where('store','APP_STORE')->exists(),
+ 'stage_isolated'=>DB::connection()->getDatabaseName()==='shelf_staging'
+   && realpath(storage_path())!==realpath('/home/shelf/apps/shelf/storage')
+   && config('mail.default')==='log' && config('queue.default')==='null',
+ 'session_schema'=>!class_exists(App\Services\Purchases\ApplePurchaseSession::class)
+   || (Schema::hasColumns('apple_purchase_sessions',['reader_id','collection_id','consent_id','provider_identity','issued_at_ms','expires_at_ms','revoked_at_ms','transaction_id','store_purchased_at_ms'])
+     && DB::table('migrations')->where('migration','2026_10_15_010000_create_apple_purchase_sessions')->exists()
+     && !DB::table('apple_purchase_sessions')->exists()),
+ 'stage_private'=>!filled(config('purchases.apple_webhook_authorization'))
+   && !filled(config('purchases.apple_public_sdk_key')) && !filled(config('purchases.metadata_key_path')),
+],JSON_THROW_ON_ERROR);"""))
+    required=('gate_off','customers_off','owned_gate_off','proof_off','checkout_off','sync_off','signin_off','migration','schema','no_apple_history','session_schema')
+    if not all(result.get(k) is True for k in required) or result['stage']==production:
+        raise RuntimeError('Apple purchase disabled rollout/schema checks failed; details withheld.')
+    if not production and not (result['stage_private'] and result['stage_isolated']):
+        raise RuntimeError('Staging contains production Apple purchase configuration.')
+    denied=json.loads(php(app, r"""$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$controller=$app->make(App\Http\Controllers\LibraryController::class);
+$reader=new App\Models\Reader(['email'=>'synthetic-non-owner@example.test']);
+$book=App\Models\Collection::findOrFail(3);
+$out=['exception_disabled'=>!App\Services\Purchases\OwnerAppleSandboxTest::allowed($reader,$book)];
+foreach ([['APP_STORE',3,true,503],['APP_STORE',4,true,503],['APP_STORE',3,false,503],['PLAY_STORE',3,true,422]] as [$store,$id,$test,$expected]) {
+ $target=$id===3 ? $book : new App\Models\Collection(); $target->id=$id;
+ $request=Illuminate\Http\Request::create('/','POST',['agree'=>true,'checkout_mode'=>'sandbox','store'=>$store,'owned_book_sandbox_test'=>$test]);
+ $request->setUserResolver(fn()=>$reader);
+ try {$controller->consent($request,$target); $out[]=false;}
+ catch (Symfony\Component\HttpKernel\Exception\HttpException $e) {$out[]=$e->getStatusCode()===$expected;}
+}
+echo json_encode($out,JSON_THROW_ON_ERROR);"""))
+    if not all(value is True for value in denied.values()):
+        raise RuntimeError('Disabled owned-book exception denial checks failed.')
+    base='https://shelf.services' if production else 'https://staging.shelf.services'
+    headers={'Accept':'application/json'}
+    if not production: headers['X-Shelf-Test-Key']=settings(app)['SHELF_STAGING_ACCESS_KEY']
+    with urllib.request.urlopen(urllib.request.Request(base+'/api/purchases/config?platform=ios',headers=headers),timeout=20) as response:
+        data=json.load(response)
+        if response.status!=200 or any(data.get(k) is not False for k in ('enabled','sandbox_checkout_enabled','production_checkout_enabled')) or data.get('public_sdk_key') is not None:
+            raise RuntimeError('HTTPS iOS purchase configuration does not fail closed.')
+    # Deliberately incomplete, unauthenticated request: must stop before validation/DB/provider calls.
+    request=urllib.request.Request(base+'/api/purchases/webhook',headers={**headers,'Content-Type':'application/json'},
+        data=b'{"event":{"store":"APP_STORE"}}',method='POST')
+    try:
+        with urllib.request.urlopen(request,timeout=20) as response: status=response.status
+    except urllib.error.HTTPError as response: status=response.code
+    if status!=(503 if production else 403):
+        raise RuntimeError('Disabled Apple webhook guard returned an unexpected status.')
+    print('PASS: Apple purchase schema; sandbox/real checkout/sign-in/sync OFF; iOS HTTPS config disabled; webhook guard closed; no Apple history.',flush=True)
+
+
+def apple_safety_checked(app, commit, changes):
+    """Reuse only exact validated session source; never the pre-binding evidence."""
+    session = 'app/Services/Purchases/ApplePurchaseSession.php'
+    backend = {p for p in changes if not p.startswith(('docs/', 'mobile/')) and p != 'AGENTS.md'}
+    if session not in backend:
+        return False
+    scope = {
+        session, 'app/Http/Controllers/LibraryController.php', 'app/Http/Controllers/PurchaseWebhookController.php',
+        'app/Services/BookAccessService.php', 'app/Services/Purchases/ApplePurchaseProof.php',
+        'app/Services/Purchases/AppleSandboxPurchases.php', 'app/Services/Purchases/OwnerAppleSandboxTest.php',
+        'app/Services/Purchases/PurchaseService.php', 'app/Services/Purchases/RevenueCatClient.php',
+        'app/Services/Purchases/PurchaseRecoveryService.php', 'app/Models/Purchase.php', 'app/Models/PurchaseEvent.php',
+        'config/purchases.php', 'database/migrations/2026_10_12_120000_add_purchase_event_store_scope.php',
+        'database/migrations/2026_10_15_010000_create_apple_purchase_sessions.php',
+        'tests/Feature/AppleSandboxPurchasesTest.php', 'tests/Feature/BookPurchasesTest.php',
+        'scripts/staging/workflow.py', 'scripts/run_tests.sh', 'scripts/ios/configure_apple_sandbox.py',
+        'scripts/ios/test_apple_rollout.py', 'scripts/ios/test_asc_key_upload.py',
+        'codemagic.yaml', 'scripts/ios/check_build_number.py', 'scripts/ios/test_build_number.py',
+    }
+    if not backend <= scope:
+        raise RuntimeError('Unreviewed backend changes in Apple session rollout; stop for scope review.')
+    for path in sorted(scope | {'tests/Feature/AccountingTest.php'}):
+        expected = subprocess.run(['git', 'show', commit + ':' + path], cwd=SOURCE, capture_output=True, check=True).stdout
+        if (app / path).read_bytes() != expected:
+            raise RuntimeError('Staged Apple safety path differs from selected commit: ' + path)
+    source = '1d3dfa5abc1bb35097ada6f2a69fb003c2e57b19'
+    reuse_scope = (scope - {'scripts/staging/workflow.py', 'scripts/ios/test_apple_rollout.py'}) | {
+        'tests/Feature/AccountingTest.php', 'mobile/lib/purchases/book_purchase_provider.dart',
+        'mobile/lib/purchases/library_controller.dart', 'mobile/test/ios_purchases_test.dart',
+        'mobile/pubspec.yaml', 'mobile/pubspec.lock',
+    }
+    if run(['git', 'diff', '--name-only', source, commit, '--', *sorted(reuse_scope)]).strip():
+        raise RuntimeError('Validated Apple safety source changed; focused retesting required.')
+    evidence = run(['git', 'show', source + ':docs/MASTER_RECORD.md'])
+    if '64 PHP tests / 604 assertions' not in evidence or '16 Flutter purchase tests + 1 staging-identity' not in evidence:
+        raise RuntimeError('Validated Apple safety test record missing.')
+    for path in sorted(reuse_scope):
+        expected = subprocess.run(['git', 'show', source + ':' + path], cwd=SOURCE, capture_output=True, check=True).stdout
+        if (app / path).read_bytes() != expected:
+            raise RuntimeError('Staged safety source differs from completed test evidence: ' + path)
+    log = RUNTIME / ('checks-' + commit + '.log')
+    artisan(app, 'shelf:check-staging')
+    apple_purchase_runtime_checks(app)
+    https_checks()
+    private_write(log, json.dumps({'tested_source': source, 'php_tests_reused':64, 'php_assertions_reused':604,
+        'flutter_tests_reused':16, 'staging_identity_tests_reused':1, 'source_bytes_match':True,
+        'runtime_checks_passed':True, 'record_sha256':hashlib.sha256(evidence.encode()).hexdigest()}, indent=2)+'\n')
+    state = current_state()
+    state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+        'scope':'apple-session-safety-disabled', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: exact validated Apple safety evidence reused; staged session schema empty; all gates OFF.', flush=True)
+    return True
+
+
+def apple_purchase_checked(app, commit, changes):
+    source='c8c266221d972d409ffa947ca87397293c69c004'
+    purchase_scope={
+        'app/Http/Controllers/LibraryController.php','app/Http/Controllers/PurchaseWebhookController.php',
+        'app/Models/Purchase.php','app/Models/PurchaseEvent.php',
+        'app/Services/Purchases/ApplePurchaseProof.php','app/Services/Purchases/AppleSandboxPurchases.php',
+        'app/Services/Purchases/PurchaseRecoveryService.php','app/Services/Purchases/PurchaseService.php',
+        'app/Services/Purchases/RevenueCatClient.php','config/purchases.php',
+        'database/migrations/2026_10_12_120000_add_purchase_event_store_scope.php',
+        'tests/Feature/AppleSandboxPurchasesTest.php','tests/Feature/BookPurchasesTest.php',
+        'app/Services/Purchases/OwnerAppleSandboxTest.php',
+    }
+    other={'scripts/staging/workflow.py','scripts/run_tests.sh','scripts/ios/test_asc_key_upload.py',
+           'scripts/ios/configure_apple_sandbox.py','scripts/ios/test_apple_rollout.py'}
+    backend={p for p in changes if not p.startswith(('docs/','mobile/')) and p!='AGENTS.md'}
+    if not backend or not backend<=purchase_scope|other or 'tests/Feature/AppleSandboxPurchasesTest.php' not in backend:
+        return False
+    # Reuse completed synthetic tests only while all purchase implementation/test files are identical.
+    if run(['git','diff','--name-only',source,commit,'--',*sorted(purchase_scope)]).strip():
+        raise RuntimeError('Apple purchase source changed since completed tests; focused retesting required.')
+    evidence=run(['git','show',source+':docs/MASTER_RECORD.md'])
+    if '56 PHP tests / 511 assertions' not in evidence or '1 staging identity test' not in evidence:
+        raise RuntimeError('Completed Apple purchase test record missing.')
+    for path in sorted(purchase_scope):
+        expected = subprocess.run(['git','show',source+':'+path], cwd=SOURCE, capture_output=True, check=True).stdout
+        if (app/path).read_bytes() != expected:
+            raise RuntimeError('Deployed Apple purchase path differs from validated source: '+path)
+    pending=json.loads(php(app, r'''$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+echo json_encode(array_values(array_diff(array_keys($app->make('migrator')->getMigrationFiles(database_path('migrations'))),$app->make('migration.repository')->getRan())));'''))
+    if pending:
+        raise RuntimeError('Unexpected pending migration in owner Apple test rollout.')
+    log=RUNTIME/('checks-'+commit+'.log')
+    apple_purchase_runtime_checks(app)
+    https_checks()
+    private_write(log,json.dumps({'tested_source':commit_id(source),
+        'reused_record_sha256':hashlib.sha256(evidence.encode()).hexdigest(),
+        'purchase_paths_identical':True,'php_tests_reused':56,'php_assertions_reused':511,
+        'flutter_tests_reused':15,'runtime_checks_passed':True},indent=2)+'\n')
+    state=current_state()
+    state.update(staging_commit=commit,checks={'commit':commit,'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(),'mobile_tests':False,
+        'scope':'apple-purchase-backend-disabled','log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: exact staged Apple purchase source matches completed test evidence; only rollout checks run.',flush=True)
+    return True
+
+
+def financial_retention_checked(app, commit, changes):
+    allowed = {
+        'app/Models/FinancialRetentionRecord.php', 'app/Services/Accounting/FinancialRetention.php',
+        'app/Filament/Pages/FinancialRetention.php', 'app/Console/Commands/CheckFinancialRetention.php',
+        'database/migrations/2026_10_16_230000_create_financial_retention_records.php',
+        'resources/views/filament/pages/financial-retention.blade.php',
+        'resources/views/privacy.blade.php', 'resources/views/account/delete.blade.php',
+        'tests/Feature/FinancialRetentionTest.php', 'tests/Feature/PrivacyPolicyTest.php',
+        'tests/Feature/PrivacySupportTest.php', 'scripts/staging/workflow.py',
+    }
+    if 'app/Services/Accounting/FinancialRetention.php' not in changes:
+        return False
+    # Existing post-production rollout tools are prerequisites, not new purchase work.
+    prior_tools = {'scripts/ios/test_apple_rollout.py', 'scripts/staging/promotion_safety.py',
+                   'scripts/staging/test_promotion_safety.py'}
+    if run(['git', 'diff', '--name-only', 'eafea353d45f4dac82c3454e9f37d702cb621004', commit, '--', *sorted(prior_tools)]).strip():
+        raise RuntimeError('Previously verified rollout prerequisites changed during retention work.')
+    allowed |= prior_tools
+    backend = {p for p in changes if not p.startswith(('docs/', 'mobile/')) and p != 'AGENTS.md'}
+    if not backend <= allowed:
+        raise RuntimeError('Unreviewed source changes outside the authorized retention rollout scope.')
+    log = RUNTIME / ('checks-' + commit + '.log')
+    env = os.environ.copy()
+    env['SHELF_PHP_TEST_FILTER'] = 'FinancialRetentionTest|PrivacyPolicyTest|PrivacySupportTest|AccountingTest|D14PolicyTest'
+    with log.open('w') as output:
+        result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+            stdout=output, stderr=subprocess.STDOUT, env=env)
+    if result.returncode:
+        raise RuntimeError('Focused financial retention checks failed; private log: ' + str(log))
+    artisan(app, 'shelf:check-staging')
+    artisan(app, 'shelf:check-financial-retention')
+    https_checks()
+    financial_disclosure_checks(app, staging=True)
+    state = current_state()
+    state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+        'scope':'financial-retention-report-only', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: focused D14 report/disclosures/accounting/recovery checks; no Apple purchase test or mobile build.', flush=True)
+    return True
+
+
+def financial_disclosure_checks(app, staging=False):
+    base = 'https://staging.shelf.services' if staging else 'https://shelf.services'
+    headers = {'X-Shelf-Test-Key': settings(app)['SHELF_STAGING_ACCESS_KEY']} if staging else {}
+    for path in ('/privacy', '/account/delete'):
+        with urllib.request.urlopen(urllib.request.Request(base+path, headers=headers), timeout=20) as response:
+            body = response.read().decode()
+            if response.status != 200 or not all(phrase in body for phrase in (
+                'three years after the relevant tax return is actually filed',
+                'Automatic financial expiry is not implemented',
+                'Apple deleted-account purchase recovery is not yet available')):
+                raise RuntimeError('Published financial retention disclosures do not match approved behavior.')
+            if 'Financial retention is still under review' in body:
+                raise RuntimeError('Outdated financial-policy disclosure remains published.')
+    print('PASS: actual HTTPS privacy and deletion pages disclose approved policy and implementation limits.', flush=True)
+
+
+def apple_customers_checked(app, commit, changes):
+    if 'tests/Feature/AppleCustomerPurchasesTest.php' not in changes:
+        return False
+    allowed = {'app/Http/Controllers/LibraryController.php', 'app/Http/Controllers/PurchaseWebhookController.php',
+        'app/Services/BookAccessService.php', 'app/Services/Purchases/ApplePurchaseProof.php',
+        'app/Services/Purchases/AppleSandboxPurchases.php', 'app/Services/Purchases/RevenueCatClient.php',
+        'config/purchases.php', 'codemagic.yaml',
+        'scripts/run_tests.sh', 'scripts/staging/workflow.py', 'scripts/ios/test_build_number.py',
+        'tests/Feature/AppleCustomerPurchasesTest.php'}
+    backend = {p for p in changes if not p.startswith(('docs/', 'mobile/')) and p != 'AGENTS.md'}
+    if not backend <= allowed:
+        raise RuntimeError('Changes exceed the authorized six-book Apple customer rollout.')
+    log = RUNTIME / ('checks-' + commit + '.log')
+    env = os.environ.copy()
+    env['SHELF_PHP_TEST_FILTER'] = 'AppleCustomerPurchasesTest|AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest|ReviewerAccessTest'
+    env['SHELF_MOBILE_TEST_SCOPE'] = 'ios-purchases'
+    with log.open('w') as output:
+        mobile_changed = any(path.startswith('mobile/') for path in changes)
+        result = subprocess.run(['bash', 'scripts/run_tests.sh'] + (['--mobile'] if mobile_changed else []), cwd=app,
+            stdout=output, stderr=subprocess.STDOUT, env=env)
+    if result.returncode:
+        raise RuntimeError('Focused Apple customer checks failed; private log: ' + str(log))
+    artisan(app, 'shelf:check-staging')
+    apple_purchase_runtime_checks(app)
+    https_checks()
+    state = current_state()
+    state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':mobile_changed,
+        'scope':'apple-customers-disabled', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: focused six-book Apple customer/restore/accounting and mobile checks; checkout remains OFF.', flush=True)
+    return True
+
+
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    if apple_customers_checked(app, commit, changes):
+        return
+    if financial_retention_checked(app, commit, changes):
+        return
+    if apple_safety_checked(app, commit, changes):
+        return
+    if apple_purchase_checked(app, commit, changes):
+        return
+    ios_auth_scope = {
+        'app/Http/Controllers/Account/AuthController.php', 'app/Http/Controllers/Account/EmailActionController.php',
+        'app/Models/Reader.php', 'app/Services/Accounts/AccountActions.php', 'app/Services/Accounts/AppleIdentity.php',
+        'bootstrap/app.php', 'config/reader_auth.php', 'routes/api.php',
+        'database/migrations/2026_10_11_120000_add_apple_reader_identity.php',
+        'tests/Feature/IosSignInTest.php', 'tests/Feature/ReaderAccountsTest.php',
+        'scripts/run_tests.sh', 'scripts/staging/workflow.py',
+        'scripts/check_ios_foundation.py', 'scripts/ios/configure_google.py',
+        'scripts/ios/github_testflight.py', 'scripts/ios/test_configure_google.py',
+        '.github/workflows/ios-foundation.yml', '.github/workflows/ios-testflight.yml', 'codemagic.yaml',
+    }
+    ios_changes = {path for path in changes if not path.startswith(('docs/', 'mobile/')) and path != 'AGENTS.md'}
+    if ios_changes and ios_changes <= ios_auth_scope and 'tests/Feature/IosSignInTest.php' in ios_changes:
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'IosSignInTest|ReaderAccountsTest|BookPurchasesTest'
+        test_env.pop('SHELF_MOBILE_TEST_SCOPE', None)
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+                stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Focused staged iOS auth tests failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        ios_auth_runtime_checks(app)
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+            'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+            'scope':'ios-auth-backend-disabled', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: focused staged iOS auth/account/purchase checks; existing Flutter evidence reused; no production Apple credentials or real mail.', flush=True)
+        return
+    avatar_scope = {'app/Http/Controllers/Account/AvatarController.php', 'app/Models/Reader.php',
+        'app/Services/Accounts/AccountActions.php', 'app/Services/Accounts/ReaderAvatar.php',
+        'bootstrap/app.php', 'config/filesystems.php', 'routes/api.php',
+        'database/migrations/2026_10_09_120000_add_private_reader_avatar.php',
+        'tests/Feature/ReaderAvatarTest.php', 'scripts/run_tests.sh', 'scripts/staging/workflow.py',
+        'app/Models/Poem.php', 'app/Http/Resources/PoemSummaryResource.php',
+        'tests/Feature/CatalogueFirstLineTest.php'}
+    backend_changes = {path for path in changes if not path.startswith(('docs/', 'mobile/')) and path != 'AGENTS.md'}
+    if backend_changes and backend_changes <= avatar_scope and 'tests/Feature/ReaderAvatarTest.php' in backend_changes:
+        # Review 3 phone preparation reuses completed shared Flutter evidence.
+        # This gate checks the newly deployed avatar backend and staging isolation.
+        log = RUNTIME / ('checks-' + commit + '.log')
+        test_env = os.environ.copy()
+        test_env['SHELF_PHP_TEST_FILTER'] = 'ReaderAvatarTest|CatalogueFirstLineTest|PrivacySupportTest'
+        with log.open('w') as output:
+            result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app,
+                stdout=output, stderr=subprocess.STDOUT, env=test_env)
+        if result.returncode:
+            raise RuntimeError('Staged avatar checks failed; private log: ' + str(log))
+        artisan(app, 'shelf:check-staging')
+        https_checks()
+        state = current_state()
+        state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+            'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+            'scope':'review-3-backend-dependencies', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+        save_state(state)
+        print('PASS: focused private-avatar lifecycle, protected first-line catalogue and staging isolation; completed mobile/AAB evidence reused.', flush=True)
+        return
     reviewer_scope = {'app/Services/BookAccessService.php', 'app/Http/Controllers/LibraryController.php',
         'app/Services/Purchases/PurchaseService.php',
         'database/migrations/2026_10_08_070000_create_reviewer_book_grants.php',
@@ -543,21 +933,88 @@ def promotion_allowed(state,commit,actual):
     return state.get('staging_commit')==commit==actual and evidence.get('commit')==commit and evidence.get('passed') is True
 
 
-def production_history_snapshot(agreement_limit=None):
-    # Only aggregate fingerprints leave PHP; no reader or money data is printed.
-    return json.loads(php(PRODUCTION,r'''$app=require $argv[1].'/bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-$out=[];
+HISTORY_SNAPSHOT_PHP = r'''$out=[];
 foreach (['readers','reader_account_actions','personal_access_tokens','purchases','purchase_events','sales_ledger','book_entitlements','purchase_consents','author_share_agreements','accounting_entries','accounting_shares'] as $table) {
  $q=Illuminate\Support\Facades\DB::table($table)->orderBy('id');
  if ($table==='author_share_agreements' && $argv[2]!=='all') {$q->where('id','<=',(int)$argv[2]);}
- $rows=Illuminate\Support\Facades\Schema::hasTable($table) ? $q->get() : collect();$out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
+ $rows=Illuminate\Support\Facades\Schema::hasTable($table) ? $q->get() : collect();
+ // Nullable avatar/Apple columns change schema, not existing reader values.
+ // Omit only null added fields; any non-null/new identity still changes the fingerprint.
+ if ($table==='readers') {$rows->each(function ($row) {foreach (['avatar_path','apple_subject_hash','apple_refresh_token'] as $field) {if (property_exists($row,$field) && $row->$field===null) {unset($row->$field);}}});}
+ // Omit only exact migration defaults; non-default/new Apple proof still changes the fingerprint.
+ $defaults=match($table) {
+  'purchase_events'=>['store'=>'PLAY_STORE','app_id'=>null,'event_timestamp_ms'=>null],
+  'purchases'=>['store_purchased_at_ms'=>null],
+  'purchase_consents'=>['store'=>'PLAY_STORE'], default=>[],
+ };
+ $rows->each(function ($row) use ($defaults) {foreach ($defaults as $field=>$value) {
+  if (property_exists($row,$field) && $row->$field===$value) {unset($row->$field);}
+ }});
+ $out[$table]=['count'=>$rows->count(),'sha256'=>hash('sha256',json_encode($rows,JSON_THROW_ON_ERROR))];
 }
 $out['agreement_limit']=$argv[2]==='all' ? (int)Illuminate\Support\Facades\DB::table('author_share_agreements')->max('id') : (int)$argv[2];
-echo json_encode($out,JSON_THROW_ON_ERROR);''','all' if agreement_limit is None else agreement_limit))
+'''
+
+def production_history_snapshot(agreement_limit=None):
+    # Raw complete fingerprints remain strict, including every entitlement timestamp.
+    code = r'''$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+''' + HISTORY_SNAPSHOT_PHP + 'echo json_encode($out,JSON_THROW_ON_ERROR);'
+    return json.loads(php(PRODUCTION, code, 'all' if agreement_limit is None else agreement_limit))
 
 
-def promote(commit):
+def entitlement_refresh_evidence():
+    # Called only in a later authorized promotion, while maintenance/refund lock
+    # quiesce writers. Return no customer names, text, credentials or receipts.
+    code = r"""$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+use Illuminate\Support\Facades\DB;
+$db=DB::connection(); $db->beginTransaction();
+try {
+ $columns=$db->select("SELECT COLUMN_NAME,DATA_TYPE,DATETIME_PRECISION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='book_entitlements' ORDER BY ORDINAL_POSITION");
+ $precision=collect($columns)->whereIn('COLUMN_NAME',['checked_at','created_at','updated_at'])->every(fn($c)=>$c->DATA_TYPE==='timestamp' && $c->DATETIME_PRECISION===0);
+ $entities=$db->table('book_entitlements')->orderBy('id')->selectRaw('id,reader_id,collection_id,active,UNIX_TIMESTAMP(checked_at) AS checked_at,UNIX_TIMESTAMP(created_at) AS created_at,UNIX_TIMESTAMP(updated_at) AS updated_at')->get();
+ $entities->each(function($e){foreach(['id','reader_id','collection_id','active','checked_at','created_at','updated_at'] as $k){if($e->$k!==null){$e->$k=(int)$e->$k;}}});
+ $runs=$db->table('play_refund_runs')->orderBy('id')->selectRaw('id,status,http_status,pages,seen,refunded,duplicate,unmatched,conflict,error_code,UNIX_TIMESTAMP(started_at) AS started_at,UNIX_TIMESTAMP(finished_at) AS finished_at,UNIX_TIMESTAMP(created_at) AS created_at')->get();
+ $runs->each(function($r){foreach(['id','http_status','pages','seen','refunded','duplicate','unmatched','conflict','started_at','finished_at','created_at'] as $k){if($r->$k!==null){$r->$k=(int)$r->$k;}}});
+ $refunded=App\Models\Purchase::where('store','PLAY_STORE')->whereHas('entries',fn($q)=>$q->where('status','refund'))->get();
+ $e=$entities->count()===1?$entities->first():null;
+ $same=$e?$refunded->where('reader_id',$e->reader_id)->where('collection_id',$e->collection_id):collect();
+ $valid=$e?App\Models\Purchase::where('store','PLAY_STORE')->where('reader_id',$e->reader_id)->where('collection_id',$e->collection_id)->whereHas('entries',fn($q)=>$q->where('status','sale'))->whereDoesntHave('entries',fn($q)=>$q->whereIn('status',['refund','revoke']))->count():0;
+ $events=$e?$db->table('purchase_events')->where('store','PLAY_STORE')->where('reader_id',$e->reader_id)->where('collection_id',$e->collection_id)->whereIn('transaction_id',$same->pluck('transaction_id'))->where('event_type','GOOGLE_VOIDED_PURCHASE')->count():0;
+ $closed=config('purchases.apple_sandbox_enabled')===false && config('purchases.apple_owned_book3_test_enabled')===false && config('purchases.production_enabled')===false && !config('reader_auth.apple_enabled') && !config('reader_auth.apple_relay_ready') && !config('play_sync.enabled') && !App\Models\Purchase::where('store','APP_STORE')->exists();
+ $result=['closed'=>$closed,'columns'=>array_map(fn($c)=>$c->COLUMN_NAME,$columns),'precision_zero'=>$precision,'offset_seconds'=>(int)$db->selectOne('SELECT TIMESTAMPDIFF(SECOND,UTC_TIMESTAMP(),NOW()) AS offset_seconds')->offset_seconds,
+ 'entitlements'=>$entities,'refund_runs'=>$runs,'link'=>['refunded_global'=>$refunded->count(),'refunded_same_book'=>$same->count(),'google_events'=>$events,'valid_play'=>$valid]];
+/* COHERENT_HISTORY */
+ $result['history']=$out;
+} finally {$db->rollBack();}
+echo json_encode($result,JSON_THROW_ON_ERROR);"""
+    return json.loads(php(PRODUCTION, code.replace('/* COHERENT_HISTORY */', HISTORY_SNAPSHOT_PHP), 'all'))
+
+
+def closed_production_preflight():
+    code = r"""$app=require $argv[1].'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+echo json_encode(['ready'=>!$app->isDownForMaintenance() && !App\Support\Staging::active()
+ && config('purchases.apple_sandbox_enabled')===false && config('purchases.apple_owned_book3_test_enabled')===false
+ && config('purchases.production_enabled')===false && !config('reader_auth.apple_enabled')
+ && !config('reader_auth.apple_relay_ready') && !config('play_sync.enabled')],JSON_THROW_ON_ERROR);"""
+    safety.require(json.loads(php(PRODUCTION, code)).get('ready') is True,
+                   'Production already in maintenance or deferred/purchase controls changed.')
+
+
+def preservation_gate(checkpoint, commit, previous, saved):
+    record, entities, runs = safety.load_checkpoint(checkpoint, commit, previous)
+    live = entitlement_refresh_evidence()
+    safety.require(live['closed'] is True, 'Purchase or deferred controls changed.')
+    report = safety.compare_history(record, entities, runs, live['history'], live)
+    private_write(saved/'entitlement-refresh-verification.json', json.dumps({
+        'source':commit,'original_checkpoint':str(checkpoint),'verified_refresh':report,
+        'ownership_and_financial_history_exact':True}, indent=2)+'\n')
+    return record
+
+
+def promote(commit, checkpoint=None):
     state=current_state()
     if not promotion_allowed(state,commit,(STAGING/'REVISION').read_text().strip()):
         raise RuntimeError('Promotion refused: exact commit must already be on staging with passing checks.')
@@ -580,37 +1037,65 @@ def promote(commit):
             raise RuntimeError('Release changes the runtime cPanel handler; stop.')
     previous=run(['git','rev-parse','HEAD'],PRODUCTION).strip()
     run(['git','merge-base','--is-ancestor',previous,commit],PRODUCTION)
-    saved=backup(PRODUCTION)
-    private_write(saved/'promotion-notes.txt','From '+previous+' to '+commit+'\nRollback code: git switch --detach '+previous+'\nDatabase: inspect migration batch; do not restore over reader/money changes. Use retained SQL/media backup only with owner approval.\n')
-    artisan(PRODUCTION,'down')
-    try:
-        unchanged=production_history_snapshot()
-        run(['git','merge','--ff-only',commit],PRODUCTION)
-        if (PRODUCTION/'public/.htaccess').read_bytes() != runtime_handler:
-            raise RuntimeError('Runtime cPanel handler changed unexpectedly.')
-        # Keep dependency setup out of maintenance where possible; same lock
-        # copies the already tested stage dependencies if it changed.
-        if (PRODUCTION/'composer.lock').read_bytes()!=(STAGING/'composer.lock').read_bytes():
-            raise RuntimeError('Staging/production lock mismatch.')
-        # The staged vendor tree is already installed and tested at this lock.
-        # Copy dependency files rather than contacting the network in maintenance.
-        shutil.copytree(STAGING/'vendor', PRODUCTION/'vendor', dirs_exist_ok=True)
-        run(['composer','dump-autoload','--no-scripts'],PRODUCTION)
-        artisan(PRODUCTION,'optimize:clear')
-        artisan(PRODUCTION,'migrate','--force')
-        artisan(PRODUCTION,'filament:assets')
-        artisan(PRODUCTION,'shelf:check-purchases')
-        artisan(PRODUCTION,'shelf:check-accounting')
-        if unchanged!=production_history_snapshot(unchanged['agreement_limit']):
-            raise RuntimeError('Past reader/payment/agreement records changed unexpectedly; stop and review.')
-        print('PASS: all previous reader, purchase, refund, ledger and agreement records unchanged.',flush=True)
-    finally:
-        artisan(PRODUCTION,'up')
-    artisan(PRODUCTION,'shelf:check-owner-shares')
-    https_checks()
-    state.update(production_commit=commit,last_backup=str(saved),previous_production_commit=previous)
-    save_state(state)
-    print('PASS: staged commit promoted with backup/migrations/health checks; history preserved.',flush=True)
+    protected = state['checks'].get('scope') == 'apple-session-safety-disabled'
+    if protected:
+        safety.require(checkpoint is not None, 'Reviewed preservation checkpoint is required for Apple safety promotion.')
+    elif checkpoint is not None:
+        raise RuntimeError('Historical allowance is not available for this rollout scope.')
+    customer_release = state['checks'].get('scope') == 'apple-customers-disabled'
+    guard = safety.PromotionWindow(PRODUCTION/'storage/framework/play-refunds.lock',
+        lambda: artisan(PRODUCTION,'up')) if (protected or customer_release) else nullcontext(None)
+    with guard as window:
+        if window:
+            closed_production_preflight()
+        saved=backup(PRODUCTION)
+        private_write(saved/'promotion-notes.txt','From '+previous+' to '+commit+'\nRollback code: git switch --detach '+previous+'\nDatabase: inspect migration batch; do not restore over reader/money changes. Use retained SQL/media backup only with owner approval.\n')
+        if window:
+            window.arm_maintenance()
+        try:
+            artisan(PRODUCTION,'down')
+            preservation = preservation_gate(checkpoint,commit,previous,saved) if protected else None
+            unchanged=production_history_snapshot()
+            run(['git','merge','--ff-only',commit],PRODUCTION)
+            if (PRODUCTION/'public/.htaccess').read_bytes() != runtime_handler:
+                raise RuntimeError('Runtime cPanel handler changed unexpectedly.')
+            # Keep dependency setup out of maintenance where possible; same lock
+            # copies the already tested stage dependencies if it changed.
+            if (PRODUCTION/'composer.lock').read_bytes()!=(STAGING/'composer.lock').read_bytes():
+                raise RuntimeError('Staging/production lock mismatch.')
+            # The staged vendor tree is already installed and tested at this lock.
+            # Copy dependency files rather than contacting the network in maintenance.
+            shutil.copytree(STAGING/'vendor', PRODUCTION/'vendor', dirs_exist_ok=True)
+            run(['composer','dump-autoload','--no-scripts'],PRODUCTION)
+            artisan(PRODUCTION,'optimize:clear')
+            artisan(PRODUCTION,'migrate','--force')
+            artisan(PRODUCTION,'filament:assets')
+            artisan(PRODUCTION,'shelf:check-purchases')
+            artisan(PRODUCTION,'shelf:check-accounting')
+            if unchanged!=production_history_snapshot(unchanged['agreement_limit']):
+                raise RuntimeError('Past reader/payment/agreement records changed unexpectedly; stop and review.')
+            print('PASS: all previous reader, purchase, refund, ledger and agreement records unchanged.',flush=True)
+            if preservation:
+                for filename, expected in preservation['files'].items():
+                    if hashlib.sha256(safety.private_bytes(Path(filename), secret=not filename.endswith('/public/.htaccess'))).hexdigest()!=expected:
+                        raise RuntimeError('Protected configuration or handler changed during promotion.')
+        finally:
+            if not window:
+                artisan(PRODUCTION,'up')
+        if window:
+            window.restore_maintenance()
+        artisan(PRODUCTION,'shelf:check-owner-shares')
+        if state['checks'].get('scope') == 'ios-auth-backend-disabled':
+            ios_auth_runtime_checks(PRODUCTION, production=True)
+        if state['checks'].get('scope') in ('apple-purchase-backend-disabled', 'apple-session-safety-disabled', 'apple-customers-disabled'):
+            apple_purchase_runtime_checks(PRODUCTION, production=True)
+        if state['checks'].get('scope') == 'financial-retention-report-only':
+            artisan(PRODUCTION, 'shelf:check-financial-retention')
+            financial_disclosure_checks(PRODUCTION)
+        https_checks()
+        state.update(production_commit=commit,last_backup=str(saved),previous_production_commit=previous)
+        save_state(state)
+        print('PASS: staged commit promoted with backup/migrations/health checks; history preserved.',flush=True)
 
 
 def main():
@@ -620,7 +1105,10 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('action',choices=['setup','deploy','refresh','check','promote','status'])
     parser.add_argument('commit',nargs='?',default='HEAD')
+    parser.add_argument('--preservation-checkpoint', type=Path, help='Reviewed historical checkpoint; only for separately authorized Apple safety promotion.')
     args=parser.parse_args()
+    if args.preservation_checkpoint is not None and args.action != 'promote':
+        parser.error('--preservation-checkpoint is only valid with promote')
     if args.action=='status': print(json.dumps(current_state(),indent=2));return
     Path('/home/shelf/tmp').mkdir(exist_ok=True)
     with Path('/home/shelf/tmp/shelf-staging-workflow.lock').open('a') as lock:
@@ -632,7 +1120,7 @@ def main():
             refresh_data(STAGING);print('Refresh complete; run check before promotion.',flush=True)
         elif args.action=='check': checked(STAGING,(STAGING/'REVISION').read_text().strip(),
                                           initial=current_state().get('initial_isolation_verified') is not True)
-        elif args.action=='promote': promote(commit)
+        elif args.action=='promote': promote(commit,args.preservation_checkpoint)
 
 
 if __name__=='__main__':

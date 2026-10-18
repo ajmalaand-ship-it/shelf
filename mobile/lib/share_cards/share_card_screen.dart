@@ -1,3 +1,5 @@
+import '../widgets/shelf_assets.dart';
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/poem.dart';
+import '../l10n/app_strings.dart';
 import 'poem_card_widget.dart';
 import 'share_card_files.dart';
 import 'share_card_models.dart';
@@ -39,6 +42,9 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
   ShareCardScope _scope = ShareCardScope.selection;
   ShareLineSelection? _selection;
   bool _working = false;
+  bool _includeTitle = false;
+  late String _fontFamily = widget.fontFamily;
+  double _fontSize = 20;
   final PageController _previewController = PageController();
   final List<GlobalKey> _previewKeys = [];
 
@@ -60,12 +66,19 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
     scope: _scope,
     text: _cardText,
     theme: _theme,
-    fontFamily: widget.fontFamily,
+    fontFamily: _fontFamily,
+    fontSize: _fontSize,
+    includeTitle: _includeTitle,
+    isEnglish: AppStrings.of(context).isEnglish,
+    isDari: AppStrings.of(context).isDari,
   );
 
   List<ShareCardPage> get _pages => _cardText.trim().isEmpty
       ? const []
-      : ShareCardPaginator(fontFamily: widget.fontFamily).paginate(_cardText);
+      : ShareCardPaginator(
+          fontFamily: _fontFamily,
+          fontSize: _fontSize,
+        ).paginate(_cardText);
 
   @override
   void initState() {
@@ -84,161 +97,346 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
     final pages = _pages;
     _syncPreviewKeys(pages.length);
     return Scaffold(
-      appBar: AppBar(title: const Text('شريکول او ساتل')),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
-          children: [
-            SegmentedButton<ShareCardScope>(
-              key: const Key('card-scope'),
-              segments: [
-                const ButtonSegment(
-                  value: ShareCardScope.selection,
-                  label: Text('ټاکلې کرښې'),
-                ),
-                ButtonSegment(
-                  value: ShareCardScope.accessiblePoem,
-                  label: Text(
-                    widget.poem.hasMore || widget.poem.locked
-                        ? 'Sample — نمونه'
-                        : 'بشپړ متن',
+      appBar: AppBar(
+        title: Text(
+          AppStrings.of(context)
+              .choose('Create card', 'کارت جوړول', 'ساختن کارت'),
+          style: const TextStyle(fontSize: 18),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        actions: [
+          IconButton(
+            key: const Key('share-preview-expand'),
+            tooltip: AppStrings.of(context).choose(
+              'Expand preview',
+              'مخکتنه لویه کړئ',
+              'بزرگ کردن پیش‌نمایش',
+            ),
+            onPressed: _working || pages.isEmpty
+                ? null
+                : () => showDialog<void>(
+                    context: context,
+                    builder: (context) => Dialog.fullscreen(
+                      child: Scaffold(
+                        appBar: AppBar(
+                          title: Text(
+                            AppStrings.of(context).choose(
+                              'Card preview',
+                              'د کارت مخکتنه',
+                              'پیش‌نمایش کارت',
+                            ),
+                          ),
+                        ),
+                        body: InteractiveViewer(
+                          minScale: .3,
+                          maxScale: 4,
+                          child: Center(
+                            child: FittedBox(
+                              child: MediaQuery.withNoTextScaling(
+                                child: PoemCardWidget(
+                                  request: _request,
+                                  page: pages.first,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ],
-              selected: {_scope},
-              onSelectionChanged: (values) =>
-                  setState(() => _scope = values.first),
-            ),
-            if (_scope == ShareCardScope.selection) ...[
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Expanded(child: Text('له ۱ تر ۴ پرله‌پسې کرښې وټاکئ')),
-                  Text('${_selection?.count ?? 0}/۴'),
-                ],
-              ),
-              const SizedBox(height: 8),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).dividerColor),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: List.generate(_lines.length, (index) {
-                    final selected =
-                        _selection != null &&
-                        index >= _selection!.start &&
-                        index <= _selection!.end;
-                    return ListTile(
-                      key: Key('share-line-$index'),
-                      selected: selected,
-                      dense: true,
-                      leading: Icon(
-                        selected
-                            ? Icons.check_circle_rounded
-                            : Icons.circle_outlined,
-                      ),
-                      title: Text(
-                        _lines[index].text,
-                        textDirection: TextDirection.rtl,
-                        style: TextStyle(
-                          fontFamily: widget.fontFamily,
-                          height: 1.8,
-                        ),
-                      ),
-                      onTap: () => setState(
-                        () => _selection = selectContiguousLine(
-                          current: _selection,
-                          tapped: index,
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ],
-            const SizedBox(height: 18),
-            Text('ډيزاين', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            SegmentedButton<ShareCardTheme>(
-              key: const Key('card-theme'),
-              segments: const [
-                ButtonSegment(
-                  value: ShareCardTheme.parchment,
-                  label: Text('کاغذ'),
-                ),
-                ButtonSegment(value: ShareCardTheme.dark, label: Text('تياره')),
-                ButtonSegment(
-                  value: ShareCardTheme.light,
-                  label: Text('روښانه'),
-                ),
-              ],
-              selected: {_theme},
-              onSelectionChanged: (values) =>
-                  setState(() => _theme = values.first),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              pages.length > 1 ? '${pages.length} کارتونه' : 'د کارت مخکتنه',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            if (pages.isNotEmpty)
-              SizedBox(
-                height: 450,
-                child: PageView.builder(
-                  key: const Key('card-preview'),
-                  controller: _previewController,
-                  itemCount: pages.length,
-                  itemBuilder: (context, index) => Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: RepaintBoundary(
-                        key: _previewKeys[index],
-                        child: PoemCardWidget(
-                          request: _request,
-                          page: pages[index],
+            icon: const ShelfActionIcon('share-card'),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) => Column(
+            children: [
+              if (pages.isNotEmpty)
+                SizedBox(
+                  height: (constraints.maxHeight * .52).clamp(110, 450),
+                  child: PageView.builder(
+                    key: const Key('card-preview'),
+                    controller: _previewController,
+                    itemCount: pages.length,
+                    itemBuilder: (context, index) => SingleChildScrollView(
+                      child: SizedBox(
+                        width: constraints.maxWidth,
+                        height: constraints.maxWidth * 1.25,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: RepaintBoundary(
+                            key: _previewKeys[index],
+                            child: MediaQuery.withNoTextScaling(
+                              child: PoemCardWidget(
+                                request: _request,
+                                page: pages[index],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
+
+              Expanded(
+                child: ListView(
+                  key: const Key('share-controls-scroll'),
+                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+                  children: [
+                    if (!widget.poem.isUntitled)
+                      CheckboxListTile(
+                        key: const Key('share-include-title'),
+                        value: _includeTitle,
+                        title: Text(widget.poem.title!),
+                        subtitle: Text(
+                          AppStrings.of(context).choose(
+                            'Include poem title',
+                            'د شعر سرلیک ورزیات کړئ',
+                            'افزودن عنوان شعر',
+                          ),
+                        ),
+                        onChanged: _working
+                            ? null
+                            : (value) =>
+                                  _updatePreview(() => _includeTitle = value!),
+                      ),
+                    SegmentedButton<ShareCardScope>(
+                      key: const Key('card-scope'),
+                      segments: [
+                        ButtonSegment(
+                          value: ShareCardScope.selection,
+                          label: Text(
+                            AppStrings.of(context).choose(
+                              'Selected lines',
+                              'ټاکلې کرښې',
+                              'خط‌های انتخاب‌شده',
+                            ),
+                          ),
+                        ),
+                        ButtonSegment(
+                          value: ShareCardScope.accessiblePoem,
+                          label: Text(
+                            widget.poem.hasMore || widget.poem.locked
+                                ? AppStrings.of(context).sample
+                                : AppStrings.of(context).choose(
+                                    'Full accessible text',
+                                    'بشپړ متن',
+                                    'متن کامل قابل دسترس',
+                                  ),
+                          ),
+                        ),
+                      ],
+                      selected: {_scope},
+                      onSelectionChanged: _working
+                          ? null
+                          : (values) =>
+                                _updatePreview(() => _scope = values.first),
+                    ),
+                    if (_scope == ShareCardScope.selection) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              AppStrings.of(context).choose(
+                                'Choose 1 to 4 consecutive lines',
+                                'له ۱ تر ۴ پرله‌پسې کرښې وټاکئ',
+                                '۱ تا ۴ خط پی‌هم را انتخاب کنید',
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '${AppStrings.of(context).number(_selection?.count ?? 0)}/${AppStrings.of(context).number(4)}',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).dividerColor,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: List.generate(_lines.length, (index) {
+                            final selected =
+                                _selection != null &&
+                                index >= _selection!.start &&
+                                index <= _selection!.end;
+                            return ListTile(
+                              key: Key('share-line-$index'),
+                              selected: selected,
+                              dense: true,
+                              leading: Icon(
+                                selected
+                                    ? Icons.check_circle_rounded
+                                    : Icons.circle_outlined,
+                              ),
+                              title: Text(
+                                _lines[index].text,
+                                textDirection: TextDirection.rtl,
+                                style: TextStyle(
+                                  fontFamily: _fontFamily,
+                                  height: 1.8,
+                                ),
+                              ),
+                              onTap: _working
+                                  ? null
+                                  : () => _updatePreview(
+                                      () => _selection = selectContiguousLine(
+                                        current: _selection,
+                                        tapped: index,
+                                      ),
+                                    ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 18),
+                    Text(AppStrings.of(context).font),
+                    DropdownButton<String>(
+                      key: const Key('share-font'),
+                      isExpanded: true,
+                      value: _fontFamily,
+                      items: [
+                        DropdownMenuItem(
+                          value: 'Vazirmatn',
+                          child: Text(AppStrings.of(context).vazirmatnName),
+                        ),
+                        DropdownMenuItem(
+                          value: 'ScheherazadeNew',
+                          child: Text(AppStrings.of(context).scheherazadeName),
+                        ),
+                        DropdownMenuItem(
+                          value: 'NotoNastaliqUrdu',
+                          child: Text(AppStrings.of(context).nastaliqName),
+                        ),
+                      ],
+                      onChanged: _working
+                          ? null
+                          : (value) =>
+                                _updatePreview(() => _fontFamily = value!),
+                    ),
+                    Text(
+                      '${AppStrings.of(context).fontSize}: ${AppStrings.of(context).number(_fontSize.round())}',
+                    ),
+                    Slider(
+                      key: const Key('share-font-size'),
+                      min: 16,
+                      max: 32,
+                      divisions: 16,
+                      value: _fontSize,
+                      label:
+                          '${AppStrings.of(context).number(_fontSize.round())}',
+                      onChanged: _working
+                          ? null
+                          : (value) => _updatePreview(() => _fontSize = value),
+                    ),
+                    Text(
+                      AppStrings.of(context)
+                          .choose('Card colors', 'د کارت رنګ', 'رنگ کارت'),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    SegmentedButton<ShareCardTheme>(
+                      key: const Key('card-theme'),
+                      segments: [
+                        ButtonSegment(
+                          value: ShareCardTheme.parchment,
+                          label: Text(AppStrings.of(context).sepiaPalette),
+                        ),
+                        ButtonSegment(
+                          value: ShareCardTheme.dark,
+                          label: Text(AppStrings.of(context).darkPalette),
+                        ),
+                        ButtonSegment(
+                          value: ShareCardTheme.light,
+                          label: Text(AppStrings.of(context).lightPalette),
+                        ),
+                      ],
+                      selected: {_theme},
+                      onSelectionChanged: _working
+                          ? null
+                          : (values) =>
+                                _updatePreview(() => _theme = values.first),
+                    ),
+                    const SizedBox(height: 18),
+                    LayoutBuilder(
+                      builder: (context, buttons) {
+                        final stacked =
+                            buttons.maxWidth < 400 ||
+                            MediaQuery.textScalerOf(context).scale(16) > 24;
+                        final width = stacked
+                            ? buttons.maxWidth
+                            : (buttons.maxWidth - 12) / 2;
+                        return Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            SizedBox(
+                              width: width,
+                              child: OutlinedButton.icon(
+                                key: const Key('save-cards'),
+                                onPressed: _working || pages.isEmpty
+                                    ? null
+                                    : () => _export(save: true),
+                                icon: const ShelfActionIcon('download'),
+                                label: Text(
+                                  AppStrings.of(context).choose(
+                                    'Save to gallery',
+                                    'په ګالرۍ کې ساتل',
+                                    'ذخیره در گالری',
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: width,
+                              child: FilledButton.icon(
+                                key: const Key('share-cards'),
+                                onPressed: _working || pages.isEmpty
+                                    ? null
+                                    : () => _export(save: false),
+                                icon: _working
+                                    ? const SizedBox.square(
+                                        dimension: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const ShelfActionIcon(
+                                        'share',
+                                        dark: true,
+                                      ),
+                                label: Text(
+                                  AppStrings.of(
+                                    context,
+                                  ).choose('Share', 'شریکول', 'اشتراک‌گذاری'),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    key: const Key('save-cards'),
-                    onPressed: _working || pages.isEmpty
-                        ? null
-                        : () => _export(save: true),
-                    icon: const Icon(Icons.download_rounded),
-                    label: const Text('په ګالرۍ کې ساتل'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    key: const Key('share-cards'),
-                    onPressed: _working || pages.isEmpty
-                        ? null
-                        : () => _export(save: false),
-                    icon: _working
-                        ? const SizedBox.square(
-                            dimension: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.share_rounded),
-                    label: const Text('شريکول'),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  void _updatePreview(VoidCallback update) {
+    if (_previewController.hasClients) _previewController.jumpToPage(0);
+    setState(update);
   }
 
   Future<void> _export({required bool save}) async {
@@ -283,8 +481,16 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
         SnackBar(
           content: Text(
             save
-                ? '${rendered.length} کارتونه په ګالرۍ کې وساتل شول.'
-                : 'کارتونه د شريکولو لپاره چمتو شول.',
+                ? AppStrings.of(context).choose(
+                    '${AppStrings.of(context).number(rendered.length)} cards saved.',
+                    '${AppStrings.of(context).number(rendered.length)} کارتونه وساتل شول.',
+                    '${AppStrings.of(context).number(rendered.length)} کارت ذخیره شد.',
+                  )
+                : AppStrings.of(context).choose(
+                    'Cards ready to share.',
+                    'کارتونه د شریکولو لپاره چمتو شول.',
+                    'کارت‌ها برای اشتراک‌گذاری آماده شدند.',
+                  ),
           ),
         ),
       );
@@ -292,12 +498,27 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
       if (!mounted) return;
       final message = error is ShareCardExportException
           ? switch (error.stage) {
-              ShareCardExportStage.share => 'کارت شريک نه شو. بيا هڅه وکړئ.',
-              ShareCardExportStage.gallery =>
+              ShareCardExportStage.share => AppStrings.of(context).choose(
+                'Could not share. Try again.',
+                'کارت شريک نه شو. بيا هڅه وکړئ.',
+                'اشتراک‌گذاری انجام نشد. دوباره کوشش کنید.',
+              ),
+              ShareCardExportStage.gallery => AppStrings.of(context).choose(
+                'Could not save to gallery. Try again.',
                 'کارت په ګالرۍ کې ونه ساتل شو. بيا هڅه وکړئ.',
-              _ => 'کارت جوړ نه شو. بيا هڅه وکړئ.',
+                'کارت در گالری ذخیره نشد. دوباره کوشش کنید.',
+              ),
+              _ => AppStrings.of(context).choose(
+                'Could not create card. Try again.',
+                'کارت جوړ نه شو. بيا هڅه وکړئ.',
+                'کارت ساخته نشد. دوباره کوشش کنید.',
+              ),
             }
-          : 'کارت جوړ نه شو. بيا هڅه وکړئ.';
+          : AppStrings.of(context).choose(
+              'Could not create card. Try again.',
+              'کارت جوړ نه شو. بيا هڅه وکړئ.',
+              'کارت ساخته نشد. دوباره کوشش کنید.',
+            );
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(message)));
     } finally {
@@ -320,6 +541,9 @@ class _ShareCardScreenState extends State<ShareCardScreen> {
     if (_previewController.hasClients) {
       _previewController.jumpToPage(index);
     }
+    // Logo decoding must finish before the exported repaint boundary is captured.
+    await precacheImage(AssetImage('assets/brand/shelf_header_${_theme == ShareCardTheme.dark ? "light" : "dark"}.png'), context);
+    if (!mounted) return null;
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted || index >= _previewKeys.length) return null;
     final renderObject = _previewKeys[index].currentContext?.findRenderObject();

@@ -1,0 +1,70 @@
+name: Shelf iOS unsigned foundation
+# Deliberate PR creation only. Pushes and PR synchronization do not run builds.
+on:
+  pull_request:
+    types: [opened]
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  unsigned-ios:
+    if: github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'ios/foundation'
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+        working-directory: mobile
+    env:
+      # Build configuration, independent of Codemagic's private variable group.
+      SHELF_API_BASE_URL: https://shelf.services/api/
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Set isolated temporary directories and install the existing Flutter version
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/shelf/tmp" "$HOME/shelf/tmp/pub-cache"
+          for key in TMPDIR TMP TEMP; do echo "$key=$HOME/shelf/tmp" >> "$GITHUB_ENV"; done
+          echo "PUB_CACHE=$HOME/shelf/tmp/pub-cache" >> "$GITHUB_ENV"
+          export TMPDIR="$HOME/shelf/tmp" TMP="$HOME/shelf/tmp" TEMP="$HOME/shelf/tmp"
+          git clone --depth 1 --branch 3.47.2 https://github.com/flutter/flutter.git "$HOME/shelf/tmp/flutter"
+          echo "$HOME/shelf/tmp/flutter/bin" >> "$GITHUB_PATH"
+      - name: Inspect native build toolchain
+        run: |
+          set -euo pipefail
+          flutter --version
+          xcodebuild -version
+          pod --version
+      - name: Resolve locked Flutter dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Generate native Flutter configuration
+        run: flutter build ios --config-only --release --no-codesign --no-pub
+      - name: Install native plugins
+        run: |
+          set -euo pipefail
+          cd ios
+          pod install
+      - name: Compile unsigned iOS foundation
+        run: |
+          set -euo pipefail
+          flutter build ios --release --no-codesign --no-pub \
+            --build-name=1.0.0 --build-number=1 \
+            --dart-define="SHELF_API_BASE_URL=$SHELF_API_BASE_URL" \
+            --dart-define=SHELF_TEST_MODE=false \
+            --dart-define=SHELF_INTERNAL_TEST_PURCHASES=false
+      - name: Archive unsigned app and native dependency evidence
+        run: |
+          set -euo pipefail
+          mkdir -p build/ios-foundation-evidence
+          git rev-parse HEAD > build/ios-foundation-evidence/source-commit.txt
+          cp ios/Podfile.lock build/ios-foundation-evidence/Podfile.lock
+          tar -czf build/ios-foundation-evidence/unsigned-app.tar.gz -C build/ios/iphoneos Runner.app
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ios-foundation-unsigned-${{ github.event.pull_request.head.sha }}
+          path: mobile/build/ios-foundation-evidence/
+          if-no-files-found: error
+          retention-days: 7

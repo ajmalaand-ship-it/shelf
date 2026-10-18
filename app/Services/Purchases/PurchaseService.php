@@ -13,6 +13,10 @@ class PurchaseService
 
     public function receive(array $event): void
     {
+        if (($event['store'] ?? null) === 'APP_STORE') {
+            app(AppleSandboxPurchases::class)->receive($event);
+            return;
+        }
         $event['app_user_id'] = \App\Support\Staging::readerId((string) $event['app_user_id']);
         $environment = $event['environment'] ?? '';
         abort_unless(in_array($environment, ['SANDBOX', 'PRODUCTION'], true) && ($event['store'] ?? '') === 'PLAY_STORE'
@@ -39,7 +43,7 @@ class PurchaseService
         }
         $duplicate = PurchaseEvent::where('provider_event_id', $event['id'])->first();
         if ($duplicate) {
-            abort_unless($duplicate->reader_id === (int) $event['app_user_id'] && $duplicate->collection_id === $book->id
+            abort_unless($duplicate->store === 'PLAY_STORE' && $duplicate->reader_id === (int) $event['app_user_id'] && $duplicate->collection_id === $book->id
                 && $duplicate->environment === $environment && $duplicate->transaction_id === $event['transaction_id']
                 && $duplicate->event_type === $type, 409, 'Provider event conflicts with recorded history.');
             return;
@@ -56,7 +60,7 @@ class PurchaseService
                 // Confirmation may arrive after withdrawal; previously initiated purchases remain valid.
                 abort_unless($this->provider->confirms($subscriber, $book, $purchasedAt, $environment), 503, 'Confirming your purchase. Please try again.');
                 if (! $purchase) {
-                    abort_unless(DB::table('purchase_consents')->where('reader_id', $reader->id)->where('collection_id', $book->id)
+                    abort_unless(DB::table('purchase_consents')->where('reader_id', $reader->id)->where('collection_id', $book->id)->where('store', 'PLAY_STORE')
                         ->where('created_at', '<=', $purchasedAt->addSeconds(5))->exists(), 409, 'Purchase agreement is missing. Contact Shelf support.');
                 }
             }
@@ -80,7 +84,7 @@ class PurchaseService
                         'estimated_earnings' => $estimates, 'earnings_status' => $environment === 'SANDBOX' ? 'test' : 'unknown']);
                 }
                 // A refund received before the sale is a tombstone, not permission to unlock.
-                foreach (PurchaseEvent::where('transaction_id', $purchase->transaction_id)->where('collection_id', $book->id)
+                foreach (PurchaseEvent::where('store', 'PLAY_STORE')->where('transaction_id', $purchase->transaction_id)->where('collection_id', $book->id)
                     ->where('reader_id', $reader->id)->where('environment', $environment)
                     ->whereIn('event_type', ['CANCELLATION', 'EXPIRATION'])->get() as $reversal) {
                     $this->reverse($purchase, $reversal->event_type === 'CANCELLATION' ? 'refund' : 'revoke', $reversal);
@@ -129,18 +133,19 @@ class PurchaseService
     public function refreshAccess(Reader $reader, Collection $book): void
     {
         $active = Purchase::where(fn ($q) => $q->where('reader_id', $reader->id)->orWhereIn('id', DB::table('purchase_recovery_claims')->where('reader_id', $reader->id)->select('purchase_id')))->where('collection_id', $book->id)
-            ->whereDoesntHave('entries', fn ($q) => $q->whereIn('status', ['refund', 'revoke']))->exists();
+            ->get()->contains(fn ($purchase) => AppleSandboxPurchases::active($purchase));
         DB::table('book_entitlements')->updateOrInsert(['reader_id' => $reader->id, 'collection_id' => $book->id],
             ['active' => $active, 'checked_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
     }
 
     public function reconcile(Reader $reader): void
     {
+        app(AppleSandboxPurchases::class)->reconcile($reader);
         if (\App\Support\Staging::active() && RevenueCatClient::configured()
             && ! ($reader->buying_blocked && DB::table('reviewer_book_grants')->where('reader_id', $reader->id)->whereNull('revoked_at')->exists())) {
             $this->confirmStaging($reader);
         }
-        $purchases = Purchase::where(fn ($q) => $q->where('reader_id', $reader->id)->orWhereIn('id', DB::table('purchase_recovery_claims')->where('reader_id', $reader->id)->select('purchase_id')))->with(['book', 'entries'])->get();
+        $purchases = Purchase::where('store', 'PLAY_STORE')->where(fn ($q) => $q->where('reader_id', $reader->id)->orWhereIn('id', DB::table('purchase_recovery_claims')->where('reader_id', $reader->id)->select('purchase_id')))->with(['book', 'entries'])->get();
         if ($purchases->isEmpty()) { return; }
         $needsCheck = $purchases->contains(fn ($purchase) => ! $purchase->entries->contains(fn ($entry) => in_array($entry->status, ['refund', 'revoke'], true)));
         $subscribers = [];
