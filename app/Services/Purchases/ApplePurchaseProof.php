@@ -35,7 +35,8 @@ class ApplePurchaseProof
 
     public static function customerCheckoutEnabled(): bool
     {
-        return self::customersConfigured() && RevenueCatClient::productionEnabled();
+        return self::customersConfigured() && (RevenueCatClient::productionEnabled()
+            || config('purchases.apple_customer_sandbox_enabled') === true);
     }
 
     public static function customerPurchase(\App\Models\Purchase $purchase): bool

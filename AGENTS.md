@@ -167,6 +167,12 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-18: Owner authorizes ordinary zero-ownership Apple review account, separate
+  sandbox offer gate with real checkout OFF, private App Store Connect credentials,
+  focused staging/production rollout and Build 8 reuse. Preserve blocked reviewer
+  ownership and Google Play. No transaction success without actual Apple evidence.
+
+
 - 2026-10-11: Owner confirms TestFlight 1.0.0 (2) processed, assigned to Shelf
   Owner, installed/tested: “seems good.” Limited phone acceptance only. Apple/Google
   iOS sign-in source 32ca4a0 implemented in isolation with focused account/purchase checks;

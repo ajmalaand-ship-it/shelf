@@ -584,6 +584,22 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Apple review sandbox offers — 18 October 2026
+
+Owner authorizes one batch: ordinary verified reviewer with no ownership, separate
+Apple sandbox offers while real checkout stays OFF, private App Store Connect login
+update, focused staging-first backend promotion and reuse of Build 8. Existing blocked
+reviewer/grants and Google Play must remain unchanged. Separate default-false
+SHELF_APPLE_CUSTOMER_SANDBOX_ENABLED opens the existing Build 8 customer protocol
+(the legacy production_checkout_enabled field means offer availability). Explicit
+real_checkout_enabled=false and sandbox_only=true distinguish runtime acceptance.
+New production transactions remain rejected before ledger/access changes; sandbox
+requires existing independent matching provider proof and remains Test income.
+No client change, migration, complimentary grant or special reader role. Rollback:
+close the two customer flags and use prior c8c4d74 code through release workflow;
+retain all account/purchase history. Deployment and live results recorded after execution.
+
+
 ## Apple public-review preparation — 17 October 2026
 
 Batch 1 authorized metadata/assets and release-access preparation only. Apple API

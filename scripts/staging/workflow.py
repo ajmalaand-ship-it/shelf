@@ -565,7 +565,8 @@ def apple_customers_checked(app, commit, changes):
     env['SHELF_PHP_TEST_FILTER'] = 'AppleCustomerPurchasesTest|AppleSandboxPurchasesTest|BookPurchasesTest|AccountingTest|ReviewerAccessTest'
     env['SHELF_MOBILE_TEST_SCOPE'] = 'ios-purchases'
     with log.open('w') as output:
-        result = subprocess.run(['bash', 'scripts/run_tests.sh', '--mobile'], cwd=app,
+        mobile_changed = any(path.startswith('mobile/') for path in changes)
+        result = subprocess.run(['bash', 'scripts/run_tests.sh'] + (['--mobile'] if mobile_changed else []), cwd=app,
             stdout=output, stderr=subprocess.STDOUT, env=env)
     if result.returncode:
         raise RuntimeError('Focused Apple customer checks failed; private log: ' + str(log))
@@ -574,7 +575,7 @@ def apple_customers_checked(app, commit, changes):
     https_checks()
     state = current_state()
     state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
-        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':mobile_changed,
         'scope':'apple-customers-disabled', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
     save_state(state)
     print('PASS: focused six-book Apple customer/restore/accounting and mobile checks; checkout remains OFF.', flush=True)
