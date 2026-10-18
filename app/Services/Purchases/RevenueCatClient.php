@@ -126,6 +126,9 @@ class RevenueCatClient
         abort_unless(is_array($transactions), 503, 'Store confirmation is incomplete. Please try again.');
         $matches = [];
         foreach ($transactions as $purchase) {
+            // One Shelf identity can legitimately have both stores' history.
+            // Apple records are never evidence for (or ambiguity between) Play transactions.
+            if (is_array($purchase) && ($purchase['store'] ?? null) === 'app_store') { continue; }
             abort_unless(is_array($purchase) && is_string($purchase['purchase_date'] ?? null)
                 && preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/', $purchase['purchase_date']), 503,
                 'Store confirmation is incomplete. Please try again.');

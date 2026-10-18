@@ -215,6 +215,16 @@ class AppleCustomerPurchasesTest extends TestCase
         $this->assertTrue(app(BookAccessService::class)->ownsBook($this->reader, $this->books[3]));
     }
 
+    public function test_same_customer_store_history_does_not_confuse_play_proof_with_an_apple_transaction(): void
+    {
+        $date = \Carbon\CarbonImmutable::now();
+        $subscriber = ['non_subscriptions' => ['shelf_book_3' => [
+            ['purchase_date' => $date->toIso8601String(), 'store' => 'app_store', 'is_sandbox' => false],
+            ['purchase_date' => $date->toIso8601String(), 'store' => 'play_store', 'is_sandbox' => false],
+        ]], 'entitlements' => ['shelf_book_3' => ['product_identifier' => 'shelf_book_3', 'expires_date' => null]]];
+        $this->assertTrue(app(\App\Services\Purchases\RevenueCatClient::class)->confirms($subscriber, $this->books[3], $date, 'PRODUCTION'));
+    }
+
     public function test_new_customer_with_no_revenuecat_history_has_an_empty_library(): void
     {
         $this->missingCustomer = true;

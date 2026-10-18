@@ -553,7 +553,8 @@ def apple_customers_checked(app, commit, changes):
         return False
     allowed = {'app/Http/Controllers/LibraryController.php', 'app/Http/Controllers/PurchaseWebhookController.php',
         'app/Services/BookAccessService.php', 'app/Services/Purchases/ApplePurchaseProof.php',
-        'app/Services/Purchases/AppleSandboxPurchases.php', 'config/purchases.php', 'codemagic.yaml',
+        'app/Services/Purchases/AppleSandboxPurchases.php', 'app/Services/Purchases/RevenueCatClient.php',
+        'config/purchases.php', 'codemagic.yaml',
         'scripts/run_tests.sh', 'scripts/staging/workflow.py', 'scripts/ios/test_build_number.py',
         'tests/Feature/AppleCustomerPurchasesTest.php'}
     backend = {p for p in changes if not p.startswith(('docs/', 'mobile/')) and p != 'AGENTS.md'}
