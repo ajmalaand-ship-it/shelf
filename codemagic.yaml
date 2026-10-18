@@ -281,3 +281,21 @@ workflows:
       - submission-captures/**/*.png
       - submission-captures/capture-evidence.json
       - submission-captures/apple-upload-results.json
+
+  ios-ipad-store-direct:
+    name: Shelf — one direct 13-inch iPad Store capture (simulator only)
+    instance_type: mac_mini_m2
+    max_build_duration: 20
+    working_directory: mobile
+    environment:
+      groups:
+        - shelf_ios_foundation
+      flutter: 3.47.2
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Compile simulator only and take one native Store screenshot
+        script: python3 ../scripts/ios/direct_ipad_store_capture.py
+    artifacts:
+      - direct-ipad-store-capture/ipad-13-store.png
+      - direct-ipad-store-capture/evidence.json

@@ -584,6 +584,40 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Direct Codemagic iPad capture authorization — 18 October 2026
+
+Owner authorizes exactly one bounded Codemagic macOS simulator-only compile/capture,
+real Store via xcrun simctl, upload and retry app-version draft association; no new
+App Store release binary, review submission, release activation or redesign. Books
+4–5 may remain unsubmitted optional products; existing suitable-capture evidence
+reused, no misrepresentation of cropped/unpriced images.
+
+Manual-only **ios-ipad-store-direct** prepared: existing mac_mini_m2 / Flutter 3.47.2 /
+foundation API group, 20-minute workflow cap, 18-minute command deadline. Simulator
+Debug compile uses unchanged **Build 8 mobile tree 1aecaddba930910a4110a660612365bf4abf8d84**.
+Existing source selector with owner-preview requested and an explicitly empty token
+fails closed to the live public catalogue (no QA fixture or owner-preview access).
+Seed only the ordinary English language preference in a clean simulator container;
+launch anonymous app, one fixed 45-second render window, one native simctl screenshot.
+Native 13-inch dimensions and Vision-recognized Store navigation/New books/Poetry
+must pass; subsequent local visual inspection remains required before upload.
+No Flutter integration tests, UI navigation loop, signing, archive, IPA/export,
+release publishing, new credential, app-source change or capture retry. Existing
+Codemagic workflow definitions compared unchanged; Python/YAML syntax checks passed.
+
+**NOT RUN:** user states Codemagic API access exists, but this session exposes no
+Codemagic connector, relevant environment variable or token in private secret/
+standard Codemagic configuration locations, nor matching production .env key.
+Bounded filename checks found only YAML configurations, not an API credential.
+Owner asked for existing private credential path/environment variable name only;
+no token requested in chat. No unauthenticated API retry or speculative key reuse.
+No Mac run started, screenshot created/uploaded, or unchanged Apple validation retry.
+Existing app item remains unaccepted with **SCREENSHOT_REQUIRED.IPAD_13_PROFILE**;
+existing draft e914a36d-ff45-4012-99c0-f1df83ae84d0 retained. Real checkout OFF,
+MANUAL release, territories and fresh reviewer 20 unchanged. Next dependency is
+making the owner's existing Codemagic API access available to this session; then
+start this one workflow, inspect/upload its image and retry the existing app item.
+
 ## Same-day Apple submission completion — 18 October 2026
 
 Owner authorizes existing Build 8/six-book review completion only, one bounded direct
