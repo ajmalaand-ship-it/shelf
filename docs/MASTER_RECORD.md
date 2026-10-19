@@ -601,7 +601,27 @@ staging/promotion tooling scoped to this website batch. No new migration.
 Rollback uses previous production commit with release backup; never restore
 reader/financial history over subsequent activity. Owner review: localized copy
 and factual service terms; no new financial or refund policy introduced.
-Deployment evidence follows after actual staging and production completion.
+**Completed rollout:** application commit 44cf2ca deployed to staging, then the
+identical verified commit promoted to production on 19 October UTC (18 October
+local). Staging backup /home/shelf/backups/shelf-staging/20261019-001652/;
+verified production SQL/ZIP/SHA-256 backup
+/home/shelf/backups/shelf/20261019-001735/. Prior code fa2bec0 remains rollback
+target. Six focused tests / 287 assertions passed: 18 localized routes, distinct
+SEO, same-page languages, valid sitemap, privacy/deletion, admin redirect and
+JSON unauthenticated Library denial. Staging/production website HTTPS, assets,
+sitemap and production robots passed. Existing staging gate/noindex, catalogue,
+cover and locked paid-text probes passed. Promotion compared all previous
+reader/purchase/refund/ledger/agreement records unchanged; real checkout OFF.
+No migration added or applied; no mobile build/test or Apple/Play action.
+Final production Library probe without JSON Accept returned 500; reported
+immediately, no fix attempted. Read-only comparison confirmed JSON Accept returns
+401 Unauthenticated, HTML Accept returns 500. Authentication/API implementation
+unchanged in this batch; HTML unauthenticated API handling remains an observed
+limitation outside website scope. No protected data returned.
+Browser/device visual review unavailable in this server session; semantic/lang/
+dir rendering and responsive CSS checked. Owner review: translation, appearance
+and factual service terms. Source committed/pushed; record-only evidence commit
+changes no application behavior.
 
 
 ## Apple review sandbox offers — 18 October 2026
