@@ -15,7 +15,8 @@ class PublicWebsiteTest extends TestCase
                     ->assertSee('lang="'.$locale.'"', false)
                     ->assertSee('dir="'.($locale === 'en' ? 'ltr' : 'rtl').'"', false)
                     ->assertSee('rel="canonical" href="https://shelf.example/'.$locale.$page.'"', false)
-                    ->assertSee('property="og:image"', false)->getContent();
+                    ->assertSee('property="og:image"', false)
+                    ->assertSee('Shelf — شیلف')->assertDontSee('ajmalaand@gmail.com')->getContent();
                 foreach (['ps', 'fa', 'en'] as $other) {
                     $this->assertStringContainsString('href="/'.$other.$page.'"', $body);
                     $this->assertStringContainsString('hreflang="'.$other.'"', $body);
@@ -42,8 +43,8 @@ class PublicWebsiteTest extends TestCase
         $this->assertStringNotContainsString('/api/', $xml);
         $this->assertStringNotContainsString('/account/', $xml);
         $this->get('/robots.txt')->assertOk()->assertSee('Sitemap: https://shelf.example/sitemap.xml')->assertSee('Disallow: /admin');
-        $this->get('/privacy')->assertOk()->assertSee('Privacy Policy');
-        $this->get('/account/delete')->assertOk()->assertSee('Request deletion');
+        $this->get('/privacy')->assertOk()->assertSee('Privacy Policy')->assertSee('editor@hindara.com');
+        $this->get('/account/delete')->assertOk()->assertSee('Request deletion')->assertSee('editor@hindara.com');
         $this->getJson('/api/library')->assertUnauthorized();
         $this->get('/admin')->assertRedirect();
     }

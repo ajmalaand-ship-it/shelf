@@ -167,6 +167,11 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-18: Owner approves editor@hindara.com as public contact/support and
+  Shelf — شیلف copyright footer. Correct website/legal and mobile source;
+  website-only safe deployment, no app builds or Apple submission/store changes.
+  Preserve real credits, legal ownership and private/developer identities.
+
 - 2026-10-18: Owner authorizes existing Laravel public informational website:
   ps/fa/en pages, SEO, Coming soon app links, focused verification, staging-first
   backed-up promotion and records/commit/push. No catalogue exposure, checkout,

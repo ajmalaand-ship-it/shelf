@@ -54,14 +54,14 @@ $entry = $text['pages'][$page];
 <section class="page-head wrap"><p class="eyebrow">{{ $text['nav'][$page] }}</p><h1>{{ $entry[0] }}</h1><p class="intro">{{ $entry[1] }}</p></section>
 <section class="wrap prose" aria-label="{{ $text['nav'][$page] }}">
 @foreach($entry[2] as $section)<article><h2>{{ $section[0] }}</h2><p>{{ $section[1] }}</p></article>@endforeach
-@if($page === 'support')<div class="support-actions"><a class="button" href="mailto:ajmalaand@gmail.com"><bdi>ajmalaand@gmail.com</bdi></a><a href="{{ route('account.delete') }}">{{ $text['delete'] }} <span lang="en">(English)</span></a><a href="{{ route('privacy') }}">{{ $text['privacy'] }} <span lang="en">(English)</span></a></div>@endif
+@if($page === 'support')<div class="support-actions"><a class="button" href="mailto:editor@hindara.com"><bdi>editor@hindara.com</bdi></a><a href="{{ route('account.delete') }}">{{ $text['delete'] }} <span lang="en">(English)</span></a><a href="{{ route('privacy') }}">{{ $text['privacy'] }} <span lang="en">(English)</span></a></div>@endif
 </section>
 @endif
 @if(in_array($page, ['home', 'download']))
 <section class="wrap download-panel"><div><p class="eyebrow">{{ $text['soon'] }}</p><h2>{{ $text['nav']['download'] }}</h2><p>{{ $text['notice'] }}</p></div><div class="platforms"><div><strong lang="en" dir="ltr">Android · Google Play</strong><span>{{ $text['soon'] }}</span></div><div><strong lang="en" dir="ltr">iPhone · App Store</strong><span>{{ $text['soon'] }}</span></div></div></section>
 @endif
 </main>
-<footer class="site-footer wrap"><div><strong>Shelf · شیلف</strong><p>{{ $text['footer'] }}</p><small>© {{ date('Y') }} <bdi>Ajmal Aand</bdi></small></div><nav aria-label="{{ $text['nav']['support'] }}">
+<footer class="site-footer wrap"><div><strong>Shelf · شیلف</strong><p>{{ $text['footer'] }}</p><small>© {{ date('Y') }} <bdi>Shelf — شیلف</bdi></small></div><nav aria-label="{{ $text['nav']['support'] }}">
 <a href="/{{ $locale }}/about">{{ $text['nav']['about'] }}</a><a href="/{{ $locale }}/support">{{ $text['nav']['support'] }}</a><a href="/{{ $locale }}/terms">{{ $text['nav']['terms'] }}</a><a href="{{ route('privacy') }}">{{ $text['privacy'] }} <span lang="en">(English)</span></a><a href="{{ route('account.delete') }}">{{ $text['delete'] }} <span lang="en">(English)</span></a>
 </nav></footer>
 </body></html>

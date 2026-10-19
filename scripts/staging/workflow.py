@@ -591,6 +591,10 @@ def website_https_checks(staging=False):
                 body = response.read().decode()
                 if response.status != 200 or ('lang="'+locale+'"') not in body or 'rel="canonical"' not in body:
                     raise RuntimeError('Localized website HTTPS check failed: '+locale+page)
+                if 'ajmalaand@gmail.com' in body or '© '+str(datetime.now().year)+' <bdi>Shelf — شیلف</bdi>' not in body:
+                    raise RuntimeError('Public contact/footer correction not present.')
+                if page in ('/support', '/terms') and 'editor@hindara.com' not in body:
+                    raise RuntimeError('Public support email correction missing.')
                 for other in ('ps', 'fa', 'en'):
                     if ('href="/'+other+page+'"') not in body:
                         raise RuntimeError('Same-page language navigation failed.')
@@ -610,12 +614,14 @@ def website_checked(app, commit, changes):
         return False
     allowed = {'app/Http/Controllers/PublicWebsiteController.php', 'routes/web.php',
         'public/robots.txt', 'scripts/staging/workflow.py', 'tests/Feature/PublicWebsiteTest.php',
-        'tests/Feature/WordImportTest.php', 'AGENTS.md'}
+        'tests/Feature/WordImportTest.php', 'AGENTS.md', 'resources/views/privacy.blade.php',
+        'resources/views/account/delete.blade.php', 'tests/Feature/PrivacySupportTest.php',
+        'tests/Feature/PrivacyPolicyTest.php'}
     if any(p not in allowed and not p.startswith(('resources/views/website/', 'resources/content/', 'public/website/', 'docs/')) for p in changes):
         raise RuntimeError('Release exceeds public informational website scope.')
     log = RUNTIME / ('checks-'+commit+'.log')
     env = os.environ.copy()
-    env['SHELF_PHP_TEST_FILTER'] = 'PublicWebsiteTest|PrivacySupportTest|ExampleTest|test_migration_rolls_back_without_changing_content_and_home_uses_shelf'
+    env['SHELF_PHP_TEST_FILTER'] = 'PublicWebsiteTest|PrivacySupportTest|PrivacyPolicyTest|ExampleTest|test_migration_rolls_back_without_changing_content_and_home_uses_shelf'
     with log.open('w') as output:
         result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app, env=env, stdout=output, stderr=subprocess.STDOUT)
     if result.returncode:

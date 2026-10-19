@@ -7,5 +7,5 @@
 
 @if(session('sent'))<p>If the account exists, a confirmation email has been sent.</p>@endif
 <form method="post" action="{{ url('/account/delete/request') }}">@csrf<label>Email<input name="email" type="email" required maxlength="255" autocomplete="email"></label><button>Request deletion</button></form>
-<p>You can also request deletion from Account in the Shelf app. If you cannot access your email, contact <a href="mailto:ajmalaand@gmail.com">ajmalaand@gmail.com</a>.</p>
+<p>You can also request deletion from Account in the Shelf app. If you cannot access your email, contact <a href="mailto:editor@hindara.com">editor@hindara.com</a>.</p>
 @endsection

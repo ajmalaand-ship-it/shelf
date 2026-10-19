@@ -15,7 +15,7 @@ class PrivacyPolicyTest extends TestCase
             ->assertSee('Privacy Policy')
             ->assertSee('Shelf', false)
             ->assertDontSee('Pitswal')
-            ->assertSee('ajmalaand@gmail.com')
+            ->assertSee('editor@hindara.com')
             ->assertSee('optional display name')
             ->assertSee('password hash')
             ->assertSee('does not collect payment-card details')

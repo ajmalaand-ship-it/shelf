@@ -584,6 +584,19 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Public contact and footer correction — 19 October UTC / 18 October local 2026
+
+Owner authorizes a small correction: public support/contact editor@hindara.com;
+public copyright footer Shelf — شیلف. Applies to all three website languages,
+Privacy/deletion support links and mobile support source where applicable.
+Personal operator/legal ownership statements, author/translator credits and
+private login/developer identities stay unchanged. Email template inspected:
+no personal support address present, no sender/transport/account change needed.
+Website-only commit staged/promoted with existing verified-backup workflow;
+mobile correction committed separately after deployment, no mobile build/upload,
+Apple submission edit or store testing. Revert website correction commit for
+code rollback; retain all reader/purchase records. Rollout evidence follows.
+
 ## Public informational website — authorized 18 October 2026
 
 Owner prioritizes finishing the existing Laravel website before Google Play;

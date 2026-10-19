@@ -21,7 +21,7 @@ class PrivacySupportTest extends TestCase
             ->assertSee('matching emails alone is insufficient')
             ->assertDontSee('We do not use advertising or analytics SDKs');
         $this->get('/account/delete')->assertOk()->assertSee('Request deletion')
-            ->assertSee('ajmalaand@gmail.com')->assertSee('one hour')->assertSee('three years after the relevant tax return is actually filed')
+            ->assertSee('editor@hindara.com')->assertSee('one hour')->assertSee('three years after the relevant tax return is actually filed')
             ->assertSee('Automatic financial expiry is not implemented')->assertSee('Apple deleted-account purchase recovery is not yet available');
     }
 }
