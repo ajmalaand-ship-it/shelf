@@ -595,7 +595,20 @@ no personal support address present, no sender/transport/account change needed.
 Website-only commit staged/promoted with existing verified-backup workflow;
 mobile correction committed separately after deployment, no mobile build/upload,
 Apple submission edit or store testing. Revert website correction commit for
-code rollback; retain all reader/purchase records. Rollout evidence follows.
+code rollback; retain all reader/purchase records.
+Completed website rollout: 341b8b9 staged and promoted at identical commit.
+Staging backup /home/shelf/backups/shelf-staging/20261019-004043/; verified
+production backup /home/shelf/backups/shelf/20261019-004109/. Rollback prior
+production b7552d2. Focused website/privacy tests passed (4 / 331 assertions);
+staged/prod language/footer/contact checks and live legal/deletion contact checks
+passed. Existing deployment protection/history checks passed, data unchanged.
+Mobile support constant and mailto test expectations corrected separately in
+source only; existing focused privacy-support/interface/staging-identity checks
+passed via scripts/run_tests.sh --mobile. No release build, upload, submission
+change or store test. No unintended personal public contact/footer references
+remain in website templates/content or mobile/lib. Email templates had no
+personal support address. Existing noreply@shelf.services service sender and
+operator/rights-holder/legal statements intentionally preserved.
 
 ## Public informational website — authorized 18 October 2026
 
