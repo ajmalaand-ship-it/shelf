@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import '../l10n/app_strings.dart';
 import '../services/api_config.dart';
 
-const supportEmail = 'ajmalaand@gmail.com';
+const supportEmail = 'editor@hindara.com';
 const _external = MethodChannel('services.shelf.app/external');
 
 Future<bool> openShelfExternal(Uri uri) async {
