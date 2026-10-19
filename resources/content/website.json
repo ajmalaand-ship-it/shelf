@@ -1,0 +1,455 @@
+{
+  "en": {
+    "name": "English",
+    "brand": "Shelf",
+    "eyebrow": "A home for Pashto & Farsi books",
+    "headline": "Keep a world of words close.",
+    "intro": "Discover Pashto and Farsi books, read a free sample, and make room for your next favourite read. Shelf brings a bookstore and your personal library together in one reading app.",
+    "cta": "Meet the app",
+    "learn": "How Shelf works",
+    "soon": "Coming soon",
+    "notice": "Shelf is preparing for public release on Android and iPhone. Official download links will appear here when the apps are available.",
+    "skip": "Skip to content",
+    "language": "Language",
+    "nav": {
+      "home": "Home",
+      "about": "About Shelf",
+      "how-it-works": "How it works",
+      "download": "Get the app",
+      "support": "Support",
+      "terms": "Terms"
+    },
+    "privacy": "Privacy Policy",
+    "delete": "Delete your account",
+    "footer": "Pashto and Farsi books. A place to discover, a space to read.",
+    "edition": "THE SHELF READING APP",
+    "artTitle": "Your next chapter, within reach.",
+    "artSub": "Discover · Sample · Read",
+    "platform": "For Android and iPhone",
+    "stepsTitle": "From discovery to your own library",
+    "steps": [
+      [
+        "Discover a book",
+        "Explore books and their author and translator credits in the app."
+      ],
+      [
+        "Read the sample",
+        "Get to know a book through its free sample before deciding to buy."
+      ],
+      [
+        "Build your library",
+        "Buy individual books through the app’s store checkout when available, then find them in My Library."
+      ]
+    ],
+    "pages": {
+      "home": [
+        "Pashto & Farsi digital bookstore",
+        "Discover Shelf, the Pashto and Farsi bookstore and reading app. Explore free samples and personal libraries. Android and iPhone release coming soon."
+      ],
+      "about": [
+        "A place for books. A space for reading.",
+        "Meet Shelf, a Pashto and Farsi digital bookstore and personal library operated by Ajmal Aand.",
+        [
+          [
+            "About Shelf",
+            "Shelf is a digital bookstore and reading app for Pashto and Farsi books. It brings discovery, free samples and a personal library into one place."
+          ],
+          [
+            "Books, with their voices intact",
+            "Authors and translators are credited with their books. Shelf’s catalogue is managed by the owner; it is not an open author-upload platform."
+          ],
+          [
+            "Made for your reading life",
+            "Choose an individual book, explore its sample, and read in the app. Shelf is operated personally by Ajmal Aand."
+          ]
+        ]
+      ],
+      "how-it-works": [
+        "A simple path to your next read",
+        "Learn how to discover books, read free samples and use My Library in the Shelf app.",
+        [
+          [
+            "Browse before you sign in",
+            "Discover books and read available free samples without creating an account."
+          ],
+          [
+            "Choose one book at a time",
+            "An account is needed to buy a book. Shelf uses individual book purchases, not a subscription or an all-books pass. Checkout and availability depend on the app store and release status."
+          ],
+          [
+            "Read from My Library",
+            "Purchased books appear in My Library. The app supports downloads for offline reading with a server check at least every 30 days. Refunded or revoked books lose access at the next successful check."
+          ],
+          [
+            "Keep access connected",
+            "Use the same Shelf account for your library. Restore purchases is available in the app; contact support if you need help."
+          ]
+        ]
+      ],
+      "download": [
+        "Your library, ready to go with you",
+        "Shelf for Android and iPhone is coming soon. Find official store links here after public release.",
+        [
+          [
+            "Android",
+            "The Android app will be available through Google Play after public release. There is no public download link yet."
+          ],
+          [
+            "iPhone",
+            "The iPhone app will be available through the App Store after public release. Native iPad support is planned for a later update."
+          ],
+          [
+            "Free app, individual books",
+            "The app will be free to download. Paid books are purchased separately; downloading Shelf does not unlock the whole catalogue."
+          ]
+        ]
+      ],
+      "support": [
+        "A little help with your next chapter",
+        "Contact Shelf for help with the app, your account, purchases, privacy or account deletion.",
+        [
+          [
+            "Contact Shelf",
+            "Email ajmalaand@gmail.com for help. Tell us what you were trying to do and which device you use. Do not send passwords, sign-in codes or payment-card details."
+          ],
+          [
+            "Account and purchase help",
+            "For a purchase issue, include the book title and the store order reference if available. Share order information privately by email, not in public."
+          ],
+          [
+            "Privacy and account deletion",
+            "Read the Privacy Policy for details about personal information. Use the existing account-deletion page to request deletion and confirm through email."
+          ]
+        ]
+      ],
+      "terms": [
+        "Using Shelf",
+        "Information about using the Shelf website and reading app, individual book access and support.",
+        [
+          [
+            "About this website",
+            "This website introduces Shelf and provides app and support information. Books are read and purchased in the app; this website does not sell books."
+          ],
+          [
+            "Books and access",
+            "A free sample does not grant access to the full book. Purchases apply to individual books and are verified for the reader’s account. Store availability and the price shown at checkout apply."
+          ],
+          [
+            "Respect books and accounts",
+            "Respect the rights of authors, translators and other rights holders. Do not redistribute protected content or share account credentials."
+          ],
+          [
+            "Purchases and help",
+            "Read the free sample before buying. Shelf’s purchase agreement states that sales are final; contact support about a duplicate purchase or a broken book. Applicable store refund rules and statutory consumer rights remain in effect. Refunds or revocations remove book access."
+          ],
+          [
+            "Privacy and questions",
+            "The Privacy Policy explains data handling and account deletion. For questions about Shelf or these service terms, contact ajmalaand@gmail.com."
+          ]
+        ]
+      ]
+    }
+  },
+  "ps": {
+    "name": "پښتو",
+    "brand": "شیلف",
+    "eyebrow": "د پښتو او فارسي کتابونو کور",
+    "headline": "د کتابونو نړۍ، تل درسره.",
+    "intro": "پښتو او فارسي کتابونه ومومئ، وړیا نمونه یې ولولئ او د خپلې خوښې کتابونه خپل کتابتون ته راوړئ. شیلف د کتاب پلورنځی او ستاسو شخصي کتابتون په یوه اپ کې راټولوي.",
+    "cta": "اپ وپېژنئ",
+    "learn": "شیلف څنګه کار کوي",
+    "soon": "ژر راځي",
+    "notice": "شیلف د انډرایډ او آیفون لپاره عامې خپرونې ته چمتو کېږي. کله چې اپونه خپاره شي، رسمي لینکونه به دلته ومومئ.",
+    "skip": "اصلي منځپانګې ته لاړ شئ",
+    "language": "ژبه",
+    "nav": {
+      "home": "کور",
+      "about": "د شیلف په اړه",
+      "how-it-works": "څنګه کار کوي",
+      "download": "اپ ترلاسه کړئ",
+      "support": "مرسته",
+      "terms": "د کارولو شرطونه"
+    },
+    "privacy": "د محرمیت تګلاره",
+    "delete": "خپل حساب ړنګ کړئ",
+    "footer": "پښتو او فارسي کتابونه؛ د موندلو او لوستلو ځای.",
+    "edition": "د شیلف د لوستلو اپ",
+    "artTitle": "راتلونکی کتاب مو، درته نږدې.",
+    "artSub": "ومومئ · نمونه ولولئ · کتاب ولولئ",
+    "platform": "د انډرایډ او آیفون لپاره",
+    "stepsTitle": "له موندلو تر خپل کتابتونه",
+    "steps": [
+      [
+        "کتاب ومومئ",
+        "په اپ کې کتابونه او د لیکوال او ژباړن نومونه وګورئ."
+      ],
+      [
+        "نمونه ولولئ",
+        "تر پېرلو مخکې د کتاب وړیا نمونه ولولئ او کتاب وپېژنئ."
+      ],
+      [
+        "خپل کتابتون جوړ کړئ",
+        "کله چې پېرود فعال شي، هر کتاب جلا واخلئ او په خپل کتابتون کې یې ومومئ."
+      ]
+    ],
+    "pages": {
+      "home": [
+        "د پښتو او فارسي ډیجیټل کتابتون",
+        "شیلف د پښتو او فارسي کتابونو پلورنځی او د لوستلو اپ دی. وړیا نمونې او شخصي کتابتون؛ د انډرایډ او آیفون لپاره ژر راځي."
+      ],
+      "about": [
+        "د کتابونو او لوستلو ځای",
+        "شیلف د پښتو او فارسي کتابونو ډیجیټل پلورنځی او شخصي کتابتون دی چې اجمل اند یې اداره کوي.",
+        [
+          [
+            "د شیلف په اړه",
+            "شیلف د پښتو او فارسي کتابونو پلورنځی او د لوستلو اپ دی. د کتاب موندنه، وړیا نمونه او شخصي کتابتون په یوه ځای کې برابروي."
+          ],
+          [
+            "له سمو نومونو سره کتابونه",
+            "د هر کتاب لیکوال او ژباړن ورسره یادېږي. د شیلف کتابونه د خاوند له خوا اداره کېږي؛ لیکوالان پخپله کتابونه نه پورته کوي."
+          ],
+          [
+            "ستاسو د لوستلو ملګری",
+            "یو کتاب وټاکئ، نمونه یې وګورئ او په اپ کې یې ولولئ. شیلف په شخصي توګه اجمل اند اداره کوي."
+          ]
+        ]
+      ],
+      "how-it-works": [
+        "تر راتلونکي کتابه یوه اسانه لار",
+        "په شیلف کې د کتاب موندلو، وړیا نمونې او خپل کتابتون د کارولو لار وپېژنئ.",
+        [
+          [
+            "له ننوتلو مخکې کتاب وګورئ",
+            "له حساب جوړولو پرته کتابونه موندلی او شته وړیا نمونې لوستلی شئ."
+          ],
+          [
+            "هر کتاب جلا واخلئ",
+            "د کتاب پېرلو لپاره حساب ته اړتیا ده. شیلف د هر کتاب جلا پېرود لري، نه ګډون او نه د ټولو کتابونو ګډه بسته. پېرود د اپ پلورنځي او د خپرونې له حالت سره تړلی دی."
+          ],
+          [
+            "له خپل کتابتونه یې ولولئ",
+            "پېرل شوي کتابونه په خپل کتابتون کې ښکاري. د بې انټرنېټه لوستلو لپاره کښته کول شته؛ لږ تر لږه په هرو ۳۰ ورځو کې له سرور سره کتنه اړینه ده. بېرته ورکړل شوی یا لغوه شوی کتاب په راتلونکې بریالۍ کتنه کې بندېږي."
+          ],
+          [
+            "خپل حساب وساتئ",
+            "د خپل کتابتون لپاره هماغه شیلف حساب وکاروئ. په اپ کې د پېرودونو بېرته راګرځول شته؛ د اړتیا پر مهال له مرستې سره اړیکه ونیسئ."
+          ]
+        ]
+      ],
+      "download": [
+        "خپل کتابتون له ځان سره یوسئ",
+        "د انډرایډ او آیفون لپاره شیلف ژر راځي. له عامې خپرونې وروسته رسمي لینکونه دلته ومومئ.",
+        [
+          [
+            "انډرایډ",
+            "د عامې خپرونې وروسته به شیلف په ګوګل پلی کې وي. اوس د عام کښته کولو لینک نشته."
+          ],
+          [
+            "آیفون",
+            "د عامې خپرونې وروسته به شیلف په اپ سټور کې وي. د آیپډ ځانګړی ملاتړ په راتلونکې نسخه کې پلان شوی دی."
+          ],
+          [
+            "وړیا اپ، جلا کتابونه",
+            "د اپ کښته کول به وړیا وي. د پیسو کتابونه جلا پېرل کېږي؛ د شیلف کښته کول ټولو کتابونو ته لاسرسی نه ورکوي."
+          ]
+        ]
+      ],
+      "support": [
+        "د لوستلو په لار کې مرسته",
+        "د اپ، حساب، پېرود، محرمیت او حساب ړنګولو لپاره له شیلف سره اړیکه ونیسئ.",
+        [
+          [
+            "له شیلف سره اړیکه",
+            "د مرستې لپاره ajmalaand@gmail.com ته برېښنالیک واستوئ. ولیکئ چې څه مو کول غوښتل او کومه وسیله کاروئ. پټنوم، د ننوتلو کوډ یا د بانکي کارت معلومات مه رالېږئ."
+          ],
+          [
+            "د حساب او پېرود مرسته",
+            "د پېرود د ستونزې لپاره د کتاب نوم او که شته، د پلورنځي د فرمایش شمېره ولیکئ. د فرمایش معلومات په شخصي برېښنالیک کې شریک کړئ، نه په عام ځای کې."
+          ],
+          [
+            "محرمیت او حساب ړنګول",
+            "د شخصي معلوماتو لپاره د محرمیت تګلاره ولولئ. د حساب ړنګولو له شته پاڼې غوښتنه وکړئ او د برېښنالیک له لارې یې تایید کړئ."
+          ]
+        ]
+      ],
+      "terms": [
+        "د شیلف کارول",
+        "د شیلف وېبپاڼې، اپ، جلا کتابونو ته د لاسرسي او مرستې معلومات.",
+        [
+          [
+            "د دې وېبپاڼې په اړه",
+            "دا وېبپاڼه شیلف، اپ او د مرستې معلومات درپېژني. کتابونه په اپ کې لوستل او پېرل کېږي؛ دا وېبپاڼه کتابونه نه پلوري."
+          ],
+          [
+            "کتابونه او لاسرسی",
+            "وړیا نمونه بشپړ کتاب ته لاسرسی نه ورکوي. هر پېرود د یوه کتاب لپاره دی او د لوستونکي له حساب سره تاییدېږي. د پلورنځي شتون او د پېرود پر مهال ښودل شوې بیه پلي کېږي."
+          ],
+          [
+            "کتابونو او حسابونو ته درناوی",
+            "د لیکوالانو، ژباړونکو او نورو حق لرونکو حقونو ته درناوی وکړئ. خوندي منځپانګه مه وېشئ او د حساب د ننوتلو معلومات مه شریکوئ."
+          ],
+          [
+            "پېرود او مرسته",
+            "له پېرلو مخکې وړیا نمونه ولولئ. د شیلف د پېرود هوکړه پلور وروستی بولي؛ د تکراري پېرود یا خراب کتاب په اړه له مرستې سره اړیکه ونیسئ. د پلورنځي د پیسو بېرته ورکولو اصول او قانوني حقونه پر ځای دي. د پیسو بېرته ورکول یا لغوه کول لاسرسی بندوي."
+          ],
+          [
+            "محرمیت او پوښتنې",
+            "د محرمیت تګلاره د معلوماتو او حساب ړنګولو څرنګوالی بیانوي. د شیلف یا دې شرطونو په اړه پوښتنې ajmalaand@gmail.com ته واستوئ."
+          ]
+        ]
+      ]
+    }
+  },
+  "fa": {
+    "name": "فارسی",
+    "brand": "شیلف",
+    "eyebrow": "خانه‌ای برای کتاب‌های پشتو و فارسی",
+    "headline": "دنیای واژه‌ها را همراه داشته باشید.",
+    "intro": "کتاب‌های پشتو و فارسی را پیدا کنید، نمونهٔ رایگان بخوانید و کتاب دلخواه‌تان را به کتابخانهٔ خود بیاورید. شیلف، کتاب‌فروشی و کتابخانهٔ شخصی شما را در یک اپ گرد هم می‌آورد.",
+    "cta": "با اپ آشنا شوید",
+    "learn": "شیلف چگونه کار می‌کند",
+    "soon": "به‌زودی",
+    "notice": "شیلف برای انتشار عمومی در اندروید و آیفون آماده می‌شود. پس از انتشار، لینک‌های رسمی دریافت اپ در این‌جا قرار می‌گیرند.",
+    "skip": "رفتن به محتوای اصلی",
+    "language": "زبان",
+    "nav": {
+      "home": "خانه",
+      "about": "دربارهٔ شیلف",
+      "how-it-works": "روش کار",
+      "download": "دریافت اپ",
+      "support": "پشتیبانی",
+      "terms": "شرایط استفاده"
+    },
+    "privacy": "سیاست حفظ حریم خصوصی",
+    "delete": "حذف حساب",
+    "footer": "کتاب‌های پشتو و فارسی؛ جایی برای کشف و فضایی برای خواندن.",
+    "edition": "اپ کتاب‌خوان شیلف",
+    "artTitle": "کتاب بعدی‌تان، در دسترس شما.",
+    "artSub": "کشف کنید · نمونه بخوانید · مطالعه کنید",
+    "platform": "برای اندروید و آیفون",
+    "stepsTitle": "از کشف کتاب تا کتابخانهٔ شما",
+    "steps": [
+      [
+        "کتاب پیدا کنید",
+        "در اپ، کتاب‌ها و نام نویسندگان و مترجمان آن‌ها را ببینید."
+      ],
+      [
+        "نمونه بخوانید",
+        "پیش از تصمیم به خرید، با نمونهٔ رایگان کتاب آشنا شوید."
+      ],
+      [
+        "کتابخانه بسازید",
+        "پس از فعال شدن خرید، هر کتاب را جداگانه بخرید و در کتابخانهٔ من پیدا کنید."
+      ]
+    ],
+    "pages": {
+      "home": [
+        "کتاب‌فروشی دیجیتال پشتو و فارسی",
+        "شیلف، کتاب‌فروشی و اپ مطالعهٔ کتاب‌های پشتو و فارسی. نمونه‌های رایگان و کتابخانهٔ شخصی؛ به‌زودی برای اندروید و آیفون."
+      ],
+      "about": [
+        "جایی برای کتاب، فضایی برای خواندن",
+        "با شیلف، کتاب‌فروشی دیجیتال و کتابخانهٔ شخصی پشتو و فارسی به مدیریت اجمل اند آشنا شوید.",
+        [
+          [
+            "دربارهٔ شیلف",
+            "شیلف، کتاب‌فروشی دیجیتال و اپ مطالعهٔ کتاب‌های پشتو و فارسی است. کشف کتاب، نمونهٔ رایگان و کتابخانهٔ شخصی را در یک جا فراهم می‌کند."
+          ],
+          [
+            "کتاب‌ها با نام پدیدآورندگان",
+            "نویسندگان و مترجمان همراه با کتاب‌های‌شان معرفی می‌شوند. کتاب‌های شیلف را صاحب آن مدیریت می‌کند؛ این بستر برای بارگذاری مستقیم نویسندگان نیست."
+          ],
+          [
+            "همراه مطالعهٔ شما",
+            "یک کتاب انتخاب کنید، نمونه‌اش را بخوانید و در اپ مطالعه کنید. شیلف را اجمل اند به‌صورت شخصی اداره می‌کند."
+          ]
+        ]
+      ],
+      "how-it-works": [
+        "راهی ساده تا کتاب بعدی شما",
+        "با یافتن کتاب، خواندن نمونهٔ رایگان و استفاده از کتابخانهٔ من در شیلف آشنا شوید.",
+        [
+          [
+            "پیش از ورود، کتاب ببینید",
+            "بدون ساختن حساب می‌توانید کتاب‌ها را پیدا کنید و نمونه‌های رایگان موجود را بخوانید."
+          ],
+          [
+            "هر کتاب، یک انتخاب",
+            "برای خرید کتاب به حساب نیاز دارید. شیلف خرید جداگانهٔ کتاب دارد، نه اشتراک یا بستهٔ همهٔ کتاب‌ها. خرید به وضعیت انتشار و فروشگاه اپ بستگی دارد."
+          ],
+          [
+            "از کتابخانهٔ من بخوانید",
+            "کتاب‌های خریداری‌شده در کتابخانهٔ من قرار می‌گیرند. دانلود برای مطالعهٔ آفلاین پشتیبانی می‌شود؛ بررسی با سرور دست‌کم هر ۳۰ روز لازم است. دسترسی به کتاب بازپرداخت‌شده یا لغوشده در بررسی موفق بعدی قطع می‌شود."
+          ],
+          [
+            "با همان حساب بمانید",
+            "برای کتابخانهٔ خود از همان حساب شیلف استفاده کنید. بازیابی خریدها در اپ موجود است؛ اگر کمک خواستید با پشتیبانی تماس بگیرید."
+          ]
+        ]
+      ],
+      "download": [
+        "کتابخانه‌ای که همراه شما می‌آید",
+        "شیلف برای اندروید و آیفون به‌زودی منتشر می‌شود. لینک‌های رسمی پس از انتشار عمومی در این‌جا قرار می‌گیرند.",
+        [
+          [
+            "اندروید",
+            "پس از انتشار عمومی، شیلف از گوگل پلی در دسترس خواهد بود. هنوز لینک دانلود عمومی وجود ندارد."
+          ],
+          [
+            "آیفون",
+            "پس از انتشار عمومی، شیلف از اپ استور در دسترس خواهد بود. پشتیبانی بومی آیپد برای نسخهٔ بعدی برنامه‌ریزی شده است."
+          ],
+          [
+            "اپ رایگان، کتاب‌های جداگانه",
+            "دریافت اپ رایگان خواهد بود. کتاب‌های پولی جداگانه خریداری می‌شوند؛ دریافت شیلف همهٔ کتاب‌ها را باز نمی‌کند."
+          ]
+        ]
+      ],
+      "support": [
+        "کمک برای ادامهٔ مطالعه",
+        "برای کمک دربارهٔ اپ، حساب، خریدها، حریم خصوصی و حذف حساب با شیلف تماس بگیرید.",
+        [
+          [
+            "تماس با شیلف",
+            "برای دریافت کمک به ajmalaand@gmail.com ایمیل بفرستید. بگویید چه کاری می‌خواستید انجام دهید و از چه دستگاهی استفاده می‌کنید. رمز عبور، کد ورود یا اطلاعات کارت بانکی نفرستید."
+          ],
+          [
+            "کمک دربارهٔ حساب و خرید",
+            "برای مشکل خرید، نام کتاب و در صورت دسترسی شمارهٔ سفارش فروشگاه را بنویسید. اطلاعات سفارش را خصوصی از راه ایمیل بفرستید، نه در فضای عمومی."
+          ],
+          [
+            "حریم خصوصی و حذف حساب",
+            "برای جزئیات اطلاعات شخصی، سیاست حفظ حریم خصوصی را بخوانید. از صفحهٔ موجود حذف حساب درخواست دهید و آن را از راه ایمیل تأیید کنید."
+          ]
+        ]
+      ],
+      "terms": [
+        "استفاده از شیلف",
+        "اطلاعات استفاده از وب‌سایت و اپ شیلف، دسترسی به کتاب‌ها و پشتیبانی.",
+        [
+          [
+            "دربارهٔ این وب‌سایت",
+            "این وب‌سایت شیلف، اپ و راه‌های پشتیبانی را معرفی می‌کند. کتاب‌ها در اپ خوانده و خریداری می‌شوند؛ این وب‌سایت فروش کتاب ندارد."
+          ],
+          [
+            "کتاب‌ها و دسترسی",
+            "نمونهٔ رایگان، دسترسی به کتاب کامل نمی‌دهد. هر خرید برای یک کتاب است و برای حساب خواننده تأیید می‌شود. موجود بودن کتاب در فروشگاه و قیمت هنگام پرداخت ملاک است."
+          ],
+          [
+            "احترام به کتاب‌ها و حساب‌ها",
+            "به حقوق نویسندگان، مترجمان و دیگر صاحبان حق احترام بگذارید. محتوای محافظت‌شده را بازنشر نکنید و اطلاعات ورود حساب را به اشتراک نگذارید."
+          ],
+          [
+            "خرید و پشتیبانی",
+            "پیش از خرید، نمونهٔ رایگان را بخوانید. توافق خرید شیلف فروش را نهایی می‌داند؛ برای خرید تکراری یا کتاب دارای مشکل با پشتیبانی تماس بگیرید. قوانین بازپرداخت فروشگاه و حقوق قانونی مصرف‌کننده برقرار است. بازپرداخت یا لغو خرید، دسترسی کتاب را قطع می‌کند."
+          ],
+          [
+            "حریم خصوصی و پرسش‌ها",
+            "سیاست حفظ حریم خصوصی، نگهداری اطلاعات و حذف حساب را توضیح می‌دهد. پرسش‌های خود را به ajmalaand@gmail.com بفرستید."
+          ]
+        ]
+      ]
+    }
+  }
+}

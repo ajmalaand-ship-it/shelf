@@ -582,9 +582,60 @@ def apple_customers_checked(app, commit, changes):
     return True
 
 
+def website_https_checks(staging=False):
+    base = 'https://staging.shelf.services' if staging else 'https://shelf.services'
+    headers = {'X-Shelf-Test-Key': settings(STAGING)['SHELF_STAGING_ACCESS_KEY']} if staging else {}
+    for locale in ('ps', 'fa', 'en'):
+        for page in ('', '/about', '/how-it-works', '/download', '/support', '/terms'):
+            with urllib.request.urlopen(urllib.request.Request(base+'/'+locale+page, headers=headers), timeout=20) as response:
+                body = response.read().decode()
+                if response.status != 200 or ('lang="'+locale+'"') not in body or 'rel="canonical"' not in body:
+                    raise RuntimeError('Localized website HTTPS check failed: '+locale+page)
+                for other in ('ps', 'fa', 'en'):
+                    if ('href="/'+other+page+'"') not in body:
+                        raise RuntimeError('Same-page language navigation failed.')
+    for path in ('/sitemap.xml', '/website/site.css', '/website/shelf-logo.png', '/website/shelf-social.png', '/website/vazirmatn.ttf'):
+        with urllib.request.urlopen(urllib.request.Request(base+path, headers=headers), timeout=20) as response:
+            if response.status != 200 or not response.read():
+                raise RuntimeError('Website asset/SEO HTTPS check failed.')
+    if not staging:
+        with urllib.request.urlopen(base+'/robots.txt', timeout=20) as response:
+            if ('Sitemap: '+base+'/sitemap.xml') not in response.read().decode():
+                raise RuntimeError('Production sitemap discovery failed.')
+    print('PASS: 18 localized public pages, same-page languages, sitemap and local branding/font assets over HTTPS.', flush=True)
+
+
+def website_checked(app, commit, changes):
+    if 'tests/Feature/PublicWebsiteTest.php' not in changes:
+        return False
+    allowed = {'app/Http/Controllers/PublicWebsiteController.php', 'routes/web.php',
+        'public/robots.txt', 'scripts/staging/workflow.py', 'tests/Feature/PublicWebsiteTest.php',
+        'tests/Feature/WordImportTest.php', 'AGENTS.md'}
+    if any(p not in allowed and not p.startswith(('resources/views/website/', 'resources/content/', 'public/website/', 'docs/')) for p in changes):
+        raise RuntimeError('Release exceeds public informational website scope.')
+    log = RUNTIME / ('checks-'+commit+'.log')
+    env = os.environ.copy()
+    env['SHELF_PHP_TEST_FILTER'] = 'PublicWebsiteTest|PrivacySupportTest|ExampleTest|test_migration_rolls_back_without_changing_content_and_home_uses_shelf'
+    with log.open('w') as output:
+        result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app, env=env, stdout=output, stderr=subprocess.STDOUT)
+    if result.returncode:
+        raise RuntimeError('Focused website checks failed; private log: '+str(log))
+    website_https_checks(staging=True)
+    https_checks()
+    state = current_state()
+    state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+        'scope':'public-website', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: focused public website checks and existing protected-route isolation; no mobile changes.', flush=True)
+    return True
+
+
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    if website_checked(app, commit, changes):
+        return
     if apple_customers_checked(app, commit, changes):
         return
     if financial_retention_checked(app, commit, changes):
@@ -1092,6 +1143,8 @@ def promote(commit, checkpoint=None):
         if state['checks'].get('scope') == 'financial-retention-report-only':
             artisan(PRODUCTION, 'shelf:check-financial-retention')
             financial_disclosure_checks(PRODUCTION)
+        if state['checks'].get('scope') == 'public-website':
+            website_https_checks()
         https_checks()
         state.update(production_commit=commit,last_backup=str(saved),previous_production_commit=previous)
         save_state(state)

@@ -7,9 +7,14 @@ use App\Http\Middleware\AccountsEnabled;
 use App\Http\Middleware\PrivateAccountResponse;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return response()->json(['service' => 'Shelf API', 'status' => 'ok']);
-});
+// Informational pages only: no catalogue or reader data is loaded here.
+Route::get('/', [\App\Http\Controllers\PublicWebsiteController::class, 'page'])->name('website.home');
+Route::get('/sitemap.xml', [\App\Http\Controllers\PublicWebsiteController::class, 'sitemap']);
+Route::get('/robots.txt', [\App\Http\Controllers\PublicWebsiteController::class, 'robots']);
+Route::get('/{locale}/{page?}', [\App\Http\Controllers\PublicWebsiteController::class, 'page'])
+    ->whereIn('locale', ['ps', 'fa', 'en'])
+    ->whereIn('page', ['about', 'how-it-works', 'download', 'support', 'terms'])
+    ->name('website.page');
 
 Route::view('/privacy', 'privacy')->name('privacy');
 

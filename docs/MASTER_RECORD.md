@@ -584,6 +584,26 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Public informational website — authorized 18 October 2026
+
+Owner prioritizes finishing the existing Laravel website before Google Play;
+Apple work is paused. One batch: homepage, About, How it works, Download,
+Support and factual service Terms in ps/fa/en, responsive RTL/LTR, existing
+owner-supplied logo/icon and OFL Vazirmatn font. No book queries/content, public
+web checkout, new database/environment, analytics or mobile change. Android and
+iPhone remain Coming soon without store links. Existing /privacy and account
+removal routes and text are unchanged, explicitly linked as English.
+Localized URLs /{ps,fa,en}, with /about, /how-it-works, /download, /support,
+/terms; root serves Pashto with canonical /ps. Unique SEO titles/descriptions,
+canonical/hreflang/Open Graph, generated sitemap and production robots rules.
+Focused route/SEO/protected-route checks through scripts/run_tests.sh; existing
+staging/promotion tooling scoped to this website batch. No new migration.
+Rollback uses previous production commit with release backup; never restore
+reader/financial history over subsequent activity. Owner review: localized copy
+and factual service terms; no new financial or refund policy introduced.
+Deployment evidence follows after actual staging and production completion.
+
+
 ## Apple review sandbox offers — 18 October 2026
 
 Owner authorizes one batch: ordinary verified reviewer with no ownership, separate

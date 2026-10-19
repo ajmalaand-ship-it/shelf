@@ -376,6 +376,6 @@ class WordImportTest extends TestCase
         $this->assertSame('Unchanged', $item->fresh()->body);
         $migration->up();
         $this->assertTrue(Schema::hasTable('word_imports'));
-        $this->get('/')->assertOk()->assertJsonPath('service', 'Shelf API');
+        $this->get('/')->assertOk()->assertSee('Shelf')->assertSee('lang="ps"', false);
     }
 }

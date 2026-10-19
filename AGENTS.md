@@ -167,6 +167,12 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-18: Owner authorizes existing Laravel public informational website:
+  ps/fa/en pages, SEO, Coming soon app links, focused verification, staging-first
+  backed-up promotion and records/commit/push. No catalogue exposure, checkout,
+  migration or mobile changes; privacy/deletion unchanged. Apple paused; website
+  precedes resuming Google Play work.
+
 - 2026-10-18: Owner authorizes ordinary zero-ownership Apple review account, separate
   sandbox offer gate with real checkout OFF, private App Store Connect credentials,
   focused staging/production rollout and Build 8 reuse. Preserve blocked reviewer
