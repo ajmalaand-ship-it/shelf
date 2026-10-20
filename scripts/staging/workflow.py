@@ -637,9 +637,43 @@ def website_checked(app, commit, changes):
     return True
 
 
+def admin_publishing_checked(app, commit, changes):
+    if 'tests/Feature/AdminBookPreviewTest.php' not in changes:
+        return False
+    allowed = {
+        'app/Filament/Resources/Collections/CollectionResource.php',
+        'app/Filament/Resources/Collections/Pages/PreviewCollection.php',
+        'app/Filament/Resources/Collections/Pages/EditCollection.php',
+        'app/Filament/Resources/Collections/Schemas/CollectionForm.php',
+        'app/Filament/Resources/Collections/Tables/CollectionsTable.php',
+        'resources/views/filament/books/preview.blade.php',
+        'tests/Feature/AdminBookPreviewTest.php', 'scripts/staging/workflow.py',
+        'docs/MASTER_RECORD.md', 'docs/ADMIN_PUBLISHING.md',
+    }
+    if not set(changes) <= allowed:
+        raise RuntimeError('Release exceeds authorized Admin publishing scope.')
+    log = RUNTIME / ('checks-'+commit+'.log')
+    env = os.environ.copy()
+    env['SHELF_PHP_TEST_FILTER'] = 'AdminBookPreviewTest|BookFoundationTest|BookContentAdminTest|PublicationAccessTest|WordImportTest|AuthorsAndLanguagesTest|BookstoreTest|BookPurchasesTest|AppleCustomerPurchasesTest'
+    with log.open('w') as output:
+        result = subprocess.run(['bash', 'scripts/run_tests.sh'], cwd=app, env=env, stdout=output, stderr=subprocess.STDOUT)
+    if result.returncode:
+        raise RuntimeError('Focused Admin workflow checks failed; private log: '+str(log))
+    https_checks()
+    state = current_state()
+    state.update(staging_commit=commit, checks={'commit':commit, 'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(), 'mobile_tests':False,
+        'scope':'admin-publishing', 'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: focused Admin publishing/access/purchase checks and staging HTTPS isolation.', flush=True)
+    return True
+
+
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    if admin_publishing_checked(app, commit, changes):
+        return
     if website_checked(app, commit, changes):
         return
     if apple_customers_checked(app, commit, changes):

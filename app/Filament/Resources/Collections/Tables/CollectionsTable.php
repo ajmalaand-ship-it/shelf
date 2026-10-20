@@ -27,7 +27,7 @@ class CollectionsTable
                 TextColumn::make('book_type')->label('Type'),
                 TextColumn::make('categories.name')->label('Categories'),
                 TextColumn::make('updated_at')->label('Last changed')->dateTime()->sortable(),
-                TextColumn::make('status')->label('Status')->badge()->formatStateUsing(fn (string $state): string => Collection::STATUSES[$state])->sortable(),
+                TextColumn::make('status')->label('Catalogue status')->badge()->formatStateUsing(fn (string $state): string => Collection::STATUSES[$state])->sortable(),
                 TextColumn::make('status_changed_at')->label('Status changed')->dateTime(),
                 TextColumn::make('price_usd')->label('Reference price')->money('USD'),
                 TextColumn::make('play_management')->label('Google Play')->badge()
@@ -56,12 +56,13 @@ class CollectionsTable
                 SelectFilter::make('status')->label('Status')->options(Collection::STATUSES),
             ])
             ->recordActions([
+                Action::make('preview')->label('Preview')->url(fn (Collection $record): string => CollectionResource::getUrl('preview', ['record' => $record])),
                 Action::make('managePoems')->label('Manage content')->icon('heroicon-o-document-text')
                     ->url(fn (Collection $record): string => CollectionResource::getUrl('edit', ['record' => $record])),
                 Action::make('publish')->label('Publish')->color('success')
                     ->visible(fn (Collection $record): bool => ! $record->isPublished())
                     ->requiresConfirmation()
-                    ->modalDescription('Publish this book? Individual content publication states will not change.')
+                    ->modalDescription('Make this book visible in the Android and iPhone catalogue? Confirm rights for the text, cover and any audio, and check author/translator credits and the sample first. Publishing does not approve or enable store purchases. Individual content visibility will not change.')
                     ->action(function (Collection $record): void {
                         $record->assertPublishable();
                         $record->changeStatus('published');

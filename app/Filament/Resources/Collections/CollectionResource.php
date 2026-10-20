@@ -67,6 +67,7 @@ class CollectionResource extends Resource
             'index' => ListCollections::route('/'),
             'create' => CreateCollection::route('/create'),
             'edit' => EditCollection::route('/{record}/edit'),
+            'preview' => \App\Filament\Resources\Collections\Pages\PreviewCollection::route('/{record}/preview'),
         ];
     }
 }

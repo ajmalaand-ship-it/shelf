@@ -29,6 +29,8 @@ class EditCollection extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            \Filament\Actions\Action::make('preview')->label('Preview book')
+                ->url(fn (): string => CollectionResource::getUrl('preview', ['record' => $this->record])),
             DeleteAction::make(),
             RestoreAction::make(),
             ForceDeleteAction::make()->visible(fn (): bool => $this->record->trashed() && ! $this->record->poems()->withTrashed()->exists()),

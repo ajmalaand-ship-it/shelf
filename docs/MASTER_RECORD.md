@@ -584,6 +584,37 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Admin book-publishing completion batch — 19 October 2026
+
+Owner authorizes practical completion using existing Admin/catalogue work, isolated
+verification, necessary commit/push and Master Record evidence; no new books
+published, existing prices changed, mobile builds, store submissions or real-checkout
+activation. Google Play closed testing is underway (owner report); Apple review is
+paused; website/icon final acceptance remains deferred.
+
+Reused existing authors, books, credits/languages/categories, private cover uploads,
+per-book poems/chapters, reviewed Word import, full/partial samples, stable permanent
+product IDs, publication validation/history, withdrawal/prior-buyer preservation,
+bins and shared paginated catalogue API. These are existing construction, not rebuilt.
+
+Demonstrated gaps corrected: direct owner-only Admin full-book/free-sample preview
+with exact existing sampleText(), hidden-item labels, escaped text and pagination;
+book edit/list preview links; explicit catalogue-status versus Apple/Google product
+approval guidance, permanent cross-store ID wording and rights/credit confirmation.
+Preview reads records only; publishing/withdrawal continue through existing guards.
+See [Admin publishing guide](ADMIN_PUBLISHING.md) for the practical owner workflow.
+
+Essential limitation: both apps receive server-managed catalogue/content updates
+without rebuilds, but installed iPhone purchase code has a six-original-book regex
+allowlist and the Apple verifier has the matching fixed list. Owner can independently
+add and prepare future books for both apps; selling a future book on iPhone still
+requires a separately authorized purchase-code update/build and store product
+setup/approval. No claim of unlimited iPhone purchasing or store approval is made.
+Real checkout remains OFF; existing matching-store-product/consent/provider-evidence
+checks unchanged. No historical text, source original, credit/right, price, account,
+purchase or financial record is edited. Rollout/test results follow below.
+
+
 ## Public contact and footer correction — 19 October UTC / 18 October local 2026
 
 Owner authorizes a small correction: public support/contact editor@hindara.com;

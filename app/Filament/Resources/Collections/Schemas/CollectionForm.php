@@ -81,8 +81,8 @@ class CollectionForm
                         return $shares.' | '.($agreement->basis === 'net' ? 'Net amount received' : 'Gross income')
                             .' | Effective '.$agreement->starts_at->toDateString().'. New versions are added in Author-share agreements; past earnings stay unchanged.';
                     })->schema([]),
-                Section::make('Google Play products and prices')
-                    ->description('Managed manually in Play Console. Automatic sync: DEFERRED. Saving this book does not create a Play product or change its price or availability. After publishing or withdrawing, review availability in Play Console.')->schema([]),
+                Section::make('Catalogue and store readiness')
+                    ->description('Draft → prepare content and credits → preview full book and free sample → publish. Published means visible in the shared Android and iPhone catalogue; it does not mean approved for purchase. Create the permanent product ID separately in Google Play, App Store Connect and RevenueCat, and obtain the required store approval and availability. Saving a reference price does not update either store. Google Play sync is deferred. Apple purchases currently support only the six original books; future iPhone sales need a separately authorized app update. Real checkout remains OFF. After withdrawal, stop new sales in both stores; prior buyers keep access.')->schema([]),
                 Section::make('Order / Publication')
                     ->columns(2)
                     ->schema([
@@ -96,8 +96,8 @@ class CollectionForm
                         TextInput::make('slug')->label('Web identifier (slug)')->required(fn (string $operation): bool => $operation === 'edit')->alphaDash()
                             ->unique(ignoreRecord: true)->maxLength(255)
                             ->helperText('Generated from the title when blank on a new book. Title edits never change it. Change an existing identifier only deliberately.'),
-                        TextInput::make('product_id')->label('Google Play product ID')->disabled()->dehydrated(false)
-                            ->helperText('Permanent Shelf mapping. Create or check this exact ID in Play Console and RevenueCat; saving does not create the Play product.'),
+                        TextInput::make('product_id')->label('Permanent store product ID')->disabled()->dehydrated(false)
+                            ->helperText('Permanent Shelf mapping for Google Play, App Store Connect and RevenueCat. Generated after first save; never change it. A mapping is not store approval.'),
                     ])
                     ->collapsible()
                     ->collapsed(),
