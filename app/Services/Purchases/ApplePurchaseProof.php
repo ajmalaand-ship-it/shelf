@@ -2,7 +2,7 @@
 
 namespace App\Services\Purchases;
 
-use App\Models\Reader;
+use App\Models\{Collection, Reader};
 use Illuminate\Support\Facades\Http;
 
 /** Server-to-server V2 evidence. No mobile receipt/environment is authoritative. */
@@ -18,7 +18,22 @@ class ApplePurchaseProof
             && filled(RevenueCatClient::appleCredential());
     }
 
-    public const PRODUCTS = ['shelf_book_3', 'shelf_book_4', 'shelf_book_5', 'shelf_book_6', 'shelf_book_7', 'shelf_book_8'];
+    // Include withdrawn/binned mappings for existing purchase/refund verification.
+    // Discovery and new-sale eligibility are checked separately.
+    public static function mappedBook(mixed $product): ?Collection
+    {
+        if (! is_string($product) || ! preg_match('/^shelf_book_([1-9][0-9]*)$/D', $product, $match)) {
+            return null;
+        }
+        return Collection::withTrashed()->whereKey($match[1])->where('product_id', $product)->first();
+    }
+
+    public static function catalogueProducts(): array
+    {
+        return Collection::where('status', 'published')->where('price_usd', '>', 0)
+            ->orderBy('id')->get(['id', 'product_id'])->filter(fn ($book) =>
+                $book->product_id === 'shelf_book_'.$book->id)->pluck('product_id')->values()->all();
+    }
 
     public static function credentialsConfigured(): bool
     {
@@ -83,7 +98,7 @@ class ApplePurchaseProof
             && ($app['project_id'] ?? null) === config('purchases.apple_project_id') && ($app['type'] ?? null) === 'app_store'
             && ($app['app_store']['bundle_id'] ?? null) === 'services.shelf.app'
             && ($mapped['id'] ?? null) === $p['product_id'] && ($mapped['app_id'] ?? null) === $app['id']
-            && in_array($canonical, self::PRODUCTS, true) && ($product === null || $canonical === $product)
+            && self::mappedBook($canonical) !== null && ($product === null || $canonical === $product)
             && (($mapped['type'] ?? null) === 'non_consumable'
                 || (($mapped['type'] ?? null) === 'one_time' && ($mapped['one_time']['is_consumable'] ?? null) === false)),
             503, 'Apple app/product mapping is unverified.');

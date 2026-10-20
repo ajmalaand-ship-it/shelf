@@ -12,6 +12,9 @@ class CollectionResource extends JsonResource
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
+            // Both stores use the existing permanent per-book SKU; platform keys
+            // keep the client from choosing another store or a provider-internal ID.
+            'store_product_ids' => ['PLAY_STORE' => $this->product_id, 'APP_STORE' => $this->product_id],
             'created_at' => $this->created_at?->toIso8601String(),
             'book_type' => $this->book_type,
             'categories' => $this->categories->map(fn ($category) => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug])->values(),

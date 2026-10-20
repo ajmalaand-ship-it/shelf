@@ -180,7 +180,6 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                         ),
                       ),
                     const SizedBox(height: 8),
-                    if (!widget.ownedMode) BookPriceLabel(book: book),
                     if (!widget.ownedMode &&
                         LibraryScope.of(context)?.refreshFailed == true)
                       Text(
@@ -192,61 +191,64 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                             : TextDirection.rtl,
                       ),
                     if (!widget.ownedMode)
-                      OutlinedButton(
-                        key: Key('buy-coming-soon'),
-                        onPressed: () {
-                          final library = LibraryScope.of(context);
-                          if (library != null) {
-                            if (library.owns(book.id)) {
-                              openOwnedBook(
-                                context,
-                                library,
-                                book,
-                                widget.readerSettings,
-                              );
-                            } else {
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => PurchaseScreen(
-                                    book: book,
-                                    settings: widget.readerSettings,
+                      BookPriceLabel(
+                        book: book,
+                        purchaseAction: OutlinedButton(
+                          key: Key('buy-coming-soon'),
+                          onPressed: () {
+                            final library = LibraryScope.of(context);
+                            if (library != null) {
+                              if (library.owns(book.id)) {
+                                openOwnedBook(
+                                  context,
+                                  library,
+                                  book,
+                                  widget.readerSettings,
+                                );
+                              } else {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => PurchaseScreen(
+                                      book: book,
+                                      settings: widget.readerSettings,
+                                    ),
                                   ),
+                                );
+                              }
+                              return;
+                            }
+                            if (AccountScope.of(context)?.user == null) {
+                              openAccount(context);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(AppStrings.of(context).buySoon),
                                 ),
                               );
                             }
-                            return;
-                          }
-                          if (AccountScope.of(context)?.user == null) {
-                            openAccount(context);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(AppStrings.of(context).buySoon),
-                              ),
-                            );
-                          }
-                        },
-                        child: Text(
-                          LibraryScope.of(context) == null
-                              ? AppStrings.of(context).buySoon
-                              : LibraryScope.of(context)!.owns(book.id)
-                              ? (AppStrings.of(context).choose(
-                                  'Open owned book',
-                                  'پېرودل شوی کتاب پرانیزئ',
-                                  'باز کردن کتاب خریداری‌شده',
-                                ))
-                              : LibraryScope.of(context)!.checkoutAvailable !=
-                                    true
-                              ? (AppStrings.of(context).choose(
-                                  'Purchases unavailable',
-                                  'پېرودنه اوس نشته',
-                                  'خرید در دسترس نیست',
-                                ))
-                              : (AppStrings.of(context).choose(
-                                  'Buy book',
-                                  'کتاب وپېرئ',
-                                  'خرید کتاب',
-                                )),
+                          },
+                          child: Text(
+                            LibraryScope.of(context) == null
+                                ? AppStrings.of(context).buySoon
+                                : LibraryScope.of(context)!.owns(book.id)
+                                ? (AppStrings.of(context).choose(
+                                    'Open owned book',
+                                    'پېرودل شوی کتاب پرانیزئ',
+                                    'باز کردن کتاب خریداری‌شده',
+                                  ))
+                                : LibraryScope.of(context)!.checkoutAvailable !=
+                                      true
+                                ? (AppStrings.of(context).choose(
+                                    'Purchases unavailable',
+                                    'پېرودنه اوس نشته',
+                                    'خرید در دسترس نیست',
+                                  ))
+                                : (AppStrings.of(context).choose(
+                                    'Buy book',
+                                    'کتاب وپېرئ',
+                                    'خرید کتاب',
+                                  )),
+                          ),
                         ),
                       ),
                   ],

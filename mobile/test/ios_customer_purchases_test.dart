@@ -21,6 +21,7 @@ PoetryCollection book(int id) => PoetryCollection(
 
 class CustomerApi implements LibraryService {
   bool checkout = true, proofFails = false, wrongIdentity = false;
+  final allowed = <int>{3, 4, 5, 6, 7, 8};
   final owned = <int>{};
   int? pending;
   final paths = <String>[];
@@ -42,9 +43,7 @@ class CustomerApi implements LibraryService {
         'public_sdk_key': 'appl_synthetic',
         'production_checkout_enabled': checkout,
         'sandbox_checkout_enabled': false,
-        'allowed_product_ids': [
-          for (var id = 3; id <= 8; id++) 'shelf_book_$id',
-        ],
+        'allowed_product_ids': [for (final id in allowed) 'shelf_book_$id'],
       };
     }
     if (path.endsWith('/consent')) {
@@ -132,6 +131,39 @@ void main() {
     expect(provider.buys, 6);
     expect(library.canTestOwnedAppleBook(book(3)), false);
     expect(await library.product(book(9)), null);
+  });
+
+  test('future IDs come from catalogue and server allowlist, not six Flutter constants', () async {
+    api.allowed.addAll([9, 42, 125, 1001]);
+    for (final id in [9, 42, 125, 1001]) {
+      final future = PoetryCollection.fromJson({
+        ...book(id).toJson(),
+        'store_product_ids': {
+          'APP_STORE': 'shelf_book_$id',
+          'PLAY_STORE': 'shelf_book_$id',
+        },
+      });
+      final product = await library.product(future);
+      expect(product?.id, 'shelf_book_$id');
+      expect(product?.price, '€2.79');
+      expect(
+        await library.purchase(future, product!, true),
+        StorePurchaseResult.confirming,
+      );
+      expect(library.owns(id), true);
+      expect(provider.user, '1');
+    }
+    expect(await library.product(book(9999)), null);
+    final missingApple = PoetryCollection.fromJson({
+      ...book(42).toJson(),
+      'store_product_ids': {'PLAY_STORE': 'shelf_book_42'},
+    });
+    expect(await library.product(missingApple), null);
+    final mismatch = PoetryCollection.fromJson({
+      ...book(42).toJson(),
+      'store_product_ids': {'APP_STORE': 'shelf_book_125'},
+    });
+    expect(await library.product(mismatch), null);
   });
 
   test('restore uses the same identity then trusts only server books and clears a refund download', () async {

@@ -4,13 +4,15 @@ import '../accounts/account_controller.dart';
 import '../accounts/account_screen.dart';
 import '../accounts/account_service.dart';
 import '../models/poetry_collection.dart';
+import '../l10n/app_strings.dart';
 import '../settings/reader_settings.dart';
 import 'book_purchase_provider.dart';
 import 'library_controller.dart';
 import 'library_screen.dart';
 
 class BookPriceLabel extends StatefulWidget {
-  const BookPriceLabel({required this.book, super.key});
+  const BookPriceLabel({required this.book, this.purchaseAction, super.key});
+  final Widget? purchaseAction;
   final PoetryCollection book;
   @override
   State<BookPriceLabel> createState() => _BookPriceLabelState();
@@ -23,7 +25,7 @@ class _BookPriceLabelState extends State<BookPriceLabel> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final next = AccountScope.of(context)?.user?.id;
-    if (next == reader) return;
+    if (next == reader && price != null) return;
     reader = next;
     price = next == null
         ? null
@@ -33,17 +35,71 @@ class _BookPriceLabelState extends State<BookPriceLabel> {
   }
 
   @override
-  Widget build(BuildContext context) => FutureBuilder<StoreBookProduct?>(
-    future: price,
-    builder: (context, snapshot) => snapshot.data == null
-        ? const SizedBox.shrink()
-        : Text(
-            snapshot.data!.price,
-            textDirection: TextDirection.ltr,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-  );
+  void didUpdateWidget(covariant BookPriceLabel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.book.toJson().toString() != widget.book.toJson().toString()) {
+      price = LibraryScope.of(context)
+          ?.product(widget.book)
+          .timeout(const Duration(seconds: 20));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final library = LibraryScope.of(context);
+    if (widget.purchaseAction != null &&
+        library?.owns(widget.book.id) == true) {
+      return widget.purchaseAction!;
+    }
+    if (reader == null && widget.purchaseAction != null) {
+      return OutlinedButton(
+        style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+        onPressed: () => openAccount(context),
+        child: const Text('Sign in to check price'),
+      );
+    }
+    return FutureBuilder<StoreBookProduct?>(
+      future: price,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LinearProgressIndicator();
+        }
+        if (snapshot.hasError || snapshot.data == null) {
+          return widget.purchaseAction == null
+              ? const SizedBox.shrink()
+              : Text(
+                  AppStrings.of(context).choose(
+                    'This book is not available to buy yet.',
+                    'دا کتاب لا د پېرودلو لپاره نشته.',
+                    'این کتاب هنوز برای خرید در دسترس نیست.',
+                  ),
+                );
+        }
+        return Column(
+          children: [
+            Text(
+              snapshot.data!.price,
+              textDirection: TextDirection.ltr,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            if (widget.purchaseAction != null &&
+                library?.checkoutAvailable == true)
+              widget.purchaseAction!,
+            if (widget.purchaseAction != null &&
+                library?.checkoutAvailable != true)
+              Text(
+                AppStrings.of(context).choose(
+                  'Purchases unavailable',
+                  'پېرودنه اوس نشته',
+                  'خرید در دسترس نیست',
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class PurchaseScreen extends StatefulWidget {
@@ -255,29 +311,30 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                   'Read the free sample first. All sales are final. I agree.',
                 ),
               ),
-              FilledButton(
-                key: const Key('purchase-buy'),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(52),
+              if (product != null)
+                FilledButton(
+                  key: const Key('purchase-buy'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                  onPressed:
+                      !agreed ||
+                          loading ||
+                          product == null ||
+                          library?.checkoutAvailable != true ||
+                          library?.busy == true ||
+                          (widget.ownedBookSandboxTest
+                              ? library?.canTestOwnedAppleBook(widget.book) !=
+                                    true
+                              : library?.owns(widget.book.id) == true)
+                      ? null
+                      : _buy,
+                  child: Text(
+                    loading
+                        ? 'Confirming…'
+                        : '${widget.ownedBookSandboxTest ? 'Test Apple purchase' : 'Buy'}${product == null ? '' : ' · ${product!.price}'}',
+                  ),
                 ),
-                onPressed:
-                    !agreed ||
-                        loading ||
-                        product == null ||
-                        library?.checkoutAvailable != true ||
-                        library?.busy == true ||
-                        (widget.ownedBookSandboxTest
-                            ? library?.canTestOwnedAppleBook(widget.book) !=
-                                  true
-                            : library?.owns(widget.book.id) == true)
-                    ? null
-                    : _buy,
-                child: Text(
-                  loading
-                      ? 'Confirming…'
-                      : '${widget.ownedBookSandboxTest ? 'Test Apple purchase' : 'Buy'}${product == null ? '' : ' · ${product!.price}'}',
-                ),
-              ),
               if (product == null && !loading)
                 OutlinedButton(
                   onPressed: _load,

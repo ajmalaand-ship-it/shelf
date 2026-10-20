@@ -584,6 +584,77 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Dynamic future-book purchases — source-only implementation, 19 October 2026
+
+Owner authorizes removing the six-book limitation on a separate development branch,
+with focused isolated tests, source commit/push and records. **No deployment,
+release build/upload, live product change, store submission or merge into either
+release branch.** Build 9 is under Apple review and Google closed testing continues
+(owner report); this supersedes the preceding paused-review status. Their existing
+source/artifacts remain untouched. Development base: main **b50ce69**; branch
+**purchases/dynamic-books-20261019**.
+
+Exact cause: `mobile/lib/purchases/library_controller.dart::_allowedProduct` used
+`^shelf_book_[3-8]$` plus a server list; ApplePurchaseProof::PRODUCTS fixed that list
+at 3–8; LibraryController consent/config and AppleSandboxPurchases event dispatch
+reused it. Existing dynamic RevenueCat getProducts(nonSubscription), localized
+StoreProduct.priceString and PurchaseParams.storeProduct already worked and are
+retained. Build-9 preparation source **b6339e3bef627f26293a3ba24bde8ab4f25d589f**
+(`origin/ios/foundation`, codemagic ios-app-store-release build number 9) contains
+those same purchase files, byte-identical to main's pre-change versions. Its native
+iPhone-only configuration/workflow are preserved. Archive/upload provenance and
+review state are not independently re-audited here; under-review status is the
+owner's report. Original Google release artifact/source remains unchanged.
+
+Completed source: public catalogue adds explicit APP_STORE/PLAY_STORE keys for the
+existing permanent per-book product_id (both stores currently use shelf_book_ID).
+Flutter selects the active platform's mapping; old catalogue/cache responses retain
+compatibility, while explicit missing mappings fail closed. Apple discovery/config,
+consent and provider-proof/event resolution use real catalogue mappings rather than
+six IDs. New-sale publication/price checks stay separate from historical withdrawn/
+binned mappings needed for restore/refunds. Numeric reader identities, consent,
+provider app/project/store/type/transaction/date/environment/entitlement checks,
+append-only money records and server-only access decisions are retained.
+
+Purchase actions wait for one matching actual RevenueCat StoreProduct with a
+positive price and nonempty localized priceString. Missing, duplicate, mismatched
+or unpriced products expose no Buy action. Selected native product is passed to
+the existing SDK purchase call; SDK CustomerInfo never grants ownership. Book
+details retain sign-in, owned-book access and clear availability states. No new
+schema, data updates, credentials or financial policy. See
+[DYNAMIC_BOOK_PURCHASES.md](DYNAMIC_BOOK_PURCHASES.md).
+
+Delivery boundary: the limitation is removed **in this development source only**.
+One future app update (including iPhone) and a separately authorized staging-first
+backend rollout are still needed to deliver it. After that, adding ordinary future
+books using the permanent mapping requires no Flutter edit/rebuild per book. Each
+store product/entitlement must still be registered, approved and available. SDK
+availability is not evidence of production approval; store setup remains necessary.
+No real payment or new device acceptance is claimed.
+
+Verification completed through **scripts/run_tests.sh --mobile** using temporary
+SQLite and synthetic SDK/provider responses. Broader focused PHP checks passed
+**89 tests / 1,005 assertions** (Apple customer/legacy sandbox, Play purchases,
+publication protection and accounting); final Apple customer rerun passed
+**15 / 241**. Flutter passed **41 focused purchase/widget tests plus 1 staging
+identity test**. Future IDs **9, 42, 125, 1001** reached supported native product
+lookup on both platforms; tests covered exact selected StoreProduct/price,
+missing/mismatched/duplicate/unpriced products, no Buy for unavailable products,
+available-product transition, unknown/global-unlock rejection, future Apple sales,
+restore/refunds/withdrawal and cross-reader denial. Existing six-book, legacy
+Book-3 session, mixed-store and accounting regressions passed. Analyzer had **no
+errors or warnings** (informational style lints remain); diff whitespace and PHP
+syntax checks passed. Initial new-test fixture/locale failures were corrected;
+no live failure or live verification writes occurred. Test logs:
+`/home/shelf/tmp/shelf-dynamic-books-tests.log` and
+`/home/shelf/tmp/shelf-dynamic-books-final-tests.log`.
+
+Release references were checked unchanged: ios/foundation **b6339e3**,
+apple/review-sandbox **fa2bec0**, main **b50ce69** at development start. No native
+Android/iOS, signing, lockfile or release-workflow changes. Development branch
+alone is committed/pushed; production remains at the preceding Admin deployment.
+Rollback is to omit/revert this development commit; no live rollback is needed.
+
 ## Admin book-publishing completion batch — 19 October 2026
 
 Owner authorizes practical completion using existing Admin/catalogue work, isolated

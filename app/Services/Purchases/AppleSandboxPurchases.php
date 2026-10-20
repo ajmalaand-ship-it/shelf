@@ -27,10 +27,11 @@ class AppleSandboxPurchases
             && (ApplePurchaseProof::customersConfigured() || ($existing && ApplePurchaseProof::customerPurchase($existing)));
         $environment = $event['environment'] ?? '';
         $product = $event['product_id'] ?? '';
-        $bookId = $customer && in_array($product, ApplePurchaseProof::PRODUCTS, true) ? (int) substr($product, 11) : 3;
+        $mappedBook = $customer ? ApplePurchaseProof::mappedBook($product) : null;
+        $bookId = $customer ? $mappedBook?->id : 3;
         abort_unless(($customer ? ApplePurchaseProof::credentialsConfigured() : ApplePurchaseProof::configured()) && ($event['store'] ?? null) === 'APP_STORE'
             && ($event['app_id'] ?? null) === config('purchases.apple_app_id')
-            && ($customer ? in_array($environment, ['SANDBOX', 'PRODUCTION'], true) && in_array($product, ApplePurchaseProof::PRODUCTS, true)
+            && ($customer ? in_array($environment, ['SANDBOX', 'PRODUCTION'], true) && $mappedBook !== null
                 : $environment === 'SANDBOX' && $product === 'shelf_book_3')
             && is_string($event['transaction_id'] ?? null) && preg_match('/^[0-9]{1,255}$/D', $event['transaction_id']), 422);
         $type = $event['type'];

@@ -61,9 +61,12 @@ class RevenueCatBookProvider implements BookPurchaseProvider {
       id,
     ], productCategory: ProductCategory.nonSubscription);
     final matches = products.where((p) => p.identifier == id);
-    return matches.isEmpty
+    return matches.length != 1 ||
+            matches.single.priceString.trim().isEmpty ||
+            !matches.single.price.isFinite ||
+            matches.single.price <= 0
         ? null
-        : StoreBookProduct(id, matches.first.priceString, matches.first);
+        : StoreBookProduct(id, matches.single.priceString, matches.single);
   }
 
   @override
@@ -73,7 +76,8 @@ class RevenueCatBookProvider implements BookPurchaseProvider {
             !RegExp(r'^(?:[1-9][0-9]*|shelf_apple_[a-f0-9]{64})$')
                 .hasMatch(_reader!)) ||
         await Purchases.appUserID != _reader ||
-        product.native == null)
+        product.native == null ||
+        product.native!.identifier != product.id)
       return StorePurchaseResult.failed;
     try {
       await Purchases.purchase(PurchaseParams.storeProduct(product.native!));

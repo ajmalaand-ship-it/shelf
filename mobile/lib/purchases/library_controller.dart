@@ -327,18 +327,31 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
   Future<StoreBookProduct?> product(PoetryCollection book) async {
     await _identityWork;
     await configureStore();
-    if (book.productId != 'shelf_book_${book.id}' ||
-        !_allowedProduct(book.productId!))
-      return null;
+    final productId = _bookProductId(book);
+    if (productId == null || !_allowedProduct(productId)) return null;
     final reader = readerId!, generation = _generation;
-    final product = await provider.product(book.productId!);
+    final product = await provider.product(productId);
     assertIdentity(reader, generation);
-    return product?.id == book.productId ? product : null;
+    if (product == null ||
+        product.id != productId ||
+        product.price.trim().isEmpty) {
+      return null;
+    }
+    return product;
+  }
+
+  String? _bookProductId(PoetryCollection book) {
+    final id = book.productIdForStore(
+      applePurchasePlatform ? 'APP_STORE' : 'PLAY_STORE',
+    );
+    return book.id != null && book.id! > 0 && id == 'shelf_book_${book.id}'
+        ? id
+        : null;
   }
 
   bool _allowedProduct(String id) =>
       !applePurchasePlatform ||
-      (RegExp(r'^shelf_book_[3-8]$').hasMatch(id) &&
+      (RegExp(r'^shelf_book_[1-9][0-9]*$').hasMatch(id) &&
           (configuration['allowed_product_ids'] as List? ?? []).contains(id));
 
   Future<StorePurchaseResult> purchase(
@@ -353,7 +366,7 @@ class LibraryController extends ChangeNotifier with WidgetsBindingObserver {
         (ownedBookSandboxTest && !canTestOwnedAppleBook(book)) ||
         (owns(book.id) && !ownedBookSandboxTest))
       return StorePurchaseResult.failed;
-    if (product.id != book.productId || product.id != 'shelf_book_${book.id}')
+    if (product.id != _bookProductId(book) || product.price.trim().isEmpty)
       return StorePurchaseResult.failed;
     busy = true;
     notifyListeners();

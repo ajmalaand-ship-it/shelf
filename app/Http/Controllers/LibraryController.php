@@ -28,7 +28,7 @@ class LibraryController extends Controller
                     'real_checkout_enabled' => RevenueCatClient::productionEnabled(),
                     'sandbox_only' => ! RevenueCatClient::productionEnabled(), 'production_checkout_enabled' => \App\Services\Purchases\ApplePurchaseProof::customerCheckoutEnabled(),
                     'sandbox_checkout_enabled' => false, 'public_sdk_key' => $ready ? config('purchases.apple_public_sdk_key') : null,
-                    'allowed_product_ids' => \App\Services\Purchases\ApplePurchaseProof::PRODUCTS, 'consent' => PurchaseService::CONSENT,
+                    'allowed_product_ids' => \App\Services\Purchases\ApplePurchaseProof::catalogueProducts(), 'consent' => PurchaseService::CONSENT,
                     'purchase_session_version' => 2, 'offline_days' => 30, 'identity_prefix' => '']);
             }
             $ready = \App\Services\Purchases\ApplePurchaseProof::configured();
@@ -76,8 +76,7 @@ class LibraryController extends Controller
                     $reader = \App\Models\Reader::whereKey($r->user()->id)->lockForUpdate()->firstOrFail();
                     $book = Collection::whereKey($collection->id)->lockForUpdate()->firstOrFail();
                     abort_unless(\App\Services\Purchases\ApplePurchaseProof::customerAllowed($reader), 403);
-                    abort_unless(in_array($book->product_id, \App\Services\Purchases\ApplePurchaseProof::PRODUCTS, true)
-                        && $book->product_id === 'shelf_book_'.$book->id && $book->isPublished() && $book->price_usd > 0, 409);
+                    abort_unless($book->product_id === 'shelf_book_'.$book->id && $book->isPublished() && $book->price_usd > 0, 409);
                     abort_if(app(BookAccessService::class)->ownsBook($reader, $book), 409, 'This account already owns the book.');
                     DB::table('purchase_consents')->insert(['reader_id' => $reader->id, 'collection_id' => $book->id,
                         'store' => 'APP_STORE', 'wording' => PurchaseService::CONSENT, 'created_at' => now()]);

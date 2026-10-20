@@ -8,6 +8,7 @@ class PoetryCollection {
     required this.slug,
     this.id,
     this.productId,
+    this.storeProductIds,
     this.status,
     this.createdAt,
     this.categories = const [],
@@ -33,6 +34,7 @@ class PoetryCollection {
         title: _string(json, 'title', required: true)!,
         id: _integer(json, 'id'),
         productId: _string(json, 'product_id'),
+        storeProductIds: _storeProducts(json['store_product_ids']),
         status: _string(json, 'status'),
         createdAt: DateTime.tryParse(_string(json, 'created_at') ?? ''),
         categories: (json['categories'] as List? ?? [])
@@ -64,6 +66,11 @@ class PoetryCollection {
   String get displayStatus => status ?? (isActive ? 'published' : 'draft');
   final int? id;
   final String? productId;
+  final Map<String, String?>? storeProductIds;
+  // Legacy catalogues/caches have one shared permanent SKU. An explicit missing
+  // platform mapping must stay unavailable rather than fall back to another SKU.
+  String? productIdForStore(String store) =>
+      storeProductIds == null ? productId : storeProductIds![store];
   final String bookType;
   final String title;
   final String slug;
@@ -103,6 +110,7 @@ class PoetryCollection {
   Map<String, dynamic> toJson() => {
     'id': id,
     'product_id': productId,
+    if (storeProductIds != null) 'store_product_ids': storeProductIds,
     'status': status,
     'created_at': createdAt?.toIso8601String(),
     'categories': categories.map((category) => category.toJson()).toList(),
@@ -161,4 +169,19 @@ List<BookCredit> _credits(dynamic value) {
         return BookCredit.fromJson(entry);
       })
       .toList(growable: false);
+}
+
+Map<String, String?>? _storeProducts(dynamic value) {
+  if (value == null) return null;
+  if (value is! Map)
+    throw const FormatException('Invalid store product mappings');
+  final result = <String, String?>{};
+  for (final entry in value.entries) {
+    if (entry.key is! String ||
+        (entry.value != null && entry.value is! String)) {
+      throw const FormatException('Invalid store product mapping');
+    }
+    result[entry.key as String] = entry.value as String?;
+  }
+  return Map.unmodifiable(result);
 }

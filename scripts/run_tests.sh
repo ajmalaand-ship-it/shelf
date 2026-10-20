@@ -97,6 +97,9 @@ if "$run_mobile"; then
     if [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "ios-relay" ]]; then
         mobile_args=(test/apple_relay_rehearsal_test.dart)
         "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib/accounts/apple_relay_rehearsal.dart lib/accounts/account_screen.dart test/apple_relay_rehearsal_test.dart
+    elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "dynamic-purchases" ]]; then
+        mobile_args=(test/dynamic_book_products_test.dart test/ios_customer_purchases_test.dart test/ios_purchases_test.dart test/book_purchases_test.dart)
+        "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib/purchases lib/models/poetry_collection.dart lib/screens/collection_detail_screen.dart test/dynamic_book_products_test.dart test/ios_customer_purchases_test.dart
     elif [[ "${SHELF_MOBILE_TEST_SCOPE:-}" == "ios-purchases" ]]; then
         mobile_args=(test/ios_purchases_test.dart test/ios_customer_purchases_test.dart test/book_purchases_test.dart)
         "${FLUTTER_BIN:-/home/shelf/flutter/bin/flutter}" analyze --no-fatal-infos --no-fatal-warnings lib/purchases/book_purchase_provider.dart lib/purchases/library_controller.dart lib/purchases/purchase_screen.dart lib/screens/collection_detail_screen.dart test/ios_purchases_test.dart

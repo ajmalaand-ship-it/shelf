@@ -40,11 +40,12 @@ approval. Real checkout remains OFF. The app requires a matching store product;
 server consent, reader eligibility and independent purchase evidence still govern
 access. No product/approval/availability was created or changed by this batch.
 
-**Current essential iPhone limit:** installed shared purchase code accepts only
-shelf_book_3 through shelf_book_8; the Apple server verifier uses the same six-book
-allowlist. Future books can be independently added and prepared for both catalogues,
-but cannot yet be sold on iPhone without a separately authorized purchase-code
-update and build. This batch changes no mobile source or store configuration.
+**Installed-release boundary:** existing iPhone releases accept only the original
+six purchase IDs. The separate source-only dynamic-purchases improvement removes
+that restriction for future delivery; see [dynamic purchases](DYNAMIC_BOOK_PURCHASES.md).
+One future app update and a separately authorized backend rollout are still needed.
+After delivery, the normal Admin workflow and per-book store/RevenueCat setup need
+no Flutter edit or rebuild per book. Store registration and approval remain required.
 
 ## Reused evidence
 

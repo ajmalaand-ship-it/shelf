@@ -167,6 +167,13 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-19: Owner authorizes dynamic future-book purchase source on an isolated
+  development branch: catalogue-backed platform mappings, supported RevenueCat
+  StoreProduct lookup/price/purchase, existing secure server proof and focused tests.
+  Preserve Build 9 review source and Google closed-test release. Commit/push only
+  the development branch; no deployment, mobile build/upload, store changes or
+  release-branch merge. Each paid book still requires store registration/approval.
+
 - 2026-10-18: Owner approves editor@hindara.com as public contact/support and
   Shelf — شیلف copyright footer. Correct website/legal and mobile source;
   website-only safe deployment, no app builds or Apple submission/store changes.

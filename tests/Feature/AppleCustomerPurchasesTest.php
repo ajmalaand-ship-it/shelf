@@ -45,11 +45,11 @@ class AppleCustomerPurchasesTest extends TestCase
                 return Http::response(['id' => 'appAppleFixture', 'type' => 'app_store', 'project_id' => 'projFixture',
                     'app_store' => ['bundle_id' => 'services.shelf.app']]);
             }
-            if (preg_match('#/products/prod([3-8])$#', $path, $m)) {
+            if (preg_match('#/products/prod([1-9][0-9]*)$#', $path, $m)) {
                 return Http::response(['id' => 'prod'.$m[1], 'app_id' => 'appAppleFixture',
                     'store_identifier' => $this->wrongMapping ? 'unlock_all' : 'shelf_book_'.$m[1], 'type' => 'non_consumable']);
             }
-            if (preg_match('#/purchases/purch([3-8])/entitlements$#', $path, $m)) {
+            if (preg_match('#/purchases/purch([1-9][0-9]*)/entitlements$#', $path, $m)) {
                 return Http::response($this->listing([['object' => 'entitlement', 'state' => 'active', 'project_id' => 'projFixture',
                     'lookup_key' => $this->wrongEntitlement ? 'unlock_all' : 'shelf_book_'.$m[1]]]));
             }
@@ -99,6 +99,64 @@ class AppleCustomerPurchasesTest extends TestCase
         $this->postJson('/api/library/restore', [], $this->bearer())->assertOk()->assertJsonCount(6, 'books');
         $other = Reader::create(['email' => 'other@example.test']); $other->forceFill(['email_verified_at' => now()])->save();
         $this->getJson('/api/library/books/'.$this->books[8]->slug, $this->bearer($other))->assertNotFound();
+    }
+
+    public function test_future_catalogue_books_purchase_restore_refund_and_keep_identity_without_an_allowlist(): void
+    {
+        foreach ([9, 42, 125, 1001] as $id) {
+            $book = new Collection(['title' => 'Future fixture '.$id, 'status' => 'published', 'price_usd' => '4.99']);
+            $book->forceFill(['id' => $id])->save();
+            $this->books[$id] = $book;
+            $this->getJson('/api/collections/'.$book->slug)->assertOk()
+                ->assertJsonPath('data.store_product_ids.APP_STORE', 'shelf_book_'.$id)
+                ->assertJsonPath('data.store_product_ids.PLAY_STORE', 'shelf_book_'.$id);
+            $event = $this->prepare($id);
+            $this->webhook($event)->assertOk();
+            $this->webhook($event)->assertOk();
+            $this->assertTrue(app(BookAccessService::class)->ownsBook($this->reader, $book));
+        }
+        $this->getJson('/api/purchases/config?platform=ios')->assertJsonCount(10, 'allowed_product_ids');
+        $this->postJson('/api/library/restore', [], $this->bearer())->assertOk()->assertJsonCount(4, 'books');
+        $other = Reader::create(['email' => 'future-other@example.test']);
+        $other->forceFill(['email_verified_at' => now()])->save();
+        $this->getJson('/api/library/books/'.$this->books[1001]->slug, $this->bearer($other))->assertNotFound();
+        $this->books[1001]->changeStatus('withdrawn');
+        $this->getJson('/api/purchases/config?platform=ios')->assertJsonCount(9, 'allowed_product_ids');
+        $this->consent(1001, $other)->assertStatus(409);
+        $this->proofs[1001]['status'] = 'refunded';
+        $event = ['id' => 'future-refund', 'type' => 'CANCELLATION', 'environment' => 'PRODUCTION',
+            'store' => 'APP_STORE', 'app_id' => 'appAppleFixture', 'app_user_id' => (string) $this->reader->id,
+            'product_id' => 'shelf_book_1001', 'transaction_id' => $this->proofs[1001]['store_purchase_identifier'],
+            'purchased_at_ms' => $this->proofs[1001]['purchased_at'], 'event_timestamp_ms' => now()->getTimestampMs() + 1000];
+        $this->webhook($event)->assertOk();
+        $this->assertFalse(app(BookAccessService::class)->ownsBook($this->reader, $this->books[1001]));
+        $this->assertDatabaseCount('purchases', 4);
+        $this->assertSame(5, SalesLedger::count());
+    }
+
+    public function test_unknown_legacy_and_unverified_future_products_never_grant_access(): void
+    {
+        foreach (['shelf_book_9999', 'unlock_all', 'pitswal_unlock_all_v1', 'shelf_book_0', 'shelf_book_042', 'shelf_book_42_suffix'] as $id) {
+            $this->assertNull(ApplePurchaseProof::mappedBook($id));
+        }
+        $this->consent(9999)->assertNotFound();
+        $book = new Collection(['title' => 'Unverified future', 'status' => 'published', 'price_usd' => '4.99']);
+        $book->forceFill(['id' => 125])->save();
+        $this->books[125] = $book;
+        $event = $this->prepare(125);
+        $this->wrongMapping = true;
+        $this->webhook($event)->assertStatus(503);
+        $this->assertDatabaseCount('purchases', 0);
+        $this->wrongMapping = false;
+        $this->wrongEntitlement = true;
+        $this->webhook($event)->assertStatus(503);
+        $this->assertFalse(app(BookAccessService::class)->ownsBook($this->reader, $book));
+        $this->wrongEntitlement = false;
+        $this->providerFails = true;
+        $this->webhook($event)->assertStatus(503);
+        $this->assertDatabaseCount('sales_ledger', 0);
+        $book->update(['status' => 'draft']);
+        $this->consent(125)->assertStatus(409);
     }
 
     public function test_restore_confirms_each_book_from_rest_when_webhook_is_delayed(): void
