@@ -601,7 +601,28 @@ catalogue refresh. Existing production bin rows 350–355 remain unchanged; all
 172 untitled, six exact footnotes including flagged `(`. Keep Draft/credits/rights/
 cover/price/settings, other books, checkout/store controls and all release holds.
 No public publication, store product registration, mobile build or submission.
-Execution evidence follows after the verified rollout.
+**Completed 21 October UTC / 20 October local:** exact application commit
+**2dd64f660cb552cb9648c7a0310bea0b81d7596b** staged and promoted. Actual staging
+import/private preview/retry passed; unchanged **18 tests / 614 assertions** reused.
+Fresh production pre-import verified SQL/ZIP/SHA-256 backup:
+`/home/shelf/backups/shelf/20261021-005159/`, independently rechecked and passed.
+Promotion backup `/home/shelf/backups/shelf/20261021-005039/`; staging pre-import
+backup `/home/shelf/backups/shelf-staging/20261021-003104/`.
+Production data migration **batch 31** imported exactly **183** new works,
+IDs **356–538**, source order at sort positions **7–189**. **172 null titles**,
+11 source titles, all six footnotes and flagged literal `(` preserved. All new
+works hidden/no sample; book **13 remains Draft**. Six bin rows **350–355**,
+author/credits/rights/cover checksum/USD 3.99 price/settings and every other book
+and protected account/financial record stayed unchanged. All **19 actual private
+Admin preview pages** contain exact ordered bodies; guest denied/private no-store.
+Direct public collection/list/poem probes returned **404**. Actual production retry:
+“Already imported exactly; no changes.” Four original-source audit records kept.
+No live failure, rollback, publication, store registration, checkout activation,
+mobile build or submission. Ready for owner private review at
+https://shelf.services/admin/collections/13/preview . Full execution evidence and
+backup paths: [Bekasyar import receipt](BEKASYAR_IMPORT_EXECUTION_2026-10-21.md).
+Completion records are a later source-only commit; deployed release remains the
+identical staging/production application commit above.
 
 
 ## Admin book-publishing completion batch — 19 October 2026

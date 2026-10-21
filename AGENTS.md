@@ -175,6 +175,11 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
   original text, flagged `(`, 172 untitled works, six original bin records,
   Draft status, author/credits/rights/cover/price/settings and other books. Record,
   commit/push approved. No publication, checkout/store change or mobile build.
+  Completed: 2dd64f6 staged/promoted; production batch 31 imported 183 hidden works
+  into Draft 13 after verified backup /home/shelf/backups/shelf/20261021-005159/.
+  All bodies/order, 172 untitled works, 19 private preview pages and no-op retry
+  verified; six bin rows and all protected records unchanged. Ready for owner
+  review; literal `(` remains flagged. See Master Record and import receipt.
 
 
 - 2026-10-18: Owner approves editor@hindara.com as public contact/support and

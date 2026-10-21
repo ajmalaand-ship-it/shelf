@@ -1,5 +1,11 @@
 # Bekasyar Draft 13 — final import preparation
 
+**Execution update — 21 October UTC / 20 October local:** the owner-approved
+183-poem import is complete; Book 13 remains Draft and is ready for private
+review. See the [verified execution receipt](BEKASYAR_IMPORT_EXECUTION_2026-10-21.md).
+The remaining sections retain the historical preparation record before execution.
+
+
 **Final proposed count: 183 poems (48 + 47 + 77 + 11). Ready for owner approval; no live import executed.**
 
 This resolves the earlier dry run. Author عبدالمالک بېکسيار and existing book
