@@ -31,6 +31,16 @@ assert r['tables'][0]['rows'][0][1]['paragraphs']==['کيڼ']
 assert r['text_node_accounting_exact']
 r=doc('<w:p><w:r><w:t>الف</w:t><w:br/><w:t>***</w:t><w:br/><w:t>***</w:t></w:r></w:p>')
 assert len(r['poems'])==1 and len(r['empty_segments'])==2
+import sys
+sys.path.insert(0, 'scripts/book_import')
+from prepare_bekasyar import visual_table
+import xml.etree.ElementTree as ET
+xml='<w:tbl xmlns:w="'+m.NS+'"><w:tblPr><w:bidiVisual w:val="true"/></w:tblPr><w:tr>'
+for value in ['R1\nR2', '', 'L1\nL2']:
+    xml+='<w:tc><w:p><w:r>'+''.join('<w:t>'+x+'</w:t><w:br/>' for x in value.split('\n'))+'</w:r></w:p></w:tc>'
+xml+='</w:tr></w:tbl>'
+assert visual_table(ET.fromstring(xml))[:4]==['R1', '', 'L1', 'R2']
+assert [x for x in visual_table(ET.fromstring(xml)) if x]==['R1','L1','R2','L2']
 print('Logical separators, exact Unicode/whitespace, table cells, reference locations and empty segments passed.')
 PY;
         $process = new Process(['python3', '-B', '-c', $script], dirname(__DIR__, 2));
