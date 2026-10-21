@@ -632,7 +632,25 @@ requires a separately authorized purchase-code update/build and store product
 setup/approval. No claim of unlimited iPhone purchasing or store approval is made.
 Real checkout remains OFF; existing matching-store-product/consent/provider-evidence
 checks unchanged. No historical text, source original, credit/right, price, account,
-purchase or financial record is edited. Rollout/test results follow below.
+purchase or financial record is edited. Staging and production both deployed **cbbbb2ab8a642f912339fe0d67150cab3f9155b4**.
+Staging gate passed **84 PHP tests / 1,198 assertions** through scripts/run_tests.sh,
+including existing import/publication/catalogue and Apple/Google purchase checks;
+new owner preview tests verify owner-only access, no-store/private headers, escaped
+text, exact partial samples, hidden-item exclusion and pagination. All fixtures are
+isolated, with no live draft created. No Flutter tests/builds (mobile unchanged).
+Live staging isolation and production HTTPS checks passed, including six-book
+catalogue/cover, locked paid content, accounts/Library and denied private paths.
+Production purchase checks confirm no real payments enabled; complete reader,
+purchase, refund, ledger and agreement fingerprints stayed unchanged. Existing
+six-book D10 agreements passed. No schema migration was added; deployment’s normal
+migration check had nothing new to apply. Verified production backup:
+`/home/shelf/backups/shelf/20261020-005604/` (SQL, ZIP test and SHA-256 passed);
+staging backup `/home/shelf/backups/shelf-staging/20261020-005516/`.
+Maintenance lifted, production healthy, cPanel handler preserved. Rollback code:
+**957c57c550b1f6bec208e6f3191f7f00a04c176b**; no data rollback is needed for this
+read-only preview/guidance change. Initial local checks exposed checkout setup and
+an overly strict cache-header assertion; corrected before the passing staged gate.
+No live failure occurred.
 
 
 ## Public contact and footer correction — 19 October UTC / 18 October local 2026

@@ -77,7 +77,7 @@ void main() {
         );
         await tester.tap(find.byKey(const Key('open-support-email')));
         await tester.pumpAndSettle();
-        expect(calls.single, 'mailto:ajmalaand@gmail.com');
+        expect(calls.single, 'mailto:editor@hindara.com');
         expect(find.text(s.emailUnavailable), findsOneWidget);
         await tester.tap(find.byKey(const Key('copy-contact-address')));
         await tester.pumpAndSettle();
@@ -111,7 +111,7 @@ void main() {
       (_) async => throw PlatformException(code: 'unavailable'),
     );
     expect(
-      await openShelfExternal(Uri.parse('mailto:ajmalaand@gmail.com')),
+      await openShelfExternal(Uri.parse('mailto:editor@hindara.com')),
       isFalse,
     );
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
