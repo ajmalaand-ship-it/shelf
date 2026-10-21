@@ -669,9 +669,77 @@ def admin_publishing_checked(app, commit, changes):
     return True
 
 
+def bekasyar_import_checked(app, commit, changes):
+    if 'app/Console/Commands/ImportBekasyarBook.php' not in changes:
+        return False
+    allowed = {
+        'app/Console/Commands/ImportBekasyarBook.php',
+        'app/Support/WordImport/BekasyarImport.php',
+        'app/Support/WordImport/ReviewedBekasyarReader.php',
+        'tests/Feature/BekasyarImportTest.php', 'tests/Feature/BekasyarDryRunTest.php',
+        'scripts/staging/workflow.py', 'AGENTS.md',
+    }
+    if any(p not in allowed and not p.startswith(('docs/', 'scripts/book_import/')) for p in changes):
+        raise RuntimeError('Release exceeds the approved Bekasyar import scope.')
+    proof = 'e0ce2e72f03a58953716ae26a8648901960c97bc'
+    exact = sorted(allowed - {'scripts/staging/workflow.py', 'AGENTS.md'}) + [
+        'app/Support/WordImport/ImportWordDocument.php', 'app/Support/WordImport/DocxReader.php',
+        'app/Models/Poem.php', 'app/Models/Collection.php', 'tests/Feature/WordImportTest.php',
+        'app/Filament/Resources/Collections/Pages/PreviewCollection.php',
+        'resources/views/filament/books/preview.blade.php',
+    ]
+    if run(['git','diff','--name-only',proof,commit,'--',*exact]).strip():
+        raise RuntimeError('Validated import dependencies changed; test reuse refused.')
+    root = Path('/home/shelf/tmp/bekasyar-import-20261020')
+    manifest = root/'final/manifest.json'
+    archive = Path('/home/shelf/tmp/Shelf_Word_Files_Converted_DOCX.zip')
+    approved = '5afdd6c4292cf73cac9a341b199e7129aa68c734e85bac26b120dc3be0344e6f'
+    if hashlib.sha256(manifest.read_bytes()).hexdigest()!=approved or hashlib.sha256(archive.read_bytes()).hexdigest()!='76b49b2c0ae5d21be7b5dff760925c76df67500654a6881e243709e95de2678f':
+        raise RuntimeError('Approved source/manifest changed; no staging mutation.')
+    has_book = php(app, r'''$app=require $argv[1].'/bootstrap/app.php';$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();echo App\Models\Collection::withTrashed()->whereKey(13)->exists() ? 'yes':'no';''').strip()
+    lines = ['REUSED: '+proof+'; 18 tests / 614 assertions; exact importer/model/reader/test blobs unchanged.']
+    if has_book=='no':
+        backup(app)
+        lines.append(artisan(app,'migrate','--force','--path=scripts/book_import/migrations/2026_10_21_000000_copy_bekasyar_draft_to_staging.php'))
+        fixture=json.loads((root/'staging-fixture.json').read_text())
+        relative=Path(fixture['baseline']['book']['cover_image'])
+        if relative.is_absolute() or '..' in relative.parts:
+            raise RuntimeError('Unsafe Draft cover path.')
+        source=PRODUCTION/'storage/app/private/covers'/relative
+        target=RUNTIME/'storage/app/private/covers'/relative
+        if target.exists() or target.is_symlink():
+            raise RuntimeError('Staging Draft cover destination already exists.')
+        target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(source,target);target.chmod(0o600)
+        if source.stat().st_ino==target.stat().st_ino or hashlib.sha256(source.read_bytes()).digest()!=hashlib.sha256(target.read_bytes()).digest():
+            raise RuntimeError('Staging Draft cover copy mismatch.')
+        lines.append('PASS: add-only reversible staging Draft/author/bin copy; other books untouched; cover independently copied.')
+    verify = app/'scripts/book_import/verify_bekasyar.php'
+    if not (root/'staging-preservation-before.json').exists():
+        lines.append(run(['php',str(verify),str(app),'checkpoint','staging'],app))
+    args=['shelf:import-bekasyar',str(manifest),str(archive),'--approved-sha256='+approved]
+    lines.append(artisan(app,*args))
+    lines.append(artisan(app,*args,'--apply'))
+    lines.append(run(['php',str(verify),str(app),'verify','staging'],app))
+    lines.append(artisan(app,*args,'--apply'))
+    https_checks()
+    log=RUNTIME/('checks-'+commit+'.log')
+    private_write(log,'\n'.join(lines)+'\nPASS: staging import and retry verified; existing isolation probes passed.\n')
+    state=current_state()
+    state.update(staging_commit=commit,checks={'commit':commit,'passed':True,
+        'checked_at':datetime.now(timezone.utc).isoformat(),'mobile_tests':False,
+        'scope':'bekasyar-reviewed-import','reused_tests':proof,
+        'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+    save_state(state)
+    print('PASS: unchanged 18-test evidence reused; 183-poem staging import, all private preview pages, retry and protected records verified.',flush=True)
+    return True
+
+
 def checked(app, commit, initial=False):
     previous = current_state().get('production_commit')
     changes = run(['git', 'diff', '--name-only', previous, commit], SOURCE).splitlines() if previous else []
+    if bekasyar_import_checked(app, commit, changes):
+        return
     if admin_publishing_checked(app, commit, changes):
         return
     if website_checked(app, commit, changes):

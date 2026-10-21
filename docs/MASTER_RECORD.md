@@ -584,6 +584,26 @@ build, deployment, purchase, provider setting change or release.
 
 # Part 10 — Current status
 
+## Approved Bekasyar Draft import — 20 October 2026
+
+Owner approves execution of the reviewed **183-poem** import into existing Draft
+**13**, دا ته د کومو غرونو شور يې؟ / عبدالمالک بېکسيار. Approved immutable manifest
+SHA-256 `5afdd6c4292cf73cac9a341b199e7129aa68c734e85bac26b120dc3be0344e6f`;
+original ZIP SHA-256 `76b49b2c0ae5d21be7b5dff760925c76df67500654a6881e243709e95de2678f`.
+Source-evidenced separate ژوند corrects the earlier separator-only count from 182.
+Reuse prepared e0ce2e7 importer and **18 tests / 614 assertions** without rerun.
+Staging-first exact-code deployment and actual import/preview/retry verification,
+fresh verified production backup, guarded Artisan import and final preservation
+checks are authorized. Staging lacks Draft 13: copy only that baseline, its author,
+cover and six bin records through a staging-only reversible migration; no broad
+catalogue refresh. Existing production bin rows 350–355 remain unchanged; all
+183 new works are hidden, no sample, original source order and exact text,
+172 untitled, six exact footnotes including flagged `(`. Keep Draft/credits/rights/
+cover/price/settings, other books, checkout/store controls and all release holds.
+No public publication, store product registration, mobile build or submission.
+Execution evidence follows after the verified rollout.
+
+
 ## Admin book-publishing completion batch — 19 October 2026
 
 Owner authorizes practical completion using existing Admin/catalogue work, isolated

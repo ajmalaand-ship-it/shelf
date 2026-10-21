@@ -167,6 +167,16 @@ commit. Never develop in the running production checkout. Use docs/STAGING.md.
 
 ## 8. Owner decisions
 
+- 2026-10-20: Owner approves executing the final 183-poem Bekasyar import into
+  existing Draft 13 using the prepared e0ce2e7 importer and unchanged 18 tests /
+  614 assertions. Stage exact code and verify actual import/private preview/retry;
+  copy only absent staging Draft/author/cover/six bin rows by reversible migration.
+  Fresh verified production backup before guarded Artisan import. Preserve all
+  original text, flagged `(`, 172 untitled works, six original bin records,
+  Draft status, author/credits/rights/cover/price/settings and other books. Record,
+  commit/push approved. No publication, checkout/store change or mobile build.
+
+
 - 2026-10-18: Owner approves editor@hindara.com as public contact/support and
   Shelf — شیلف copyright footer. Correct website/legal and mobile source;
   website-only safe deployment, no app builds or Apple submission/store changes.
